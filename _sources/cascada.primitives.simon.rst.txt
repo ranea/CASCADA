@@ -1,0 +1,6 @@
+cascada.primitives.simon module
+===============================
+
+.. automodule:: cascada.primitives.simon
+   :members:
+   :show-inheritance:

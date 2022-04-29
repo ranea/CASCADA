@@ -1,0 +1,6 @@
+cascada.bitvector.operation module
+==================================
+
+.. automodule:: cascada.bitvector.operation
+   :members:
+   :show-inheritance:

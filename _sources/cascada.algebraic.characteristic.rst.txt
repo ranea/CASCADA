@@ -1,0 +1,6 @@
+cascada.algebraic.characteristic module
+=======================================
+
+.. automodule:: cascada.algebraic.characteristic
+   :members:
+   :show-inheritance:

@@ -1,0 +1,6 @@
+cascada.primitives.picipher module
+==================================
+
+.. automodule:: cascada.primitives.picipher
+   :members:
+   :show-inheritance:

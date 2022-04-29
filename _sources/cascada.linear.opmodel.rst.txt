@@ -1,0 +1,6 @@
+cascada.linear.opmodel module
+=============================
+
+.. automodule:: cascada.linear.opmodel
+   :members:
+   :show-inheritance:

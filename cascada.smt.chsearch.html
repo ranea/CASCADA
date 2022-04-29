@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cascada.smt.chsearch module &mdash; CASCADA 1.0.rc0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="cascada.smt.invalidpropsearch module" href="cascada.smt.invalidpropsearch.html" />
+    <link rel="prev" title="cascada.smt.pysmttypes module" href="cascada.smt.pysmttypes.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> CASCADA
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">CASCADA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="primitives_implemented.html">Primitives implemented</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="cascada.html">API reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="cascada.bitvector.html">cascada.bitvector module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.primitives.html">cascada.primitives module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.abstractproperty.html">cascada.abstractproperty module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.differential.html">cascada.differential module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.linear.html">cascada.linear module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.algebraic.html">cascada.algebraic module</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="cascada.smt.html">cascada.smt module</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="cascada.smt.pysmttypes.html">cascada.smt.pysmttypes module</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">cascada.smt.chsearch module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.smt.invalidpropsearch.html">cascada.smt.invalidpropsearch module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.smt.wrappedchmodel.html">cascada.smt.wrappedchmodel module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">CASCADA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="cascada.html">API reference</a> &raquo;</li>
+          <li><a href="cascada.smt.html">cascada.smt module</a> &raquo;</li>
+      <li>cascada.smt.chsearch module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/cascada.smt.chsearch.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-cascada.smt.chsearch">
+<span id="cascada-smt-chsearch-module"></span><h1>cascada.smt.chsearch module<a class="headerlink" href="#module-cascada.smt.chsearch" title="Permalink to this headline"></a></h1>
+<p>Search for characteristics by modeling the search as a sequence of SMT problems.</p>
+<dl class="py data">
+<dt class="sig sig-object py" id="cascada.smt.chsearch.INCREMENT_NUM_ROUNDS">
+<span class="sig-prename descclassname"><span class="pre">cascada.smt.chsearch.</span></span><span class="sig-name descname"><span class="pre">INCREMENT_NUM_ROUNDS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'increment_num_rounds'</span></em><a class="headerlink" href="#cascada.smt.chsearch.INCREMENT_NUM_ROUNDS" title="Permalink to this definition"></a></dt>
+<dd><p>Message to increase the current number of rounds by one (see <a class="reference internal" href="#cascada.smt.chsearch.round_based_ch_search" title="cascada.smt.chsearch.round_based_ch_search"><code class="xref any py py-func docutils literal notranslate"><span class="pre">round_based_ch_search</span></code></a>)</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.smt.chsearch.ChModelAssertType">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.smt.chsearch.</span></span><span class="sig-name descname"><span class="pre">ChModelAssertType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/smt/chsearch.html#ChModelAssertType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.smt.chsearch.ChModelAssertType" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
+<p>Represent the options available for the type of constraints
+of the characteristic model.</p>
+<p>See also <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel" title="cascada.abstractproperty.chmodel.ChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.chmodel.ChModel</span></code></a>.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.smt.chsearch.ChModelAssertType.ValidityAndWeight">
+<span class="sig-name descname"><span class="pre">ValidityAndWeight</span></span><a class="headerlink" href="#cascada.smt.chsearch.ChModelAssertType.ValidityAndWeight" title="Permalink to this definition"></a></dt>
+<dd><p>consider <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel.validity_assertions" title="cascada.abstractproperty.chmodel.ChModel.validity_assertions"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">abstractproperty.chmodel.ChModel.validity_assertions</span></code></a>
+and <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel.weight_assertions" title="cascada.abstractproperty.chmodel.ChModel.weight_assertions"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">abstractproperty.chmodel.ChModel.weight_assertions</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.smt.chsearch.ChModelAssertType.ProbabilityOne">
+<span class="sig-name descname"><span class="pre">ProbabilityOne</span></span><a class="headerlink" href="#cascada.smt.chsearch.ChModelAssertType.ProbabilityOne" title="Permalink to this definition"></a></dt>
+<dd><p>only consider <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel.pr_one_assertions" title="cascada.abstractproperty.chmodel.ChModel.pr_one_assertions"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">abstractproperty.chmodel.ChModel.pr_one_assertions</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.smt.chsearch.ChModelAssertType.Validity">
+<span class="sig-name descname"><span class="pre">Validity</span></span><a class="headerlink" href="#cascada.smt.chsearch.ChModelAssertType.Validity" title="Permalink to this definition"></a></dt>
+<dd><p>only consider <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel.validity_assertions" title="cascada.abstractproperty.chmodel.ChModel.validity_assertions"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">abstractproperty.chmodel.ChModel.validity_assertions</span></code></a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.smt.chsearch.PrintingMode">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.smt.chsearch.</span></span><span class="sig-name descname"><span class="pre">PrintingMode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/smt/chsearch.html#PrintingMode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.smt.chsearch.PrintingMode" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
+<p>Represent the options available for the information to print.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.smt.chsearch.PrintingMode.Silent">
+<span class="sig-name descname"><span class="pre">Silent</span></span><a class="headerlink" href="#cascada.smt.chsearch.PrintingMode.Silent" title="Permalink to this definition"></a></dt>
+<dd><p>nothing is printed</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.smt.chsearch.PrintingMode.WeightsAndSrepr">
+<span class="sig-name descname"><span class="pre">WeightsAndSrepr</span></span><a class="headerlink" href="#cascada.smt.chsearch.PrintingMode.WeightsAndSrepr" title="Permalink to this definition"></a></dt>
+<dd><p>prints every time the target weight is increased
+or the final weight is modified, and prints the
+<a class="reference internal" href="cascada.abstractproperty.characteristic.html#cascada.abstractproperty.characteristic.Characteristic.srepr" title="cascada.abstractproperty.characteristic.Characteristic.srepr"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">abstractproperty.characteristic.Characteristic.srepr</span></code></a> method
+of all non-returned characteristics (together with the current time)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.smt.chsearch.PrintingMode.WeightsAndVrepr">
+<span class="sig-name descname"><span class="pre">WeightsAndVrepr</span></span><a class="headerlink" href="#cascada.smt.chsearch.PrintingMode.WeightsAndVrepr" title="Permalink to this definition"></a></dt>
+<dd><p>similar as <a class="reference internal" href="#cascada.smt.chsearch.PrintingMode.WeightsAndSrepr" title="cascada.smt.chsearch.PrintingMode.WeightsAndSrepr"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">WeightsAndSrepr</span></code></a>, but the
+<a class="reference internal" href="cascada.abstractproperty.characteristic.html#cascada.abstractproperty.characteristic.Characteristic.vrepr" title="cascada.abstractproperty.characteristic.Characteristic.vrepr"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">abstractproperty.characteristic.Characteristic.vrepr</span></code></a> method is
+printed instead.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.smt.chsearch.PrintingMode.Debug">
+<span class="sig-name descname"><span class="pre">Debug</span></span><a class="headerlink" href="#cascada.smt.chsearch.PrintingMode.Debug" title="Permalink to this definition"></a></dt>
+<dd><p>similar as <a class="reference internal" href="#cascada.smt.chsearch.PrintingMode.WeightsAndSrepr" title="cascada.smt.chsearch.PrintingMode.WeightsAndSrepr"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">WeightsAndSrepr</span></code></a>, but also prints all
+the constraints generated during the search</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="cascada.smt.chsearch.MissingVarWarning">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.smt.chsearch.</span></span><span class="sig-name descname"><span class="pre">MissingVarWarning</span></span><a class="reference internal" href="_modules/cascada/smt/chsearch.html#MissingVarWarning"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.smt.chsearch.MissingVarWarning" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#UserWarning" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">UserWarning</span></code></a></p>
+<p>The class of warnings when a variable from an additional constraint
+is missing in the SMT problem (see <a class="reference internal" href="#cascada.smt.chsearch.ChFinder" title="cascada.smt.chsearch.ChFinder"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChFinder</span></code></a>).</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.smt.chsearch.ChFinder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.smt.chsearch.</span></span><span class="sig-name descname"><span class="pre">ChFinder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ch_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assert_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_constraints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_zero_input_prop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var_prop2ct_prop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raise_exception_missing_var</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">printing_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">PrintingMode.Silent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'w'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/smt/chsearch.html#ChFinder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.smt.chsearch.ChFinder" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Search for characteristics by modeling the search as a sequence of SMT problems.</p>
+<p>Given a characteristic model (<a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel" title="cascada.abstractproperty.chmodel.ChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.chmodel.ChModel</span></code></a>
+o <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.EncryptionChModel" title="cascada.abstractproperty.chmodel.EncryptionChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.chmodel.EncryptionChModel</span></code></a>)
+defined for a particular <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> (e.g., <a class="reference internal" href="cascada.differential.difference.html#cascada.differential.difference.XorDiff" title="cascada.differential.difference.XorDiff"><code class="xref any py py-class docutils literal notranslate"><span class="pre">XorDiff</span></code></a> or <a class="reference internal" href="cascada.linear.mask.html#cascada.linear.mask.LinearMask" title="cascada.linear.mask.LinearMask"><code class="xref any py py-class docutils literal notranslate"><span class="pre">LinearMask</span></code></a>),
+this class finds characteristics
+(<a class="reference internal" href="cascada.abstractproperty.characteristic.html#cascada.abstractproperty.characteristic.Characteristic" title="cascada.abstractproperty.characteristic.Characteristic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.characteristic.Characteristic</span></code></a>
+o <a class="reference internal" href="cascada.abstractproperty.characteristic.html#cascada.abstractproperty.characteristic.EncryptionCharacteristic" title="cascada.abstractproperty.characteristic.EncryptionCharacteristic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.characteristic.EncryptionCharacteristic</span></code></a>)
+satisfying the characteristic model by modelling the search as a sequence
+of SMT problems in the bit-vector theory.</p>
+<p>Depending on <code class="docutils literal notranslate"><span class="pre">assert_type</span></code>, the SMT problems contains the validity,
+probability-one and/or weight assertions from the
+<a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel" title="cascada.abstractproperty.chmodel.ChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.chmodel.ChModel</span></code></a>.
+They might also contain a constraint fixing the
+characteristic weight variable to a constant value
+(in the case of <a class="reference internal" href="#cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight" title="cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">find_next_ch_increasing_weight</span></code></a>) or
+additional constraints provided in <code class="docutils literal notranslate"><span class="pre">initial_constraints</span></code>
+or derived from <code class="docutils literal notranslate"><span class="pre">var2ct_prop</span></code> or <code class="docutils literal notranslate"><span class="pre">exclude_zero_input_prop</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The optional initialization argument <code class="docutils literal notranslate"><span class="pre">var2ct_prop</span></code> is a
+<a class="reference external" href="https://docs.python.org/3/library/collections.html#collections.OrderedDict" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">collections.OrderedDict</span></code></a> mapping symbolic properties
+of the characteristic model to constant values.
+From each <code class="docutils literal notranslate"><span class="pre">(sp,</span> <span class="pre">cp)</span></code> pair in  <code class="docutils literal notranslate"><span class="pre">var2ct_prop</span></code>,
+where <code class="docutils literal notranslate"><span class="pre">sp</span></code> is a symbolic <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> and <code class="docutils literal notranslate"><span class="pre">cp</span></code> a constant <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a>,
+the constraint <code class="docutils literal notranslate"><span class="pre">sp</span> <span class="pre">==</span> <span class="pre">cp</span></code> is added to <code class="docutils literal notranslate"><span class="pre">initial_constraints</span></code>.
+The dictionary <code class="docutils literal notranslate"><span class="pre">var2ct_prop</span></code> can also be filled with
+pairs of symbolic <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term" title="cascada.bitvector.core.Term"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Term</span></code></a> and <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Constant" title="cascada.bitvector.core.Constant"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a> objects;
+in this case, they are first automatically converted to
+<a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> objects.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">exclude_zero_input_prop</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>, and additional
+constraint is added preventing the input property to be zero.</p>
+<p>By defaut, an exception is raised if an additional constraint
+(one of the constraint from <code class="docutils literal notranslate"><span class="pre">initial_constraints</span></code> or one of the
+constraints derived from <code class="docutils literal notranslate"><span class="pre">var2ct_prop</span></code> or <code class="docutils literal notranslate"><span class="pre">exclude_zero_input_prop</span></code>)
+contains a variable that does not appear in the SMT problem
+(i.e., <a class="reference internal" href="#cascada.smt.chsearch.ChFinder.chmodel_asserts" title="cascada.smt.chsearch.ChFinder.chmodel_asserts"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">chmodel_asserts</span></code></a>).
+If the initialization argument <code class="docutils literal notranslate"><span class="pre">raise_exception_missing_var</span></code> is False,
+a warning with category <a class="reference internal" href="#cascada.smt.chsearch.MissingVarWarning" title="cascada.smt.chsearch.MissingVarWarning"><code class="xref any py py-exc docutils literal notranslate"><span class="pre">MissingVarWarning</span></code></a> is printed
+instead of raising an exception.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">ch_model</span></code> is an algebraic characteristic model (defined for
+the property <a class="reference internal" href="cascada.algebraic.value.html#cascada.algebraic.value.BitValue" title="cascada.algebraic.value.BitValue"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BitValue</span></code></a> or <a class="reference internal" href="cascada.algebraic.value.html#cascada.algebraic.value.WordValue" title="cascada.algebraic.value.WordValue"><code class="xref any py py-class docutils literal notranslate"><span class="pre">WordValue</span></code></a>), the assertion type
+<a class="reference internal" href="#cascada.smt.chsearch.ChModelAssertType.ValidityAndWeight" title="cascada.smt.chsearch.ChModelAssertType.ValidityAndWeight"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">ValidityAndWeight</span></code></a> in  <code class="docutils literal notranslate"><span class="pre">assert_type</span></code> is not supported
+(and <a class="reference internal" href="#cascada.smt.chsearch.ChModelAssertType.Validity" title="cascada.smt.chsearch.ChModelAssertType.Validity"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">Validity</span></code></a> and <a class="reference internal" href="#cascada.smt.chsearch.ChModelAssertType.ProbabilityOne" title="cascada.smt.chsearch.ChModelAssertType.ProbabilityOne"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">ProbabilityOne</span></code></a> are
+equivalent due to the definition of characteristic probability,
+see also <a class="reference internal" href="cascada.algebraic.chmodel.html#cascada.algebraic.chmodel.ChModel" title="cascada.algebraic.chmodel.ChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">algebraic.chmodel.ChModel</span></code></a>).</p>
+<p>If the algebraic characteristic model does not contain
+external variables and a ciphertext value is provided in
+<code class="docutils literal notranslate"><span class="pre">var2ct_prop</span></code> or <code class="docutils literal notranslate"><span class="pre">initial_constraints</span></code>, then the
+search for algebraic characteristics is equivalent to the
+search for preimages of the given ciphertext value.
+On the other hand, if the algebraic characteristic model
+contains external variables (e.g., round keys) and a
+plaintext-ciphertext pair is provided in
+<code class="docutils literal notranslate"><span class="pre">var2ct_prop</span></code> or <code class="docutils literal notranslate"><span class="pre">initial_constraints</span></code>, then the
+search for algebraic characteristics is equivalent to the
+search for the external values (e.g., round keys)
+that make the underlying bit-vector function maps
+the given plaintext to the given ciphertext.</p>
+</div>
+<p>The SMT problems are solved through <a class="reference external" href="https://github.com/pysmt/pysmt">pySMT</a>, which calls an
+off-the-shelf SMT solver supported by pySMT given by <code class="docutils literal notranslate"><span class="pre">solver_name</span></code>
+(e.g., <code class="docutils literal notranslate"><span class="pre">solver_name='btor'</span></code> sets <a class="reference external" href="https://boolector.github.io">Boolector</a> as the SMT solver).
+The pySMT <a class="reference external" href="https://github.com/pysmt/pysmt">documentation</a> explains how to install an SMT solver.</p>
+<p>This class provides two methods to search for characteristics:
+<a class="reference internal" href="#cascada.smt.chsearch.ChFinder.find_next_ch" title="cascada.smt.chsearch.ChFinder.find_next_ch"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">find_next_ch</span></code></a> and <a class="reference internal" href="#cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight" title="cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">find_next_ch_increasing_weight</span></code></a>.
+Both methods are Python <a class="reference external" href="https://docs.python.org/3/glossary.html#term-generator" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">generator</span></code></a> functions, returning an <a class="reference external" href="https://docs.python.org/3/glossary.html#term-iterator" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">iterator</span></code></a> that
+yields the <a class="reference internal" href="cascada.abstractproperty.characteristic.html#cascada.abstractproperty.characteristic.Characteristic" title="cascada.abstractproperty.characteristic.Characteristic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.characteristic.Characteristic</span></code></a> objects
+found in the search (see also <a class="reference external" href="https://docs.python.org/3/howto/functional.html?highlight=generator#generators">this</a>).
+The characteristics returned are defined for
+the <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> of the characteristic model.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The characteristics can be obtained in a for-loop over the iterator
+or retrieved one at a time with the <a class="reference external" href="https://docs.python.org/3/library/functions.html#next" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">next</span></code></a> function, that is,</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="o">...</span><span class="p">]</span>
+<span class="n">ch_finder</span> <span class="o">=</span> <span class="n">ChFinder</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="n">iterator</span> <span class="o">=</span> <span class="n">ch_finder</span><span class="o">.</span><span class="n">search_all</span><span class="p">()</span>
+<span class="n">first_ch_found</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">iterator</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">next_ch_found</span> <span class="ow">in</span> <span class="n">iterator</span><span class="p">:</span>
+    <span class="p">[</span><span class="o">...</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>If <a class="reference external" href="https://docs.python.org/3/library/functions.html#next" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">next</span></code></a> is used but not characteristic is found,
+an <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#StopIteration" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">StopIteration</span></code></a> exception is raised.</p>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># example of SMT problem of XorDiff-EncryptionCharacteristic of Speck32</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.difference</span> <span class="kn">import</span> <span class="n">XorDiff</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.chmodel</span> <span class="kn">import</span> <span class="n">EncryptionChModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.smt.chsearch</span> <span class="kn">import</span> <span class="n">ChFinder</span><span class="p">,</span> <span class="n">ChModelAssertType</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">speck</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model</span> <span class="o">=</span> <span class="n">EncryptionChModel</span><span class="p">(</span><span class="n">Speck32</span><span class="p">,</span> <span class="n">XorDiff</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">assert_type</span> <span class="o">=</span> <span class="n">ChModelAssertType</span><span class="o">.</span><span class="n">ValidityAndWeight</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_finder</span> <span class="o">=</span> <span class="n">ChFinder</span><span class="p">(</span><span class="n">ch_model</span><span class="p">,</span> <span class="n">assert_type</span><span class="p">,</span> <span class="s2">&quot;btor&quot;</span><span class="p">,</span> <span class="n">exclude_zero_input_prop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">solver_seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_finder</span><span class="o">.</span><span class="n">formula_size</span><span class="p">()</span>
+<span class="go">801</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">ch_finder</span><span class="o">.</span><span class="n">hrepr</span><span class="p">(</span><span class="n">full_repr</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>  
+<span class="go">; initial constraints</span>
+<span class="go">assert ~((dp0 :: dp1) == 0x00000000)</span>
+<span class="go">; characteristic model assertions</span>
+<span class="go">assert ((~(... &lt;&lt; ...) ^ (dp1 &lt;&lt; 0x0001)) &amp; (~(... &lt;&lt; ...) ^ (dx1 &lt;&lt; 0x0001)) &amp;</span>
+<span class="go">    ((... &gt;&gt;&gt; ...) ^ dp1 ^ dx1 ^ ((dp0 &gt;&gt;&gt; 7) &lt;&lt; 0x0001))) == 0x0000</span>
+<span class="go">assert ((~(... &lt;&lt; ...) ^ ((... ^ ...) &lt;&lt; 0x0001)) &amp; (~(... &lt;&lt; ...) ^ (dx6 &lt;&lt; 0x0001)) &amp;</span>
+<span class="go">    ((... &gt;&gt;&gt; ...) ^ ... ^ ... ^ dx6 ^ ((dx1 &gt;&gt;&gt; 7) &lt;&lt; 0x0001))) == 0x0000</span>
+<span class="go">assert dx6 == dx7_out</span>
+<span class="go">assert ((((dp1 &lt;&lt;&lt; 2) ^ dx1) &lt;&lt;&lt; 2) ^ dx6) == dx9_out</span>
+<span class="go">assert w0 == PopCount(~((~... ^ dp1) &amp; (~... ^ dx1))[14:])</span>
+<span class="go">assert w1 == PopCount(~((~... ^ ... ^ ...) &amp; (~... ^ dx6))[14:])</span>
+<span class="go">assert w2 == 0b0</span>
+<span class="go">assert w3 == 0b0</span>
+<span class="go">assert w == ((0b0 :: w0) + (0b0 :: w1))</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># example of SMT problem of LinearMask-Characteristic of Speck32.key_schedule</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.linear.mask</span> <span class="kn">import</span> <span class="n">LinearMask</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.linear.chmodel</span> <span class="kn">import</span> <span class="n">ChModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.smt.chsearch</span> <span class="kn">import</span> <span class="n">ChFinder</span><span class="p">,</span> <span class="n">ChModelAssertType</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">speck</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32_KS</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span><span class="o">.</span><span class="n">key_schedule</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32_KS</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model</span> <span class="o">=</span> <span class="n">ChModel</span><span class="p">(</span><span class="n">Speck32_KS</span><span class="p">,</span> <span class="n">LinearMask</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;mk0&quot;</span><span class="p">,</span> <span class="s2">&quot;mk1&quot;</span><span class="p">,</span> <span class="s2">&quot;mk2&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v2c</span> <span class="o">=</span> <span class="p">{</span><span class="n">ch_model</span><span class="o">.</span><span class="n">input_mask</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">16</span><span class="p">)}</span>  <span class="c1"># setting input_mask[2] to 0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">at</span> <span class="o">=</span> <span class="n">ChModelAssertType</span><span class="o">.</span><span class="n">ProbabilityOne</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_finder</span> <span class="o">=</span> <span class="n">ChFinder</span><span class="p">(</span><span class="n">ch_model</span><span class="p">,</span> <span class="n">at</span><span class="p">,</span> <span class="s2">&quot;btor&quot;</span><span class="p">,</span> <span class="n">var_prop2ct_prop</span><span class="o">=</span><span class="n">v2c</span><span class="p">,</span> <span class="n">solver_seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_finder</span><span class="o">.</span><span class="n">formula_size</span><span class="p">()</span>
+<span class="go">80</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">ch_finder</span><span class="o">.</span><span class="n">hrepr</span><span class="p">(</span><span class="n">full_repr</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>  
+<span class="go">; initial constraints</span>
+<span class="go">assert mk2 == 0x0000</span>
+<span class="go">; characteristic model assertions</span>
+<span class="go">assert (~((mx1 ^ (... &gt;&gt;&gt; ...)) | (mx1 ^ mk2__0)) == 0xffff) &amp;</span>
+<span class="go">    (((mx1 ^ (mk1 &gt;&gt;&gt; 7) ^ mk2__0)[:1]) == 0b000000000000000)</span>
+<span class="go">assert ((mk2__1 &lt;&lt;&lt; 2) == mx1) &amp; ((mk2__1 &lt;&lt;&lt; 2) == mx3)</span>
+<span class="go">assert (~((mx5 ^ (... &gt;&gt;&gt; ...)) | (mx5 ^ mx3__0)) == 0xffff) &amp;</span>
+<span class="go">    (((mx5 ^ (mk0 &gt;&gt;&gt; 7) ^ mx3__0)[:1]) == 0b000000000000000)</span>
+<span class="go">assert ((mx3__1 &lt;&lt;&lt; 2) == mx5) &amp; ((mx3__1 &lt;&lt;&lt; 2) == mx8)</span>
+<span class="go">assert (mk2 ^ mk2__0 ^ mk2__1) == mk2_out</span>
+<span class="go">assert (mx3 ^ mx3__0 ^ mx3__1) == mx3_out</span>
+<span class="go">assert mx8 == mx8_out</span>
+</pre></div>
+</div>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.smt.chsearch.ChFinder.ch_model">
+<span class="sig-name descname"><span class="pre">ch_model</span></span><a class="headerlink" href="#cascada.smt.chsearch.ChFinder.ch_model" title="Permalink to this definition"></a></dt>
+<dd><p>the underlying characteristic model (a subclass of
+<a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel" title="cascada.abstractproperty.chmodel.ChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.chmodel.ChModel</span></code></a> or
+<a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.EncryptionChModel" title="cascada.abstractproperty.chmodel.EncryptionChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.chmodel.EncryptionChModel</span></code></a>)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.smt.chsearch.ChFinder.assert_type">
+<span class="sig-name descname"><span class="pre">assert_type</span></span><a class="headerlink" href="#cascada.smt.chsearch.ChFinder.assert_type" title="Permalink to this definition"></a></dt>
+<dd><p>the type of assertions (an element from <a class="reference internal" href="#cascada.smt.chsearch.ChModelAssertType" title="cascada.smt.chsearch.ChModelAssertType"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChModelAssertType</span></code></a>)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.smt.chsearch.ChFinder.solver_name">
+<span class="sig-name descname"><span class="pre">solver_name</span></span><a class="headerlink" href="#cascada.smt.chsearch.ChFinder.solver_name" title="Permalink to this definition"></a></dt>
+<dd><p>the pySMT solver <a class="reference external" href="https://github.com/pysmt/pysmt#solvers-support">name</a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.smt.chsearch.ChFinder.initial_constraints">
+<span class="sig-name descname"><span class="pre">initial_constraints</span></span><a class="headerlink" href="#cascada.smt.chsearch.ChFinder.initial_constraints" title="Permalink to this definition"></a></dt>
+<dd><p>the list of additional constraints (given as <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term" title="cascada.bitvector.core.Term"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Term</span></code></a>)
+to add to the SMT problems (by default an empty list)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.smt.chsearch.ChFinder.printing_mode">
+<span class="sig-name descname"><span class="pre">printing_mode</span></span><a class="headerlink" href="#cascada.smt.chsearch.ChFinder.printing_mode" title="Permalink to this definition"></a></dt>
+<dd><p>the information to print (an element of <a class="reference internal" href="#cascada.smt.chsearch.PrintingMode" title="cascada.smt.chsearch.PrintingMode"><code class="xref any py py-class docutils literal notranslate"><span class="pre">PrintingMode</span></code></a>,
+by default <a class="reference internal" href="#cascada.smt.chsearch.PrintingMode.Silent" title="cascada.smt.chsearch.PrintingMode.Silent"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">PrintingMode.Silent</span></code></a>)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.smt.chsearch.ChFinder.filename">
+<span class="sig-name descname"><span class="pre">filename</span></span><a class="headerlink" href="#cascada.smt.chsearch.ChFinder.filename" title="Permalink to this definition"></a></dt>
+<dd><p>the filename where the messages
+will be printed (by default the standard output is used)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.smt.chsearch.ChFinder.weight_prefix">
+<span class="sig-name descname"><span class="pre">weight_prefix</span></span><a class="headerlink" href="#cascada.smt.chsearch.ChFinder.weight_prefix" title="Permalink to this definition"></a></dt>
+<dd><p>the prefix to label the weight variables</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.smt.chsearch.ChFinder.solver_seed">
+<span class="sig-name descname"><span class="pre">solver_seed</span></span><a class="headerlink" href="#cascada.smt.chsearch.ChFinder.solver_seed" title="Permalink to this definition"></a></dt>
+<dd><p>the seed for the SMT solver</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.smt.chsearch.ChFinder.env">
+<span class="sig-name descname"><span class="pre">env</span></span><a class="headerlink" href="#cascada.smt.chsearch.ChFinder.env" title="Permalink to this definition"></a></dt>
+<dd><p>the associated <a class="reference external" href="https://pysmt.readthedocs.io/en/latest/api_ref.html#pysmt.environment.Environment" title="(in pySMT v0.7)"><code class="xref any docutils literal notranslate"><span class="pre">pysmt.environment.Environment</span></code></a>
+(by default a new one is created)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.smt.chsearch.ChFinder.chmodel_asserts">
+<span class="sig-name descname"><span class="pre">chmodel_asserts</span></span><a class="headerlink" href="#cascada.smt.chsearch.ChFinder.chmodel_asserts" title="Permalink to this definition"></a></dt>
+<dd><p>the list containing the main assertions (<a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term" title="cascada.bitvector.core.Term"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Term</span></code></a> objects)
+common to the SMT problems</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.smt.chsearch.ChFinder.find_next_ch">
+<span class="sig-name descname"><span class="pre">find_next_ch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yield_assignment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/smt/chsearch.html#ChFinder.find_next_ch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.smt.chsearch.ChFinder.find_next_ch" title="Permalink to this definition"></a></dt>
+<dd><p>Return an iterator that yields the characteristics found in the SMT-based search.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This method requires that <a class="reference internal" href="#cascada.smt.chsearch.ChFinder.assert_type" title="cascada.smt.chsearch.ChFinder.assert_type"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">assert_type</span></code></a> is either
+<a class="reference internal" href="#cascada.smt.chsearch.ChModelAssertType.Validity" title="cascada.smt.chsearch.ChModelAssertType.Validity"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">Validity</span></code></a> or <a class="reference internal" href="#cascada.smt.chsearch.ChModelAssertType.ProbabilityOne" title="cascada.smt.chsearch.ChModelAssertType.ProbabilityOne"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">ProbabilityOne</span></code></a> (and not <a class="reference internal" href="#cascada.smt.chsearch.ChModelAssertType.ValidityAndWeight" title="cascada.smt.chsearch.ChModelAssertType.ValidityAndWeight"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">ValidityAndWeight</span></code></a>).</p>
+</div>
+<p>This method searches for characteristic using SMT solvers.
+The decision problem of whether there exists a characteristic
+(following the characteristic model <code class="docutils literal notranslate"><span class="pre">ch_model</span></code>)
+is encoded as an SMT problem and given to the SMT solver,
+which checks its satisfiability.</p>
+<p>If the SMT solver finds the first problem satisfiable,
+an assignment of the variables that makes the problem satisfiable is
+obtained, and a <a class="reference internal" href="cascada.abstractproperty.characteristic.html#cascada.abstractproperty.characteristic.Characteristic" title="cascada.abstractproperty.characteristic.Characteristic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.characteristic.Characteristic</span></code></a>
+object is created and <em>yielded</em>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">yield_assignment</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>, the assignment
+(as a dictionary mapping <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Variable" title="cascada.bitvector.core.Variable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Variable</span></code></a> to <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Constant" title="cascada.bitvector.core.Constant"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a> objects)
+is yielded instead of the characteristic.</p>
+</div>
+<p>Afterwards, an additional constraint is added to the SMT problem
+to exclude the characteristic yielded and this procedure is repeated
+until all characteristics are found.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># example of search for LinearMask-Characteristic of Speck32.key_schedule</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.linear.mask</span> <span class="kn">import</span> <span class="n">LinearMask</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.linear.chmodel</span> <span class="kn">import</span> <span class="n">ChModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.smt.chsearch</span> <span class="kn">import</span> <span class="n">ChFinder</span><span class="p">,</span> <span class="n">ChModelAssertType</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">speck</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32_KS</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span><span class="o">.</span><span class="n">key_schedule</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32_KS</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model</span> <span class="o">=</span> <span class="n">ChModel</span><span class="p">(</span><span class="n">Speck32_KS</span><span class="p">,</span> <span class="n">LinearMask</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;mk0&quot;</span><span class="p">,</span> <span class="s2">&quot;mk1&quot;</span><span class="p">,</span> <span class="s2">&quot;mk2&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v2c</span> <span class="o">=</span> <span class="p">{</span><span class="n">ch_model</span><span class="o">.</span><span class="n">input_mask</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">16</span><span class="p">)}</span>  <span class="c1"># setting input_mask[2] to 0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">at</span> <span class="o">=</span> <span class="n">ChModelAssertType</span><span class="o">.</span><span class="n">ProbabilityOne</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_finder</span> <span class="o">=</span> <span class="n">ChFinder</span><span class="p">(</span><span class="n">ch_model</span><span class="p">,</span> <span class="n">at</span><span class="p">,</span> <span class="s2">&quot;btor&quot;</span><span class="p">,</span> <span class="n">var_prop2ct_prop</span><span class="o">=</span><span class="n">v2c</span><span class="p">,</span> <span class="n">solver_seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">ch_finder</span><span class="o">.</span><span class="n">find_next_ch</span><span class="p">():</span> <span class="nb">print</span><span class="p">(</span><span class="n">ch</span><span class="o">.</span><span class="n">srepr</span><span class="p">())</span> <span class="c1"># all 2-rounds probability-one trails</span>
+<span class="go">Ch(w=0, id=0000 0000 0000, od=0000 0000 0000)</span>
+<span class="go">Ch(w=0, id=0080 0080 0000, od=4001 4000 0001)</span>
+<span class="go">Ch(w=0, id=0080 0000 0000, od=0000 4001 0001)</span>
+<span class="go">Ch(w=0, id=0000 0080 0000, od=4001 0001 0000)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># example of search for BitValue-EncryptionCharacteristic of Speck32</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.algebraic.value</span> <span class="kn">import</span> <span class="n">BitValue</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.algebraic.chmodel</span> <span class="kn">import</span> <span class="n">EncryptionChModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model</span> <span class="o">=</span> <span class="n">EncryptionChModel</span><span class="p">(</span><span class="n">Speck32</span><span class="p">,</span> <span class="n">BitValue</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">input_output_vals</span> <span class="o">=</span> <span class="n">ch_model</span><span class="o">.</span><span class="n">input_val</span> <span class="o">+</span> <span class="n">ch_model</span><span class="o">.</span><span class="n">output_val</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># setting each input and output word to 0x0001</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v2c</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">input_output_vals</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">at</span> <span class="o">=</span> <span class="n">ChModelAssertType</span><span class="o">.</span><span class="n">Validity</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_finder</span> <span class="o">=</span> <span class="n">ChFinder</span><span class="p">(</span><span class="n">ch_model</span><span class="p">,</span> <span class="n">at</span><span class="p">,</span> <span class="s2">&quot;btor&quot;</span><span class="p">,</span> <span class="n">var_prop2ct_prop</span><span class="o">=</span><span class="n">v2c</span><span class="p">,</span> <span class="n">solver_seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">found_ch</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">ch_finder</span><span class="o">.</span><span class="n">find_next_ch</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">round_sep</span> <span class="o">=</span> <span class="n">found_ch</span><span class="o">.</span><span class="n">get_round_separators</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">round_ch</span> <span class="ow">in</span> <span class="n">found_ch</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">round_sep</span><span class="p">):</span> <span class="nb">print</span><span class="p">(</span><span class="n">round_ch</span><span class="p">)</span>  
+<span class="go">Characteristic(ch_weight=0, assignment_weights=[0, 0, 0],</span>
+<span class="go">    input_val=[0x0001, 0x0001], output_val=[0x0004, 0x0000], external_vals=[0x0205],</span>
+<span class="go">    assign_outval_list=[0x0201, 0x0004, 0x0000])</span>
+<span class="go">Characteristic(ch_weight=0, assignment_weights=[0, 0, 0],</span>
+<span class="go">    input_val=[0x0004, 0x0000], output_val=[0x0001, 0x0001], external_vals=[0x0801],</span>
+<span class="go">    assign_outval_list=[0x0800, 0x0001, 0x0001])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight">
+<span class="sig-name descname"><span class="pre">find_next_ch_increasing_weight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">empirical_weight_options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_after_optimal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yield_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/smt/chsearch.html#ChFinder.find_next_ch_increasing_weight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight" title="Permalink to this definition"></a></dt>
+<dd><p>Return an iterator that yields the characteristics found in the SMT-based search
+with increasing weight order.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This method requires that <a class="reference internal" href="#cascada.smt.chsearch.ChFinder.assert_type" title="cascada.smt.chsearch.ChFinder.assert_type"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">assert_type</span></code></a> is <a class="reference internal" href="#cascada.smt.chsearch.ChModelAssertType.ValidityAndWeight" title="cascada.smt.chsearch.ChModelAssertType.ValidityAndWeight"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">ValidityAndWeight</span></code></a>
+(and not <a class="reference internal" href="#cascada.smt.chsearch.ChModelAssertType.Validity" title="cascada.smt.chsearch.ChModelAssertType.Validity"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">Validity</span></code></a> nor <a class="reference internal" href="#cascada.smt.chsearch.ChModelAssertType.ProbabilityOne" title="cascada.smt.chsearch.ChModelAssertType.ProbabilityOne"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">ProbabilityOne</span></code></a>).</p>
+</div>
+<p>This method searches for optimal characteristics (with optimal probability)
+using SMT solvers as follows.</p>
+<p>First, the probability space is decomposed into many intervals
+<span class="math notranslate nohighlight">\(I_w = (2^{-w-1}, 2^{-w}]\)</span>,
+where <code class="docutils literal notranslate"><span class="pre">w</span> <span class="pre">=</span> <span class="pre">initial_weight,</span> <span class="pre">initial_weight</span> <span class="pre">+</span> <span class="pre">1,</span> <span class="pre">...,</span> <span class="pre">final_weight</span></code>.
+For each interval, the decision problem of whether there exists a
+characteristic (following the characteristic model <code class="docutils literal notranslate"><span class="pre">ch_model</span></code>)
+with probability <span class="math notranslate nohighlight">\(p \in I_w\)</span> is encoded as an
+SMT problem. Note that a characteristic has probability <span class="math notranslate nohighlight">\(p \in I_w\)</span>
+if and only if its integer weight (the integer part of the weight)
+is equal to <span class="math notranslate nohighlight">\(w\)</span>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>See <a class="reference internal" href="cascada.abstractproperty.characteristic.html#cascada.abstractproperty.characteristic.Characteristic" title="cascada.abstractproperty.characteristic.Characteristic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.characteristic.Characteristic</span></code></a> for
+the characteristic probability and weight considered here.</p>
+</div>
+<p>The SMT problems are provided to the SMT solver,
+which checks their satisfiability in increasing weight order.
+When the SMT solver finds the first problem satisfisable,
+an assignment of the variables that makes the problem satisfiable is
+obtained, and a <a class="reference internal" href="cascada.abstractproperty.characteristic.html#cascada.abstractproperty.characteristic.Characteristic" title="cascada.abstractproperty.characteristic.Characteristic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.characteristic.Characteristic</span></code></a>
+object is created and <em>yielded</em>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">yield_weight</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>, a tuple is yielded instead,
+containing the target weight <span class="math notranslate nohighlight">\(w\)</span> and the characteristic.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">empirical_weight_options</span></code> is provided, before yielding
+the characteristic, the empirical weight
+of the characteristic is computed by calling the method
+<a class="reference internal" href="cascada.abstractproperty.characteristic.html#cascada.abstractproperty.characteristic.Characteristic.compute_empirical_ch_weight" title="cascada.abstractproperty.characteristic.Characteristic.compute_empirical_ch_weight"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">abstractproperty.characteristic.Characteristic.compute_empirical_ch_weight</span></code></a>
+with the given options as arguments (see below for an explanation
+of <code class="docutils literal notranslate"><span class="pre">empirical_weight_options</span></code>).
+Importantly, if the empirical weight computed is <code class="docutils literal notranslate"><span class="pre">math.inf</span></code>,
+this characteristic is NOT yielded and the search continues.
+If <code class="docutils literal notranslate"><span class="pre">empirical_weight_options</span></code> is not provided, all characteristics
+found are yielded.</p>
+</div>
+<p>If the error bound of the associated characteristic model
+(see <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel.error" title="cascada.abstractproperty.chmodel.ChModel.error"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">abstractproperty.chmodel.ChModel.error</span></code></a>) is zero,
+the first characteristic yielded is optimal in the sense that
+there are no characteristics with integer weight strictly smaller,
+and the search finishes (if <code class="docutils literal notranslate"><span class="pre">stop_after_optimal</span> <span class="pre">is</span> <span class="pre">True</span></code>,
+otherwise it continues until all characteristics are found).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Note the first characteristic yielded is optimal for the
+characteristic probability here considered, which might be
+an approximation of the actual characteristic probability
+(e.g., see <a class="reference internal" href="cascada.differential.characteristic.html#cascada.differential.characteristic.Characteristic" title="cascada.differential.characteristic.Characteristic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">differential.characteristic.Characteristic</span></code></a>
+or <a class="reference internal" href="cascada.linear.characteristic.html#cascada.linear.characteristic.Characteristic" title="cascada.linear.characteristic.Characteristic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">linear.characteristic.Characteristic</span></code></a>).</p>
+</div>
+<p>Let <span class="math notranslate nohighlight">\(\hat{w}\)</span> the weight of the first characteristic yielded.
+If the error bound of the associated characteristic model is
+<span class="math notranslate nohighlight">\(e &gt; 0\)</span>, then the search continues yielding all characteristics
+with weights between <span class="math notranslate nohighlight">\(\hat{w}\)</span> and <span class="math notranslate nohighlight">\(\hat{w} + e\)</span>.
+After all these characteristics have been yielded,
+the optimal characteristic (the characteristic among all yielded
+characteristics with the lowest
+<a class="reference internal" href="cascada.abstractproperty.characteristic.html#cascada.abstractproperty.characteristic.Characteristic.ch_weight" title="cascada.abstractproperty.characteristic.Characteristic.ch_weight"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">abstractproperty.characteristic.Characteristic.ch_weight</span></code></a>)
+is yielded again and the search finishes
+(if <code class="docutils literal notranslate"><span class="pre">stop_after_optimal</span> <span class="pre">is</span> <span class="pre">True</span></code>,  otherwise it continues until all
+characteristics are found).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>After the iterator is exhausted, the last characteristic yielded
+is always the optimal, but the optimal characteristic is only yielded
+twice if it is different from the previous characteristic yielded.</p>
+<p>Moreoever, if <code class="docutils literal notranslate"><span class="pre">yield_weight</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>, the second time
+the optimal characteristic is yielded a tuple is also yielded,
+but the first entry in the tuple contains <code class="docutils literal notranslate"><span class="pre">None</span></code>
+(the target weight of the optimal characteristic is
+yielded the first time the optimal characteristic is yielded).</p>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># example of search for XorDiff-EncryptionCharacteristic of Speck32</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.difference</span> <span class="kn">import</span> <span class="n">XorDiff</span><span class="p">,</span> <span class="n">RXDiff</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.chmodel</span> <span class="kn">import</span> <span class="n">ChModel</span><span class="p">,</span> <span class="n">EncryptionChModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.smt.chsearch</span> <span class="kn">import</span> <span class="n">ChFinder</span><span class="p">,</span> <span class="n">ChModelAssertType</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">speck</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model</span> <span class="o">=</span> <span class="n">EncryptionChModel</span><span class="p">(</span><span class="n">Speck32</span><span class="p">,</span> <span class="n">XorDiff</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">assert_type</span> <span class="o">=</span> <span class="n">ChModelAssertType</span><span class="o">.</span><span class="n">ValidityAndWeight</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_finder</span> <span class="o">=</span> <span class="n">ChFinder</span><span class="p">(</span><span class="n">ch_model</span><span class="p">,</span> <span class="n">assert_type</span><span class="p">,</span> <span class="s2">&quot;btor&quot;</span><span class="p">,</span> <span class="n">solver_seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># no need to exclude the input zero XOR difference if initial_weight != 0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ewo</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;seed&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>  <span class="c1"># no need to specify all args</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">next</span><span class="p">(</span><span class="n">ch_finder</span><span class="o">.</span><span class="n">find_next_ch_increasing_weight</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">empirical_weight_options</span><span class="o">=</span><span class="n">ewo</span><span class="p">))</span>  
+<span class="go">EncryptionCharacteristic(ch_weight=1, empirical_ch_weight=1.027020213933709037746664618,</span>
+<span class="go">    assignment_weights=[1, 0, 0, 0],</span>
+<span class="go">    input_diff=[0x0010, 0x2000], output_diff=[0x8000, 0x8002], external_diffs=[0x0000, 0x0000],</span>
+<span class="go">    assign_outdiff_list=[0x0000, 0x8000, 0x8000, 0x8002])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># example of search for RXDiff-Characteristic of Speck32.key_schedule</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32_KS</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span><span class="o">.</span><span class="n">key_schedule</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32_KS</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model</span> <span class="o">=</span> <span class="n">ChModel</span><span class="p">(</span><span class="n">Speck32_KS</span><span class="p">,</span> <span class="n">RXDiff</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;dmk0&quot;</span><span class="p">,</span> <span class="s2">&quot;dmk1&quot;</span><span class="p">,</span> <span class="s2">&quot;dmk2&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dmk0</span><span class="p">,</span> <span class="n">dmk1</span> <span class="o">=</span> <span class="n">ch_model</span><span class="o">.</span><span class="n">input_diff</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v2c</span> <span class="o">=</span> <span class="p">{</span><span class="n">dmk0</span><span class="p">:</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span> <span class="n">dmk1</span><span class="p">:</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">16</span><span class="p">)}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_finder</span> <span class="o">=</span> <span class="n">ChFinder</span><span class="p">(</span><span class="n">ch_model</span><span class="p">,</span> <span class="n">assert_type</span><span class="p">,</span> <span class="s2">&quot;btor&quot;</span><span class="p">,</span> <span class="n">var_prop2ct_prop</span><span class="o">=</span><span class="n">v2c</span><span class="p">,</span> <span class="n">solver_seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">ch_finder</span><span class="o">.</span><span class="n">find_next_ch_increasing_weight</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span> <span class="nb">print</span><span class="p">(</span><span class="n">ch</span><span class="o">.</span><span class="n">srepr</span><span class="p">())</span>  
+<span class="go">Ch(w=2.830, id=0000 0000 0000, od=0000 0001 0007)</span>
+<span class="gp">...</span>
+<span class="go">Ch(w=3.830, id=0000 0000 8000, od=8000 8002 800b)</span>
+<span class="gp">...</span>
+<span class="go">Ch(w=4.830, id=0000 0000 0001, od=0001 0005 001b)</span>
+<span class="gp">...</span>
+<span class="go">Ch(w=4.830, id=0000 0000 8000, od=8000 8002 800e)</span>
+<span class="go">Ch(w=2.830, id=0000 0000 0000, od=0000 0001 0007)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>initial_weight</strong> – the initial weight to start the search</p></li>
+<li><p><strong>final_weight</strong> – the last weight to consider in the search
+(by default <code class="docutils literal notranslate"><span class="pre">math.inf</span></code>)</p></li>
+<li><p><strong>empirical_weight_options</strong> – (optional) a dictionary containing
+the arguments of
+<a class="reference internal" href="cascada.abstractproperty.characteristic.html#cascada.abstractproperty.characteristic.Characteristic.compute_empirical_ch_weight" title="cascada.abstractproperty.characteristic.Characteristic.compute_empirical_ch_weight"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">abstractproperty.characteristic.Characteristic.compute_empirical_ch_weight</span></code></a>
+(used similar as <code class="docutils literal notranslate"><span class="pre">**kwargs</span></code>, that is,
+<code class="docutils literal notranslate"><span class="pre">compute_empirical_ch_weight(**empirical_weight_options)</span></code></p></li>
+<li><p><strong>yield_weight</strong> – if <code class="docutils literal notranslate"><span class="pre">True</span></code>, the target weight of the SMT problem
+is also yielded (default <code class="docutils literal notranslate"><span class="pre">False</span></code>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.smt.chsearch.ChFinder.formula_size">
+<span class="sig-name descname"><span class="pre">formula_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">measure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/smt/chsearch.html#ChFinder.formula_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.smt.chsearch.ChFinder.formula_size" title="Permalink to this definition"></a></dt>
+<dd><p>Return the size of the underlying SMT problem.</p>
+<p>See <a class="reference external" href="https://pysmt.readthedocs.io/en/latest/api_ref.html#pysmt.oracles.SizeOracle" title="(in pySMT v0.7)"><code class="xref any docutils literal notranslate"><span class="pre">pysmt.oracles.SizeOracle</span></code></a> for choosing <code class="docutils literal notranslate"><span class="pre">measure</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.smt.chsearch.ChFinder.hrepr">
+<span class="sig-name descname"><span class="pre">hrepr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">full_repr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/smt/chsearch.html#ChFinder.hrepr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.smt.chsearch.ChFinder.hrepr" title="Permalink to this definition"></a></dt>
+<dd><p>Return a human-readable representation of the base SMT problem.</p>
+<p>The base SMT problem is the SMT problem containing the validity,
+probability-one and/or weight assertions (depending on <code class="docutils literal notranslate"><span class="pre">assert_type</span></code>)
+and the additional constraints from <a class="reference internal" href="#cascada.smt.chsearch.ChFinder.initial_constraints" title="cascada.smt.chsearch.ChFinder.initial_constraints"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">initial_constraints</span></code></a>,
+but excluding constraints created during the search such as
+the constraints fixing the characteristic weight variable to a
+constant value in <a class="reference internal" href="#cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight" title="cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">find_next_ch_increasing_weight</span></code></a>.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">full_repr</span></code> is False, the short string representation srepr is used.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.smt.chsearch.CipherChFinder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.smt.chsearch.</span></span><span class="sig-name descname"><span class="pre">CipherChFinder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ch_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ks_assert_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enc_assert_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_constraints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ks_exclude_zero_input_prop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enc_exclude_zero_input_prop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var_prop2ct_prop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raise_exception_missing_var</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">printing_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">PrintingMode.Silent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ks_weight_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'wk'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enc_weight_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'we'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/smt/chsearch.html#CipherChFinder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.smt.chsearch.CipherChFinder" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cascada.smt.chsearch.ChFinder" title="cascada.smt.chsearch.ChFinder"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.smt.chsearch.ChFinder</span></code></a></p>
+<p>Search for cipher characteristics by modeling the search as a sequence of SMT problems.</p>
+<p>Given a characteristic model of a <a class="reference internal" href="cascada.primitives.blockcipher.html#cascada.primitives.blockcipher.Cipher" title="cascada.primitives.blockcipher.Cipher"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Cipher</span></code></a>
+(<a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.CipherChModel" title="cascada.abstractproperty.chmodel.CipherChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.chmodel.CipherChModel</span></code></a>)
+defined for a particular <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> (e.g., <a class="reference internal" href="cascada.differential.difference.html#cascada.differential.difference.XorDiff" title="cascada.differential.difference.XorDiff"><code class="xref any py py-class docutils literal notranslate"><span class="pre">XorDiff</span></code></a> or <a class="reference internal" href="cascada.algebraic.value.html#cascada.algebraic.value.BitValue" title="cascada.algebraic.value.BitValue"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BitValue</span></code></a>),
+this class finds characteristics
+(<a class="reference internal" href="cascada.abstractproperty.characteristic.html#cascada.abstractproperty.characteristic.CipherCharacteristic" title="cascada.abstractproperty.characteristic.CipherCharacteristic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.characteristic.CipherCharacteristic</span></code></a>)
+satisfying the characteristic model by modelling the search
+as a sequence of SMT problems in the bit-vector theory.</p>
+<p>To initialize a <a class="reference internal" href="#cascada.smt.chsearch.CipherChFinder" title="cascada.smt.chsearch.CipherChFinder"><code class="xref any py py-class docutils literal notranslate"><span class="pre">CipherChFinder</span></code></a> object, first two auxiliary instances of
+<a class="reference internal" href="#cascada.smt.chsearch.ChFinder" title="cascada.smt.chsearch.ChFinder"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChFinder</span></code></a> are created:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ks_finder</span></code>: a <a class="reference internal" href="#cascada.smt.chsearch.ChFinder" title="cascada.smt.chsearch.ChFinder"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChFinder</span></code></a> with arguments
+<code class="docutils literal notranslate"><span class="pre">ch_model.ks_ch_model</span></code>, <code class="docutils literal notranslate"><span class="pre">ks_assert_type</span></code>
+<code class="docutils literal notranslate"><span class="pre">ks_exclude_zero_input_prop</span></code> and <code class="docutils literal notranslate"><span class="pre">ks_weight_prefix</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">enc_finder</span></code>: a <a class="reference internal" href="#cascada.smt.chsearch.ChFinder" title="cascada.smt.chsearch.ChFinder"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChFinder</span></code></a> with arguments
+<code class="docutils literal notranslate"><span class="pre">ch_model.enc_ch_model</span></code>, <code class="docutils literal notranslate"><span class="pre">enc_assert_type</span></code>,
+<code class="docutils literal notranslate"><span class="pre">enc_exclude_zero_input_prop</span></code> amd <code class="docutils literal notranslate"><span class="pre">enc_weight_prefix</span></code></p></li>
+</ul>
+<p>Both <code class="docutils literal notranslate"><span class="pre">ks_finder</span></code> and <code class="docutils literal notranslate"><span class="pre">enc_finder</span></code> (together with the <a class="reference internal" href="#cascada.smt.chsearch.CipherChFinder" title="cascada.smt.chsearch.CipherChFinder"><code class="xref any py py-class docutils literal notranslate"><span class="pre">CipherChFinder</span></code></a> object)
+share the arguments <a class="reference internal" href="#cascada.smt.chsearch.ChFinder.solver_name" title="cascada.smt.chsearch.ChFinder.solver_name"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">solver_name</span></code></a>, <a class="reference internal" href="#cascada.smt.chsearch.ChFinder.printing_mode" title="cascada.smt.chsearch.ChFinder.printing_mode"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">printing_mode</span></code></a>,
+<a class="reference internal" href="#cascada.smt.chsearch.ChFinder.filename" title="cascada.smt.chsearch.ChFinder.filename"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">filename</span></code></a>,  <a class="reference internal" href="#cascada.smt.chsearch.ChFinder.solver_seed" title="cascada.smt.chsearch.ChFinder.solver_seed"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">solver_seed</span></code></a> and <a class="reference internal" href="#cascada.smt.chsearch.ChFinder.env" title="cascada.smt.chsearch.ChFinder.env"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">env</span></code></a>.</p>
+<p>Then, these two auxiliary <a class="reference internal" href="#cascada.smt.chsearch.ChFinder" title="cascada.smt.chsearch.ChFinder"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChFinder</span></code></a> objects are merged into a <a class="reference internal" href="#cascada.smt.chsearch.CipherChFinder" title="cascada.smt.chsearch.CipherChFinder"><code class="xref any py py-class docutils literal notranslate"><span class="pre">CipherChFinder</span></code></a>
+(which is also an instance of <a class="reference internal" href="#cascada.smt.chsearch.ChFinder" title="cascada.smt.chsearch.ChFinder"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChFinder</span></code></a>) as follows:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">solver_name</span></code>, <code class="docutils literal notranslate"><span class="pre">printing_mode</span></code>, <code class="docutils literal notranslate"><span class="pre">filename</span></code>,  <code class="docutils literal notranslate"><span class="pre">solver_seed</span></code>
+<code class="docutils literal notranslate"><span class="pre">env</span></code> are the same as the ones from <code class="docutils literal notranslate"><span class="pre">ks_finder</span></code> and <code class="docutils literal notranslate"><span class="pre">enc_finder</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ch_model</span></code> is set to the characteristic model of the cipher
+(a subclass of <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.CipherChModel" title="cascada.abstractproperty.chmodel.CipherChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.chmodel.CipherChModel</span></code></a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">assert_type</span></code> is set as the <em>largest</em> assertion type, following
+the order <a class="reference internal" href="#cascada.smt.chsearch.ChModelAssertType.ValidityAndWeight" title="cascada.smt.chsearch.ChModelAssertType.ValidityAndWeight"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">ValidityAndWeight</span></code></a> &gt; <a class="reference internal" href="#cascada.smt.chsearch.ChModelAssertType.Validity" title="cascada.smt.chsearch.ChModelAssertType.Validity"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">Validity</span></code></a> &gt; <a class="reference internal" href="#cascada.smt.chsearch.ChModelAssertType.ProbabilityOne" title="cascada.smt.chsearch.ChModelAssertType.ProbabilityOne"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">ProbabilityOne</span></code></a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">initial_constraints</span></code> contains all initial constraints
+(including the ones derived from <code class="docutils literal notranslate"><span class="pre">ks_exclude_zero_input_prop</span></code>,
+<code class="docutils literal notranslate"><span class="pre">enc_exclude_zero_input_prop</span></code> and <code class="docutils literal notranslate"><span class="pre">var_prop2ct_prop</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">chmodel_asserts</span></code> is the union of <a class="reference internal" href="#cascada.smt.chsearch.ChFinder.chmodel_asserts" title="cascada.smt.chsearch.ChFinder.chmodel_asserts"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">chmodel_asserts</span></code></a> of
+<code class="docutils literal notranslate"><span class="pre">ks_finder</span></code> and <code class="docutils literal notranslate"><span class="pre">enc_finder</span></code></p></li>
+</ul>
+<p>See also <a class="reference internal" href="#cascada.smt.chsearch.ChFinder" title="cascada.smt.chsearch.ChFinder"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChFinder</span></code></a>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.difference</span> <span class="kn">import</span> <span class="n">XorDiff</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.chmodel</span> <span class="kn">import</span> <span class="n">CipherChModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.smt.chsearch</span> <span class="kn">import</span> <span class="n">CipherChFinder</span><span class="p">,</span> <span class="n">ChModelAssertType</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">speck</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model</span> <span class="o">=</span> <span class="n">CipherChModel</span><span class="p">(</span><span class="n">Speck32</span><span class="p">,</span> <span class="n">XorDiff</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">assert_type</span> <span class="o">=</span> <span class="n">ChModelAssertType</span><span class="o">.</span><span class="n">ValidityAndWeight</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_finder</span> <span class="o">=</span> <span class="n">CipherChFinder</span><span class="p">(</span><span class="n">ch_model</span><span class="p">,</span> <span class="n">assert_type</span><span class="p">,</span> <span class="n">assert_type</span><span class="p">,</span> <span class="s2">&quot;btor&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                           <span class="n">enc_exclude_zero_input_prop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">solver_seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_finder</span><span class="o">.</span><span class="n">formula_size</span><span class="p">()</span>
+<span class="go">1290</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">ch_finder</span><span class="o">.</span><span class="n">hrepr</span><span class="p">(</span><span class="n">full_repr</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>  
+<span class="go">; initial constraints</span>
+<span class="go">assert ~((dp0 :: dp1) == 0x00000000)</span>
+<span class="go">; characteristic model assertions</span>
+<span class="go">assert ((~(... &lt;&lt; ...) ^ (dmk1 &lt;&lt; 0x0001)) &amp; (~(... &lt;&lt; ...) ^ (dk1 &lt;&lt; 0x0001)) &amp;</span>
+<span class="go">    ((... &gt;&gt;&gt; ...) ^ dmk1 ^ dk1 ^ ((dmk0 &gt;&gt;&gt; 7) &lt;&lt; 0x0001))) == 0x0000</span>
+<span class="go">assert dmk1 == dmk1_out</span>
+<span class="go">assert ((dmk1 &lt;&lt;&lt; 2) ^ dk1) == dk3_out</span>
+<span class="go">assert wk0 == PopCount(~((~... ^ dmk1) &amp; (~... ^ dk1))[14:])</span>
+<span class="go">assert wk1 == 0b0</span>
+<span class="go">assert wk2 == 0b0</span>
+<span class="go">assert wk == wk0</span>
+<span class="go">assert ((~(... &lt;&lt; ...) ^ (dp1 &lt;&lt; 0x0001)) &amp; (~(... &lt;&lt; ...) ^ (dx1 &lt;&lt; 0x0001)) &amp;</span>
+<span class="go">    ((... &gt;&gt;&gt; ...) ^ dp1 ^ dx1 ^ ((dp0 &gt;&gt;&gt; 7) &lt;&lt; 0x0001))) == 0x0000</span>
+<span class="go">assert ((~(... &lt;&lt; ...) ^ ((... ^ ...) &lt;&lt; 0x0001)) &amp; (~(... &lt;&lt; ...) ^ (dx6 &lt;&lt; 0x0001)) &amp;</span>
+<span class="go">    ((... &gt;&gt;&gt; ...) ^ ... ^ ... ^ dx6 ^ (((... ^ ...) &gt;&gt;&gt; 7) &lt;&lt; 0x0001))) == 0x0000</span>
+<span class="go">assert (dx6 ^ dk3_out) == dx7_out</span>
+<span class="go">assert ((((dp1 &lt;&lt;&lt; 2) ^ dx1 ^ dmk1_out) &lt;&lt;&lt; 2) ^ dx6 ^ dk3_out) == dx9_out</span>
+<span class="go">assert we0 == PopCount(~((~... ^ dp1) &amp; (~... ^ dx1))[14:])</span>
+<span class="go">assert we1 == PopCount(~((~... ^ ... ^ ...) &amp; (~... ^ dx6))[14:])</span>
+<span class="go">assert we2 == 0b0</span>
+<span class="go">assert we3 == 0b0</span>
+<span class="go">assert we == ((0b0 :: we0) + (0b0 :: we1))</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.smt.chsearch.CipherChFinder.find_next_ch">
+<span class="sig-name descname"><span class="pre">find_next_ch</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/smt/chsearch.html#CipherChFinder.find_next_ch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.smt.chsearch.CipherChFinder.find_next_ch" title="Permalink to this definition"></a></dt>
+<dd><p>Return an iterator that yields the characteristics found in the SMT-based search.</p>
+<p>See also <a class="reference internal" href="#cascada.smt.chsearch.ChFinder.find_next_ch" title="cascada.smt.chsearch.ChFinder.find_next_ch"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">ChFinder.find_next_ch</span></code></a>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.algebraic.value</span> <span class="kn">import</span> <span class="n">BitValue</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.algebraic.chmodel</span> <span class="kn">import</span> <span class="n">CipherChModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.smt.chsearch</span> <span class="kn">import</span> <span class="n">CipherChFinder</span><span class="p">,</span> <span class="n">ChModelAssertType</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">speck</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model</span> <span class="o">=</span> <span class="n">CipherChModel</span><span class="p">(</span><span class="n">Speck32</span><span class="p">,</span> <span class="n">BitValue</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">input_output_vals</span> <span class="o">=</span> <span class="n">ch_model</span><span class="o">.</span><span class="n">enc_ch_model</span><span class="o">.</span><span class="n">input_val</span> <span class="o">+</span> <span class="n">ch_model</span><span class="o">.</span><span class="n">enc_ch_model</span><span class="o">.</span><span class="n">output_val</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># setting each input and output plaintext word to 0x0001</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v2c</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">input_output_vals</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">assert_type</span> <span class="o">=</span> <span class="n">ChModelAssertType</span><span class="o">.</span><span class="n">Validity</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_finder</span> <span class="o">=</span> <span class="n">CipherChFinder</span><span class="p">(</span><span class="n">ch_model</span><span class="p">,</span> <span class="n">assert_type</span><span class="p">,</span> <span class="n">assert_type</span><span class="p">,</span> <span class="s2">&quot;btor&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                           <span class="n">var_prop2ct_prop</span><span class="o">=</span><span class="n">v2c</span><span class="p">,</span> <span class="n">solver_seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">found_enc_ch</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">ch_finder</span><span class="o">.</span><span class="n">find_next_ch</span><span class="p">())</span><span class="o">.</span><span class="n">enc_characteristic</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">round_sep</span> <span class="o">=</span> <span class="n">found_enc_ch</span><span class="o">.</span><span class="n">get_round_separators</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">round_enc_ch</span> <span class="ow">in</span> <span class="n">found_enc_ch</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">round_sep</span><span class="p">):</span> <span class="nb">print</span><span class="p">(</span><span class="n">round_enc_ch</span><span class="p">)</span>  
+<span class="go">Characteristic(ch_weight=0, assignment_weights=[0, 0, 0],</span>
+<span class="go">    input_val=[0x0001, 0x0001], output_val=[0x0004, 0x0000], external_vals=[0x0205],</span>
+<span class="go">    assign_outval_list=[0x0201, 0x0004, 0x0000])</span>
+<span class="go">Characteristic(ch_weight=0, assignment_weights=[0, 0, 0],</span>
+<span class="go">    input_val=[0x0004, 0x0000], output_val=[0x0001, 0x0001], external_vals=[0x0801],</span>
+<span class="go">    assign_outval_list=[0x0800, 0x0001, 0x0001])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.smt.chsearch.CipherChFinder.fix_key_schedule_ch_weight">
+<span class="sig-name descname"><span class="pre">fix_key_schedule_ch_weight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">integer_weight</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/smt/chsearch.html#CipherChFinder.fix_key_schedule_ch_weight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.smt.chsearch.CipherChFinder.fix_key_schedule_ch_weight" title="Permalink to this definition"></a></dt>
+<dd><p>Add the constraint that fixes the key-schedule weight to the given integer weight.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.smt.chsearch.CipherChFinder.fix_encryption_ch_weight">
+<span class="sig-name descname"><span class="pre">fix_encryption_ch_weight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">integer_weight</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/smt/chsearch.html#CipherChFinder.fix_encryption_ch_weight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.smt.chsearch.CipherChFinder.fix_encryption_ch_weight" title="Permalink to this definition"></a></dt>
+<dd><p>Add the constraint that fixes the encryption weight to the given integer weight.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.smt.chsearch.CipherChFinder.find_next_ch_increasing_weight">
+<span class="sig-name descname"><span class="pre">find_next_ch_increasing_weight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ks_empirical_weight_options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enc_empirical_weight_options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_after_optimal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yield_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/smt/chsearch.html#CipherChFinder.find_next_ch_increasing_weight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.smt.chsearch.CipherChFinder.find_next_ch_increasing_weight" title="Permalink to this definition"></a></dt>
+<dd><p>Return an iterator that yields the characteristics found in the SMT-based search.</p>
+<p>This method searches for optimal characteristics (with optimal probability)
+using SMT solvers (see <a class="reference internal" href="#cascada.smt.chsearch.ChFinder" title="cascada.smt.chsearch.ChFinder"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChFinder</span></code></a>).</p>
+<p>In particular, the search creates decision problems
+of whether there exists a characteristic with probability
+<span class="math notranslate nohighlight">\(p \in I_w\)</span>, where a characteristic has probability
+<span class="math notranslate nohighlight">\(p \in I_w\)</span> if and only if its integer weight
+(the integer part of the weight) is equal to <span class="math notranslate nohighlight">\(w\)</span>.</p>
+<p>The main difference between <a class="reference internal" href="#cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight" title="cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">ChFinder.find_next_ch_increasing_weight</span></code></a>
+and this method is that this method defined the weight of a
+<code class="docutils literal notranslate"><span class="pre">CipherCharacteristic</span></code> depending on the type of the assertions.</p>
+<ul class="simple">
+<li><p>If both <code class="docutils literal notranslate"><span class="pre">ks_assert_type</span></code> and <code class="docutils literal notranslate"><span class="pre">enc_assert_type</span></code> are
+<a class="reference internal" href="#cascada.smt.chsearch.ChModelAssertType.ValidityAndWeight" title="cascada.smt.chsearch.ChModelAssertType.ValidityAndWeight"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">ValidityAndWeight</span></code></a>, then the weight of a
+<code class="docutils literal notranslate"><span class="pre">CipherCharacteristic</span></code>
+is defined as the sum of the weight of the key-schedule
+characteristic and the weight of the encryption characteristic.</p></li>
+<li><p>If only <code class="docutils literal notranslate"><span class="pre">ks_assert_type</span></code> is <a class="reference internal" href="#cascada.smt.chsearch.ChModelAssertType.ValidityAndWeight" title="cascada.smt.chsearch.ChModelAssertType.ValidityAndWeight"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">ValidityAndWeight</span></code></a>,
+then the weight is defined as the weight of the key-schedule
+characteristic.</p></li>
+<li><p>If only <code class="docutils literal notranslate"><span class="pre">enc_assert_type</span></code> is <a class="reference internal" href="#cascada.smt.chsearch.ChModelAssertType.ValidityAndWeight" title="cascada.smt.chsearch.ChModelAssertType.ValidityAndWeight"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">ValidityAndWeight</span></code></a>,
+then the weight is defined as the weight of the encryption
+characteristic.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For example, if only <code class="docutils literal notranslate"><span class="pre">enc_assert_type</span></code> is <a class="reference internal" href="#cascada.smt.chsearch.ChModelAssertType.ValidityAndWeight" title="cascada.smt.chsearch.ChModelAssertType.ValidityAndWeight"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">ValidityAndWeight</span></code></a>,
+the search starts finding characteristics where
+the integer weight of the encryption characteristic is
+equal to the initial weight.</p>
+</div>
+<p>The argument <code class="docutils literal notranslate"><span class="pre">ks_empirical_weight_options</span></code>
+(resp. <code class="docutils literal notranslate"><span class="pre">enc_empirical_weight_options</span></code>) specifies the options
+for the computation of the empirical weight over the key-schedule
+(resp. encryption) characteristic. If only one of them is given
+(and the other one is <code class="docutils literal notranslate"><span class="pre">None</span></code>), then only one of the empirical
+weights is computed and used to determine whether to yield
+the characteristic found.</p>
+<p>See also <a class="reference internal" href="#cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight" title="cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">ChFinder.find_next_ch_increasing_weight</span></code></a>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.difference</span> <span class="kn">import</span> <span class="n">RXDiff</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.chmodel</span> <span class="kn">import</span> <span class="n">CipherChModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.smt.chsearch</span> <span class="kn">import</span> <span class="n">CipherChFinder</span><span class="p">,</span> <span class="n">ChModelAssertType</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">speck</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model</span> <span class="o">=</span> <span class="n">CipherChModel</span><span class="p">(</span><span class="n">Speck32</span><span class="p">,</span> <span class="n">RXDiff</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">assert_type</span> <span class="o">=</span> <span class="n">ChModelAssertType</span><span class="o">.</span><span class="n">ValidityAndWeight</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_finder</span> <span class="o">=</span> <span class="n">CipherChFinder</span><span class="p">(</span><span class="n">ch_model</span><span class="p">,</span> <span class="n">assert_type</span><span class="p">,</span> <span class="n">assert_type</span><span class="p">,</span> <span class="s2">&quot;btor&quot;</span><span class="p">,</span> <span class="n">solver_seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">iterator</span> <span class="o">=</span> <span class="n">ch_finder</span><span class="o">.</span><span class="n">find_next_ch_increasing_weight</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">iterator</span><span class="p">)</span><span class="o">.</span><span class="n">srepr</span><span class="p">())</span>
+<span class="go">Ch(ks_ch=Ch(w=1.415, id=0000 0000, od=0000 0000), enc_ch=Ch(w=2.830, id=0000 0000, od=0000 0000))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">iterator</span><span class="p">)</span><span class="o">.</span><span class="n">srepr</span><span class="p">())</span>
+<span class="go">Ch(ks_ch=Ch(w=1.415, id=0000 8000, od=8000 8002), enc_ch=Ch(w=2.830, id=0040 0000, od=8003 8003))</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cascada.smt.chsearch.round_based_ch_search">
+<span class="sig-prename descclassname"><span class="pre">cascada.smt.chsearch.</span></span><span class="sig-name descname"><span class="pre">round_based_ch_search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_num_rounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_num_rounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assert_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_chmodel_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_chfinder_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_findnextchweight_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/smt/chsearch.html#round_based_ch_search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.smt.chsearch.round_based_ch_search" title="Permalink to this definition"></a></dt>
+<dd><p>Search for characteristics of round-based functions over multiple number of rounds.</p>
+<p>This function searches for characteristics of <code class="docutils literal notranslate"><span class="pre">func</span></code> (a <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.RoundBasedFunction" title="cascada.bitvector.ssa.RoundBasedFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RoundBasedFunction</span></code></a>)
+by modelling the search as a sequence of SMT problems (using <a class="reference internal" href="#cascada.smt.chsearch.ChFinder" title="cascada.smt.chsearch.ChFinder"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChFinder</span></code></a>),
+but the search is perfomed iteratively over the number of rounds of <code class="docutils literal notranslate"><span class="pre">func</span></code>.
+That is, first characteristics covering <code class="docutils literal notranslate"><span class="pre">initial_num_rounds</span></code> rounds
+are searched, then <code class="docutils literal notranslate"><span class="pre">initial_num_rounds</span> <span class="pre">+</span> <span class="pre">1</span></code>, until <code class="docutils literal notranslate"><span class="pre">final_num_rounds</span></code>.</p>
+<p>This function proceed as follows:</p>
+<ol class="arabic simple">
+<li><p>Set the number of rounds of <code class="docutils literal notranslate"><span class="pre">func</span></code> to <code class="docutils literal notranslate"><span class="pre">initial_num_rounds</span></code>.</p></li>
+<li><p>Create a <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel" title="cascada.abstractproperty.chmodel.ChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.chmodel.ChModel</span></code></a>
+(resp. <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.EncryptionChModel" title="cascada.abstractproperty.chmodel.EncryptionChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.chmodel.EncryptionChModel</span></code></a>) object using as
+arguments <code class="docutils literal notranslate"><span class="pre">func</span></code>, <code class="docutils literal notranslate"><span class="pre">prop_type</span></code> and <code class="docutils literal notranslate"><span class="pre">extra_chmodel_args</span></code>.</p></li>
+<li><p>Create a <a class="reference internal" href="#cascada.smt.chsearch.ChFinder" title="cascada.smt.chsearch.ChFinder"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChFinder</span></code></a> object with arguments the characteristic model
+created in step 2, <code class="docutils literal notranslate"><span class="pre">assert_type</span></code>, <code class="docutils literal notranslate"><span class="pre">solver_name</span></code> and
+<code class="docutils literal notranslate"><span class="pre">extra_chfinder_args</span></code>.</p></li>
+<li><p>Loop over the generator <a class="reference internal" href="#cascada.smt.chsearch.ChFinder.find_next_ch" title="cascada.smt.chsearch.ChFinder.find_next_ch"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">ChFinder.find_next_ch</span></code></a> or
+<a class="reference internal" href="#cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight" title="cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">ChFinder.find_next_ch_increasing_weight</span></code></a> (depending on
+<code class="docutils literal notranslate"><span class="pre">assert_type</span></code>), and yield all characteristics from the
+generator (together with the current number of rounds).</p></li>
+<li><p>After the generator has been exhausted, the search is finished if
+the current number of rounds is <code class="docutils literal notranslate"><span class="pre">final_num_rounds</span></code>.
+Otherwise, increase the number of rounds by one, set <code class="docutils literal notranslate"><span class="pre">func</span></code>
+to this number of rounds, and go to step 2.</p></li>
+</ol>
+<p>In particular, this function is a Python <a class="reference external" href="https://docs.python.org/3/glossary.html#term-generator" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">generator</span></code></a> function
+(see <a class="reference internal" href="#cascada.smt.chsearch.ChFinder" title="cascada.smt.chsearch.ChFinder"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChFinder</span></code></a>), returning an <a class="reference external" href="https://docs.python.org/3/glossary.html#term-iterator" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">iterator</span></code></a> that yields
+tuples containing the current number of rounds and the last
+characteristic (an <a class="reference internal" href="cascada.abstractproperty.characteristic.html#cascada.abstractproperty.characteristic.Characteristic" title="cascada.abstractproperty.characteristic.Characteristic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.characteristic.Characteristic</span></code></a>
+if <code class="docutils literal notranslate"><span class="pre">func</span></code> is a <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.RoundBasedFunction" title="cascada.bitvector.ssa.RoundBasedFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RoundBasedFunction</span></code></a> object, or
+a <a class="reference internal" href="cascada.abstractproperty.characteristic.html#cascada.abstractproperty.characteristic.EncryptionCharacteristic" title="cascada.abstractproperty.characteristic.EncryptionCharacteristic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.characteristic.EncryptionCharacteristic</span></code></a> if
+<code class="docutils literal notranslate"><span class="pre">func</span></code> is a <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.RoundBasedFunction" title="cascada.bitvector.ssa.RoundBasedFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RoundBasedFunction</span></code></a>-encryption function
+of a <a class="reference internal" href="cascada.primitives.blockcipher.html#cascada.primitives.blockcipher.Cipher" title="cascada.primitives.blockcipher.Cipher"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Cipher</span></code></a>) found in the search.</p>
+<p>The argument <code class="docutils literal notranslate"><span class="pre">prop_type</span></code> is a particular <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> such as <a class="reference internal" href="cascada.differential.difference.html#cascada.differential.difference.XorDiff" title="cascada.differential.difference.XorDiff"><code class="xref any py py-class docutils literal notranslate"><span class="pre">XorDiff</span></code></a>
+or <a class="reference internal" href="cascada.linear.mask.html#cascada.linear.mask.LinearMask" title="cascada.linear.mask.LinearMask"><code class="xref any py py-class docutils literal notranslate"><span class="pre">LinearMask</span></code></a>. For <code class="docutils literal notranslate"><span class="pre">assert_type</span></code> and <code class="docutils literal notranslate"><span class="pre">solver_name</span></code>, see <a class="reference internal" href="#cascada.smt.chsearch.ChFinder" title="cascada.smt.chsearch.ChFinder"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChFinder</span></code></a>.
+The optional arguments <code class="docutils literal notranslate"><span class="pre">extra_chmodel_args</span></code>, <code class="docutils literal notranslate"><span class="pre">extra_chfinder_args</span></code>
+and <code class="docutils literal notranslate"><span class="pre">extra_findnextchweight_args</span></code> can be given as dictionaries
+(in the form of <code class="docutils literal notranslate"><span class="pre">**kwargs</span></code>) containing additional arguments
+for <code class="docutils literal notranslate"><span class="pre">ChModel/EncryptionChModel</span></code>, <a class="reference internal" href="#cascada.smt.chsearch.ChFinder" title="cascada.smt.chsearch.ChFinder"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChFinder</span></code></a> and
+<a class="reference internal" href="#cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight" title="cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">ChFinder.find_next_ch_increasing_weight</span></code></a> calls respectively.</p>
+<p>It is possible to abort the current search for the current number of rounds
+and start the search with one more round by <a class="reference external" href="https://docs.python.org/3/howto/functional.html?highlight=generator#passing-values-into-a-generator">passing</a> the
+value <a class="reference internal" href="#cascada.smt.chsearch.INCREMENT_NUM_ROUNDS" title="cascada.smt.chsearch.INCREMENT_NUM_ROUNDS"><code class="xref any py py-data docutils literal notranslate"><span class="pre">INCREMENT_NUM_ROUNDS</span></code></a>
+to the generator iterator with <a class="reference external" href="https://docs.python.org/3/reference/expressions.html#generator.send" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">generator.send</span></code></a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In other words, step 4 in the previous description can be early
+aborted as follows</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="o">...</span><span class="p">]</span>
+<span class="n">iterator</span> <span class="o">=</span> <span class="n">round_based_ch_search</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="n">n1</span><span class="p">,</span> <span class="n">ch_found</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">iterator</span><span class="p">)</span>
+<span class="n">iterator</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">INCREMENT_NUM_ROUNDS</span><span class="p">)</span>
+<span class="n">n2</span><span class="p">,</span> <span class="n">ch_found</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">iterator</span><span class="p">)</span>  <span class="c1"># n2 &gt; n1</span>
+<span class="p">[</span><span class="o">...</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Although <a class="reference external" href="https://docs.python.org/3/reference/expressions.html#generator.send" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">generator.send</span></code></a> yields a new value of the iteration,
+this function does not yield anything meaningful in the <code class="docutils literal notranslate"><span class="pre">send</span></code> calls.</p>
+</div>
+<p>The function <a class="reference internal" href="#cascada.smt.chsearch.round_based_ch_search" title="cascada.smt.chsearch.round_based_ch_search"><code class="xref any py py-func docutils literal notranslate"><span class="pre">round_based_ch_search</span></code></a> is mostly meant to be used with
+<a class="reference internal" href="#cascada.smt.chsearch.ChModelAssertType.ValidityAndWeight" title="cascada.smt.chsearch.ChModelAssertType.ValidityAndWeight"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">ChModelAssertType.ValidityAndWeight</span></code></a>, as the minimum weight obtain
+in one round is used as the initial weight for the next round.
+In other words, if all the characteristics covering <span class="math notranslate nohighlight">\(r\)</span> number
+of rounds were found with SMT problems for integer weights
+(see <a class="reference internal" href="#cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight" title="cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">ChFinder.find_next_ch_increasing_weight</span></code></a>)
+larger than <span class="math notranslate nohighlight">\(w\)</span>, then <span class="math notranslate nohighlight">\(w\)</span> is set as the initial weight
+for the search for characteristics covering <span class="math notranslate nohighlight">\(r+1\)</span> rounds.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>All SMT problems modelling a characteristic covering
+<span class="math notranslate nohighlight">\(r+1\)</span> rounds for integer weights less or equal
+than <span class="math notranslate nohighlight">\(r - 1\)</span> are unsatisfiable due to our definition
+of characteristic weight (see
+<a class="reference internal" href="cascada.abstractproperty.characteristic.html#cascada.abstractproperty.characteristic.Characteristic" title="cascada.abstractproperty.characteristic.Characteristic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.characteristic.Characteristic</span></code></a> and
+<a class="reference internal" href="cascada.differential.characteristic.html#cascada.differential.characteristic.Characteristic" title="cascada.differential.characteristic.Characteristic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">differential.characteristic.Characteristic</span></code></a> or
+<a class="reference internal" href="cascada.linear.characteristic.html#cascada.linear.characteristic.Characteristic" title="cascada.linear.characteristic.Characteristic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">linear.characteristic.Characteristic</span></code></a> for some examples)</p>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># example of searching for XorDiff Characteristic over a BvFunction</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.difference</span> <span class="kn">import</span> <span class="n">XorDiff</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.smt.chsearch</span> <span class="kn">import</span> <span class="n">ChModelAssertType</span><span class="p">,</span> <span class="n">round_based_ch_search</span><span class="p">,</span> <span class="n">INCREMENT_NUM_ROUNDS</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">speck</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32_ks</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span><span class="o">.</span><span class="n">key_schedule</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">assert_type</span> <span class="o">=</span> <span class="n">ChModelAssertType</span><span class="o">.</span><span class="n">ValidityAndWeight</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">iterator</span> <span class="o">=</span> <span class="n">round_based_ch_search</span><span class="p">(</span><span class="n">Speck32_ks</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">XorDiff</span><span class="p">,</span> <span class="n">assert_type</span><span class="p">,</span> <span class="s2">&quot;btor&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">extra_chfinder_args</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;exclude_zero_input_prop&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;solver_seed&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="n">extra_findnextchweight_args</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;initial_weight&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="p">(</span><span class="n">num_rounds</span><span class="p">,</span> <span class="n">ch</span><span class="p">)</span> <span class="ow">in</span> <span class="n">iterator</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">num_rounds</span><span class="p">,</span> <span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="n">ch</span><span class="o">.</span><span class="n">srepr</span><span class="p">())</span>
+<span class="go">2 : Ch(w=0, id=0040 0000 0000, od=0000 0000 8000)</span>
+<span class="go">3 : Ch(w=0, id=0040 0000 0000 0000, od=0000 0000 0000 8000)</span>
+<span class="go">4 : Ch(w=0, id=0040 0000 0000 0000, od=0000 0000 0000 8000 8002)</span>
+<span class="go">5 : Ch(w=1, id=0040 0000 0000 0000, od=0000 0000 0000 8000 8002 8008)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># example of searching for LinearMask EncryptionCharacteristic over a Cipher</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.linear.mask</span> <span class="kn">import</span> <span class="n">LinearMask</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">assert_type</span> <span class="o">=</span> <span class="n">ChModelAssertType</span><span class="o">.</span><span class="n">ProbabilityOne</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">iterator</span> <span class="o">=</span> <span class="n">round_based_ch_search</span><span class="p">(</span><span class="n">Speck32</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">LinearMask</span><span class="p">,</span> <span class="n">assert_type</span><span class="p">,</span> <span class="s2">&quot;btor&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">extra_chfinder_args</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;solver_seed&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">num_rounds</span><span class="p">,</span> <span class="n">ch</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">iterator</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">num_rounds</span><span class="p">,</span> <span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="n">ch</span><span class="o">.</span><span class="n">srepr</span><span class="p">())</span>
+<span class="go">2 : Ch(w=0, id=0000 0000, od=0000 0000)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">num_rounds</span><span class="p">,</span> <span class="n">ch</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">iterator</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">num_rounds</span><span class="p">,</span> <span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="n">ch</span><span class="o">.</span><span class="n">srepr</span><span class="p">())</span>
+<span class="go">2 : Ch(w=0, id=0080 4021, od=0201 0200)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">iterator</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">INCREMENT_NUM_ROUNDS</span><span class="p">)</span>  <span class="c1"># stop current num_rounds and increment by 1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">num_rounds</span><span class="p">,</span> <span class="n">ch</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">iterator</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">num_rounds</span><span class="p">,</span> <span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="n">ch</span><span class="o">.</span><span class="n">srepr</span><span class="p">())</span>
+<span class="go">3 : Ch(w=0, id=0000 0000, od=0000 0000)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cascada.smt.chsearch.round_based_cipher_ch_search">
+<span class="sig-prename descclassname"><span class="pre">cascada.smt.chsearch.</span></span><span class="sig-name descname"><span class="pre">round_based_cipher_ch_search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cipher</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_num_rounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_num_rounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ks_assert_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enc_assert_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_cipherchmodel_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_cipherchfinder_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_findnextchweight_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/smt/chsearch.html#round_based_cipher_ch_search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.smt.chsearch.round_based_cipher_ch_search" title="Permalink to this definition"></a></dt>
+<dd><p>Search for characteristics of iterated ciphers over multiple number of rounds.</p>
+<p>This function is similar to <a class="reference internal" href="#cascada.smt.chsearch.round_based_cipher_ch_search" title="cascada.smt.chsearch.round_based_cipher_ch_search"><code class="xref any py py-func docutils literal notranslate"><span class="pre">round_based_cipher_ch_search</span></code></a> but searching for
+<a class="reference internal" href="cascada.abstractproperty.characteristic.html#cascada.abstractproperty.characteristic.CipherCharacteristic" title="cascada.abstractproperty.characteristic.CipherCharacteristic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.characteristic.CipherCharacteristic</span></code></a> instead of
+<a class="reference internal" href="cascada.abstractproperty.characteristic.html#cascada.abstractproperty.characteristic.Characteristic" title="cascada.abstractproperty.characteristic.Characteristic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.characteristic.Characteristic</span></code></a>.</p>
+<p>In particular, this function creates an <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.CipherChModel" title="cascada.abstractproperty.chmodel.CipherChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.chmodel.CipherChModel</span></code></a>
+and an <a class="reference internal" href="#cascada.smt.chsearch.CipherChFinder" title="cascada.smt.chsearch.CipherChFinder"><code class="xref any py py-class docutils literal notranslate"><span class="pre">CipherChFinder</span></code></a> objects instead of an <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel" title="cascada.abstractproperty.chmodel.ChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.chmodel.ChModel</span></code></a>
+and an <a class="reference internal" href="#cascada.smt.chsearch.ChFinder" title="cascada.smt.chsearch.ChFinder"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChFinder</span></code></a> objects.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.difference</span> <span class="kn">import</span> <span class="n">XorDiff</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.smt.chsearch</span> <span class="kn">import</span> <span class="n">ChModelAssertType</span><span class="p">,</span> <span class="n">round_based_cipher_ch_search</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">speck</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">at</span> <span class="o">=</span> <span class="n">ChModelAssertType</span><span class="o">.</span><span class="n">ValidityAndWeight</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">iterator</span> <span class="o">=</span> <span class="n">round_based_cipher_ch_search</span><span class="p">(</span><span class="n">Speck32</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">XorDiff</span><span class="p">,</span> <span class="n">at</span><span class="p">,</span> <span class="n">at</span><span class="p">,</span> <span class="s2">&quot;btor&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">extra_cipherchfinder_args</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;ks_exclude_zero_input_prop&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;solver_seed&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="n">extra_findnextchweight_args</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;initial_weight&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="p">(</span><span class="n">num_rounds</span><span class="p">,</span> <span class="n">ch</span><span class="p">)</span> <span class="ow">in</span> <span class="n">iterator</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">num_rounds</span><span class="p">,</span> <span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="n">ch</span><span class="o">.</span><span class="n">srepr</span><span class="p">())</span>  
+<span class="go">2 : Ch(ks_ch=Ch(w=0, id=0040 0000, od=0000 8000),</span>
+<span class="go">      enc_ch=Ch(w=0, id=0000 0000, od=8000 8000))</span>
+<span class="go">3 : Ch(ks_ch=Ch(w=0, id=0040 0000 0000, od=0000 0000 8000),</span>
+<span class="go">      enc_ch=Ch(w=0, id=0000 0000, od=8000 8000))</span>
+<span class="go">4 : Ch(ks_ch=Ch(w=0, id=0040 0000 0000 0000, od=0000 0000 0000 8000),</span>
+<span class="go">      enc_ch=Ch(w=0, id=0000 0000, od=8000 8000))</span>
+<span class="go">5 : Ch(ks_ch=Ch(w=0, id=0040 0000 0000 0000, od=0000 0000 0000 8000 8002),</span>
+<span class="go">      enc_ch=Ch(w=1, id=0000 0000, od=0102 0100))</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cascada.smt.pysmttypes.html" class="btn btn-neutral float-left" title="cascada.smt.pysmttypes module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cascada.smt.invalidpropsearch.html" class="btn btn-neutral float-right" title="cascada.smt.invalidpropsearch module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Adrián Ranea.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

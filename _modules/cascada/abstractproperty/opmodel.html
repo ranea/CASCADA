@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cascada.abstractproperty.opmodel &mdash; CASCADA 1.0.rc0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> CASCADA
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">CASCADA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../primitives_implemented.html">Primitives implemented</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cascada.html">API reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">CASCADA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>cascada.abstractproperty.opmodel</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cascada.abstractproperty.opmodel</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Manipulate property models of bit-vector operations (w.r.t an abstract property).&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">decimal</span>
+<span class="kn">import</span> <span class="nn">math</span>
+
+<span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">core</span>
+<span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">operation</span>
+<span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">context</span>
+
+<span class="kn">from</span> <span class="nn">cascada</span> <span class="kn">import</span> <span class="n">abstractproperty</span>
+
+
+<span class="k">def</span> <span class="nf">_tuplify</span><span class="p">(</span><span class="n">seq</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">seq</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">Sequence</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">seq</span><span class="p">])</span>
+
+
+<span class="k">def</span> <span class="nf">log2_decimal</span><span class="p">(</span><span class="n">my_decimal</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">my_decimal</span><span class="o">.</span><span class="n">ln</span><span class="p">()</span> <span class="o">/</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">ln</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="InvalidOpModelError"><a class="viewcode-back" href="../../../cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.InvalidOpModelError">[docs]</a><span class="k">class</span> <span class="nc">InvalidOpModelError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when the OpModel is not valid and a valid one was expected.&quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="OpModel"><a class="viewcode-back" href="../../../cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel">[docs]</a><span class="k">class</span> <span class="nc">OpModel</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent property models of bit-vector operations.</span>
+
+<span class="sd">    A (bit-vector) property model of a bit-vector `Operation` :math:`f` for</span>
+<span class="sd">    a particular `Property` is a set of bit-vector constraints that</span>
+<span class="sd">    models the propagation probability of `Property` over :math:`f`.</span>
+<span class="sd">    See `Property`.</span>
+
+<span class="sd">    .. note::</span>
+
+<span class="sd">        For the `Value` and `Difference` `Property` types,</span>
+<span class="sd">        the propagation probability satisfies that for any</span>
+<span class="sd">        fixed :math:`\\alpha`, the sum of the probabilities of :math:`\\alpha`</span>
+<span class="sd">        propagating to :math:`\\beta` (for all :math:`\\beta`) is equal to 1.</span>
+<span class="sd">        In particular, if the propagation probability of</span>
+<span class="sd">        :math:`(\\alpha, \\beta)` is 1, then :math:`\\alpha`</span>
+<span class="sd">        uniquely propagates to :math:`\\beta`.</span>
+
+<span class="sd">        For the `LinearMask` property this is different</span>
+<span class="sd">        (see `linear.opmodel.OpModel`).</span>
+
+<span class="sd">    A model of :math:`f` is mainly given by three bit-vector formulas or</span>
+<span class="sd">    constraints: the `validity_constraint` constraint, the `weight_constraint`</span>
+<span class="sd">    and the `pr_one_constraint`:</span>
+
+<span class="sd">    * The validity constraint (with inputs :math:`(\\alpha, \\beta)`) is True</span>
+<span class="sd">      if and only if the propagation probability of :math:`(\\alpha, \\beta)`</span>
+<span class="sd">      is non-zero, that is, :math:`P(\\alpha, \\beta) \\neq 0`.</span>
+<span class="sd">    * The weight constraint (with inputs :math:`(w, \\alpha, \\beta)` is True</span>
+<span class="sd">      if and only if the bit-vector :math:`w` is equals to the negative binary</span>
+<span class="sd">      logarithm (weight) of the propagation probability of :math:`(\\alpha, \\beta)`,</span>
+<span class="sd">      that is, :math:`w = -log_2(P(\\alpha, \\beta)))`.</span>
+<span class="sd">    * The probability-one constraint  (with inputs :math:`(\\alpha, \\beta)`)</span>
+<span class="sd">      is True if and only if the propagation probability of</span>
+<span class="sd">      :math:`(\\alpha, \\beta)` is 1.</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">        The weight constraint is only defined for inputs :math:`(w, \\alpha, \\beta)`</span>
+<span class="sd">        where the propagation probability of :math:`(\\alpha, \\beta)` is non-zero.</span>
+
+<span class="sd">        By default, the :math:`n_w`-bit input `Variable` :math:`w`</span>
+<span class="sd">        of the weight constraint is interpreted as the non-negative integer</span>
+<span class="sd">        :math:`w[0] + 2 w[1] + \dots + 2^{n_w−1} w[n_w − 1]`.</span>
+<span class="sd">        However, since the propagation weight can be a non-integer value</span>
+<span class="sd">        for some properties and functions, :math:`w` can also be interpreted</span>
+<span class="sd">        as the rational value :math:`2^{−l}(w[0] + 2w[1] + \dots + 2^{n_w−1} w[n_w − 1]`</span>
+<span class="sd">        for a given fixed number :math:`l` (`num_frac_bits`) of fractional bits.</span>
+
+<span class="sd">        Moreover, weight constraints can also be True if</span>
+<span class="sd">        :math:`w` is equals to weight of the propagation probability up to</span>
+<span class="sd">        some error bounded by `error`.</span>
+
+<span class="sd">    An `OpModel` is defined for a type of `Property` and a bit-vector</span>
+<span class="sd">    `Operation` :math:`f` . The input property :math:`\\alpha` is used</span>
+<span class="sd">    when initializing the `OpModel` object, and the output property</span>
+<span class="sd">    :math:`\\beta` is given in the arguments of the methods</span>
+<span class="sd">    `OpModel.validity_constraint`, `OpModel.weight_constraint`</span>
+<span class="sd">    and `OpModel.pr_one_constraint` (among others).</span>
+
+<span class="sd">    In some cases, the validity, weight or probability-one constraints</span>
+<span class="sd">    use auxiliary external (different from the input and output</span>
+<span class="sd">    properties) variables in the bit-vector expression.</span>
+<span class="sd">    These external variables can be obtained from</span>
+<span class="sd">    `external_vars_validity_constraint`,</span>
+<span class="sd">    `external_vars_weight_constraint` and</span>
+<span class="sd">    `external_vars_pr_one_constraint` respectively.</span>
+
+<span class="sd">    .. note::  `OpModel` of functions with scalar operands are not supported.</span>
+
+<span class="sd">    This class is not meant to be instantiated but to provide a base</span>
+<span class="sd">    class for creating models of some operation w.r.t some property,</span>
+<span class="sd">    (see `XorModelBvAdd`, `LinearModelBvAdd` or `BitModelBvAdd`</span>
+<span class="sd">    for some examples).</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">        It is highly recommended that new models of bit-vector operations</span>
+<span class="sd">        are tested with `TestOpModelGeneric`</span>
+<span class="sd">        (see ``differential/tests/test_opmodel.py`` or</span>
+<span class="sd">        ``linear/tests/test_opmodel.py`` for some examples).</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        prop_type: the particular `Property` type</span>
+<span class="sd">        op: the bit-vector `Operation` :math:`f`</span>
+<span class="sd">        input_prop: a list containing the `Property` associated to</span>
+<span class="sd">            each bit-vector operand.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">prop_type</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">op</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_prop</span><span class="p">):</span>  <span class="c1"># noqa: 102</span>
+        <span class="n">input_prop</span> <span class="o">=</span> <span class="n">_tuplify</span><span class="p">(</span><span class="n">input_prop</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">PartialOpModel</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;op&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> need to be given to make_partial_op_model&quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot; to get the OpModel for the particular fixed operand&quot;</span><span class="p">)</span>
+
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">arity</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>  <span class="c1"># no scalars</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_prop</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">arity</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">input_prop</span><span class="p">)</span><span class="si">}</span><span class="s2"> inputs given to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> but &quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;arity of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> is </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">arity</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">input_prop</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">prop_type</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;input </span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2"> of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> is not a &quot;</span>
+                                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">prop_type</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> object&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_prop</span> <span class="o">=</span> <span class="n">input_prop</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">input_prop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_prop</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_prop</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_prop</span><span class="p">)</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="n">input_prop</span><span class="si">}</span><span class="s2">)&quot;</span>
+
+    <span class="fm">__repr__</span> <span class="o">=</span> <span class="fm">__str__</span>
+
+<div class="viewcode-block" id="OpModel.vrepr"><a class="viewcode-back" href="../../../cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel.vrepr">[docs]</a>    <span class="k">def</span> <span class="nf">vrepr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return an executable string representation.</span>
+
+<span class="sd">        This method returns a string so that ``eval(self.vrepr())``</span>
+<span class="sd">        and ``self`` have the same content.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_prop</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">id_vrepr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_prop</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">vrepr</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">id_vrepr</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">d</span><span class="o">.</span><span class="n">vrepr</span><span class="p">()</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_prop</span><span class="p">])</span><span class="si">}</span><span class="s2">]&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="n">id_vrepr</span><span class="si">}</span><span class="s2">)&quot;</span></div>
+
+<div class="viewcode-block" id="OpModel.validity_constraint"><a class="viewcode-back" href="../../../cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel.validity_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">validity_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_prop</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the validity constraint for a given output `Property`.</span>
+
+<span class="sd">        The validity constraint is a bit-vector expression that depends on</span>
+<span class="sd">        the input property `OpModel.input_prop` and the output property</span>
+<span class="sd">        ``output_prop`` and it is True if and only if the input property</span>
+<span class="sd">        propagates to the output property with non-zero probability.</span>
+
+<span class="sd">        If both the input and output properties are constant values,</span>
+<span class="sd">        this method returns the `Constant` ``0b1`` or ``0b0`` depending on</span>
+<span class="sd">        whether the corresponding propagation has non-zero probability.</span>
+<span class="sd">        Otherwise, this method returns a bit-vector `Term`</span>
+<span class="sd">        containing the input and output properties as `Variable` objects.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;subclasses need to override this method&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OpModel.pr_one_constraint"><a class="viewcode-back" href="../../../cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel.pr_one_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">pr_one_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_prop</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the probability-one constraint for a given output `Property`.</span>
+
+<span class="sd">        Return the constraint that evaluates to True if the input `Property`</span>
+<span class="sd">        propagates to the given output `Property` with probability one.</span>
+
+<span class="sd">        This method returns a bit-vector expression that depends on</span>
+<span class="sd">        the input property `OpModel.input_prop` and the output property</span>
+<span class="sd">        ``output_prop`` and it is True if and only if the input property</span>
+<span class="sd">        propagates to the output property with probability 1.</span>
+
+<span class="sd">        If both the input and output properties are constant values,</span>
+<span class="sd">        this method returns the `Constant` ``0b1`` or ``0b0`` depending on</span>
+<span class="sd">        whether the corresponding propagation has probability 1.</span>
+<span class="sd">        Otherwise, this method returns a bit-vector `Term`</span>
+<span class="sd">        containing the input and output properties as `Variable` objects.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;subclasses need to override this method&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OpModel.weight_constraint"><a class="viewcode-back" href="../../../cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel.weight_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">weight_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_prop</span><span class="p">,</span> <span class="n">weight_variable</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the weight constraint for a given output `Property` and weight `Variable`.</span>
+
+<span class="sd">        The weight constraint is a bit-vector expression that depends on</span>
+<span class="sd">        the input property `OpModel.input_prop`, the output property</span>
+<span class="sd">        ``output_prop`` and the weight variable ``weight_variable``.</span>
+<span class="sd">        This expression is True if and only if the weight</span>
+<span class="sd">        (negative binary logarithm of the probability) of the input property</span>
+<span class="sd">        propagating to the output property is equals to ``weight_variable``.</span>
+
+<span class="sd">        .. note::</span>
+<span class="sd">            It is assumed that the corresponding propagation has non-zero probability.</span>
+
+<span class="sd">        If the input and output properties and the weight variable are constant values,</span>
+<span class="sd">        this method returns the `Constant` ``0b1`` or ``0b0`` depending on</span>
+<span class="sd">        whether the corresponding propagation has the given weight.</span>
+<span class="sd">        Otherwise, this method returns a bit-vector `Term`</span>
+<span class="sd">        containing the input and output properties and the weight as `Variable` objects.</span>
+
+<span class="sd">        Subclasses can either reimplement this method or implement the method ``bv_weight``.</span>
+<span class="sd">        In the last case, the weight constraint is defined as</span>
+<span class="sd">        ``BvComp(weight_variable, self.bv_weight(output_prop))``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">weight_variable</span><span class="o">.</span><span class="n">width</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight_width</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;invalid weight_variable width&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvComp</span><span class="p">(</span><span class="n">weight_variable</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bv_weight</span><span class="p">(</span><span class="n">output_prop</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="OpModel.bv_weight"><a class="viewcode-back" href="../../../cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel.bv_weight">[docs]</a>    <span class="k">def</span> <span class="nf">bv_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_prop</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the bit-vector weight for a given output `Property`.</span>
+
+<span class="sd">        The bit-vector weight is a bit-vector expression that depends on</span>
+<span class="sd">        the input property `OpModel.input_prop` and the output property</span>
+<span class="sd">        ``output_prop``. This bit-vector function represents an approximation</span>
+<span class="sd">        of the negative binary logarithm (weight) of the probability of</span>
+<span class="sd">        the input property propagating to the output property.</span>
+
+<span class="sd">        .. note::</span>
+<span class="sd">            This method is optional and subclasses of `OpModel` don&#39;t need to implement it</span>
+<span class="sd">            (as opposed to `OpModel.weight_constraint`).</span>
+
+<span class="sd">            It is assumed that the corresponding propagation has non-zero probability.</span>
+
+<span class="sd">        If the input and output properties are constant values,</span>
+<span class="sd">        this method returns a `Constant` of bit-size `weight_width`</span>
+<span class="sd">        denoting the weight of the valid propagation.</span>
+<span class="sd">        Otherwise, this method returns a bit-vector `Term`</span>
+<span class="sd">        containing the input and output properties as `Variable` objects.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;subclasses need to override this method&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OpModel.max_weight"><a class="viewcode-back" href="../../../cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel.max_weight">[docs]</a>    <span class="k">def</span> <span class="nf">max_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the maximum value the weight variable can achieve in `OpModel.weight_constraint`.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;subclasses need to override this method&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OpModel.weight_width"><a class="viewcode-back" href="../../../cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel.weight_width">[docs]</a>    <span class="k">def</span> <span class="nf">weight_width</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the width of the weight variable used `OpModel.weight_constraint`.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;subclasses need to override this method&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OpModel.decimal_weight"><a class="viewcode-back" href="../../../cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel.decimal_weight">[docs]</a>    <span class="k">def</span> <span class="nf">decimal_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_prop</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the `decimal.Decimal` weight for a given constant output `Property`.</span>
+
+<span class="sd">        This method returns, as a decimal number, the weight (negative binary logarithm)</span>
+<span class="sd">        of the probability of the input property propagating to the output property.</span>
+
+<span class="sd">        This method only works when the input property and the output property are</span>
+<span class="sd">        constant values, but provides a better approximation than the bit-vector weight</span>
+<span class="sd">        from `OpModel.weight_constraint`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;subclasses need to override this method&quot;</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_assert_preconditions_decimal_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_prop</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_prop</span> <span class="o">+</span> <span class="p">(</span><span class="n">output_prop</span><span class="p">,</span> <span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;decimal_weight requires constant input and output properties | &quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2">(output_prop=</span><span class="si">{</span><span class="n">output_prop</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">validity_constraint</span><span class="p">(</span><span class="n">output_prop</span><span class="p">)</span> <span class="o">==</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">InvalidOpModelError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;decimal_weight requires a valid propagation | &quot;</span>
+                                      <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2">(output_prop=</span><span class="si">{</span><span class="n">output_prop</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_assert_postconditions_decimal_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_prop</span><span class="p">,</span> <span class="n">decimal_weight</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">decimal_weight</span><span class="p">,</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">bv_weight_with_frac_bits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bv_weight</span><span class="p">(</span><span class="n">output_prop</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">NotImplementedError</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="n">bv_weight_with_frac_bits</span> <span class="o">=</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">bv_weight_with_frac_bits</span><span class="p">))</span>
+        <span class="n">bv_weight</span> <span class="o">=</span> <span class="n">bv_weight_with_frac_bits</span> <span class="o">/</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_frac_bits</span><span class="p">()))</span>
+
+        <span class="n">abs_error</span> <span class="o">=</span> <span class="p">(</span><span class="n">decimal_weight</span> <span class="o">-</span> <span class="n">bv_weight</span><span class="p">)</span><span class="o">.</span><span class="n">copy_abs</span><span class="p">()</span>
+        <span class="n">max_abs_error</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">abs_error</span> <span class="o">&gt;</span> <span class="n">max_abs_error</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;absolute error between decimal_weight=</span><span class="si">{</span><span class="n">decimal_weight</span><span class="si">}</span><span class="s2"> &quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;and bv_weight=</span><span class="si">{</span><span class="n">bv_weight</span><span class="si">}</span><span class="s2"> for op_model=</span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2"> and &quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;output_prop=</span><span class="si">{</span><span class="n">output_prop</span><span class="si">}</span><span class="s2"> is </span><span class="si">{</span><span class="n">abs_error</span><span class="si">}</span><span class="s2">, which is greater &quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;than maximum absolute error given by error()=</span><span class="si">{</span><span class="n">max_abs_error</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="OpModel.num_frac_bits"><a class="viewcode-back" href="../../../cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel.num_frac_bits">[docs]</a>    <span class="k">def</span> <span class="nf">num_frac_bits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the number of fractional bits used in the weight variable of `OpModel.weight_constraint`.</span>
+
+<span class="sd">        If the number of fractional bits is ``k``, then the bit-vector weight variable</span>
+<span class="sd">        ``w`` of `OpModel.weight_constraint` represents the number ``2^{-k} * bv2int(w)``.</span>
+<span class="sd">        In particular, if ``k == 0``, then ``w`` represents an integer number.</span>
+<span class="sd">        Otherwise, the ``k`` least significant bits of ``w`` denote the</span>
+<span class="sd">        fractional part of the number represented by ``w``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;subclasses need to override this method&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OpModel.error"><a class="viewcode-back" href="../../../cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel.error">[docs]</a>    <span class="k">def</span> <span class="nf">error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the maximum difference between `OpModel.weight_constraint` and the exact weight.</span>
+
+<span class="sd">        The exact weight is exact value (without error) of the negative binary</span>
+<span class="sd">        logarithm (weight) of the propagation probability of :math:`(\\alpha, \\beta)`.</span>
+
+<span class="sd">        .. note::</span>
+
+<span class="sd">            The exact weight can be computed in `TestOpModelGeneric.get_empirical_weight_slow`.</span>
+
+<span class="sd">        This method returns an upper bound (in absolute value) of the maximum difference</span>
+<span class="sd">        (over all input and output properties) between the bit-vector weight</span>
+<span class="sd">        from `OpModel.weight_constraint` and the exact weight.</span>
+
+<span class="sd">        Note that the exact weight might still differ from `decimal_weight`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;subclasses need to override this method&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OpModel.external_vars_validity_constraint"><a class="viewcode-back" href="../../../cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel.external_vars_validity_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">external_vars_validity_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_prop</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the list of external variables of `validity_constraint`</span>
+<span class="sd">        for a given output `Property` (an empty list by default).&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[]</span></div>
+
+<div class="viewcode-block" id="OpModel.external_vars_pr_one_constraint"><a class="viewcode-back" href="../../../cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel.external_vars_pr_one_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">external_vars_pr_one_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_prop</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the list of external variables of `pr_one_constraint`</span>
+<span class="sd">        for a given output `Property` (an empty list by default).&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[]</span></div>
+
+<div class="viewcode-block" id="OpModel.external_vars_weight_constraint"><a class="viewcode-back" href="../../../cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel.external_vars_weight_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">external_vars_weight_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_prop</span><span class="p">,</span> <span class="n">weight_variable</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the list of external variables of `weight_constraint`</span>
+<span class="sd">        for a given output `Property` and weight `Variable` (an empty list by default).&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[]</span></div></div>
+
+
+<div class="viewcode-block" id="PartialOpModel"><a class="viewcode-back" href="../../../cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.PartialOpModel">[docs]</a><span class="k">class</span> <span class="nc">PartialOpModel</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent property models of operations with fixed operands.</span>
+
+<span class="sd">    This class is not meant to be instantiated but to provide a base</span>
+<span class="sd">    class for property models of operations with fixed operands generated</span>
+<span class="sd">    through `make_partial_op_model`.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        base_op: a subclass of `Operation` denoting the base operator.</span>
+
+<span class="sd">    .. Implementation details:</span>
+
+<span class="sd">        This class does not subclass `abstractproperty.opmodel.OpModel`,</span>
+<span class="sd">        but subclasses of this class defined for a particular `Property`</span>
+<span class="sd">        must subclass the corresponding ``OpModel``.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="PartialOpModel.vrepr"><a class="viewcode-back" href="../../../cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.PartialOpModel.vrepr">[docs]</a>    <span class="k">def</span> <span class="nf">vrepr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return an executable string representation.</span>
+
+<span class="sd">        This method returns a string so that ``eval(self.vrepr())``</span>
+<span class="sd">        and ``self`` have the same content.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fa_vrepr</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Term</span><span class="p">)</span> <span class="k">else</span> <span class="n">a</span><span class="o">.</span><span class="n">vrepr</span><span class="p">()</span>
+                              <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">])</span>
+        <span class="n">fa_vrepr</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">fa_vrepr</span><span class="si">}</span><span class="s2">)&quot;</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_prop</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">id_vrepr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_prop</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">vrepr</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">id_vrepr</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">d</span><span class="o">.</span><span class="n">vrepr</span><span class="p">()</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_prop</span><span class="p">])</span><span class="si">}</span><span class="s2">]&quot;</span>
+
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">(</span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">)(</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">make_partial_op_model</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__bases__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+            <span class="n">fa_vrepr</span><span class="p">,</span>
+            <span class="n">id_vrepr</span>
+        <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="make_partial_op_model"><a class="viewcode-back" href="../../../cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.make_partial_op_model">[docs]</a><span class="nd">@functools</span><span class="o">.</span><span class="n">lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>  <span class="c1"># temporary hack to create singletons</span>
+<span class="k">def</span> <span class="nf">make_partial_op_model</span><span class="p">(</span><span class="n">abstract_partial_op_model</span><span class="p">,</span> <span class="n">fixed_args</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the partial property model of the given bit-vector partial operation.</span>
+
+<span class="sd">    The argument ``abstract_partial_op_model`` is an (abstract) subclass of</span>
+<span class="sd">    `PartialOpModel` containing the base operator.</span>
+
+<span class="sd">    The argument ``fixed_args`` is a `tuple`, with the same length as</span>
+<span class="sd">    the number of operands of the base operator, containing ``None``,</span>
+<span class="sd">    scalar or `Constant` elements. If ``fixed_args[i]`` is ``None``,</span>
+<span class="sd">    the i-th operand is not fixed; otherwise, the i-th operand is</span>
+<span class="sd">    replaced with ``fixed_args[i]``. See also `make_partial_operation`.</span>
+
+<span class="sd">    The resulting class is a subclass of ``abstract_partial_op_model``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">abstract_partial_op_model</span><span class="p">,</span> <span class="n">PartialOpModel</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">abstract_partial_op_model</span><span class="p">,</span> <span class="s2">&quot;op&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">abstract_partial_op_model</span><span class="o">.</span><span class="n">op</span> <span class="ow">is</span> <span class="kc">None</span>
+
+    <span class="n">partial_op</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">make_partial_operation</span><span class="p">(</span><span class="n">abstract_partial_op_model</span><span class="o">.</span><span class="n">base_op</span><span class="p">,</span> <span class="n">fixed_args</span><span class="p">)</span>
+
+    <span class="n">fixed_args_str</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">partial_op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">arg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fixed_args_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;·&quot;</span><span class="p">)</span>
+            <span class="k">continue</span>
+        <span class="n">fixed_args_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">arg</span><span class="p">))</span>
+
+    <span class="k">class</span> <span class="nc">MyPartialOpModel</span><span class="p">(</span><span class="n">abstract_partial_op_model</span><span class="p">):</span>
+        <span class="n">op</span> <span class="o">=</span> <span class="n">partial_op</span>
+
+    <span class="n">MyPartialOpModel</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">abstract_partial_op_model</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">_</span><span class="se">{{</span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fixed_args_str</span><span class="p">)</span><span class="si">}</span><span class="se">}}</span><span class="s2">&quot;</span>
+
+    <span class="k">return</span> <span class="n">MyPartialOpModel</span></div>
+
+
+<div class="viewcode-block" id="ModelIdentity"><a class="viewcode-back" href="../../../cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.ModelIdentity">[docs]</a><span class="k">class</span> <span class="nc">ModelIdentity</span><span class="p">(</span><span class="n">OpModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent the (trivial) property model of the identity function.</span>
+
+<span class="sd">    This model is used to rename a complex intermediate property with a new name.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">op</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvIdentity</span>
+
+<div class="viewcode-block" id="ModelIdentity.validity_constraint"><a class="viewcode-back" href="../../../cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.ModelIdentity.validity_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">validity_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_prop</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvComp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_prop</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="n">output_prop</span><span class="o">.</span><span class="n">val</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ModelIdentity.pr_one_constraint"><a class="viewcode-back" href="../../../cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.ModelIdentity.pr_one_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">pr_one_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_prop</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">validity_constraint</span><span class="p">(</span><span class="n">output_prop</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ModelIdentity.bv_weight"><a class="viewcode-back" href="../../../cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.ModelIdentity.bv_weight">[docs]</a>    <span class="k">def</span> <span class="nf">bv_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_prop</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ModelIdentity.max_weight"><a class="viewcode-back" href="../../../cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.ModelIdentity.max_weight">[docs]</a>    <span class="k">def</span> <span class="nf">max_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">0</span>  <span class="c1"># as an integer</span></div>
+
+<div class="viewcode-block" id="ModelIdentity.weight_width"><a class="viewcode-back" href="../../../cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.ModelIdentity.weight_width">[docs]</a>    <span class="k">def</span> <span class="nf">weight_width</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="ModelIdentity.decimal_weight"><a class="viewcode-back" href="../../../cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.ModelIdentity.decimal_weight">[docs]</a>    <span class="k">def</span> <span class="nf">decimal_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_prop</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_assert_preconditions_decimal_weight</span><span class="p">(</span><span class="n">output_prop</span><span class="p">)</span>
+        <span class="n">dw</span> <span class="o">=</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_assert_postconditions_decimal_weight</span><span class="p">(</span><span class="n">output_prop</span><span class="p">,</span> <span class="n">dw</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dw</span></div>
+
+<div class="viewcode-block" id="ModelIdentity.num_frac_bits"><a class="viewcode-back" href="../../../cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.ModelIdentity.num_frac_bits">[docs]</a>    <span class="k">def</span> <span class="nf">num_frac_bits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="ModelIdentity.error"><a class="viewcode-back" href="../../../cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.ModelIdentity.error">[docs]</a>    <span class="k">def</span> <span class="nf">error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">0</span></div></div>
+
+
+<div class="viewcode-block" id="WeakModel"><a class="viewcode-back" href="../../../cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.WeakModel">[docs]</a><span class="k">class</span> <span class="nc">WeakModel</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent *weak models* of bit-vector operations w.r.t some property.</span>
+
+<span class="sd">    A *weak model* is an `OpModel` where the propagation weight of a</span>
+<span class="sd">    `Property` pair :math:`(\\alpha, \\beta)` is one of the following cases:</span>
+
+<span class="sd">    - If :math:`\\alpha = 0 = \\beta`, the weight is `zero2zero_weight`.</span>
+<span class="sd">    - If :math:`\\alpha \\neq 0 \\neq \\beta`, the weight is `nonzero2nonzero_weight`.</span>
+<span class="sd">    - If :math:`\\alpha = 0 \\neq \\beta`, the weight is `zero2nonzero_weight`.</span>
+<span class="sd">    - If :math:`\\alpha \\neq 0 = \\beta`, the weight is `nonzero2zero_weight`.</span>
+
+<span class="sd">    If any of weights `zero2zero_weight`, `nonzero2nonzero_weight`,</span>
+<span class="sd">    `zero2nonzero_weight` or `nonzero2zero_weight` is ``math.inf``,</span>
+<span class="sd">    the propagation probability of the corresponding case is assumed to be 0.</span>
+
+<span class="sd">    This class is not meant to be instantiated but to provide a base</span>
+<span class="sd">    class for weak models of operations (generated for example</span>
+<span class="sd">    through `differential.opmodel.get_weak_model` or </span>
+<span class="sd">    `linear.opmodel.get_weak_model`).</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        zero2zero_weight: a `decimal.Decimal` denoting the weight</span>
+<span class="sd">            of the zero to zero transitions (``math.inf`` if these</span>
+<span class="sd">            transitions are invalid)</span>
+<span class="sd">        nonzero2nonzero_weight: a `decimal.Decimal` denoting the weight</span>
+<span class="sd">            of the non-zero to non-zero transitions (``math.inf`` if these</span>
+<span class="sd">            transitions are invalid)</span>
+<span class="sd">        zero2nonzero_weight: a `decimal.Decimal` denoting the weight</span>
+<span class="sd">            of the zero to non-zero transitions (``math.inf`` if these</span>
+<span class="sd">            transitions are invalid)</span>
+<span class="sd">        nonzero2zero_weight: a `decimal.Decimal` denoting the weight</span>
+<span class="sd">            of the non-zero to zero transitions (``math.inf`` if these</span>
+<span class="sd">            transitions are invalid)</span>
+<span class="sd">        precision: the number of fraction bits used in the bit-vector weight</span>
+<span class="sd">            (0 if all non-``math.inf`` attributes ``*_weight`` are integer values)</span>
+
+<span class="sd">    .. Implementation details:</span>
+
+<span class="sd">        This class does not subclass `abstractproperty.opmodel.OpModel`,</span>
+<span class="sd">        but subclasses of this class defined for a particular `Property`</span>
+<span class="sd">        must subclass the corresponding ``OpModel``.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_get_1bit_val</span><span class="p">(</span><span class="n">my_val</span><span class="p">):</span> 
+        <span class="c1"># return 0b0 if my_val == 0 and 0b1 if my_val != 0 (active)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">my_val</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Term</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">my_val</span><span class="o">.</span><span class="n">width</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">my_val</span>
+        <span class="k">return</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvNot</span><span class="p">(</span><span class="n">operation</span><span class="o">.</span><span class="n">BvComp</span><span class="p">(</span><span class="n">my_val</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">my_val</span><span class="o">.</span><span class="n">width</span><span class="p">)))</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_prop</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">input_prop</span><span class="p">)</span>
+
+        <span class="bp">cls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span>
+        <span class="n">found_frac_bits</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">w</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+            <span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">zero2zero_weight</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">nonzero2nonzero_weight</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">zero2nonzero_weight</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">nonzero2zero_weight</span><span class="p">],</span>
+            <span class="p">[</span><span class="s2">&quot;zero2zero_weight&quot;</span><span class="p">,</span> <span class="s2">&quot;nonzero2nonzero_weight&quot;</span><span class="p">,</span> <span class="s2">&quot;zero2nonzero_weight&quot;</span><span class="p">,</span> <span class="s2">&quot;nonzero2zero_weight&quot;</span><span class="p">]</span>
+        <span class="p">):</span>
+            <span class="k">if</span> <span class="n">w</span> <span class="o">!=</span> <span class="n">math</span><span class="o">.</span><span class="n">inf</span> <span class="ow">and</span> <span class="n">w</span> <span class="o">!=</span> <span class="nb">int</span><span class="p">(</span><span class="n">w</span><span class="p">):</span>
+                <span class="n">found_frac_bits</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;non-integer </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">w</span><span class="si">}</span><span class="s2"> is not a Decimal object&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="mi">0</span> <span class="o">!=</span> <span class="n">w</span> <span class="o">!=</span> <span class="n">math</span><span class="o">.</span><span class="n">inf</span> <span class="ow">and</span> <span class="nb">int</span><span class="p">(</span><span class="n">w</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="bp">cls</span><span class="o">.</span><span class="n">precision</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">w</span><span class="si">}</span><span class="s2"> is 0 with precision </span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">precision</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">found_frac_bits</span> <span class="ow">and</span> <span class="bp">cls</span><span class="o">.</span><span class="n">precision</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;precision = </span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">precision</span><span class="si">}</span><span class="s2"> != 0 but no non-integer weight was given&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">validity_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_prop</span><span class="p">,</span> <span class="n">weight_condition</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">alpha_1b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_1bit_val</span><span class="p">(</span>
+            <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">operation</span><span class="o">.</span><span class="n">Concat</span><span class="p">,</span> <span class="nb">reversed</span><span class="p">([</span><span class="n">p</span><span class="o">.</span><span class="n">val</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_prop</span><span class="p">])))</span>
+        <span class="n">beta_1b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_1bit_val</span><span class="p">(</span><span class="n">output_prop</span><span class="o">.</span><span class="n">val</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">weight_condition</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">def</span> <span class="nf">weight_condition</span><span class="p">(</span><span class="n">w</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">w</span> <span class="o">!=</span> <span class="n">math</span><span class="o">.</span><span class="n">inf</span>
+
+        <span class="n">zero2zero_c</span> <span class="o">=</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># False (False | * = *)</span>
+        <span class="k">if</span> <span class="n">weight_condition</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">zero2zero_weight</span><span class="p">):</span>
+            <span class="n">zero2zero_c</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvComp</span><span class="p">((</span><span class="o">~</span><span class="n">alpha_1b</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="o">~</span><span class="n">beta_1b</span><span class="p">),</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="n">zero2nonzero_c</span> <span class="o">=</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">weight_condition</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">zero2nonzero_weight</span><span class="p">):</span>
+            <span class="n">zero2nonzero_c</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvComp</span><span class="p">((</span><span class="o">~</span><span class="n">alpha_1b</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">beta_1b</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="n">nonzero2zero_c</span> <span class="o">=</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">weight_condition</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">nonzero2zero_weight</span><span class="p">):</span>
+            <span class="n">nonzero2zero_c</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvComp</span><span class="p">(</span><span class="n">alpha_1b</span> <span class="o">&amp;</span> <span class="p">(</span><span class="o">~</span><span class="n">beta_1b</span><span class="p">),</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="n">nonzero2nonzero_c</span> <span class="o">=</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">weight_condition</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">nonzero2nonzero_weight</span><span class="p">):</span>
+            <span class="n">nonzero2nonzero_c</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvComp</span><span class="p">(</span><span class="n">alpha_1b</span> <span class="o">&amp;</span> <span class="n">beta_1b</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">zero2zero_c</span> <span class="o">|</span> <span class="p">(</span><span class="n">zero2nonzero_c</span> <span class="o">|</span> <span class="n">nonzero2zero_c</span> <span class="o">|</span> <span class="n">nonzero2nonzero_c</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">pr_one_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_prop</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">validity_constraint</span><span class="p">(</span><span class="n">output_prop</span><span class="p">,</span> <span class="n">weight_condition</span><span class="o">=</span><span class="k">lambda</span> <span class="n">w</span><span class="p">:</span> <span class="n">w</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">bv_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_prop</span><span class="p">):</span>
+        <span class="n">alpha_1b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_1bit_val</span><span class="p">(</span>
+            <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">operation</span><span class="o">.</span><span class="n">Concat</span><span class="p">,</span> <span class="nb">reversed</span><span class="p">([</span><span class="n">p</span><span class="o">.</span><span class="n">val</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_prop</span><span class="p">])))</span>
+        <span class="n">beta_1b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_1bit_val</span><span class="p">(</span><span class="n">output_prop</span><span class="o">.</span><span class="n">val</span><span class="p">)</span>
+
+        <span class="n">width</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight_width</span><span class="p">()</span>
+        <span class="bp">cls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span>
+
+        <span class="k">def</span> <span class="nf">parse_dec</span><span class="p">(</span><span class="n">my_decimal</span><span class="p">):</span>
+            <span class="k">assert</span> <span class="n">my_decimal</span> <span class="o">!=</span> <span class="n">math</span><span class="o">.</span><span class="n">inf</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">my_decimal</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="bp">cls</span><span class="o">.</span><span class="n">precision</span><span class="p">))</span>
+
+        <span class="n">w2c</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">zb</span> <span class="o">=</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">zero2zero_weight</span> <span class="o">!=</span> <span class="n">math</span><span class="o">.</span><span class="n">inf</span><span class="p">:</span>
+            <span class="n">w</span> <span class="o">=</span> <span class="n">parse_dec</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">zero2zero_weight</span><span class="p">)</span>
+            <span class="n">w2c</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="o">=</span> <span class="n">w2c</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">zb</span><span class="p">)</span> <span class="o">|</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvComp</span><span class="p">((</span><span class="o">~</span><span class="n">alpha_1b</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="o">~</span><span class="n">beta_1b</span><span class="p">),</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">zero2nonzero_weight</span> <span class="o">!=</span> <span class="n">math</span><span class="o">.</span><span class="n">inf</span><span class="p">:</span>
+            <span class="n">w</span> <span class="o">=</span> <span class="n">parse_dec</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">zero2nonzero_weight</span><span class="p">)</span>
+            <span class="n">w2c</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="o">=</span> <span class="n">w2c</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">zb</span><span class="p">)</span> <span class="o">|</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvComp</span><span class="p">((</span><span class="o">~</span><span class="n">alpha_1b</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">beta_1b</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">nonzero2zero_weight</span> <span class="o">!=</span> <span class="n">math</span><span class="o">.</span><span class="n">inf</span><span class="p">:</span>
+            <span class="n">w</span> <span class="o">=</span> <span class="n">parse_dec</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">nonzero2zero_weight</span><span class="p">)</span>
+            <span class="n">w2c</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="o">=</span> <span class="n">w2c</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">zb</span><span class="p">)</span> <span class="o">|</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvComp</span><span class="p">(</span><span class="n">alpha_1b</span> <span class="o">&amp;</span> <span class="p">(</span><span class="o">~</span><span class="n">beta_1b</span><span class="p">),</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">nonzero2nonzero_weight</span> <span class="o">!=</span> <span class="n">math</span><span class="o">.</span><span class="n">inf</span><span class="p">:</span>
+            <span class="n">w</span> <span class="o">=</span> <span class="n">parse_dec</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">nonzero2nonzero_weight</span><span class="p">)</span>
+            <span class="n">w2c</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="o">=</span> <span class="n">w2c</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">zb</span><span class="p">)</span> <span class="o">|</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvComp</span><span class="p">(</span><span class="n">alpha_1b</span> <span class="o">&amp;</span> <span class="n">beta_1b</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">w2c</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidOpModelError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;zero2zero_weight, nonzero2nonzero_weight, zero2nonzero_weight and &quot;</span>
+                                      <span class="sa">f</span><span class="s2">&quot;nonzero2zero_weight of </span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2"> are math.inf&quot;</span><span class="p">)</span>
+
+        <span class="n">w2c</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">w2c</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+
+        <span class="n">ite_expr</span> <span class="o">=</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="n">w2c</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">width</span><span class="p">)</span>  <span class="c1"># last weight</span>
+        <span class="k">for</span> <span class="n">my_weight</span><span class="p">,</span> <span class="n">my_constraint</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">w2c</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="n">ite_expr</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">Ite</span><span class="p">(</span>
+                <span class="n">my_constraint</span><span class="p">,</span>
+                <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="n">my_weight</span><span class="p">,</span> <span class="n">width</span><span class="p">),</span>
+                <span class="n">ite_expr</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">ite_expr</span>
+
+    <span class="k">def</span> <span class="nf">max_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">max_w</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">cls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span>
+        <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">zero2zero_weight</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">nonzero2nonzero_weight</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">zero2nonzero_weight</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">nonzero2zero_weight</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">w</span> <span class="o">==</span> <span class="n">math</span><span class="o">.</span><span class="n">inf</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">max_w</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">max_w</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">w</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="bp">cls</span><span class="o">.</span><span class="n">precision</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">max_w</span>
+
+    <span class="k">def</span> <span class="nf">weight_width</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_weight</span><span class="p">()</span><span class="o">.</span><span class="n">bit_length</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">decimal_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_prop</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_assert_preconditions_decimal_weight</span><span class="p">(</span><span class="n">output_prop</span><span class="p">)</span>
+
+        <span class="n">alpha_1b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_1bit_val</span><span class="p">(</span>
+            <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">operation</span><span class="o">.</span><span class="n">Concat</span><span class="p">,</span> <span class="nb">reversed</span><span class="p">([</span><span class="n">p</span><span class="o">.</span><span class="n">val</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_prop</span><span class="p">])))</span>
+        <span class="n">beta_1b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_1bit_val</span><span class="p">(</span><span class="n">output_prop</span><span class="o">.</span><span class="n">val</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">alpha_1b</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">beta_1b</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">dw</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">zero2zero_weight</span>
+        <span class="k">elif</span> <span class="n">alpha_1b</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">beta_1b</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">dw</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">zero2nonzero_weight</span>
+        <span class="k">elif</span> <span class="n">alpha_1b</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">beta_1b</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">dw</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">nonzero2zero_weight</span>
+        <span class="k">elif</span> <span class="n">alpha_1b</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">beta_1b</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">dw</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">nonzero2nonzero_weight</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;invalid input </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">input_prop</span><span class="si">}</span><span class="s2"> or output </span><span class="si">{</span><span class="n">output_prop</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">dw</span> <span class="o">=</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="n">dw</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_assert_postconditions_decimal_weight</span><span class="p">(</span><span class="n">output_prop</span><span class="p">,</span> <span class="n">dw</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dw</span>
+
+    <span class="k">def</span> <span class="nf">num_frac_bits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># num_frac_bits() might be larger than weight_width()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">precision</span>
+
+    <span class="k">def</span> <span class="nf">error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">max_error</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">cls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span>
+        <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">zero2zero_weight</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">nonzero2nonzero_weight</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">zero2nonzero_weight</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">nonzero2zero_weight</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">w</span> <span class="o">==</span> <span class="n">math</span><span class="o">.</span><span class="n">inf</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="c1"># e.g., w = 3/8 = 0.375 = 0.011, prec=2, approx_w = int(1.5)/2^3 = 0.125</span>
+            <span class="n">approx_w</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">w</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="bp">cls</span><span class="o">.</span><span class="n">precision</span><span class="p">))</span> <span class="o">/</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="bp">cls</span><span class="o">.</span><span class="n">precision</span><span class="p">)</span>
+            <span class="n">max_error</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">max_error</span><span class="p">,</span> <span class="nb">abs</span><span class="p">(</span><span class="n">w</span> <span class="o">-</span> <span class="n">approx_w</span><span class="p">))</span>
+        <span class="c1"># if prec = 2, max_error = 0.001···(inf)··1 = 0.01 - 0.00···(inf)···1</span>
+        <span class="c1">#   ==&gt; max_error &gt; 0.01 = 2^(-prec)</span>
+        <span class="k">assert</span> <span class="n">max_error</span> <span class="o">&lt;</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="bp">cls</span><span class="o">.</span><span class="n">precision</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">max_error</span></div>
+
+
+<div class="viewcode-block" id="BranchNumberModel"><a class="viewcode-back" href="../../../cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.BranchNumberModel">[docs]</a><span class="k">class</span> <span class="nc">BranchNumberModel</span><span class="p">(</span><span class="n">WeakModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent property models of bit-vector operations based on the branch number.</span>
+
+<span class="sd">    Let :math:`(y_0, y_1, \dots, y_m) = f(x_1, x_2, \dots, x_n)` be a bit-vector</span>
+<span class="sd">    function with input words :math:`x_i` and output words :math:`y_j`.</span>
+<span class="sd">    Given a property pair</span>
+<span class="sd">    :math:`((P_{x_1}, \dots, P_{x_n}), (P_{y_1}, \dots, P_{y_n}))`</span>
+<span class="sd">    over :math:`f`, we say that the property</span>
+<span class="sd">    :math:`P_{x_i}` over :math:`x_i` is *active* if :math:`P_{x_i} \\neq 0`</span>
+<span class="sd">    (similar for :math:`P_{y_j}`).</span>
+
+<span class="sd">    A `BranchNumberModel` of an `Operation` :math:`f` is an `OpModel`</span>
+<span class="sd">    where the propagation weight of a `Property` pair :math:`(\\alpha, \\beta)`</span>
+<span class="sd">    is one of the four cases of `WeakModel` but with the additional</span>
+<span class="sd">    constraint that if :math:`(\\alpha, \\beta)` is non-zero and its</span>
+<span class="sd">    number of active words is strictly less than :math:`B` then it is invalid.</span>
+
+<span class="sd">    The number :math:`B` is usually the *branch number* of :math:`f`, that is,</span>
+<span class="sd">    the minimum number of active words (at the input and at the output)</span>
+<span class="sd">    among all non-zero property pairs.</span>
+<span class="sd">    Nevertheless, any :math:`2 \le B \le n + m` can be used.</span>
+
+<span class="sd">    Since an `Operation` outputs a single bit-vector, the</span>
+<span class="sd">    class attribute `output_widths` of `BranchNumberModel` delimits</span>
+<span class="sd">    the output words of :math:`f`</span>
+<span class="sd">    (for the counting of active output words).</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">        To extract the output words from an `Operation` with a</span>
+<span class="sd">        `BranchNumberModel`, use `PropExtract` instead of `Extract`.</span>
+
+<span class="sd">    This class is not meant to be instantiated but to provide a base</span>
+<span class="sd">    class for branch-number-based models of operations (generated for example</span>
+<span class="sd">    through `differential.opmodel.get_branch_number_model` or</span>
+<span class="sd">    `linear.opmodel.get_branch_number_model`).</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        output_widths: a `tuple` containing the widths of the output words</span>
+<span class="sd">        branch_number: the branch number :math:`B`</span>
+<span class="sd">        zero2zero_weight: a `decimal.Decimal` denoting the weight</span>
+<span class="sd">            of the zero to zero transitions (``math.inf`` if all these</span>
+<span class="sd">            transitions are invalid)</span>
+<span class="sd">        nonzero2nonzero_weight: a `decimal.Decimal` denoting the weight</span>
+<span class="sd">            of the non-zero to non-zero transitions (``math.inf`` if all these</span>
+<span class="sd">            transitions are invalid)</span>
+<span class="sd">        zero2nonzero_weight: a `decimal.Decimal` denoting the weight</span>
+<span class="sd">            of the zero to non-zero transitions (``math.inf`` if all these</span>
+<span class="sd">            transitions are invalid)</span>
+<span class="sd">        nonzero2zero_weight: a `decimal.Decimal` denoting the weight</span>
+<span class="sd">            of the non-zero to zero transitions (``math.inf`` if all these</span>
+<span class="sd">            transitions are invalid)</span>
+<span class="sd">        precision: the number of fraction bits used in the bit-vector weight</span>
+<span class="sd">            (0 if all non-``math.inf`` attributes ``*_weight`` are integer values)</span>
+
+<span class="sd">    .. Implementation details:</span>
+
+<span class="sd">        This class does not subclass `abstractproperty.opmodel.OpModel`,</span>
+<span class="sd">        but subclasses of this class defined for a particular `Property`</span>
+<span class="sd">        must subclass the corresponding ``OpModel``.</span>
+
+<span class="sd">        Source: The Design of Rijndael: AES - The Advanced Encryption Standard</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_val</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">output_val</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Term</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">output_val</span><span class="o">.</span><span class="n">width</span> <span class="o">==</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_widths</span><span class="p">)</span>
+        <span class="n">split_output</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_widths</span><span class="p">:</span>
+            <span class="c1"># in Extract both endpoints are included</span>
+            <span class="n">split_output</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">output_val</span><span class="p">[</span><span class="n">offset</span> <span class="o">+</span> <span class="n">w</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span> <span class="n">offset</span><span class="p">])</span>
+            <span class="k">assert</span> <span class="n">split_output</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">width</span> <span class="o">==</span> <span class="n">w</span>
+            <span class="n">offset</span> <span class="o">+=</span> <span class="n">w</span>
+        <span class="k">assert</span> <span class="n">output_val</span> <span class="o">==</span> <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">operation</span><span class="o">.</span><span class="n">Concat</span><span class="p">,</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">split_output</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">split_output</span>  <span class="c1"># first list element contains LSB, last MSB</span>
+
+    <span class="k">def</span> <span class="nf">validity_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_prop</span><span class="p">,</span> <span class="n">weight_condition</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">cls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span>
+        <span class="k">assert</span> <span class="mi">2</span> <span class="o">&lt;=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">branch_number</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_prop</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">output_widths</span><span class="p">)</span>
+
+        <span class="n">alpha_1b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_1bit_val</span><span class="p">(</span>
+            <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">operation</span><span class="o">.</span><span class="n">Concat</span><span class="p">,</span> <span class="nb">reversed</span><span class="p">([</span><span class="n">p</span><span class="o">.</span><span class="n">val</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_prop</span><span class="p">])))</span>
+        <span class="n">beta_1b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_1bit_val</span><span class="p">(</span><span class="n">output_prop</span><span class="o">.</span><span class="n">val</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">weight_condition</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">def</span> <span class="nf">weight_condition</span><span class="p">(</span><span class="n">w</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">w</span> <span class="o">!=</span> <span class="n">math</span><span class="o">.</span><span class="n">inf</span>
+
+        <span class="n">zero2zero_c</span> <span class="o">=</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># False (False | * = *)</span>
+        <span class="k">if</span> <span class="n">weight_condition</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">zero2zero_weight</span><span class="p">):</span>
+            <span class="n">zero2zero_c</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvComp</span><span class="p">((</span><span class="o">~</span><span class="n">alpha_1b</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="o">~</span><span class="n">beta_1b</span><span class="p">),</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="n">zero2nonzero_c</span> <span class="o">=</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">weight_condition</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">zero2nonzero_weight</span><span class="p">):</span>
+            <span class="n">zero2nonzero_c</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvComp</span><span class="p">((</span><span class="o">~</span><span class="n">alpha_1b</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">beta_1b</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="n">nonzero2zero_c</span> <span class="o">=</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">weight_condition</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">nonzero2zero_weight</span><span class="p">):</span>
+            <span class="n">nonzero2zero_c</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvComp</span><span class="p">(</span><span class="n">alpha_1b</span> <span class="o">&amp;</span> <span class="p">(</span><span class="o">~</span><span class="n">beta_1b</span><span class="p">),</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="n">nonzero2nonzero_c</span> <span class="o">=</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">weight_condition</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">nonzero2nonzero_weight</span><span class="p">):</span>
+            <span class="n">nonzero2nonzero_c</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvComp</span><span class="p">(</span><span class="n">alpha_1b</span> <span class="o">&amp;</span> <span class="n">beta_1b</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="c1">#</span>
+
+        <span class="n">alpha_1b_list</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_1bit_val</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_prop</span><span class="p">]</span>
+        <span class="n">beta_1b_list</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_1bit_val</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_split</span><span class="p">(</span><span class="n">output_prop</span><span class="o">.</span><span class="n">val</span><span class="p">)]</span>
+
+        <span class="n">list_1b</span> <span class="o">=</span> <span class="n">alpha_1b_list</span> <span class="o">+</span> <span class="n">beta_1b_list</span>  <span class="c1"># i-th element is 1 if var_i is 1 (active)</span>
+        <span class="c1"># extend avoid overflow when +</span>
+        <span class="n">num_bits</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">list_1b</span><span class="p">)</span><span class="o">.</span><span class="n">bit_length</span><span class="p">(),</span> <span class="bp">cls</span><span class="o">.</span><span class="n">branch_number</span><span class="p">)</span>
+        <span class="n">list_1b</span> <span class="o">=</span> <span class="p">[</span><span class="n">operation</span><span class="o">.</span><span class="n">zero_extend</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">num_bits</span> <span class="o">-</span> <span class="n">b</span><span class="o">.</span><span class="n">width</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">list_1b</span><span class="p">]</span>
+        <span class="n">bn_constraint</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvUge</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">list_1b</span><span class="p">),</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">branch_number</span><span class="p">,</span> <span class="n">num_bits</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">zero2zero_c</span> <span class="o">|</span> <span class="p">((</span><span class="n">zero2nonzero_c</span> <span class="o">|</span> <span class="n">nonzero2zero_c</span> <span class="o">|</span> <span class="n">nonzero2nonzero_c</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">bn_constraint</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">pr_one_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_prop</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">validity_constraint</span><span class="p">(</span><span class="n">output_prop</span><span class="p">,</span> <span class="n">weight_condition</span><span class="o">=</span><span class="k">lambda</span> <span class="n">w</span><span class="p">:</span> <span class="n">w</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="WDTModel"><a class="viewcode-back" href="../../../cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.WDTModel">[docs]</a><span class="k">class</span> <span class="nc">WDTModel</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent WDT-based models of bit-vector operations w.r.t some property.</span>
+
+<span class="sd">    A model based on a Weight Distribution Table (WDT) is an `OpModel`</span>
+<span class="sd">    where the propagation weight is obtained from a 2-dimensional</span>
+<span class="sd">    table ``WDT`` such that ``WDT[a][b]`` contains the propagation</span>
+<span class="sd">    weight of the input-output `Property` pair :math:`(a, b)`.</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">        For the `Difference` (resp. `LinearMask`) property,</span>
+<span class="sd">        the WDT is also known as the Difference Distribution Table or DDT</span>
+<span class="sd">        (resp. Linear Approximation Table or LAT).</span>
+
+<span class="sd">    This class is not meant to be instantiated but to provide a base</span>
+<span class="sd">    class for WDT-based models of operations (generated for example</span>
+<span class="sd">    through `differential.opmodel.get_wdt_model` or</span>
+<span class="sd">    `linear.opmodel.get_wdt_model`).</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        weight_distribution_table: a 2-dimensional `tuple` containing</span>
+<span class="sd">            the distribution of the propagations weights,</span>
+<span class="sd">            where `math.inf` entries correspond to invalid transitions</span>
+<span class="sd">        loop_rows_then_columns: whether to extract the constraints from</span>
+<span class="sd">            `weight_distribution_table` by looping first over the rows</span>
+<span class="sd">            (input properties) and then over the columns (output properties)</span>
+<span class="sd">            or vice-versa</span>
+<span class="sd">        precision: the number of fraction bits used in the bit-vector weight</span>
+<span class="sd">            (0 if all the weights in `weight_distribution_table` are integer values)</span>
+
+<span class="sd">    .. Implementation details:</span>
+
+<span class="sd">        This class does not subclass `abstractproperty.opmodel.OpModel`,</span>
+<span class="sd">        but subclasses of this class defined for a particular `Property`</span>
+<span class="sd">        must subclass the corresponding ``OpModel``.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_transpose</span><span class="p">(</span><span class="n">my_2D_list</span><span class="p">):</span>
+        <span class="n">num_rows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">my_2D_list</span><span class="p">)</span>
+        <span class="n">num_columns</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">my_2D_list</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="n">num_columns</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">my_2D_list</span><span class="p">)</span>
+        <span class="n">transposed</span> <span class="o">=</span> <span class="p">[[</span><span class="n">my_2D_list</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_rows</span><span class="p">)]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_columns</span><span class="p">)]</span>
+        <span class="n">num_rows</span><span class="p">,</span> <span class="n">num_columns</span> <span class="o">=</span> <span class="n">num_columns</span><span class="p">,</span> <span class="n">num_rows</span>
+        <span class="k">assert</span> <span class="n">num_rows</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">transposed</span><span class="p">)</span> <span class="ow">and</span> <span class="n">num_columns</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">transposed</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">transposed</span><span class="p">,</span> <span class="n">num_rows</span><span class="p">,</span> <span class="n">num_columns</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_prop</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">input_prop</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">arity</span> <span class="o">==</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_prop</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;WDTModel only supports operations with 1 input operand&quot;</span><span class="p">)</span>
+
+        <span class="n">WDT</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">weight_distribution_table</span>
+        <span class="n">num_rows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">WDT</span><span class="p">)</span>
+        <span class="n">num_columns</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">WDT</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">num_rows</span> <span class="o">!=</span> <span class="mi">2</span> <span class="o">**</span> <span class="nb">sum</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">width</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_prop</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;2**&lt;input bit-size&gt; = </span><span class="si">{</span><span class="mi">2</span> <span class="o">**</span> <span class="nb">sum</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">width</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_prop</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;!= </span><span class="si">{</span><span class="n">num_rows</span><span class="si">}</span><span class="s2"> = number of rows of WDT&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">num_columns</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">WDT</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;WDT contains columns with different length&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">all</span><span class="p">(</span><span class="n">elem</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">row</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">WDT</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;negative weights found in WDT&quot;</span><span class="p">)</span>
+
+        <span class="n">precision</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">precision</span>
+        <span class="n">found_frac_bits</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">WDT</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">weight</span> <span class="ow">in</span> <span class="n">row</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">weight</span> <span class="o">!=</span> <span class="n">math</span><span class="o">.</span><span class="n">inf</span> <span class="ow">and</span> <span class="n">weight</span> <span class="o">!=</span> <span class="nb">int</span><span class="p">(</span><span class="n">weight</span><span class="p">):</span>
+                    <span class="n">found_frac_bits</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">weight</span><span class="p">,</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;non-integer weight </span><span class="si">{</span><span class="n">weight</span><span class="si">}</span><span class="s2"> in weight_distribution_table is&quot;</span>
+                                         <span class="sa">f</span><span class="s2">&quot; not a Decimal object&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="mi">0</span> <span class="o">!=</span> <span class="n">weight</span> <span class="o">!=</span> <span class="n">math</span><span class="o">.</span><span class="n">inf</span> <span class="ow">and</span> <span class="nb">int</span><span class="p">(</span><span class="n">weight</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="n">precision</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;non-zero weight </span><span class="si">{</span><span class="n">weight</span><span class="si">}</span><span class="s2"> in weight_distribution_table is&quot;</span>
+                                     <span class="sa">f</span><span class="s2">&quot; 0 with precision </span><span class="si">{</span><span class="n">precision</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">found_frac_bits</span> <span class="ow">and</span> <span class="n">precision</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;precision = </span><span class="si">{</span><span class="n">precision</span><span class="si">}</span><span class="s2"> != 0 but no non-integer weight was given&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">validity_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_prop</span><span class="p">):</span>
+        <span class="n">WDT</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">weight_distribution_table</span>
+        <span class="n">num_rows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">WDT</span><span class="p">)</span>
+        <span class="n">num_columns</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">WDT</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">assert</span> <span class="n">num_columns</span> <span class="o">==</span> <span class="mi">2</span> <span class="o">**</span> <span class="n">output_prop</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">width</span>
+
+        <span class="n">alpha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_prop</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">val</span>  <span class="c1"># multiple input props could be done by concatenating them</span>
+        <span class="n">beta</span> <span class="o">=</span> <span class="n">output_prop</span><span class="o">.</span><span class="n">val</span>
+
+        <span class="c1"># Ite representation</span>
+
+        <span class="n">civ2oc</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="n">oc2list_civ</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">loop_rows_then_columns</span><span class="p">:</span>
+            <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span> <span class="o">=</span> <span class="n">beta</span><span class="p">,</span> <span class="n">alpha</span>
+            <span class="n">WDT</span><span class="p">,</span> <span class="n">num_rows</span><span class="p">,</span> <span class="n">num_columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transpose</span><span class="p">(</span><span class="n">WDT</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">context</span><span class="o">.</span><span class="n">Simplification</span><span class="p">(</span><span class="kc">False</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">ct_input_val</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_rows</span><span class="p">):</span>
+                <span class="n">add_invalid</span> <span class="o">=</span> <span class="n">WDT</span><span class="p">[</span><span class="n">ct_input_val</span><span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">num_columns</span> <span class="o">/</span> <span class="mi">2</span>
+
+                <span class="n">output_constraint</span> <span class="o">=</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">add_invalid</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">ct_output_val</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_columns</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">add_invalid</span> <span class="o">==</span> <span class="p">(</span><span class="n">WDT</span><span class="p">[</span><span class="n">ct_input_val</span><span class="p">][</span><span class="n">ct_output_val</span><span class="p">]</span> <span class="o">==</span> <span class="n">math</span><span class="o">.</span><span class="n">inf</span><span class="p">):</span>
+                        <span class="n">constraint</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvComp</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="n">ct_output_val</span><span class="p">,</span> <span class="n">beta</span><span class="o">.</span><span class="n">width</span><span class="p">))</span>
+                        <span class="k">if</span> <span class="n">add_invalid</span><span class="p">:</span>
+                            <span class="n">output_constraint</span> <span class="o">&amp;=</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvNot</span><span class="p">(</span><span class="n">constraint</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">output_constraint</span> <span class="o">|=</span> <span class="n">constraint</span>
+
+                <span class="c1"># e.g., if for a ct_input_val A, only 2 ct_output_val B1, B2 are invalid (among 4+ Bi)</span>
+                <span class="c1"># we will have Ite(input == A, output_constraint, ···) where</span>
+                <span class="c1">#                   output_constraint = ~(output == B1) &amp; ~(output == B2)</span>
+                <span class="c1"># but if only 3 Bi: output_constraint = output == B3</span>
+
+                <span class="n">civ2oc</span><span class="p">[</span><span class="n">ct_input_val</span><span class="p">]</span> <span class="o">=</span> <span class="n">output_constraint</span>
+                <span class="n">oc2list_civ</span><span class="p">[</span><span class="n">output_constraint</span><span class="p">]</span> <span class="o">=</span> <span class="n">oc2list_civ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">output_constraint</span><span class="p">,</span> <span class="p">[])</span> <span class="o">+</span> <span class="p">[</span><span class="n">ct_input_val</span><span class="p">]</span>
+
+            <span class="n">oc2list_civ</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">oc2list_civ</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>  <span class="c1"># [1] &lt; [4] &lt; [2, 3]</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">oc2list_civ</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">oc</span><span class="p">,</span> <span class="n">list_civ</span> <span class="o">=</span> <span class="n">oc2list_civ</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">list_civ</span><span class="p">)</span> <span class="o">==</span> <span class="n">num_rows</span>
+                <span class="k">return</span> <span class="n">oc</span>
+
+            <span class="n">ite</span> <span class="o">=</span> <span class="n">oc2list_civ</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># only the OC of the last list_civ is used (and not the large list_civ)</span>
+            <span class="k">for</span> <span class="n">output_constraint</span><span class="p">,</span> <span class="n">list_civ</span> <span class="ow">in</span> <span class="n">oc2list_civ</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">list_civ</span> <span class="o">=</span> <span class="p">[</span><span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="n">civ</span><span class="p">,</span> <span class="n">alpha</span><span class="o">.</span><span class="n">width</span><span class="p">)</span> <span class="k">for</span> <span class="n">civ</span> <span class="ow">in</span> <span class="n">list_civ</span><span class="p">]</span>
+                <span class="n">input_c</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">operation</span><span class="o">.</span><span class="n">BvOr</span><span class="p">,</span> <span class="p">[</span><span class="n">operation</span><span class="o">.</span><span class="n">BvComp</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">civ</span><span class="p">)</span> <span class="k">for</span> <span class="n">civ</span> <span class="ow">in</span> <span class="n">list_civ</span><span class="p">])</span>
+                <span class="n">ite</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">Ite</span><span class="p">(</span>
+                    <span class="n">input_c</span><span class="p">,</span>
+                    <span class="n">output_constraint</span><span class="p">,</span>
+                    <span class="n">ite</span>
+                <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">ite</span>
+
+        <span class="c1"># # sum (disjunction) of minterms representation</span>
+        <span class="c1"># ite = constant(0, 1)  # False</span>
+        <span class="c1"># with context.Simplification(False):</span>
+        <span class="c1">#     for ct_input_val in range(num_rows):</span>
+        <span class="c1">#         # e.g., if for a ct_input_val A, only 2 ct_output_val B1, B2 are invalid</span>
+        <span class="c1">#         # we add the constraint [(input == A) &amp; ~(output == B1)] | [(input == A) &amp; ~(output == B2)]</span>
+        <span class="c1">#         # (equivalent to [(input == A) &amp; (output == B2)] | [(input == A) &amp; output == B3)] | ··· )</span>
+        <span class="c1">#         add_invalid = WDT[ct_input_val].count(math.inf) &lt; num_columns / 2</span>
+        <span class="c1">#         input_constraint = operation.BvComp(alpha, core.Constant(ct_input_val, alpha.width))</span>
+        <span class="c1">#         for ct_output_val in range(num_columns):</span>
+        <span class="c1">#             if add_invalid == (WDT[int(ct_input_val)][ct_output_val] == math.inf):</span>
+        <span class="c1">#                 output_constraint = operation.BvComp(beta, core.Constant(ct_output_val, beta.width))</span>
+        <span class="c1">#                 if add_invalid:</span>
+        <span class="c1">#                     output_constraint = operation.BvNot(output_constraint)</span>
+        <span class="c1">#                 assert ite is not None  # ite == False</span>
+        <span class="c1">#                 ite |= (input_constraint &amp; output_constraint)</span>
+        <span class="c1"># return ite</span>
+
+    <span class="k">def</span> <span class="nf">pr_one_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_prop</span><span class="p">):</span>
+        <span class="n">WDT</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">weight_distribution_table</span>
+        <span class="n">num_rows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">WDT</span><span class="p">)</span>
+        <span class="n">num_columns</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">WDT</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">assert</span> <span class="n">num_columns</span> <span class="o">==</span> <span class="mi">2</span> <span class="o">**</span> <span class="n">output_prop</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">width</span>
+
+        <span class="n">alpha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_prop</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">val</span>
+        <span class="n">beta</span> <span class="o">=</span> <span class="n">output_prop</span><span class="o">.</span><span class="n">val</span>
+
+        <span class="n">civ2oc</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="n">oc2list_civ</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">loop_rows_then_columns</span><span class="p">:</span>
+            <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span> <span class="o">=</span> <span class="n">beta</span><span class="p">,</span> <span class="n">alpha</span>
+            <span class="n">WDT</span><span class="p">,</span> <span class="n">num_rows</span><span class="p">,</span> <span class="n">num_columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transpose</span><span class="p">(</span><span class="n">WDT</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">context</span><span class="o">.</span><span class="n">Simplification</span><span class="p">(</span><span class="kc">False</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">ct_input_val</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_rows</span><span class="p">):</span>
+                <span class="n">add_non_zero</span> <span class="o">=</span> <span class="nb">len</span><span class="p">([</span><span class="n">w</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">WDT</span><span class="p">[</span><span class="n">ct_input_val</span><span class="p">]</span> <span class="k">if</span> <span class="n">w</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">])</span> <span class="o">&lt;</span> <span class="n">num_columns</span> <span class="o">/</span> <span class="mi">2</span>
+
+                <span class="n">output_constraint</span> <span class="o">=</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">add_non_zero</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">ct_output_val</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_columns</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">add_non_zero</span> <span class="o">==</span> <span class="p">(</span><span class="n">WDT</span><span class="p">[</span><span class="n">ct_input_val</span><span class="p">][</span><span class="n">ct_output_val</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">):</span>
+                        <span class="n">constraint</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvComp</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="n">ct_output_val</span><span class="p">,</span> <span class="n">beta</span><span class="o">.</span><span class="n">width</span><span class="p">))</span>
+                        <span class="k">if</span> <span class="n">add_non_zero</span><span class="p">:</span>
+                            <span class="n">output_constraint</span> <span class="o">&amp;=</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvNot</span><span class="p">(</span><span class="n">constraint</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">output_constraint</span> <span class="o">|=</span> <span class="n">constraint</span>
+
+                <span class="c1"># e.g., if for a ct_input_val A, only 2 ct_output_val B1, B2 are non-zero (among 4+ Bi)</span>
+                <span class="c1"># we will have Ite(input == A, output_constraint, ···) where</span>
+                <span class="c1">#                   output_constraint = ~(output == B1) &amp; ~(output == B2)</span>
+                <span class="c1"># but if only 3 Bi: output_constraint = output == B3</span>
+
+                <span class="n">civ2oc</span><span class="p">[</span><span class="n">ct_input_val</span><span class="p">]</span> <span class="o">=</span> <span class="n">output_constraint</span>
+                <span class="n">oc2list_civ</span><span class="p">[</span><span class="n">output_constraint</span><span class="p">]</span> <span class="o">=</span> <span class="n">oc2list_civ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">output_constraint</span><span class="p">,</span> <span class="p">[])</span> <span class="o">+</span> <span class="p">[</span><span class="n">ct_input_val</span><span class="p">]</span>
+
+            <span class="n">oc2list_civ</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">oc2list_civ</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>  <span class="c1"># [1] &lt; [4] &lt; [2, 3]</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">oc2list_civ</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">oc</span><span class="p">,</span> <span class="n">list_civ</span> <span class="o">=</span> <span class="n">oc2list_civ</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">list_civ</span><span class="p">)</span> <span class="o">==</span> <span class="n">num_rows</span>
+                <span class="k">return</span> <span class="n">oc</span>
+
+            <span class="n">ite</span> <span class="o">=</span> <span class="n">oc2list_civ</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># only the OC of the last list_civ is used (and not the large list_civ)</span>
+            <span class="k">for</span> <span class="n">output_constraint</span><span class="p">,</span> <span class="n">list_civ</span> <span class="ow">in</span> <span class="n">oc2list_civ</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">list_civ</span> <span class="o">=</span> <span class="p">[</span><span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="n">civ</span><span class="p">,</span> <span class="n">alpha</span><span class="o">.</span><span class="n">width</span><span class="p">)</span> <span class="k">for</span> <span class="n">civ</span> <span class="ow">in</span> <span class="n">list_civ</span><span class="p">]</span>
+                <span class="n">input_c</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">operation</span><span class="o">.</span><span class="n">BvOr</span><span class="p">,</span> <span class="p">[</span><span class="n">operation</span><span class="o">.</span><span class="n">BvComp</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">civ</span><span class="p">)</span> <span class="k">for</span> <span class="n">civ</span> <span class="ow">in</span> <span class="n">list_civ</span><span class="p">])</span>
+                <span class="n">ite</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">Ite</span><span class="p">(</span>
+                    <span class="n">input_c</span><span class="p">,</span>
+                    <span class="n">output_constraint</span><span class="p">,</span>
+                    <span class="n">ite</span>
+                <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">ite</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_WDT_with_precision_and_loop_order</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_stored_WDT_with_precision_and_loop_order&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">loop_rows_then_columns</span><span class="p">:</span>
+                <span class="n">WDT</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transpose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">weight_distribution_table</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">WDT</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">weight_distribution_table</span><span class="p">]</span>
+            <span class="n">num_rows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">WDT</span><span class="p">)</span>
+            <span class="n">num_columns</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">WDT</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_rows</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_columns</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">WDT</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">!=</span> <span class="n">math</span><span class="o">.</span><span class="n">inf</span><span class="p">:</span>
+                        <span class="n">WDT</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">WDT</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">precision</span><span class="p">))</span>
+                        <span class="n">WDT</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="n">WDT</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight_width</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_stored_WDT_with_precision_and_loop_order</span> <span class="o">=</span> <span class="n">WDT</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stored_WDT_with_precision_and_loop_order</span>
+
+    <span class="k">def</span> <span class="nf">bv_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_prop</span><span class="p">):</span>
+        <span class="n">WDT_with_p_lo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_WDT_with_precision_and_loop_order</span>
+        <span class="n">num_rows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">WDT_with_p_lo</span><span class="p">)</span>
+        <span class="n">num_columns</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">WDT_with_p_lo</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">loop_rows_then_columns</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">num_columns</span> <span class="o">==</span> <span class="mi">2</span> <span class="o">**</span> <span class="n">output_prop</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">width</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">num_rows</span> <span class="o">==</span> <span class="mi">2</span> <span class="o">**</span> <span class="n">output_prop</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">width</span>
+
+        <span class="n">alpha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_prop</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">val</span>
+        <span class="n">beta</span> <span class="o">=</span> <span class="n">output_prop</span><span class="o">.</span><span class="n">val</span>
+
+        <span class="n">civ2iw</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="n">iw2list_civ</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">loop_rows_then_columns</span><span class="p">:</span>
+            <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span> <span class="o">=</span> <span class="n">beta</span><span class="p">,</span> <span class="n">alpha</span>
+            <span class="c1"># WDT_with_p_lo already transposed</span>
+
+        <span class="k">with</span> <span class="n">context</span><span class="o">.</span><span class="n">Simplification</span><span class="p">(</span><span class="kc">False</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">ct_input_val</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_rows</span><span class="p">):</span>
+                <span class="n">non_inf_weights</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">Counter</span><span class="p">(</span><span class="n">w</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">WDT_with_p_lo</span><span class="p">[</span><span class="n">ct_input_val</span><span class="p">]</span> <span class="k">if</span> <span class="n">w</span> <span class="o">!=</span> <span class="n">math</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+                <span class="n">non_inf_weights</span> <span class="o">=</span> <span class="p">[</span><span class="n">w</span> <span class="k">for</span> <span class="n">w</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">non_inf_weights</span><span class="o">.</span><span class="n">most_common</span><span class="p">(</span><span class="kc">None</span><span class="p">)]</span>  <span class="c1"># 1st weight most common</span>
+
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">non_inf_weights</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">continue</span>
+
+                <span class="n">ite_weights</span> <span class="o">=</span> <span class="n">non_inf_weights</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># if all Ite conditions are False, result is the most common weight</span>
+                <span class="k">for</span> <span class="n">bv_w</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">non_inf_weights</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>  <span class="c1"># omitting the 1st weight</span>
+                    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bv_w</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">)</span>
+                    <span class="n">w_constraint</span> <span class="o">=</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">ct_output_val</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_columns</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="n">WDT_with_p_lo</span><span class="p">[</span><span class="n">ct_input_val</span><span class="p">][</span><span class="n">ct_output_val</span><span class="p">]</span> <span class="o">==</span> <span class="n">bv_w</span><span class="p">:</span>
+                            <span class="n">w_constraint</span> <span class="o">|=</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvComp</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="n">ct_output_val</span><span class="p">,</span> <span class="n">beta</span><span class="o">.</span><span class="n">width</span><span class="p">))</span>
+                    <span class="n">ite_weights</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">Ite</span><span class="p">(</span>
+                        <span class="n">w_constraint</span><span class="p">,</span>
+                        <span class="n">bv_w</span><span class="p">,</span>
+                        <span class="n">ite_weights</span><span class="p">)</span>
+
+                <span class="c1"># e.g., if for a ct_input_val A, only ct_output_vals B1, B2 have weight 0 and B3 weight 1</span>
+                <span class="c1"># we will have Ite(input == A, ite_weight, ···) where</span>
+                <span class="c1">#   ite_weights = Ite(output == B3, 1, 0)</span>
+
+                <span class="n">civ2iw</span><span class="p">[</span><span class="n">ct_input_val</span><span class="p">]</span> <span class="o">=</span> <span class="n">ite_weights</span>
+                <span class="n">iw2list_civ</span><span class="p">[</span><span class="n">ite_weights</span><span class="p">]</span> <span class="o">=</span> <span class="n">iw2list_civ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">ite_weights</span><span class="p">,</span> <span class="p">[])</span> <span class="o">+</span> <span class="p">[</span><span class="n">ct_input_val</span><span class="p">]</span>
+
+            <span class="n">iw2list_civ</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">iw2list_civ</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>  <span class="c1"># [1] &lt; [4] &lt; [2, 3]</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">iw2list_civ</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">iw</span><span class="p">,</span> <span class="n">list_civ</span> <span class="o">=</span> <span class="n">iw2list_civ</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="c1"># # if some row/column is full of math.inf, list_civ might contain fewer elements</span>
+                <span class="c1"># # e,g, for wdt = [(0, 1), (inf, inf)]], list_civ = [0]</span>
+                <span class="c1"># assert len(list_civ) == num_rows</span>
+                <span class="k">return</span> <span class="n">iw</span>
+
+            <span class="n">main_ite</span> <span class="o">=</span> <span class="n">iw2list_civ</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># only the ite_weights of the last list_civ is used</span>
+            <span class="k">for</span> <span class="n">ite_ws</span><span class="p">,</span> <span class="n">list_civ</span> <span class="ow">in</span> <span class="n">iw2list_civ</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">list_civ</span> <span class="o">=</span> <span class="p">[</span><span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="n">civ</span><span class="p">,</span> <span class="n">alpha</span><span class="o">.</span><span class="n">width</span><span class="p">)</span> <span class="k">for</span> <span class="n">civ</span> <span class="ow">in</span> <span class="n">list_civ</span><span class="p">]</span>
+                <span class="n">input_c</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">operation</span><span class="o">.</span><span class="n">BvOr</span><span class="p">,</span> <span class="p">[</span><span class="n">operation</span><span class="o">.</span><span class="n">BvComp</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">civ</span><span class="p">)</span> <span class="k">for</span> <span class="n">civ</span> <span class="ow">in</span> <span class="n">list_civ</span><span class="p">])</span>
+                <span class="n">main_ite</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">Ite</span><span class="p">(</span>
+                    <span class="n">input_c</span><span class="p">,</span>
+                    <span class="n">ite_ws</span><span class="p">,</span>
+                    <span class="n">main_ite</span>
+                <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">main_ite</span>
+
+    <span class="k">def</span> <span class="nf">max_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">max_w</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="c1"># cannot use self._WDT_with_precision_and_loop_order since it calls max_weight</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">weight_distribution_table</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">row</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">w</span> <span class="o">==</span> <span class="n">math</span><span class="o">.</span><span class="n">inf</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">max_w</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">max_w</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">w</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">precision</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">max_w</span>
+
+    <span class="k">def</span> <span class="nf">weight_width</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_weight</span><span class="p">()</span><span class="o">.</span><span class="n">bit_length</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">decimal_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_prop</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_assert_preconditions_decimal_weight</span><span class="p">(</span><span class="n">output_prop</span><span class="p">)</span>
+
+        <span class="n">alpha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_prop</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">val</span>
+        <span class="n">beta</span> <span class="o">=</span> <span class="n">output_prop</span><span class="o">.</span><span class="n">val</span>
+        <span class="n">dw</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">weight_distribution_table</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">alpha</span><span class="p">)][</span><span class="nb">int</span><span class="p">(</span><span class="n">beta</span><span class="p">)]</span>
+        <span class="n">dw</span> <span class="o">=</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="n">dw</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_assert_postconditions_decimal_weight</span><span class="p">(</span><span class="n">output_prop</span><span class="p">,</span> <span class="n">dw</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dw</span>
+
+    <span class="k">def</span> <span class="nf">num_frac_bits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">precision</span>
+
+    <span class="k">def</span> <span class="nf">error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">max_error</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">cls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">weight_distribution_table</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">row</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">w</span> <span class="o">==</span> <span class="n">math</span><span class="o">.</span><span class="n">inf</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">approx_w</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">w</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="bp">cls</span><span class="o">.</span><span class="n">precision</span><span class="p">))</span> <span class="o">/</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="bp">cls</span><span class="o">.</span><span class="n">precision</span><span class="p">)</span>
+                <span class="n">max_error</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">max_error</span><span class="p">,</span> <span class="nb">abs</span><span class="p">(</span><span class="n">w</span> <span class="o">-</span> <span class="n">approx_w</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="n">max_error</span> <span class="o">&lt;</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="bp">cls</span><span class="o">.</span><span class="n">precision</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">max_error</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Adrián Ranea.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

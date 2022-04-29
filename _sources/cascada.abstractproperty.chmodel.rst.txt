@@ -1,0 +1,6 @@
+cascada.abstractproperty.chmodel module
+=======================================
+
+.. automodule:: cascada.abstractproperty.chmodel
+   :members:
+   :show-inheritance:

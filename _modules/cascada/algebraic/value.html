@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cascada.algebraic.value &mdash; CASCADA 1.0.rc0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> CASCADA
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">CASCADA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../primitives_implemented.html">Primitives implemented</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cascada.html">API reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">CASCADA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>cascada.algebraic.value</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cascada.algebraic.value</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Represent type of value properties.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">core</span>
+<span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">operation</span>
+<span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">secondaryop</span>
+<span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">ssa</span> <span class="k">as</span> <span class="n">cascada_ssa</span>
+
+<span class="kn">from</span> <span class="nn">cascada</span> <span class="kn">import</span> <span class="n">abstractproperty</span>
+
+
+<span class="nb">zip</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="nb">zip</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Value"><a class="viewcode-back" href="../../../cascada.algebraic.value.html#cascada.algebraic.value.Value">[docs]</a><span class="k">class</span> <span class="nc">Value</span><span class="p">(</span><span class="n">abstractproperty</span><span class="o">.</span><span class="n">property</span><span class="o">.</span><span class="n">Property</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent value properties.</span>
+
+<span class="sd">    Given a function :math:`f`,  a `Value` property pair</span>
+<span class="sd">    :math:`(\\alpha, \\beta)` is a bit-vector `Property` :math:`(\\alpha, \\beta)`</span>
+<span class="sd">    where the propagation probability</span>
+<span class="sd">    is simply 1 if :math:`\\beta = f(\\alpha)` otherwise 0, that is,</span>
+<span class="sd">    the propagation probability is 0 or 1 depending on whether</span>
+<span class="sd">    the output value is the image of the input value through :math:`f`.</span>
+
+<span class="sd">    This class is not meant to be instantiated but to provide a base</span>
+<span class="sd">    class for the different representations of the value of a bit-vector</span>
+<span class="sd">    (see `BitValue` or `WordValue`).</span>
+
+<span class="sd">    Internally, `Value` is a subclass of `Property` (as `Difference`).</span>
+<span class="sd">    The `Value` methods inherited from `Property` requiring</span>
+<span class="sd">    arguments of type `Property` should be called instead with arguments</span>
+<span class="sd">    of type `Value`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Value.get_value"><a class="viewcode-back" href="../../../cascada.algebraic.value.html#cascada.algebraic.value.Value.get_value">[docs]</a>    <span class="k">def</span> <span class="nf">get_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the value of the underlying bit-vector.</span>
+
+<span class="sd">        Subclasses of `Value` can represent the underlying bit-vector</span>
+<span class="sd">        in different ways and return its value in different ways</span>
+<span class="sd">        (i.e., not only as ``self.val``).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;subclasses need to override this method&quot;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="WordValue"><a class="viewcode-back" href="../../../cascada.algebraic.value.html#cascada.algebraic.value.WordValue">[docs]</a><span class="k">class</span> <span class="nc">WordValue</span><span class="p">(</span><span class="n">Value</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent word value properties.</span>
+
+<span class="sd">    The word value is a `Value` property where the underlying bit-vector</span>
+<span class="sd">    value of the property is given as is (i.e., as a bit-vector `Term`).</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.algebraic.value import WordValue</span>
+<span class="sd">        &gt;&gt;&gt; alpha = WordValue(Constant(0b001, 3))</span>
+<span class="sd">        &gt;&gt;&gt; alpha, alpha.val</span>
+<span class="sd">        (WordValue(0b001), 0b001)</span>
+<span class="sd">        &gt;&gt;&gt; alpha.get_value()</span>
+<span class="sd">        0b001</span>
+<span class="sd">        &gt;&gt;&gt; alpha = WordValue(Variable(&quot;alpha&quot;, 3))</span>
+<span class="sd">        &gt;&gt;&gt; alpha, alpha.val</span>
+<span class="sd">        (WordValue(alpha), alpha)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="WordValue.get_value"><a class="viewcode-back" href="../../../cascada.algebraic.value.html#cascada.algebraic.value.WordValue.get_value">[docs]</a>    <span class="k">def</span> <span class="nf">get_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the value of the underlying bit-vector as ``self.val``.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">val</span></div>
+
+<div class="viewcode-block" id="WordValue.propagate"><a class="viewcode-back" href="../../../cascada.algebraic.value.html#cascada.algebraic.value.WordValue.propagate">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">propagate</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">input_val</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Propagate the given input `WordValue` through the given operation.</span>
+
+<span class="sd">        For any operation ``op`` and any</span>
+<span class="sd">        input value ``input_val``, the output value ``output_val``</span>
+<span class="sd">        is uniquely determined and its bit-vector value is ``f(input_val)``.</span>
+
+<span class="sd">        See `Property.propagate` for more information.</span>
+
+<span class="sd">        User-defined or new `Operation` ``op`` can store its associated</span>
+<span class="sd">        `WordValue` `algebraic.opmodel.OpModel` in ``op.word_model``,</span>
+<span class="sd">        as this method first checks whether ``op`` has its associated</span>
+<span class="sd">        `algebraic.opmodel.OpModel` stored in the class attribute ``word_model``.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Variable, Constant</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.operation import BvXor, BvIdentity</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.algebraic.value import WordValue</span>
+<span class="sd">            &gt;&gt;&gt; d1, d2 = WordValue(Variable(&quot;d1&quot;, 8)), WordValue(Constant(1, 8))</span>
+<span class="sd">            &gt;&gt;&gt; WordValue.propagate(BvXor, [d1, d2])</span>
+<span class="sd">            WordValue(d1 ^ 0x01)</span>
+<span class="sd">            &gt;&gt;&gt; WordValue.propagate(BvIdentity, d1)</span>
+<span class="sd">            WordModelId(WordValue(d1))</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">input_val</span> <span class="o">=</span> <span class="n">abstractproperty</span><span class="o">.</span><span class="n">property</span><span class="o">.</span><span class="n">_tuplify</span><span class="p">(</span><span class="n">input_val</span><span class="p">)</span>
+
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_val</span><span class="p">)</span> <span class="o">==</span> <span class="nb">sum</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">arity</span><span class="p">)</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;invalid arguments: op=</span><span class="si">{}</span><span class="s2">, input_val=</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">op</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+            <span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">vrepr</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Term</span><span class="p">)</span> <span class="k">else</span> <span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">input_val</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">input_val</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="s2">&quot;_trivial_propagation&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">op</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">val</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">input_val</span><span class="p">]))</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="s2">&quot;word_model&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">op</span><span class="o">.</span><span class="n">word_model</span><span class="p">(</span><span class="n">input_val</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="n">cascada_ssa</span><span class="o">.</span><span class="n">SSAReturn</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">):</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;constant propagation of output wordval in &quot;</span>
+                              <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.propagate(op=</span><span class="si">{</span><span class="n">op</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">, &quot;</span>
+                              <span class="sa">f</span><span class="s2">&quot;input_val=</span><span class="si">{</span><span class="n">input_val</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="kn">from</span> <span class="nn">cascada.algebraic</span> <span class="kn">import</span> <span class="n">opmodel</span>
+            <span class="k">return</span> <span class="n">opmodel</span><span class="o">.</span><span class="n">WordModelId</span><span class="p">(</span><span class="n">input_val</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvIdentity</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">input_val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="kn">from</span> <span class="nn">cascada.algebraic</span> <span class="kn">import</span> <span class="n">opmodel</span>
+                <span class="k">return</span> <span class="n">opmodel</span><span class="o">.</span><span class="n">WordModelId</span><span class="p">(</span><span class="n">input_val</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">op</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">val</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">input_val</span><span class="p">]))</span></div></div>
+
+
+<div class="viewcode-block" id="BitValue"><a class="viewcode-back" href="../../../cascada.algebraic.value.html#cascada.algebraic.value.BitValue">[docs]</a><span class="k">class</span> <span class="nc">BitValue</span><span class="p">(</span><span class="n">Value</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent bit value properties.</span>
+
+<span class="sd">    The bit value is a `Value` property where the underlying bit-vector</span>
+<span class="sd">    value of the property is given as the list of its bits</span>
+<span class="sd">    (starting from the least significant bit (LSB) and ending in the MSB).</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.algebraic.value import BitValue</span>
+<span class="sd">        &gt;&gt;&gt; alpha = BitValue(Constant(0b001, 3))</span>
+<span class="sd">        &gt;&gt;&gt; alpha, alpha.val</span>
+<span class="sd">        (BitValue(0b001), 0b001)</span>
+<span class="sd">        &gt;&gt;&gt; alpha.get_value()</span>
+<span class="sd">        (0b1, 0b0, 0b0)</span>
+<span class="sd">        &gt;&gt;&gt; alpha = BitValue(Variable(&quot;alpha&quot;, 3))</span>
+<span class="sd">        &gt;&gt;&gt; alpha, alpha.val</span>
+<span class="sd">        (BitValue(alpha), alpha)</span>
+<span class="sd">        &gt;&gt;&gt; alpha.get_value()</span>
+<span class="sd">        (alpha[0], alpha[1], alpha[2])</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="BitValue.get_value"><a class="viewcode-back" href="../../../cascada.algebraic.value.html#cascada.algebraic.value.BitValue.get_value">[docs]</a>    <span class="k">def</span> <span class="nf">get_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the value of the underling bit-vector as the</span>
+<span class="sd">        list of its bits.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">width</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="BitValue.propagate"><a class="viewcode-back" href="../../../cascada.algebraic.value.html#cascada.algebraic.value.BitValue.propagate">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">propagate</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">input_val</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Propagate the given input `BitValue` through the given operation.</span>
+
+<span class="sd">        For any operation ``op`` and any</span>
+<span class="sd">        input value ``input_val``, the output value</span>
+<span class="sd">        is uniquely determined and its bit-vector value is ``f(input_val)``.</span>
+
+<span class="sd">        For some operations, the output value is given implicitly</span>
+<span class="sd">        through a system of binary equations or constraints</span>
+<span class="sd">        (see `BitModelBvAdd`). For these operations,</span>
+<span class="sd">        this method return an `algebraic.opmodel.OpModel`.</span>
+
+<span class="sd">        See `Property.propagate` for more information.</span>
+
+<span class="sd">        User-defined or new `Operation` ``op`` can store its associated</span>
+<span class="sd">        `BitValue` `algebraic.opmodel.OpModel` in ``op.bit_model``, as this method</span>
+<span class="sd">        first checks whether ``op`` has its associated `algebraic.opmodel.OpModel`</span>
+<span class="sd">        stored in the class attribute ``bit_model``.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Variable, Constant</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.operation import BvXor, Concat, BvIdentity</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.algebraic.value import BitValue</span>
+<span class="sd">            &gt;&gt;&gt; d1, d2 = BitValue(Variable(&quot;d1&quot;, 2)), BitValue(Constant(1, 2))</span>
+<span class="sd">            &gt;&gt;&gt; BitValue.propagate(BvXor, [d1, d2])</span>
+<span class="sd">            BitValue((d1[1]) :: ~(d1[0]))</span>
+<span class="sd">            &gt;&gt;&gt; d1, d2 = BitValue(Variable(&quot;d1&quot;, 2)), BitValue(Variable(&quot;d2&quot;, 2))</span>
+<span class="sd">            &gt;&gt;&gt; BitValue.propagate(Concat, [d1, d2])</span>
+<span class="sd">            BitValue(d1 :: (d2[1]) :: (d2[0]))</span>
+<span class="sd">            &gt;&gt;&gt; BitValue.propagate(BvIdentity, d1)</span>
+<span class="sd">            BitValue(Id(d1[1]) :: Id(d1[0]))</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">input_val</span> <span class="o">=</span> <span class="n">abstractproperty</span><span class="o">.</span><span class="n">property</span><span class="o">.</span><span class="n">_tuplify</span><span class="p">(</span><span class="n">input_val</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_val</span><span class="p">)</span> <span class="o">==</span> <span class="nb">sum</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">arity</span><span class="p">)</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;invalid arguments: op=</span><span class="si">{}</span><span class="s2">, input_val=</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">op</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+            <span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">vrepr</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Term</span><span class="p">)</span> <span class="k">else</span> <span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">input_val</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">input_val</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="s2">&quot;_trivial_propagation&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">op</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">val</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">input_val</span><span class="p">]))</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="s2">&quot;bit_model&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">op</span><span class="o">.</span><span class="n">bit_model</span><span class="p">(</span><span class="n">input_val</span><span class="p">)</span>
+
+        <span class="c1"># f(x, y) is bitwise if f(x, y) == f(x0, y0) || ... || f(xn-1, yn-1)</span>
+        <span class="n">bitwise_ops</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">operation</span><span class="o">.</span><span class="n">BvNot</span><span class="p">,</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvIdentity</span><span class="p">,</span>  <span class="c1"># unary</span>
+            <span class="n">operation</span><span class="o">.</span><span class="n">BvAnd</span><span class="p">,</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvOr</span><span class="p">,</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvXor</span><span class="p">,</span>
+            <span class="n">secondaryop</span><span class="o">.</span><span class="n">BvMaj</span><span class="p">,</span> <span class="n">secondaryop</span><span class="o">.</span><span class="n">BvIf</span>
+        <span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="ow">in</span> <span class="n">bitwise_ops</span><span class="p">:</span>
+            <span class="c1"># l = list of 1-bit inputs</span>
+            <span class="n">out_bitlist</span> <span class="o">=</span> <span class="p">[</span><span class="n">op</span><span class="p">(</span><span class="o">*</span><span class="n">l</span><span class="p">)</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">input_val</span><span class="p">])]</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">operation</span><span class="o">.</span><span class="n">Concat</span><span class="p">,</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">out_bitlist</span><span class="p">)))</span>  <span class="c1"># back to single BV</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvAdd</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">cascada.algebraic</span> <span class="kn">import</span> <span class="n">opmodel</span>
+            <span class="k">return</span> <span class="n">opmodel</span><span class="o">.</span><span class="n">BitModelBvAdd</span><span class="p">(</span><span class="n">input_val</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvSub</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">cascada.algebraic</span> <span class="kn">import</span> <span class="n">opmodel</span>
+            <span class="k">return</span> <span class="n">opmodel</span><span class="o">.</span><span class="n">BitModelBvSub</span><span class="p">(</span><span class="n">input_val</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvNeg</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">cascada.algebraic</span> <span class="kn">import</span> <span class="n">opmodel</span>
+            <span class="n">zero_val</span> <span class="o">=</span> <span class="n">BitValue</span><span class="p">(</span><span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">input_val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">width</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">opmodel</span><span class="o">.</span><span class="n">BitModelBvSub</span><span class="p">([</span><span class="n">zero_val</span><span class="p">,</span> <span class="n">input_val</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">Concat</span><span class="p">:</span>
+            <span class="n">in_bitlist</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">input_val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_value</span><span class="p">()))</span>
+            <span class="n">in_bitlist</span> <span class="o">+=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">input_val</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_value</span><span class="p">()))</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">operation</span><span class="o">.</span><span class="n">Concat</span><span class="p">,</span> <span class="n">in_bitlist</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="n">cascada_ssa</span><span class="o">.</span><span class="n">SSAReturn</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">):</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;constant propagation of output bitval in &quot;</span>
+                              <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.propagate(op=</span><span class="si">{</span><span class="n">op</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">, &quot;</span>
+                              <span class="sa">f</span><span class="s2">&quot;input_val=</span><span class="si">{</span><span class="n">input_val</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="kn">from</span> <span class="nn">cascada.algebraic</span> <span class="kn">import</span> <span class="n">opmodel</span>
+            <span class="k">return</span> <span class="n">opmodel</span><span class="o">.</span><span class="n">BitModelId</span><span class="p">(</span><span class="n">input_val</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvIdentity</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">input_val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="kn">from</span> <span class="nn">cascada.algebraic</span> <span class="kn">import</span> <span class="n">opmodel</span>
+                <span class="k">return</span> <span class="n">opmodel</span><span class="o">.</span><span class="n">BitModelId</span><span class="p">(</span><span class="n">input_val</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">operation</span><span class="o">.</span><span class="n">PartialOperation</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">base_op</span> <span class="ow">in</span> <span class="p">[</span><span class="n">operation</span><span class="o">.</span><span class="n">RotateLeft</span><span class="p">,</span> <span class="n">operation</span><span class="o">.</span><span class="n">RotateRight</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">x</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="n">input_val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_value</span><span class="p">(),</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">r</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="n">input_val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">base_op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">RotateLeft</span><span class="p">:</span>
+                        <span class="c1">#               xn-1, xn-2, ..., x1, x0</span>
+                        <span class="c1"># rl(x, 2) =    xn-3, ...., x1, x0, xn-1, xn-2</span>
+                        <span class="c1"># reversed(·) = xn-2, xn-1, x0, x1, ..., xn-3</span>
+                        <span class="n">out_bitlist</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">-</span> <span class="n">r</span><span class="p">:]</span> <span class="o">+</span> <span class="n">x</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">-</span> <span class="n">r</span><span class="p">]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c1">#               x-1, xn-2, ..., x1, x0</span>
+                        <span class="c1"># rr(x, 2) =    x1, x0, xn-1, ...., x2</span>
+                        <span class="c1"># reversed(·) = x2, ..., xn-1, x0, x1</span>
+                        <span class="n">out_bitlist</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">r</span><span class="p">:]</span> <span class="o">+</span> <span class="n">x</span><span class="p">[:</span><span class="n">r</span><span class="p">]</span>
+                    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">operation</span><span class="o">.</span><span class="n">Concat</span><span class="p">,</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">out_bitlist</span><span class="p">)))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">base_op</span> <span class="ow">in</span> <span class="p">[</span><span class="n">operation</span><span class="o">.</span><span class="n">BvShl</span><span class="p">,</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvLshr</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">x</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="n">input_val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_value</span><span class="p">(),</span> <span class="nb">int</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="n">r</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="n">input_val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">r</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+                        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+                    <span class="n">zero_list</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">r</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">base_op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvShl</span><span class="p">:</span>
+                        <span class="c1">#               xn-1, xn-2, ..., x1, x0</span>
+                        <span class="c1"># rs(x, 2) =    xn-3, ...., x1, x0, 0, 0</span>
+                        <span class="c1"># reversed(·) = 0, 0, x0, x1, ..., xn-3</span>
+                        <span class="n">out_bitlist</span> <span class="o">=</span> <span class="n">zero_list</span> <span class="o">+</span> <span class="n">x</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">-</span> <span class="n">r</span><span class="p">]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c1">#               x-1, xn-2, ..., x1, x0</span>
+                        <span class="c1"># rs(x, 2) =    0, 0, xn-1, ...., x2</span>
+                        <span class="c1"># reversed(·) = x2, ..., xn-1, 0, 0</span>
+                        <span class="n">out_bitlist</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">r</span><span class="p">:]</span> <span class="o">+</span> <span class="n">zero_list</span>
+                    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">operation</span><span class="o">.</span><span class="n">Concat</span><span class="p">,</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">out_bitlist</span><span class="p">)))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">base_op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">Extract</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_val</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+                    <span class="n">x</span> <span class="o">=</span> <span class="n">input_val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+                    <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+                    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                    <span class="n">out_bitlist</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">x</span><span class="p">))[</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">i</span><span class="p">:</span><span class="n">n</span> <span class="o">-</span> <span class="n">j</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">j</span><span class="p">:</span>
+                        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">out_bitlist</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+                        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">out_bitlist</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">operation</span><span class="o">.</span><span class="n">Concat</span><span class="p">,</span> <span class="n">out_bitlist</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">new_input_val</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">counter_non_fixed_args</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">for</span> <span class="n">fa</span> <span class="ow">in</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">fa</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fa</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                        <span class="n">new_input_val</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">cls</span><span class="p">(</span><span class="n">fa</span><span class="p">))</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">new_input_val</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">input_val</span><span class="p">[</span><span class="n">counter_non_fixed_args</span><span class="p">])</span>
+                        <span class="n">counter_non_fixed_args</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_val</span><span class="p">)</span> <span class="o">==</span> <span class="n">counter_non_fixed_args</span>
+                <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">propagate</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">base_op</span><span class="p">,</span> <span class="n">new_input_val</span><span class="p">)</span>
+
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Adrián Ranea.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

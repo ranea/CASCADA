@@ -1,0 +1,6 @@
+cascada.primitives.chaskey module
+=================================
+
+.. automodule:: cascada.primitives.chaskey
+   :members:
+   :show-inheritance:

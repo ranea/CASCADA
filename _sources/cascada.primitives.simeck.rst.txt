@@ -1,0 +1,6 @@
+cascada.primitives.simeck module
+================================
+
+.. automodule:: cascada.primitives.simeck
+   :members:
+   :show-inheritance:

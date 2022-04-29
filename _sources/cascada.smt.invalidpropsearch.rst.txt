@@ -1,0 +1,6 @@
+cascada.smt.invalidpropsearch module
+====================================
+
+.. automodule:: cascada.smt.invalidpropsearch
+   :members:
+   :show-inheritance:

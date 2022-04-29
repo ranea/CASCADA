@@ -1,0 +1,6 @@
+cascada.algebraic.opmodel module
+================================
+
+.. automodule:: cascada.algebraic.opmodel
+   :members:
+   :show-inheritance:

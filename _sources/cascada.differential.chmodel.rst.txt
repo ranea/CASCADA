@@ -1,0 +1,6 @@
+cascada.differential.chmodel module
+===================================
+
+.. automodule:: cascada.differential.chmodel
+   :members:
+   :show-inheritance:

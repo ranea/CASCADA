@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cascada.primitives.shacal2 &mdash; CASCADA 1.0.rc0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> CASCADA
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">CASCADA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../primitives_implemented.html">Primitives implemented</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cascada.html">API reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">CASCADA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>cascada.primitives.shacal2</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cascada.primitives.shacal2</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;SHACAL-2 cipher (based on SHA-256).&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span>
+<span class="kn">from</span> <span class="nn">cascada.bitvector.operation</span> <span class="kn">import</span> <span class="n">RotateRight</span> <span class="k">as</span> <span class="n">ROR</span>
+<span class="kn">from</span> <span class="nn">cascada.bitvector.secondaryop</span> <span class="kn">import</span> <span class="n">BvIf</span><span class="p">,</span> <span class="n">BvMaj</span>
+
+<span class="kn">from</span> <span class="nn">cascada.bitvector.ssa</span> <span class="kn">import</span> <span class="n">RoundBasedFunction</span>
+<span class="kn">from</span> <span class="nn">cascada.primitives.blockcipher</span> <span class="kn">import</span> <span class="n">Encryption</span><span class="p">,</span> <span class="n">Cipher</span>
+
+
+<span class="n">N</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># at least 4, at most 16</span>
+<span class="sd">&quot;&quot;&quot;number of key words (N=4 for 128-bit key).&quot;&quot;&quot;</span>
+
+<span class="k">assert</span> <span class="n">N</span> <span class="o">&gt;=</span> <span class="mi">4</span>
+<span class="c1"># N == 16, optimized for default single-key</span>
+<span class="c1"># N == 4, ref for linear related-key characteristics</span>
+<span class="c1"># N == 4, optimized for non-linear related-key characteristics</span>
+
+<span class="n">REFERENCE_VERSION</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># True ==constants added in the encryption</span>
+
+<span class="n">k_cts</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="mh">0x428a2f98</span><span class="p">,</span> <span class="mh">0x71374491</span><span class="p">,</span> <span class="mh">0xb5c0fbcf</span><span class="p">,</span> <span class="mh">0xe9b5dba5</span><span class="p">,</span>
+    <span class="mh">0x3956c25b</span><span class="p">,</span> <span class="mh">0x59f111f1</span><span class="p">,</span> <span class="mh">0x923f82a4</span><span class="p">,</span> <span class="mh">0xab1c5ed5</span><span class="p">,</span>
+    <span class="mh">0xd807aa98</span><span class="p">,</span> <span class="mh">0x12835b01</span><span class="p">,</span> <span class="mh">0x243185be</span><span class="p">,</span> <span class="mh">0x550c7dc3</span><span class="p">,</span>
+    <span class="mh">0x72be5d74</span><span class="p">,</span> <span class="mh">0x80deb1fe</span><span class="p">,</span> <span class="mh">0x9bdc06a7</span><span class="p">,</span> <span class="mh">0xc19bf174</span><span class="p">,</span>
+    <span class="mh">0xe49b69c1</span><span class="p">,</span> <span class="mh">0xefbe4786</span><span class="p">,</span> <span class="mh">0x0fc19dc6</span><span class="p">,</span> <span class="mh">0x240ca1cc</span><span class="p">,</span>
+    <span class="mh">0x2de92c6f</span><span class="p">,</span> <span class="mh">0x4a7484aa</span><span class="p">,</span> <span class="mh">0x5cb0a9dc</span><span class="p">,</span> <span class="mh">0x76f988da</span><span class="p">,</span>
+    <span class="mh">0x983e5152</span><span class="p">,</span> <span class="mh">0xa831c66d</span><span class="p">,</span> <span class="mh">0xb00327c8</span><span class="p">,</span> <span class="mh">0xbf597fc7</span><span class="p">,</span>
+    <span class="mh">0xc6e00bf3</span><span class="p">,</span> <span class="mh">0xd5a79147</span><span class="p">,</span> <span class="mh">0x06ca6351</span><span class="p">,</span> <span class="mh">0x14292967</span><span class="p">,</span>
+    <span class="mh">0x27b70a85</span><span class="p">,</span> <span class="mh">0x2e1b2138</span><span class="p">,</span> <span class="mh">0x4d2c6dfc</span><span class="p">,</span> <span class="mh">0x53380d13</span><span class="p">,</span>
+    <span class="mh">0x650a7354</span><span class="p">,</span> <span class="mh">0x766a0abb</span><span class="p">,</span> <span class="mh">0x81c2c92e</span><span class="p">,</span> <span class="mh">0x92722c85</span><span class="p">,</span>
+    <span class="mh">0xa2bfe8a1</span><span class="p">,</span> <span class="mh">0xa81a664b</span><span class="p">,</span> <span class="mh">0xc24b8b70</span><span class="p">,</span> <span class="mh">0xc76c51a3</span><span class="p">,</span>
+    <span class="mh">0xd192e819</span><span class="p">,</span> <span class="mh">0xd6990624</span><span class="p">,</span> <span class="mh">0xf40e3585</span><span class="p">,</span> <span class="mh">0x106aa070</span><span class="p">,</span>
+    <span class="mh">0x19a4c116</span><span class="p">,</span> <span class="mh">0x1e376c08</span><span class="p">,</span> <span class="mh">0x2748774c</span><span class="p">,</span> <span class="mh">0x34b0bcb5</span><span class="p">,</span>
+    <span class="mh">0x391c0cb3</span><span class="p">,</span> <span class="mh">0x4ed8aa4a</span><span class="p">,</span> <span class="mh">0x5b9cca4f</span><span class="p">,</span> <span class="mh">0x682e6ff3</span><span class="p">,</span>
+    <span class="mh">0x748f82ee</span><span class="p">,</span> <span class="mh">0x78a5636f</span><span class="p">,</span> <span class="mh">0x84c87814</span><span class="p">,</span> <span class="mh">0x8cc70208</span><span class="p">,</span>
+    <span class="mh">0x90befffa</span><span class="p">,</span> <span class="mh">0xa4506ceb</span><span class="p">,</span> <span class="mh">0xbef9a3f7</span><span class="p">,</span> <span class="mh">0xc67178f2</span>
+<span class="p">]</span>
+<span class="n">k_cts</span> <span class="o">=</span> <span class="p">[</span><span class="n">Constant</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">k_cts</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="SHACAL2KeySchedule"><a class="viewcode-back" href="../../../cascada.primitives.shacal2.html#cascada.primitives.shacal2.SHACAL2KeySchedule">[docs]</a><span class="k">class</span> <span class="nc">SHACAL2KeySchedule</span><span class="p">(</span><span class="n">RoundBasedFunction</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Key schedule function.&quot;&quot;&quot;</span>
+
+    <span class="n">num_rounds</span> <span class="o">=</span> <span class="mi">64</span>
+    <span class="n">input_widths</span> <span class="o">=</span> <span class="p">[</span><span class="mi">32</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)]</span>
+    <span class="n">output_widths</span> <span class="o">=</span> <span class="p">[</span><span class="mi">32</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">64</span> <span class="o">-</span> <span class="p">(</span><span class="mi">16</span> <span class="o">-</span> <span class="n">N</span><span class="p">))]</span>
+
+<div class="viewcode-block" id="SHACAL2KeySchedule.set_num_rounds"><a class="viewcode-back" href="../../../cascada.primitives.shacal2.html#cascada.primitives.shacal2.SHACAL2KeySchedule.set_num_rounds">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">set_num_rounds</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">new_num_rounds</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span> <span class="o">=</span> <span class="n">new_num_rounds</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">output_widths</span> <span class="o">=</span> <span class="p">[</span><span class="mi">32</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span> <span class="o">+</span> <span class="nb">max</span><span class="p">(</span><span class="n">new_num_rounds</span> <span class="o">-</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">0</span><span class="p">))]</span></div>
+
+<div class="viewcode-block" id="SHACAL2KeySchedule.eval"><a class="viewcode-back" href="../../../cascada.primitives.shacal2.html#cascada.primitives.shacal2.SHACAL2KeySchedule.eval">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">W</span><span class="p">):</span>  <span class="c1"># w0, w1, ...</span>
+        <span class="n">rk</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">W</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="mi">16</span><span class="p">):</span>
+            <span class="n">rk</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">32</span><span class="p">))</span>
+
+        <span class="n">sigma0</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">ROR</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span> <span class="o">^</span> <span class="n">ROR</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">18</span><span class="p">)</span> <span class="o">^</span> <span class="p">(</span><span class="n">x</span> <span class="o">&gt;&gt;</span> <span class="n">Constant</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">32</span><span class="p">))</span>
+        <span class="n">sigma1</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">ROR</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">17</span><span class="p">)</span> <span class="o">^</span> <span class="n">ROR</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">19</span><span class="p">)</span> <span class="o">^</span> <span class="p">(</span><span class="n">x</span> <span class="o">&gt;&gt;</span> <span class="n">Constant</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">32</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span><span class="p">):</span>
+            <span class="n">rk</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sigma1</span><span class="p">(</span><span class="n">rk</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span> <span class="o">+</span> <span class="n">rk</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">7</span><span class="p">]</span> <span class="o">+</span> <span class="n">sigma0</span><span class="p">(</span><span class="n">rk</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">15</span><span class="p">])</span> <span class="o">+</span> <span class="n">rk</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">16</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">REFERENCE_VERSION</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">N</span> <span class="o">&lt;=</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="mi">15</span><span class="p">:</span>
+                    <span class="c1"># rk[:N] + rk[16:cls.num_rounds] does not include rk[N],...,rk[15]</span>
+                    <span class="k">continue</span>
+                <span class="n">rk</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="n">k_cts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">rk</span><span class="p">[:</span><span class="n">N</span><span class="p">]</span> <span class="o">+</span> <span class="n">rk</span><span class="p">[</span><span class="mi">16</span><span class="p">:</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span><span class="p">]</span></div></div>
+
+
+<div class="viewcode-block" id="SHACAL2Encryption"><a class="viewcode-back" href="../../../cascada.primitives.shacal2.html#cascada.primitives.shacal2.SHACAL2Encryption">[docs]</a><span class="k">class</span> <span class="nc">SHACAL2Encryption</span><span class="p">(</span><span class="n">Encryption</span><span class="p">,</span> <span class="n">RoundBasedFunction</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Encryption function.&quot;&quot;&quot;</span>
+
+    <span class="n">num_rounds</span> <span class="o">=</span> <span class="mi">64</span>
+    <span class="n">input_widths</span> <span class="o">=</span> <span class="p">[</span><span class="mi">32</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">)]</span>
+    <span class="n">output_widths</span> <span class="o">=</span> <span class="p">[</span><span class="mi">32</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">)]</span>
+    <span class="n">round_keys</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="SHACAL2Encryption.set_num_rounds"><a class="viewcode-back" href="../../../cascada.primitives.shacal2.html#cascada.primitives.shacal2.SHACAL2Encryption.set_num_rounds">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">set_num_rounds</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">new_num_rounds</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span> <span class="o">=</span> <span class="n">new_num_rounds</span></div>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">round_function</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="n">F</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">N</span><span class="p">:</span>
+            <span class="n">W</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">round_keys</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">N</span> <span class="o">&lt;=</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">16</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">REFERENCE_VERSION</span><span class="p">:</span>
+                <span class="n">W</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">W</span> <span class="o">=</span> <span class="n">k_cts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">W</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">round_keys</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="p">(</span><span class="mi">16</span> <span class="o">-</span> <span class="n">N</span><span class="p">)]</span>
+
+        <span class="n">delta0</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">ROR</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">^</span> <span class="n">ROR</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">13</span><span class="p">)</span> <span class="o">^</span> <span class="n">ROR</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">22</span><span class="p">)</span>
+        <span class="n">delta1</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">ROR</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span> <span class="o">^</span> <span class="n">ROR</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">11</span><span class="p">)</span> <span class="o">^</span> <span class="n">ROR</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">25</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">REFERENCE_VERSION</span><span class="p">:</span>
+            <span class="n">T1</span> <span class="o">=</span> <span class="n">H</span> <span class="o">+</span> <span class="n">delta1</span><span class="p">(</span><span class="n">E</span><span class="p">)</span> <span class="o">+</span> <span class="n">BvIf</span><span class="p">(</span><span class="n">E</span><span class="p">,</span> <span class="n">F</span><span class="p">,</span> <span class="n">G</span><span class="p">)</span> <span class="o">+</span> <span class="n">W</span> <span class="o">+</span> <span class="n">k_cts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>  <span class="c1"># ref</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">T1</span> <span class="o">=</span> <span class="n">H</span> <span class="o">+</span> <span class="n">delta1</span><span class="p">(</span><span class="n">E</span><span class="p">)</span> <span class="o">+</span> <span class="n">BvIf</span><span class="p">(</span><span class="n">E</span><span class="p">,</span> <span class="n">F</span><span class="p">,</span> <span class="n">G</span><span class="p">)</span> <span class="o">+</span> <span class="n">W</span>  <span class="c1"># optimized</span>
+        <span class="n">T2</span> <span class="o">=</span> <span class="n">delta0</span><span class="p">(</span><span class="n">A</span><span class="p">)</span> <span class="o">+</span> <span class="n">BvMaj</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">T1</span> <span class="o">+</span> <span class="n">T2</span><span class="p">,</span>
+            <span class="n">A</span><span class="p">,</span>
+            <span class="n">B</span><span class="p">,</span>
+            <span class="n">C</span><span class="p">,</span>
+            <span class="n">D</span> <span class="o">+</span> <span class="n">T1</span><span class="p">,</span>
+            <span class="n">E</span><span class="p">,</span>
+            <span class="n">F</span><span class="p">,</span>
+            <span class="n">G</span>
+        <span class="p">]</span>
+
+<div class="viewcode-block" id="SHACAL2Encryption.eval"><a class="viewcode-back" href="../../../cascada.primitives.shacal2.html#cascada.primitives.shacal2.SHACAL2Encryption.eval">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="n">F</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="n">H</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span><span class="p">):</span>
+            <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="n">F</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="n">H</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">round_function</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="n">F</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">add_round_outputs</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="n">F</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="n">H</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="n">F</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="n">H</span></div></div>
+
+
+<div class="viewcode-block" id="SHACAL2Cipher"><a class="viewcode-back" href="../../../cascada.primitives.shacal2.html#cascada.primitives.shacal2.SHACAL2Cipher">[docs]</a><span class="k">class</span> <span class="nc">SHACAL2Cipher</span><span class="p">(</span><span class="n">Cipher</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;SHACAL-2 cipher.&quot;&quot;&quot;</span>
+    <span class="n">key_schedule</span> <span class="o">=</span> <span class="n">SHACAL2KeySchedule</span>
+    <span class="n">encryption</span> <span class="o">=</span> <span class="n">SHACAL2Encryption</span>
+    <span class="n">_min_num_rounds</span> <span class="o">=</span> <span class="n">N</span>
+
+<div class="viewcode-block" id="SHACAL2Cipher.set_num_rounds"><a class="viewcode-back" href="../../../cascada.primitives.shacal2.html#cascada.primitives.shacal2.SHACAL2Cipher.set_num_rounds">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">set_num_rounds</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">new_num_rounds</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="n">new_num_rounds</span> <span class="o">&gt;=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_min_num_rounds</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">key_schedule</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="n">new_num_rounds</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">encryption</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="n">new_num_rounds</span><span class="p">)</span></div>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">test</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="c1"># https://www.cosic.esat.kuleuven.be/nessie/testvectors/</span>
+        <span class="c1"># key =</span>
+        <span class="c1"># 80000000000000000000000000000000</span>
+        <span class="c1"># 00000000000000000000000000000000</span>
+        <span class="c1"># 00000000000000000000000000000000</span>
+        <span class="c1"># 00000000000000000000000000000000</span>
+        <span class="c1"># plain =</span>
+        <span class="c1"># 00000000000000000000000000000000</span>
+        <span class="c1"># 00000000000000000000000000000000</span>
+        <span class="c1"># cipher =</span>
+        <span class="c1"># 361AB632 2FA9E7A7 BB23818D 839E01BD</span>
+        <span class="c1"># DAFDF473 05426EDD 297AEDB9 F6202BAE</span>
+
+        <span class="n">old_num_rounds</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">64</span><span class="p">)</span>
+
+        <span class="k">global</span> <span class="n">REFERENCE_VERSION</span>
+
+        <span class="k">for</span> <span class="n">ref_v</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">]:</span>
+            <span class="n">REFERENCE_VERSION</span> <span class="o">=</span> <span class="n">ref_v</span>
+
+            <span class="n">key</span> <span class="o">=</span> <span class="p">[</span><span class="n">Constant</span><span class="p">(</span><span class="mh">0x80000000</span><span class="p">,</span> <span class="mi">32</span><span class="p">)]</span>
+            <span class="n">key</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="p">)])</span>
+            <span class="n">pt</span> <span class="o">=</span> <span class="p">[</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">)]</span>
+            <span class="n">ct</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">Constant</span><span class="p">(</span><span class="mh">0x361AB632</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+                <span class="n">Constant</span><span class="p">(</span><span class="mh">0x2FA9E7A7</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+                <span class="n">Constant</span><span class="p">(</span><span class="mh">0xBB23818D</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+                <span class="n">Constant</span><span class="p">(</span><span class="mh">0x839E01BD</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+                <span class="n">Constant</span><span class="p">(</span><span class="mh">0xDAFDF473</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+                <span class="n">Constant</span><span class="p">(</span><span class="mh">0x05426EDD</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+                <span class="n">Constant</span><span class="p">(</span><span class="mh">0x297AEDB9</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+                <span class="n">Constant</span><span class="p">(</span><span class="mh">0xF6202BAE</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+            <span class="p">]</span>
+            <span class="k">assert</span> <span class="bp">cls</span><span class="p">(</span><span class="n">pt</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span> <span class="o">==</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">ct</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">N</span> <span class="o">==</span> <span class="mi">16</span><span class="p">:</span>
+                <span class="c1"># key =</span>
+                <span class="c1"># 00010203 04050607 08090A0B 0C0D0E0F</span>
+                <span class="c1"># 10111213 14151617 18191A1B 1C1D1E1F</span>
+                <span class="c1"># 20212223 24252627 28292A2B 2C2D2E2F</span>
+                <span class="c1"># 30313233 34353637 38393A3B 3C3D3E3F</span>
+                <span class="c1"># plain =</span>
+                <span class="c1"># 00112233 44556677 8899AABB CCDDEEFF</span>
+                <span class="c1"># 10213243 54657687 98A9BACB DCEDFE0F</span>
+                <span class="c1"># cipher =</span>
+                <span class="c1"># 1A6B234A 20EAD408 C2D83B35 8AC81D7A</span>
+                <span class="c1"># 648ED25D 01B7C9EC 9CC4C9E2 5CFA813E</span>
+
+                <span class="n">key</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">Constant</span><span class="p">(</span><span class="mh">0x00010203</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span> <span class="n">Constant</span><span class="p">(</span><span class="mh">0x04050607</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span> <span class="n">Constant</span><span class="p">(</span><span class="mh">0x08090A0B</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span> <span class="n">Constant</span><span class="p">(</span><span class="mh">0x0C0D0E0F</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+                    <span class="n">Constant</span><span class="p">(</span><span class="mh">0x10111213</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span> <span class="n">Constant</span><span class="p">(</span><span class="mh">0x14151617</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span> <span class="n">Constant</span><span class="p">(</span><span class="mh">0x18191A1B</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span> <span class="n">Constant</span><span class="p">(</span><span class="mh">0x1C1D1E1F</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+                    <span class="n">Constant</span><span class="p">(</span><span class="mh">0x20212223</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span> <span class="n">Constant</span><span class="p">(</span><span class="mh">0x24252627</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span> <span class="n">Constant</span><span class="p">(</span><span class="mh">0x28292A2B</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span> <span class="n">Constant</span><span class="p">(</span><span class="mh">0x2C2D2E2F</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+                    <span class="n">Constant</span><span class="p">(</span><span class="mh">0x30313233</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span> <span class="n">Constant</span><span class="p">(</span><span class="mh">0x34353637</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span> <span class="n">Constant</span><span class="p">(</span><span class="mh">0x38393A3B</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span> <span class="n">Constant</span><span class="p">(</span><span class="mh">0x3C3D3E3F</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+                <span class="p">]</span>
+                <span class="n">pt</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">Constant</span><span class="p">(</span><span class="mh">0x00112233</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+                    <span class="n">Constant</span><span class="p">(</span><span class="mh">0x44556677</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+                    <span class="n">Constant</span><span class="p">(</span><span class="mh">0x8899AABB</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+                    <span class="n">Constant</span><span class="p">(</span><span class="mh">0xCCDDEEFF</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+                    <span class="n">Constant</span><span class="p">(</span><span class="mh">0x10213243</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+                    <span class="n">Constant</span><span class="p">(</span><span class="mh">0x54657687</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+                    <span class="n">Constant</span><span class="p">(</span><span class="mh">0x98A9BACB</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+                    <span class="n">Constant</span><span class="p">(</span><span class="mh">0xDCEDFE0F</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+                <span class="p">]</span>
+                <span class="n">ct</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">Constant</span><span class="p">(</span><span class="mh">0x1A6B234A</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+                    <span class="n">Constant</span><span class="p">(</span><span class="mh">0x20EAD408</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+                    <span class="n">Constant</span><span class="p">(</span><span class="mh">0xC2D83B35</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+                    <span class="n">Constant</span><span class="p">(</span><span class="mh">0x8AC81D7A</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+                    <span class="n">Constant</span><span class="p">(</span><span class="mh">0x648ED25D</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+                    <span class="n">Constant</span><span class="p">(</span><span class="mh">0x01B7C9EC</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+                    <span class="n">Constant</span><span class="p">(</span><span class="mh">0x9CC4C9E2</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+                    <span class="n">Constant</span><span class="p">(</span><span class="mh">0x5CFA813E</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+                <span class="p">]</span>
+                <span class="k">assert</span> <span class="bp">cls</span><span class="p">(</span><span class="n">pt</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span> <span class="o">==</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">ct</span><span class="p">)</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="n">old_num_rounds</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Adrián Ranea.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

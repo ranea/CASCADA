@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cascada.primitives.blockcipher &mdash; CASCADA 1.0.rc0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> CASCADA
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">CASCADA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../primitives_implemented.html">Primitives implemented</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cascada.html">API reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">CASCADA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>cascada.primitives.blockcipher</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cascada.primitives.blockcipher</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Represent encryption functions and block ciphers.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">core</span>
+<span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">ssa</span> <span class="k">as</span> <span class="n">cascada_ssa</span>
+
+
+<div class="viewcode-block" id="Encryption"><a class="viewcode-back" href="../../../cascada.primitives.blockcipher.html#cascada.primitives.blockcipher.Encryption">[docs]</a><span class="k">class</span> <span class="nc">Encryption</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent encryption functions of block ciphers.</span>
+
+<span class="sd">    An encryption function is a bit-vector function (see `BvFunction`) that takes</span>
+<span class="sd">    the plaintext as input and returns the ciphertext for some fixed master key.</span>
+
+<span class="sd">    An encryption function together with a key-schedule function forms a `Cipher`.</span>
+
+<span class="sd">    The tuple of round keys (the outputs of the associated key-schedule function)</span>
+<span class="sd">    are accessible through the class attribute `round_keys`.</span>
+
+<span class="sd">    The encryption function is not responsible for the creation of the round keys,</span>
+<span class="sd">    and the ``eval`` method of `Encryption` can assume that `round_keys` is a tuple</span>
+<span class="sd">    of bit-vectors with the bit-sizes given by ``Cipher.key_schedule.output_widths``.</span>
+
+<span class="sd">    .. note::</span>
+
+<span class="sd">        The ``eval`` method of `Encryption` is meant to be called from the ``eval``</span>
+<span class="sd">        method of `Cipher`, and in the latter ``eval`` the round keys for the</span>
+<span class="sd">        given master key are automatically created and temporarily stored in</span>
+<span class="sd">        `round_keys` (until the end of ``eval``).</span>
+
+<span class="sd">    To use the encryption function as a regular `BvFunction`, `round_keys`</span>
+<span class="sd">    must be filled with a tuple of `Constant` or `Variable` objects.</span>
+<span class="sd">    This can be easily done by `Cipher.set_round_keys`</span>
+<span class="sd">    If `round_keys` contains `Variable` objects, the round keys are represented</span>
+<span class="sd">    in the `SSA` of the encryption function as external variables.</span>
+
+<span class="sd">    To define an encryption function for a new `Cipher`, you must</span>
+<span class="sd">    create a new class with two parent/base classes: `Encryption` and</span>
+<span class="sd">    either `BvFunction` or `RoundBasedFunction`.</span>
+
+<span class="sd">    .. note::</span>
+
+<span class="sd">        `Encryption` must always be the first parent/base class so that</span>
+<span class="sd">        the `Encryption` methods can override the `BvFunction` or</span>
+<span class="sd">        `RoundBasedFunction` methods.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        round_keys: the round keys as a tuple of `Constant` or `Variable` objects</span>
+
+<span class="sd">    .. Implementation details:</span>
+
+<span class="sd">        Encryption doesn&#39;t implement the round keys as an eval argument since</span>
+<span class="sd">        it does not have access to `Cipher.key_schedule.output_widths`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">round_keys</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">round_keys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span><span class="si">}</span><span class="s2"> cannot be evaluated without setting the round_keys&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">to_ssa</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">input_names</span><span class="p">,</span> <span class="n">id_prefix</span><span class="p">,</span> <span class="n">decompose_sec_ops</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">ssa_options</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">round_keys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;round_keys must be set before calling to_ssa()&quot;</span><span class="p">)</span>
+
+        <span class="n">my_ssa</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">to_ssa</span><span class="p">(</span><span class="n">input_names</span><span class="p">,</span> <span class="n">id_prefix</span><span class="p">,</span> <span class="n">decompose_sec_ops</span><span class="o">=</span><span class="n">decompose_sec_ops</span><span class="p">,</span> <span class="o">**</span><span class="n">ssa_options</span><span class="p">)</span>
+
+        <span class="n">all_round_keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">round_keys</span><span class="p">)</span>
+        <span class="n">round_keys_found</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">ext_var</span> <span class="ow">in</span> <span class="n">my_ssa</span><span class="o">.</span><span class="n">external_vars</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">ext_var</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">all_round_keys</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;found external variable </span><span class="si">{}</span><span class="s2"> not in round_keys </span><span class="si">{}</span><span class="s2"> in </span><span class="si">{}</span><span class="se">\n</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">ext_var</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">round_keys</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">my_ssa</span>
+                <span class="p">))</span>
+            <span class="n">round_keys_found</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ext_var</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">round_keys_found</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_round_keys</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;round keys </span><span class="si">{</span><span class="n">all_round_keys</span> <span class="o">-</span> <span class="n">round_keys_found</span><span class="si">}</span><span class="s2"> not used in </span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">my_ssa</span></div>
+
+
+<div class="viewcode-block" id="Cipher"><a class="viewcode-back" href="../../../cascada.primitives.blockcipher.html#cascada.primitives.blockcipher.Cipher">[docs]</a><span class="k">class</span> <span class="nc">Cipher</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent block ciphers.</span>
+
+<span class="sd">    A block cipher is a pair of bit-vector functions (see `BvFunction`):</span>
+<span class="sd">    the key schedule that computes the round keys from a master key, and</span>
+<span class="sd">    the `Encryption` function.</span>
+
+<span class="sd">    Similar to `BvFunction`, `Cipher` is evaluated with the operator ``()``</span>
+<span class="sd">    that is, ``Cipher(plaintext, masterkey)`` returns the ciphertext.</span>
+<span class="sd">    The arguments ``plaintext`` and ``masterkey`` are both lists of</span>
+<span class="sd">    `Constant` objects or integers (integers are automatically converted</span>
+<span class="sd">    to `Constant` objects using the bit-sizes given by</span>
+<span class="sd">    ``Cipher.key_schedule.input_widths`` and ``Cipher.encryption.input_widths``.</span>
+
+<span class="sd">    An iterated block cipher is a `Cipher` where both the key-schedule and the</span>
+<span class="sd">    encryption functions are `RoundBasedFunction` objects.</span>
+
+<span class="sd">    This class is not meant to be instantiated but to provide a base class for</span>
+<span class="sd">    block ciphers. To define a block cipher, subclass `Cipher` and set the class</span>
+<span class="sd">    attributes `key_schedule` and `encryption`.</span>
+<span class="sd">    For an iterated block cipher, the method `set_num_rounds` must be implemented.</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">        The method `set_num_rounds` must set the number of rounds of `encryption`</span>
+<span class="sd">        to the given number of rounds, but the number of rounds of</span>
+<span class="sd">        `key_schedule` might differ.</span>
+
+<span class="sd">        For an iterated block cipher ``C`` where the `key_schedule`</span>
+<span class="sd">        and the `encryption` share the number of rounds (i.e.,</span>
+<span class="sd">        ``C.key_schedule.num_rounds == C.encryption.num_rounds``),</span>
+<span class="sd">        the usual implement of `set_num_rounds` is</span>
+
+<span class="sd">        .. code:: python</span>
+
+<span class="sd">            @classmethod</span>
+<span class="sd">            def set_num_rounds(cls, encryption_new_num_rounds):</span>
+<span class="sd">                cls.key_schedule.set_num_rounds(encryption_new_num_rounds)</span>
+<span class="sd">                cls.encryption.set_num_rounds(encryption_new_num_rounds)</span>
+
+<span class="sd">        However, an iterated block cipher can also contain a `key_schedule`</span>
+<span class="sd">        with a different number of rounds than the `encryption`.</span>
+<span class="sd">        An example of `set_num_rounds` for an iterated cipher where</span>
+<span class="sd">        the `key_schedule` has one less round that the  `encryption` is</span>
+
+<span class="sd">        .. code:: python</span>
+
+<span class="sd">            @classmethod</span>
+<span class="sd">            def set_num_rounds(cls, encryption_new_num_rounds):</span>
+<span class="sd">                cls.key_schedule.set_num_rounds(encryption_new_num_rounds - 1)</span>
+<span class="sd">                cls.encryption.set_num_rounds(encryption_new_num_rounds)</span>
+
+
+<span class="sd">    ::</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.primitives.blockcipher import Cipher</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">        &gt;&gt;&gt; Speck32 = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64)</span>
+<span class="sd">        &gt;&gt;&gt; issubclass(Speck32, Cipher)</span>
+<span class="sd">        True</span>
+<span class="sd">        &gt;&gt;&gt; Speck32(plaintext=[0, 0], masterkey=[0, 0, 0, 0])  # Automatic Constant Conversion</span>
+<span class="sd">        (0x2bb9, 0xc642)</span>
+<span class="sd">        &gt;&gt;&gt; Speck32.get_name()</span>
+<span class="sd">        &#39;SpeckCipher_22R&#39;</span>
+<span class="sd">        &gt;&gt;&gt; Speck32.vrepr()</span>
+<span class="sd">        &#39;SpeckCipher.set_num_rounds_and_return(22)&#39;</span>
+<span class="sd">        &gt;&gt;&gt; Speck32.set_round_keys(masterkey=[0, 0, 0, 0])</span>
+<span class="sd">        &gt;&gt;&gt; Speck32.encryption.round_keys  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        (0x0000, 0x0000, 0x0001, 0x0007, 0x0018, 0x027c, 0x0189, 0x0fab, 0x7904, 0x8f0d, 0x911f,</span>
+<span class="sd">        0xa5da, 0x49d1, 0xba62, 0xeda2, 0xd3da, 0x6c70, 0x0da9, 0x86c6, 0xa604, 0xef7d, 0x093e)</span>
+<span class="sd">        &gt;&gt;&gt; Speck32.set_num_rounds(2)</span>
+<span class="sd">        &gt;&gt;&gt; Speck32(plaintext=[0, 0], masterkey=[0, 0])  # masterkey is now a 2-word list</span>
+<span class="sd">        (0x0000, 0x0000)</span>
+<span class="sd">        &gt;&gt;&gt; Speck32.get_name()</span>
+<span class="sd">        &#39;SpeckCipher_2R&#39;</span>
+<span class="sd">        &gt;&gt;&gt; Speck32.vrepr()</span>
+<span class="sd">        &#39;SpeckCipher.set_num_rounds_and_return(2)&#39;</span>
+<span class="sd">        &gt;&gt;&gt; Speck32.set_round_keys(symbolic_prefix=&quot;k&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; for v in Speck32.encryption.round_keys: print(v.vrepr())</span>
+<span class="sd">        Variable(&#39;k0&#39;, width=16)</span>
+<span class="sd">        Variable(&#39;k1&#39;, width=16)</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        key_schedule: the key-schedule function (a subclass of `BvFunction`)</span>
+<span class="sd">        encryption: the encryption function (a subclass of `Encryption` and `BvFunction`)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">key_schedule</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">encryption</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="c1"># _min_num_rounds</span>
+
+    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">plaintext</span><span class="p">,</span> <span class="n">masterkey</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">plaintext</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">Sequence</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">masterkey</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">Sequence</span><span class="p">)</span>
+
+        <span class="c1"># best place to check that the Cipher subclass has been well-defined</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">key_schedule</span><span class="p">,</span> <span class="n">cascada_ssa</span><span class="o">.</span><span class="n">BvFunction</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span><span class="si">}</span><span class="s2">.key_schedule is not a subclass of BvFunction&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">encryption</span><span class="p">,</span> <span class="n">Encryption</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">encryption</span><span class="p">,</span> <span class="n">cascada_ssa</span><span class="o">.</span><span class="n">BvFunction</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span><span class="si">}</span><span class="s2">.encryption is not a subclass of Encryption or BvFunction&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">parent_class</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">encryption</span><span class="o">.</span><span class="vm">__mro__</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">parent_class</span> <span class="o">==</span> <span class="n">Encryption</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="k">if</span> <span class="n">parent_class</span> <span class="ow">in</span> <span class="p">[</span><span class="n">cascada_ssa</span><span class="o">.</span><span class="n">BvFunction</span><span class="p">,</span> <span class="n">cascada_ssa</span><span class="o">.</span><span class="n">RoundBasedFunction</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span><span class="si">}</span><span class="s2">.encryption must subclass Encryption before BvFunction&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># ks_schedule does not need to be a RoundBasedFunction</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">encryption</span><span class="p">,</span> <span class="n">cascada_ssa</span><span class="o">.</span><span class="n">RoundBasedFunction</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span><span class="si">}</span><span class="s2">.encryption is not a subclass of &quot;</span>
+                                 <span class="sa">f</span><span class="s2">&quot;RoundBasedFunction but num_rounds is </span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span><span class="si">}</span><span class="s2">.num_rounds must be a non-zero positive integer&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s2">&quot;_min_num_rounds&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span> <span class="o">&lt;</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_min_num_rounds</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span><span class="si">}</span><span class="s2">._min_num_rounds = </span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">_min_num_rounds</span><span class="si">}</span><span class="s2">&quot;</span>
+                                 <span class="sa">f</span><span class="s2">&quot; &gt; </span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span><span class="si">}</span><span class="s2">.num_rounds&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">encryption</span><span class="o">.</span><span class="n">round_keys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">prev_round_keys</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">encryption</span><span class="o">.</span><span class="n">round_keys</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">key_schedule</span><span class="o">.</span><span class="n">output_widths</span><span class="p">):</span>
+                <span class="n">prev_round_keys</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">encryption</span><span class="o">.</span><span class="n">round_keys</span><span class="p">[:])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;removing old round_keys (&quot;</span>
+                              <span class="sa">f</span><span class="s2">&quot;len(</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">encryption</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span><span class="si">}</span><span class="s2">.round_keys) = &quot;</span>
+                              <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">encryption</span><span class="o">.</span><span class="n">round_keys</span><span class="p">)</span><span class="si">}</span><span class="s2"> but &quot;</span>
+                              <span class="sa">f</span><span class="s2">&quot;len(</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">key_schedule</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span><span class="si">}</span><span class="s2">.output_widths) = &quot;</span>
+                              <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">key_schedule</span><span class="o">.</span><span class="n">output_widths</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+                <span class="c1"># if set_round_keys and then set_num_rounds, round_keys might be invalid</span>
+                <span class="n">prev_round_keys</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">round_keys</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">key_schedule</span><span class="p">(</span><span class="o">*</span><span class="n">masterkey</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">prev_round_keys</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">prev_round_keys</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">round_keys</span><span class="p">)</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">encryption</span><span class="o">.</span><span class="n">round_keys</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">round_keys</span><span class="p">)</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">encryption</span><span class="p">(</span><span class="o">*</span><span class="n">plaintext</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">encryption</span><span class="o">.</span><span class="n">round_keys</span> <span class="o">=</span> <span class="n">prev_round_keys</span>
+
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">num_rounds</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The number of rounds of `encryption` if iterated, otherwise ``None``&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">encryption</span><span class="p">,</span> <span class="n">cascada_ssa</span><span class="o">.</span><span class="n">RoundBasedFunction</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">encryption</span><span class="o">.</span><span class="n">num_rounds</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="Cipher.get_name"><a class="viewcode-back" href="../../../cascada.primitives.blockcipher.html#cascada.primitives.blockcipher.Cipher.get_name">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the class name and the current number of rounds (if iterated).&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">aux_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span><span class="si">}</span><span class="s2">R&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">aux_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}{</span><span class="n">aux_str</span><span class="si">}</span><span class="s2">&quot;</span></div>
+
+<div class="viewcode-block" id="Cipher.vrepr"><a class="viewcode-back" href="../../../cascada.primitives.blockcipher.html#cascada.primitives.blockcipher.Cipher.vrepr">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">vrepr</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return an executable string representation.</span>
+
+<span class="sd">        This method returns a string so that ``eval(cls.vrepr())``</span>
+<span class="sd">        returns a new `Cipher` object with the same content.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.set_num_rounds_and_return(</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span></div>
+
+<div class="viewcode-block" id="Cipher.set_num_rounds"><a class="viewcode-back" href="../../../cascada.primitives.blockcipher.html#cascada.primitives.blockcipher.Cipher.set_num_rounds">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">set_num_rounds</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">encryption_new_num_rounds</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Call `RoundBasedFunction.set_num_rounds` of `key_schedule` and `encryption` (if iterated).&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span><span class="si">}</span><span class="s2"> is not iterated&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;subclasses need to override this method&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Cipher.set_num_rounds_and_return"><a class="viewcode-back" href="../../../cascada.primitives.blockcipher.html#cascada.primitives.blockcipher.Cipher.set_num_rounds_and_return">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">set_num_rounds_and_return</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">new_num_rounds</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Call `set_num_rounds` and return ``cls`` (if iterated).&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span><span class="si">}</span><span class="s2"> is not iterated&quot;</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="n">new_num_rounds</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span></div>
+
+<div class="viewcode-block" id="Cipher.set_round_keys"><a class="viewcode-back" href="../../../cascada.primitives.blockcipher.html#cascada.primitives.blockcipher.Cipher.set_round_keys">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">set_round_keys</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">masterkey</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">symbolic_prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set ``cls.encryption.round_keys``.</span>
+
+<span class="sd">        If ``masterkey`` is given,</span>
+<span class="sd">        set the round keys as the output of ``cls.key_schedule(*masterkey)``.</span>
+
+<span class="sd">        If ``symbolic_prefix`` is given,</span>
+<span class="sd">        set the round keys as a tuple of `Variable` objects with</span>
+<span class="sd">        prefix name ``symbolic_prefix`` and with bit-sizes given by</span>
+<span class="sd">        ``cls.key_schedule.output_widths``.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            masterkey: (optional) a list of `Constant` objects or integers</span>
+<span class="sd">            symbolic_prefix: (optional) a string</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">masterkey</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">encryption</span><span class="o">.</span><span class="n">round_keys</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">key_schedule</span><span class="p">(</span><span class="o">*</span><span class="n">masterkey</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">symbolic_prefix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">encryption</span><span class="o">.</span><span class="n">round_keys</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">width</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">key_schedule</span><span class="o">.</span><span class="n">output_widths</span><span class="p">):</span>
+                <span class="n">var</span> <span class="o">=</span> <span class="n">core</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">symbolic_prefix</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">width</span><span class="p">)</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">encryption</span><span class="o">.</span><span class="n">round_keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">encryption</span><span class="o">.</span><span class="n">round_keys</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">encryption</span><span class="o">.</span><span class="n">round_keys</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="get_random_cipher"><a class="viewcode-back" href="../../../cascada.primitives.blockcipher.html#cascada.primitives.blockcipher.get_random_cipher">[docs]</a><span class="nd">@functools</span><span class="o">.</span><span class="n">lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">get_random_cipher</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">key_num_inputs</span><span class="p">,</span> <span class="n">key_num_assignments</span><span class="p">,</span>
+                      <span class="n">enc_num_inputs</span><span class="p">,</span> <span class="n">enc_num_outputs</span><span class="p">,</span> <span class="n">enc_num_assignments</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span>
+                      <span class="n">external_variable_prefix</span><span class="p">,</span> <span class="n">operation_set_index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_rounds</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                      <span class="n">extra_operations</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return a random `Cipher` with given shape.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        width: the common bitsize of the input and output variables of the function</span>
+<span class="sd">        key_num_inputs: the number of inputs of the key schedule</span>
+<span class="sd">        key_num_assignments: an estimation of the number of operations within the key schedule</span>
+<span class="sd">        enc_num_inputs: the number of inputs of the encryption</span>
+<span class="sd">        enc_num_assignments: an estimation of the number of operations within the encryption</span>
+<span class="sd">        enc_num_outputs: the number of outputs of the encryption</span>
+<span class="sd">        seed: the seed used when sampling</span>
+<span class="sd">        operation_set_index: four set of operations to choose indexed by 0, 1, 2 and 3</span>
+<span class="sd">        num_rounds: if not ``None``, sample the key-schedule and the encryption</span>
+<span class="sd">            functions as random `RoundBasedFunction` objects with the given number of rounds</span>
+<span class="sd">        extra_operations: an optional `tuple` containing `Operation` subclasses</span>
+<span class="sd">            to add to the list of operations to choose</span>
+
+<span class="sd">    ::</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.primitives.blockcipher import get_random_cipher</span>
+<span class="sd">        &gt;&gt;&gt; my_cipher = get_random_cipher(4, 1, 1, 2, 2, 4, seed=1, external_variable_prefix=&quot;rk&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; my_cipher.key_schedule.to_ssa([&quot;mk0&quot;], &quot;k&quot;)</span>
+<span class="sd">        SSA(input_vars=[mk0], output_vars=[k0_out], assignments=[(k0, mk0 &amp; 0x5), (k0_out, Id(k0))])</span>
+<span class="sd">        &gt;&gt;&gt; my_cipher.encryption.round_keys = [Variable(f&quot;rk{i}&quot;, 4) for i in range(1)]</span>
+<span class="sd">        &gt;&gt;&gt; my_cipher.encryption.to_ssa([&quot;p0&quot;, &quot;p1&quot;], &quot;x&quot;)  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        SSA(input_vars=[p0, p1], output_vars=[x2_out, x3_out], external_vars=[rk0],</span>
+<span class="sd">            assignments=[(x0, p0 ^ rk0), (x1, x0 - p1), (x2, p0 + p1), (x3, -x1), (x2_out, Id(x2)), (x3_out, Id(x3))])</span>
+
+<span class="sd">    See also `get_random_bvfunction`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">enc_seed</span> <span class="o">=</span> <span class="n">seed</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">random_enc</span> <span class="o">=</span> <span class="n">cascada_ssa</span><span class="o">.</span><span class="n">get_random_bvfunction</span><span class="p">(</span>
+                <span class="n">width</span><span class="p">,</span> <span class="n">num_inputs</span><span class="o">=</span><span class="n">enc_num_inputs</span><span class="p">,</span> <span class="n">num_outputs</span><span class="o">=</span><span class="n">enc_num_outputs</span><span class="p">,</span>
+                <span class="n">num_assignments</span><span class="o">=</span><span class="n">enc_num_assignments</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">enc_seed</span><span class="p">,</span>
+                <span class="n">external_variable_prefix</span><span class="o">=</span><span class="n">external_variable_prefix</span><span class="p">,</span> <span class="n">operation_set_index</span><span class="o">=</span><span class="n">operation_set_index</span><span class="p">,</span>
+                <span class="n">num_rounds</span><span class="o">=</span><span class="n">num_rounds</span><span class="p">,</span> <span class="n">extra_operations</span><span class="o">=</span><span class="n">extra_operations</span>
+            <span class="p">)</span>
+
+            <span class="c1"># repeat until random_enc doesn&#39;t contain a redundant assignment with an external var</span>
+            <span class="k">assert</span> <span class="n">external_variable_prefix</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;p&quot;</span><span class="p">]</span>
+            <span class="n">enc_ssa</span> <span class="o">=</span> <span class="n">random_enc</span><span class="o">.</span><span class="n">to_ssa</span><span class="p">([</span><span class="s2">&quot;p&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">enc_num_inputs</span><span class="p">)],</span> <span class="s2">&quot;x&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">random_enc</span><span class="o">.</span><span class="n">round_keys</span><span class="p">)</span> <span class="o">==</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">enc_ssa</span><span class="o">.</span><span class="n">external_vars</span><span class="p">):</span>
+                <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">enc_seed</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">key_num_outputs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">random_enc</span><span class="o">.</span><span class="n">round_keys</span><span class="p">)</span>
+        <span class="n">key_num_assignments</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">key_num_outputs</span><span class="p">,</span> <span class="n">key_num_assignments</span><span class="p">)</span>
+
+        <span class="n">random_ks</span> <span class="o">=</span> <span class="n">cascada_ssa</span><span class="o">.</span><span class="n">get_random_bvfunction</span><span class="p">(</span>
+            <span class="n">width</span><span class="p">,</span> <span class="n">num_inputs</span><span class="o">=</span><span class="n">key_num_inputs</span><span class="p">,</span> <span class="n">num_outputs</span><span class="o">=</span><span class="n">key_num_outputs</span><span class="p">,</span> <span class="n">num_assignments</span><span class="o">=</span><span class="n">key_num_assignments</span><span class="p">,</span>
+            <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span> <span class="n">external_variable_prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">operation_set_index</span><span class="o">=</span><span class="n">operation_set_index</span><span class="p">,</span> <span class="n">num_rounds</span><span class="o">=</span><span class="n">num_rounds</span><span class="p">,</span>
+            <span class="n">extra_operations</span><span class="o">=</span><span class="n">extra_operations</span>
+        <span class="p">)</span>
+
+        <span class="c1">## debugging</span>
+        <span class="c1"># print(&quot;key_ssa:&quot;, random_ks.to_ssa([&quot;mk&quot; + str(i) for i in range(key_num_inputs)], &quot;k&quot;))</span>
+        <span class="c1"># print(&quot;enc_ssa:&quot;, random_enc.to_ssa([&quot;p&quot; + str(i) for i in range(enc_num_inputs)], &quot;x&quot;))</span>
+
+        <span class="k">class</span> <span class="nc">RandomEncryption</span><span class="p">(</span><span class="n">Encryption</span><span class="p">,</span> <span class="n">random_enc</span><span class="p">):</span>
+            <span class="n">num_rounds</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">random_enc</span><span class="p">,</span> <span class="s2">&quot;num_rounds&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">round_keys</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">assert</span> <span class="n">RandomEncryption</span><span class="o">.</span><span class="n">round_keys</span> <span class="o">!=</span> <span class="n">random_enc</span><span class="o">.</span><span class="n">round_keys</span>
+
+        <span class="k">class</span> <span class="nc">RandomKeySchedule</span><span class="p">(</span><span class="n">random_ks</span><span class="p">):</span>
+            <span class="n">num_rounds</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">random_ks</span><span class="p">,</span> <span class="s2">&quot;num_rounds&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="n">extra_operations_vrepr</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">extra_operations</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">extra_operations_vrepr</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="vm">__name__</span> <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="n">extra_operations</span><span class="p">)</span><span class="si">}</span><span class="s2">,)&quot;</span>
+
+        <span class="k">class</span> <span class="nc">RandomCipher</span><span class="p">(</span><span class="n">Cipher</span><span class="p">):</span>
+            <span class="n">key_schedule</span> <span class="o">=</span> <span class="n">RandomKeySchedule</span>
+            <span class="n">encryption</span> <span class="o">=</span> <span class="n">RandomEncryption</span>
+            <span class="n">num_rounds</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">random_enc</span><span class="p">,</span> <span class="s2">&quot;num_rounds&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+            <span class="nd">@classmethod</span>
+            <span class="k">def</span> <span class="nf">vrepr</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+                <span class="n">evp</span> <span class="o">=</span> <span class="n">external_variable_prefix</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span>
+                <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;get_random_cipher(</span><span class="si">{</span><span class="n">width</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">key_num_inputs</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">key_num_assignments</span><span class="si">}</span><span class="s2">, &quot;</span> \
+                       <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">enc_num_inputs</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">enc_num_outputs</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">enc_num_assignments</span><span class="si">}</span><span class="s2">, &quot;</span> \
+                       <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">seed</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">evp</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">operation_set_index</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">num_rounds</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">extra_operations_vrepr</span><span class="si">}</span><span class="s2">)&quot;</span>
+
+            <span class="nd">@classmethod</span>
+            <span class="k">def</span> <span class="nf">set_num_rounds</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">new_num_rounds</span><span class="p">):</span>
+                <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span><span class="si">}</span><span class="s2"> is not iterated&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">assert</span> <span class="n">new_num_rounds</span> <span class="o">&gt;=</span> <span class="mi">0</span>
+                    <span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span> <span class="o">=</span> <span class="n">new_num_rounds</span>
+                    <span class="bp">cls</span><span class="o">.</span><span class="n">encryption</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="n">new_num_rounds</span><span class="p">)</span>
+                    <span class="bp">cls</span><span class="o">.</span><span class="n">key_schedule</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="n">new_num_rounds</span><span class="p">)</span>
+
+        <span class="c1"># check RandomCipher does not return Constant</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">plaintext</span> <span class="o">=</span> <span class="p">[</span><span class="n">core</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;p</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">width</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">enc_num_inputs</span><span class="p">)]</span>
+            <span class="n">masterkey</span> <span class="o">=</span> <span class="p">[</span><span class="n">core</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mk</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">width</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">key_num_inputs</span><span class="p">)]</span>
+            <span class="n">RandomCipher</span><span class="p">(</span><span class="n">plaintext</span><span class="p">,</span> <span class="n">masterkey</span><span class="p">,</span> <span class="n">symbolic_inputs</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">simplify</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;if symbolic_inputs, expected no Constant values&quot;</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">e</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">seed</span> <span class="o">+=</span> <span class="mi">1024</span>  <span class="c1"># avoid collisions with enc_seed</span>
+                <span class="k">continue</span>
+        <span class="k">break</span>
+
+    <span class="k">return</span> <span class="n">RandomCipher</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Adrián Ranea.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

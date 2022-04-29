@@ -1,0 +1,6 @@
+cascada.algebraic.value module
+==============================
+
+.. automodule:: cascada.algebraic.value
+   :members:
+   :show-inheritance:

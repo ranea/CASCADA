@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cascada.primitives.lea &mdash; CASCADA 1.0.rc0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> CASCADA
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">CASCADA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../primitives_implemented.html">Primitives implemented</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cascada.html">API reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">CASCADA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>cascada.primitives.lea</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cascada.primitives.lea</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;LEA 128-bit cipher.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+
+<span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span>
+<span class="kn">from</span> <span class="nn">cascada.bitvector.operation</span> <span class="kn">import</span> <span class="n">RotateLeft</span> <span class="k">as</span> <span class="n">ROL</span>
+<span class="kn">from</span> <span class="nn">cascada.bitvector.operation</span> <span class="kn">import</span> <span class="n">RotateRight</span> <span class="k">as</span> <span class="n">ROR</span>
+
+<span class="kn">from</span> <span class="nn">cascada.bitvector.ssa</span> <span class="kn">import</span> <span class="n">RoundBasedFunction</span>
+<span class="kn">from</span> <span class="nn">cascada.primitives.blockcipher</span> <span class="kn">import</span> <span class="n">Encryption</span><span class="p">,</span> <span class="n">Cipher</span>
+
+
+<div class="viewcode-block" id="LEAKeySchedule"><a class="viewcode-back" href="../../../cascada.primitives.lea.html#cascada.primitives.lea.LEAKeySchedule">[docs]</a><span class="k">class</span> <span class="nc">LEAKeySchedule</span><span class="p">(</span><span class="n">RoundBasedFunction</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Key schedule function.&quot;&quot;&quot;</span>
+
+    <span class="n">num_rounds</span> <span class="o">=</span> <span class="mi">24</span>
+    <span class="n">input_widths</span> <span class="o">=</span> <span class="p">[</span><span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">]</span>
+    <span class="n">output_widths</span> <span class="o">=</span> <span class="p">[</span><span class="mi">32</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">24</span> <span class="o">*</span> <span class="mi">6</span><span class="p">)]</span>
+
+<div class="viewcode-block" id="LEAKeySchedule.set_num_rounds"><a class="viewcode-back" href="../../../cascada.primitives.lea.html#cascada.primitives.lea.LEAKeySchedule.set_num_rounds">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">set_num_rounds</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">new_num_rounds</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span> <span class="o">=</span> <span class="n">new_num_rounds</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">output_widths</span> <span class="o">=</span> <span class="p">[</span><span class="mi">32</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">new_num_rounds</span> <span class="o">*</span> <span class="mi">6</span><span class="p">)]</span></div>
+
+<div class="viewcode-block" id="LEAKeySchedule.eval"><a class="viewcode-back" href="../../../cascada.primitives.lea.html#cascada.primitives.lea.LEAKeySchedule.eval">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">k0</span><span class="p">,</span> <span class="n">k1</span><span class="p">,</span> <span class="n">k2</span><span class="p">,</span> <span class="n">k3</span><span class="p">):</span>
+        <span class="n">round_keys</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span><span class="p">)]</span>
+        <span class="n">T0</span><span class="p">,</span> <span class="n">T1</span><span class="p">,</span> <span class="n">T2</span><span class="p">,</span> <span class="n">T3</span> <span class="o">=</span> <span class="n">k0</span><span class="p">,</span> <span class="n">k1</span><span class="p">,</span> <span class="n">k2</span><span class="p">,</span> <span class="n">k3</span>
+
+        <span class="n">delta</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">Constant</span><span class="p">(</span><span class="mh">0xc3efe9db</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span> <span class="n">Constant</span><span class="p">(</span><span class="mh">0x44626b02</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+            <span class="n">Constant</span><span class="p">(</span><span class="mh">0x79e27c8a</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span> <span class="n">Constant</span><span class="p">(</span><span class="mh">0x78df30ec</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+        <span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span><span class="p">):</span>
+            <span class="n">T0</span> <span class="o">=</span> <span class="n">ROL</span><span class="p">(</span><span class="n">T0</span> <span class="o">+</span> <span class="n">ROL</span><span class="p">(</span><span class="n">delta</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="mi">4</span><span class="p">],</span> <span class="n">i</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">T1</span> <span class="o">=</span> <span class="n">ROL</span><span class="p">(</span><span class="n">T1</span> <span class="o">+</span> <span class="n">ROL</span><span class="p">(</span><span class="n">delta</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="mi">4</span><span class="p">],</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)),</span> <span class="mi">3</span><span class="p">)</span>
+            <span class="n">T2</span> <span class="o">=</span> <span class="n">ROL</span><span class="p">(</span><span class="n">T2</span> <span class="o">+</span> <span class="n">ROL</span><span class="p">(</span><span class="n">delta</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="mi">4</span><span class="p">],</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)),</span> <span class="mi">6</span><span class="p">)</span>
+            <span class="n">T3</span> <span class="o">=</span> <span class="n">ROL</span><span class="p">(</span><span class="n">T3</span> <span class="o">+</span> <span class="n">ROL</span><span class="p">(</span><span class="n">delta</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="mi">4</span><span class="p">],</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">3</span><span class="p">)),</span> <span class="mi">11</span><span class="p">)</span>
+            <span class="n">round_keys</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">T0</span><span class="p">,</span> <span class="n">T1</span><span class="p">,</span> <span class="n">T2</span><span class="p">,</span> <span class="n">T1</span><span class="p">,</span> <span class="n">T3</span><span class="p">,</span> <span class="n">T1</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">add_round_outputs</span><span class="p">(</span><span class="o">*</span><span class="n">round_keys</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="p">(</span><span class="o">*</span><span class="n">round_keys</span><span class="p">))</span>  <span class="c1"># flatten</span></div></div>
+
+
+<div class="viewcode-block" id="LEAEncryption"><a class="viewcode-back" href="../../../cascada.primitives.lea.html#cascada.primitives.lea.LEAEncryption">[docs]</a><span class="k">class</span> <span class="nc">LEAEncryption</span><span class="p">(</span><span class="n">Encryption</span><span class="p">,</span> <span class="n">RoundBasedFunction</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Encryption function.&quot;&quot;&quot;</span>
+
+    <span class="n">num_rounds</span> <span class="o">=</span> <span class="mi">24</span>
+    <span class="n">input_widths</span> <span class="o">=</span> <span class="p">[</span><span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">]</span>
+    <span class="n">output_widths</span> <span class="o">=</span> <span class="p">[</span><span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">]</span>
+    <span class="n">round_keys</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="LEAEncryption.set_num_rounds"><a class="viewcode-back" href="../../../cascada.primitives.lea.html#cascada.primitives.lea.LEAEncryption.set_num_rounds">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">set_num_rounds</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">new_num_rounds</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span> <span class="o">=</span> <span class="n">new_num_rounds</span></div>
+
+<div class="viewcode-block" id="LEAEncryption.eval"><a class="viewcode-back" href="../../../cascada.primitives.lea.html#cascada.primitives.lea.LEAEncryption.eval">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">p0</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">p3</span><span class="p">):</span>
+        <span class="n">x0</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">x3</span> <span class="o">=</span> <span class="n">p0</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">p3</span>
+
+        <span class="n">rk</span> <span class="o">=</span> <span class="p">[[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">)]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">round_keys</span><span class="p">):</span>
+            <span class="n">rk</span><span class="p">[</span><span class="n">i</span> <span class="o">//</span> <span class="mi">6</span><span class="p">][</span><span class="n">i</span> <span class="o">%</span> <span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="n">k</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span><span class="p">):</span>
+            <span class="n">k0</span><span class="p">,</span> <span class="n">k1</span><span class="p">,</span> <span class="n">k2</span><span class="p">,</span> <span class="n">k3</span><span class="p">,</span> <span class="n">k4</span><span class="p">,</span> <span class="n">k5</span> <span class="o">=</span> <span class="n">rk</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">x0</span>
+            <span class="n">x0</span> <span class="o">=</span> <span class="n">ROL</span><span class="p">((</span><span class="n">x0</span> <span class="o">^</span> <span class="n">k0</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">x1</span> <span class="o">^</span> <span class="n">k1</span><span class="p">),</span> <span class="mi">9</span><span class="p">)</span>
+            <span class="n">x1</span> <span class="o">=</span> <span class="n">ROR</span><span class="p">((</span><span class="n">x1</span> <span class="o">^</span> <span class="n">k2</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">x2</span> <span class="o">^</span> <span class="n">k3</span><span class="p">),</span> <span class="mi">5</span><span class="p">)</span>
+            <span class="n">x2</span> <span class="o">=</span> <span class="n">ROR</span><span class="p">((</span><span class="n">x2</span> <span class="o">^</span> <span class="n">k4</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">x3</span> <span class="o">^</span> <span class="n">k5</span><span class="p">),</span> <span class="mi">3</span><span class="p">)</span>
+            <span class="n">x3</span> <span class="o">=</span> <span class="n">tmp</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">add_round_outputs</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">x3</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">x0</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">x3</span></div></div>
+
+
+<div class="viewcode-block" id="LEACipher"><a class="viewcode-back" href="../../../cascada.primitives.lea.html#cascada.primitives.lea.LEACipher">[docs]</a><span class="k">class</span> <span class="nc">LEACipher</span><span class="p">(</span><span class="n">Cipher</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;LEA-128 cipher.&quot;&quot;&quot;</span>
+    <span class="n">key_schedule</span> <span class="o">=</span> <span class="n">LEAKeySchedule</span>
+    <span class="n">encryption</span> <span class="o">=</span> <span class="n">LEAEncryption</span>
+
+<div class="viewcode-block" id="LEACipher.set_num_rounds"><a class="viewcode-back" href="../../../cascada.primitives.lea.html#cascada.primitives.lea.LEACipher.set_num_rounds">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">set_num_rounds</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">new_num_rounds</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">key_schedule</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="n">new_num_rounds</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">encryption</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="n">new_num_rounds</span><span class="p">)</span></div>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">test</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="n">old_num_rounds</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">24</span><span class="p">)</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">Constant</span><span class="p">(</span><span class="mh">0x3c2d1e0f</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+            <span class="n">Constant</span><span class="p">(</span><span class="mh">0x78695a4b</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+            <span class="n">Constant</span><span class="p">(</span><span class="mh">0xb4a59687</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+            <span class="n">Constant</span><span class="p">(</span><span class="mh">0xf0e1d2c3</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="n">pt</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">Constant</span><span class="p">(</span><span class="mh">0x13121110</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+            <span class="n">Constant</span><span class="p">(</span><span class="mh">0x17161514</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+            <span class="n">Constant</span><span class="p">(</span><span class="mh">0x1b1a1918</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+            <span class="n">Constant</span><span class="p">(</span><span class="mh">0x1f1e1d1c</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="n">ct</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">Constant</span><span class="p">(</span><span class="mh">0x354ec89f</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+            <span class="n">Constant</span><span class="p">(</span><span class="mh">0x18c6c628</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+            <span class="n">Constant</span><span class="p">(</span><span class="mh">0xa7c73255</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+            <span class="n">Constant</span><span class="p">(</span><span class="mh">0xfd8b6404</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="k">assert</span> <span class="bp">cls</span><span class="p">(</span><span class="n">pt</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span> <span class="o">==</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">ct</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="n">old_num_rounds</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Adrián Ranea.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

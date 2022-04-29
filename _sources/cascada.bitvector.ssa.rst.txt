@@ -1,0 +1,6 @@
+cascada.bitvector.ssa module
+============================
+
+.. automodule:: cascada.bitvector.ssa
+   :members:
+   :show-inheritance:

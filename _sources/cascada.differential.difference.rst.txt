@@ -1,0 +1,6 @@
+cascada.differential.difference module
+======================================
+
+.. automodule:: cascada.differential.difference
+   :members:
+   :show-inheritance:

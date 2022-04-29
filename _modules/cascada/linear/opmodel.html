@@ -1,0 +1,1597 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cascada.linear.opmodel &mdash; CASCADA 1.0.rc0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> CASCADA
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">CASCADA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../primitives_implemented.html">Primitives implemented</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cascada.html">API reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">CASCADA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>cascada.linear.opmodel</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cascada.linear.opmodel</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Manipulate linear models of bit-vector operations.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">hashlib</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">operator</span>
+<span class="kn">import</span> <span class="nn">fractions</span>
+<span class="kn">import</span> <span class="nn">decimal</span>
+
+<span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">core</span>
+<span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">operation</span>
+<span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">secondaryop</span>
+
+<span class="kn">from</span> <span class="nn">cascada</span> <span class="kn">import</span> <span class="n">abstractproperty</span>
+
+<span class="kn">from</span> <span class="nn">cascada.linear.mask</span> <span class="kn">import</span> <span class="n">LinearMask</span>
+
+
+<span class="n">make_partial_op_model</span> <span class="o">=</span> <span class="n">abstractproperty</span><span class="o">.</span><span class="n">opmodel</span><span class="o">.</span><span class="n">make_partial_op_model</span>
+
+
+<div class="viewcode-block" id="OpModel"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.OpModel">[docs]</a><span class="k">class</span> <span class="nc">OpModel</span><span class="p">(</span><span class="n">abstractproperty</span><span class="o">.</span><span class="n">opmodel</span><span class="o">.</span><span class="n">OpModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent linear models of bit-vector operations.</span>
+
+<span class="sd">    A (bit-vector) linear model of a bit-vector `Operation` :math:`f`</span>
+<span class="sd">    is a set of bit-vector constraints that models the</span>
+<span class="sd">    absolute correlation  of :math:`f`. See `LinearMask`.</span>
+
+<span class="sd">    Internally, this class is a subclass of `abstractproperty.opmodel.OpModel`,</span>
+<span class="sd">    where the `Property` is `LinearMask`, the pair of input and output</span>
+<span class="sd">    properties (masks) :math:`(\\alpha, \\beta)` is called a (linear)</span>
+<span class="sd">    approximation, and the propagation probability is the absolute correlation.</span>
+
+<span class="sd">    For linear models (except `LinearModelFreeBranch`),</span>
+<span class="sd">    the propagation probability (absolute linear correlation)</span>
+<span class="sd">    satisfies that for any fixed :math:`\\beta`, the sum of the squares of the</span>
+<span class="sd">    correlations (linear probabilities) of  :math:`(\\alpha, \\beta)`</span>
+<span class="sd">    (for all :math:`\\alpha`) is equal to 1.</span>
+<span class="sd">    Moreover, if the absolute linear correlation is 1, then</span>
+<span class="sd">    :math:`\\beta` uniquely propagates (backwards) to :math:`\\alpha`.</span>
+
+<span class="sd">    This class is not meant to be instantiated but to provide a base</span>
+<span class="sd">    class for creating linear models.</span>
+
+<span class="sd">    .. Implementation details:</span>
+
+<span class="sd">        Part of the nomenclature was extracted from</span>
+<span class="sd">        https://eprint.iacr.org/2005/212</span>
+
+<span class="sd">        The capacity or data-complexity of an approximation</span>
+<span class="sd">        with correlation :math:`c` is roughly :math:`1/c^{2}`.</span>
+
+<span class="sd">        The weight of the linear probability ranges between 0 and 2(n − 1),</span>
+<span class="sd">        max{over abs(C)} -log2(abs(C)^2) = 2(n-1)</span>
+<span class="sd">        Thus, the weight of the correlation of an n-bit approximation</span>
+<span class="sd">        ranges between 0 and n − 1 (n - 2 if the approximation</span>
+<span class="sd">        is over a permutation).</span>
+
+<span class="sd">        Proof:</span>
+<span class="sd">            C = 2 x ( #{ x : ... }/2^n )  -  1  = #x/2^{n-1} - 1  (ignoring abs)</span>
+<span class="sd">            min(abs(C)) =&gt; #x/2^{n-1} closer to 1 ==&gt; #x = 2^{n-1} +- 1  (+- 2 if permutation)</span>
+<span class="sd">            min(C) = (2^{n-1} +- 1)/2^{n-1} - 1 = 1 +- 1/2^{n-1} - 1 = +-2^{-(n-1)}</span>
+<span class="sd">            max(weight) = weight(min(C)) = -log2(abs(+-2^{-(n-1)})) = n - 1</span>
+
+<span class="sd">        LP is as DP is for differential cryptanalysis.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">prop_type</span> <span class="o">=</span> <span class="n">LinearMask</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">input_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_prop</span></div>
+
+
+<div class="viewcode-block" id="PartialOpModel"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.PartialOpModel">[docs]</a><span class="k">class</span> <span class="nc">PartialOpModel</span><span class="p">(</span><span class="n">abstractproperty</span><span class="o">.</span><span class="n">opmodel</span><span class="o">.</span><span class="n">PartialOpModel</span><span class="p">,</span> <span class="n">OpModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent `linear.opmodel.OpModel` of `PartialOperation`.</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Constant</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.linear.opmodel import LinearModelBvAndCt, LinearModelBvOrCt, LinearModelBvShlCt</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.linear.opmodel import LinearModelExtractCt, make_partial_op_model</span>
+<span class="sd">        &gt;&gt;&gt; make_partial_op_model(LinearModelBvAndCt, tuple([None, Constant(1, 4)])).__name__</span>
+<span class="sd">        &#39;LinearModelBvAndCt_{·, 0x1}&#39;</span>
+<span class="sd">        &gt;&gt;&gt; make_partial_op_model(LinearModelBvOrCt, tuple([None, Constant(1, 4)])).__name__</span>
+<span class="sd">        &#39;LinearModelBvOrCt_{·, 0x1}&#39;</span>
+<span class="sd">        &gt;&gt;&gt; make_partial_op_model(LinearModelBvShlCt, tuple([None, Constant(1, 4)])).__name__</span>
+<span class="sd">        &#39;LinearModelBvShlCt_{·, 0x1}&#39;</span>
+<span class="sd">        &gt;&gt;&gt; make_partial_op_model(LinearModelExtractCt, tuple([None, 2, 1])).__name__</span>
+<span class="sd">        &#39;LinearModelExtractCt_{·, 2, 1}&#39;</span>
+
+<span class="sd">    See also `abstractproperty.opmodel.PartialOpModel`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="LinearModelId"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelId">[docs]</a><span class="k">class</span> <span class="nc">LinearModelId</span><span class="p">(</span><span class="n">abstractproperty</span><span class="o">.</span><span class="n">opmodel</span><span class="o">.</span><span class="n">ModelIdentity</span><span class="p">,</span> <span class="n">OpModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent the `linear.opmodel.OpModel` of `BvIdentity`.</span>
+
+<span class="sd">    See also `ModelIdentity`.</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.linear.opmodel import LinearModelId</span>
+<span class="sd">        &gt;&gt;&gt; alpha, beta = LinearMask(Variable(&quot;a&quot;, 4)), LinearMask(Variable(&quot;b&quot;, 4))</span>
+<span class="sd">        &gt;&gt;&gt; f = LinearModelId(alpha)</span>
+<span class="sd">        &gt;&gt;&gt; print(f.vrepr())</span>
+<span class="sd">        LinearModelId(LinearMask(Variable(&#39;a&#39;, width=4)))</span>
+<span class="sd">        &gt;&gt;&gt; f.validity_constraint(beta)</span>
+<span class="sd">        a == b</span>
+<span class="sd">        &gt;&gt;&gt; f.max_weight(), f.weight_width(), f.error(), f.num_frac_bits()</span>
+<span class="sd">        (0, 1, 0, 0)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="LinearModelFreeBranch"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelFreeBranch">[docs]</a><span class="k">class</span> <span class="nc">LinearModelFreeBranch</span><span class="p">(</span><span class="n">OpModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent the (trivial) linear model of the free branches</span>
+<span class="sd">    of the forking or branching subroutine.</span>
+
+<span class="sd">    The forking or branching subroutine is defined as</span>
+
+<span class="sd">    .. code-block:: none</span>
+
+<span class="sd">                |--&gt; x</span>
+<span class="sd">            x --|    .</span>
+<span class="sd">                |    .</span>
+<span class="sd">                |    .</span>
+<span class="sd">                |--&gt; x</span>
+<span class="sd">                |</span>
+<span class="sd">                |--&gt; x</span>
+
+<span class="sd">    or equivalently :math:`x \mapsto (x, x, \dots, x)`.</span>
+
+<span class="sd">    Branching subroutines appears implicitly in bit-vector functions</span>
+<span class="sd">    anytime a variable is used multiple times.</span>
+
+<span class="sd">    When a `BvFunction` contains (implicit) branching subroutines</span>
+<span class="sd">    and the `SSA` of this function is initialized with ``replace_multiuse_vars``</span>
+<span class="sd">    set to ``True``, new variables are created to uniquely label each</span>
+<span class="sd">    branch of the forking subroutine (see also `SSA`).</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">        For example, a 3-forking subroutine :math:`x \mapsto (x, x, x)` would be</span>
+<span class="sd">        transformed after this preprocessing to the following 3-forking subroutine</span>
+
+<span class="sd">        .. code-block:: none</span>
+
+<span class="sd">                    |--&gt; x__0</span>
+<span class="sd">                x --|</span>
+<span class="sd">                    |--&gt; x__1</span>
+<span class="sd">                    |</span>
+<span class="sd">                    |--&gt; x__1</span>
+
+<span class="sd">    If a `linear.chmodel.ChModel` is created for a function containing</span>
+<span class="sd">    branching subroutines, for every one of them, each right branch</span>
+<span class="sd">    (except the last one) is assigned to a new free mask, and the last branch</span>
+<span class="sd">    is assigned to the XOR of all masks.</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">        Following our previous example, `linear.chmodel.ChModel` would propagate</span>
+<span class="sd">        the `LinearMask` ``m(x)`` of ``x`` through this (preprocessed)</span>
+<span class="sd">        branching subroutine by assigning new free masks ``m(x__0), m(x__1)``</span>
+<span class="sd">        to the first two right branches, and the last branch is set</span>
+<span class="sd">        to the XOR of ``m(x__0)``, ``m(x__1)`` and ``m(x)``,</span>
+
+<span class="sd">        .. code-block:: none</span>
+
+<span class="sd">                       |--&gt; m(x__0)</span>
+<span class="sd">                m(x) --|</span>
+<span class="sd">                       |--&gt; m(x__1)</span>
+<span class="sd">                       |</span>
+<span class="sd">                       |--&gt; m(x) ^ m(x__0) ^ m(x__1)</span>
+
+<span class="sd">    These new free masks are associated to `LinearModelFreeBranch` objects</span>
+<span class="sd">    in the characteristic model so that the characteristic model can keep track</span>
+<span class="sd">    of these new free masks. In particular, each (output) free mask is associated</span>
+<span class="sd">    in `linear.chmodel.ChModel.assign_outmask2op_model` to a `LinearModelFreeBranch`</span>
+<span class="sd">    object with input mask the left branch mask.</span>
+
+<span class="sd">    .. note::</span>
+
+<span class="sd">        The model `LinearModelFreeBranch` does not represent a linear model of any</span>
+<span class="sd">        operation. It is instead an auxiliary model to &quot;create&quot; new masks</span>
+<span class="sd">        in the characteristic model without any constraints.</span>
+<span class="sd">        For this reason, the validity constraint</span>
+<span class="sd">        of `LinearModelFreeBranch` is always True and the weight</span>
+<span class="sd">        is always 0 for any input and output mask.</span>
+
+<span class="sd">    ::</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.linear.opmodel import LinearModelFreeBranch</span>
+<span class="sd">        &gt;&gt;&gt; alpha, beta = LinearMask(Variable(&quot;mx&quot;, 4)), LinearMask(Variable(&quot;mx__0&quot;, 4))</span>
+<span class="sd">        &gt;&gt;&gt; f = LinearModelFreeBranch(alpha)</span>
+<span class="sd">        &gt;&gt;&gt; print(f.vrepr())</span>
+<span class="sd">        LinearModelFreeBranch(LinearMask(Variable(&#39;mx&#39;, width=4)))</span>
+<span class="sd">        &gt;&gt;&gt; f.validity_constraint(beta)</span>
+<span class="sd">        0b1</span>
+<span class="sd">        &gt;&gt;&gt; f.max_weight(), f.weight_width(), f.error(), f.num_frac_bits()</span>
+<span class="sd">        (0, 1, 0, 0)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">op</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvIdentity</span>
+    
+<div class="viewcode-block" id="LinearModelFreeBranch.validity_constraint"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelFreeBranch.validity_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">validity_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_mask</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the validity constraint for a given output `LinearMask`.</span>
+
+<span class="sd">        For `LinearModelFreeBranch`, all output masks are valid.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># 1 == True</span></div>
+
+<div class="viewcode-block" id="LinearModelFreeBranch.pr_one_constraint"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelFreeBranch.pr_one_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">pr_one_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_mask</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the pr. 1 constraint for a given output `LinearMask`.</span>
+
+<span class="sd">        For `LinearModelFreeBranch`, all output masks are valid with weight 0.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># 1 == True</span></div>
+
+<div class="viewcode-block" id="LinearModelFreeBranch.bv_weight"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelFreeBranch.bv_weight">[docs]</a>    <span class="k">def</span> <span class="nf">bv_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_mask</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the bit-vector weight for a given output `LinearMask`.</span>
+
+<span class="sd">        For `LinearModelFreeBranch`, any output mask has weight 0.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LinearModelFreeBranch.max_weight"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelFreeBranch.max_weight">[docs]</a>    <span class="k">def</span> <span class="nf">max_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="LinearModelFreeBranch.weight_width"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelFreeBranch.weight_width">[docs]</a>    <span class="k">def</span> <span class="nf">weight_width</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="LinearModelFreeBranch.decimal_weight"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelFreeBranch.decimal_weight">[docs]</a>    <span class="k">def</span> <span class="nf">decimal_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_mask</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_assert_preconditions_decimal_weight</span><span class="p">(</span><span class="n">output_mask</span><span class="p">)</span>
+        <span class="n">dw</span> <span class="o">=</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bv_weight</span><span class="p">(</span><span class="n">output_mask</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_assert_postconditions_decimal_weight</span><span class="p">(</span><span class="n">output_mask</span><span class="p">,</span> <span class="n">dw</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dw</span></div>
+
+<div class="viewcode-block" id="LinearModelFreeBranch.num_frac_bits"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelFreeBranch.num_frac_bits">[docs]</a>    <span class="k">def</span> <span class="nf">num_frac_bits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="LinearModelFreeBranch.error"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelFreeBranch.error">[docs]</a>    <span class="k">def</span> <span class="nf">error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">0</span></div></div>
+
+
+<div class="viewcode-block" id="LinearModelBvXor"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvXor">[docs]</a><span class="k">class</span> <span class="nc">LinearModelBvXor</span><span class="p">(</span><span class="n">OpModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent the `linear.opmodel.OpModel` of `BvXor`.</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.linear.opmodel import LinearModelBvXor</span>
+<span class="sd">        &gt;&gt;&gt; alpha = LinearMask(Constant(0, 4)), LinearMask(Constant(0, 4))</span>
+<span class="sd">        &gt;&gt;&gt; f = LinearModelBvXor(alpha)</span>
+<span class="sd">        &gt;&gt;&gt; print(f.vrepr())</span>
+<span class="sd">        LinearModelBvXor([LinearMask(Constant(0b0000, width=4)), LinearMask(Constant(0b0000, width=4))])</span>
+<span class="sd">        &gt;&gt;&gt; f.max_weight(), f.weight_width(), f.error(), f.num_frac_bits()</span>
+<span class="sd">        (0, 1, 0, 0)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">op</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvXor</span>
+
+<div class="viewcode-block" id="LinearModelBvXor.validity_constraint"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvXor.validity_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">validity_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_mask</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the validity constraint for a given output `LinearMask`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.opmodel import LinearModelBvXor</span>
+<span class="sd">            &gt;&gt;&gt; alpha = LinearMask(Constant(0, 4)), LinearMask(Constant(0, 4))</span>
+<span class="sd">            &gt;&gt;&gt; f = LinearModelBvXor(alpha)</span>
+<span class="sd">            &gt;&gt;&gt; beta = LinearMask(Constant(0, 4))</span>
+<span class="sd">            &gt;&gt;&gt; f.validity_constraint(beta)</span>
+<span class="sd">            0b1</span>
+<span class="sd">            &gt;&gt;&gt; a0, a1, b = Variable(&quot;a0&quot;, 4), Variable(&quot;a1&quot;, 4), Variable(&quot;b&quot;, 4)</span>
+<span class="sd">            &gt;&gt;&gt; alpha = LinearMask(a0), LinearMask(a1)</span>
+<span class="sd">            &gt;&gt;&gt; f = LinearModelBvXor(alpha)</span>
+<span class="sd">            &gt;&gt;&gt; beta = LinearMask(b)</span>
+<span class="sd">            &gt;&gt;&gt; result = f.validity_constraint(beta)</span>
+<span class="sd">            &gt;&gt;&gt; result</span>
+<span class="sd">            (a0 == a1) &amp; (a0 == b)</span>
+<span class="sd">            &gt;&gt;&gt; result.xreplace({a0: Constant(0, 4), a1: Constant(0, 4), b: Constant(0, 4)})</span>
+<span class="sd">            0b1</span>
+
+<span class="sd">        See `OpModel.validity_constraint` for more information.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">a0</span><span class="p">,</span> <span class="n">a1</span> <span class="o">=</span> <span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">val</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_mask</span><span class="p">]</span>
+        <span class="n">b0</span> <span class="o">=</span> <span class="n">output_mask</span><span class="o">.</span><span class="n">val</span>
+        <span class="n">a_i</span> <span class="o">=</span> <span class="n">a1</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">)</span> <span class="k">else</span> <span class="n">a0</span>
+        <span class="k">return</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvComp</span><span class="p">(</span><span class="n">a0</span><span class="p">,</span> <span class="n">a1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvComp</span><span class="p">(</span><span class="n">a_i</span><span class="p">,</span> <span class="n">b0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LinearModelBvXor.pr_one_constraint"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvXor.pr_one_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">pr_one_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_mask</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the probability-one constraint for a given output `LinearMask`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.opmodel import LinearModelBvXor</span>
+<span class="sd">            &gt;&gt;&gt; alpha = LinearMask(Constant(0, 4)), LinearMask(Constant(0, 4))</span>
+<span class="sd">            &gt;&gt;&gt; f = LinearModelBvXor(alpha)</span>
+<span class="sd">            &gt;&gt;&gt; f.pr_one_constraint(LinearMask(Constant(0, 4)))</span>
+<span class="sd">            0b1</span>
+
+<span class="sd">        See `abstractproperty.opmodel.OpModel.pr_one_constraint` for more information.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">validity_constraint</span><span class="p">(</span><span class="n">output_mask</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LinearModelBvXor.bv_weight"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvXor.bv_weight">[docs]</a>    <span class="k">def</span> <span class="nf">bv_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_mask</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the bit-vector weight for a given output `LinearMask`.</span>
+
+<span class="sd">        For `LinearModelBvXor`, any valid linear approximation has weight 0.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LinearModelBvXor.weight_constraint"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvXor.weight_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">weight_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_mask</span><span class="p">,</span> <span class="n">weight_variable</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the weight constraint for a given output `LinearMask` and weight `Variable`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.opmodel import LinearModelBvXor</span>
+<span class="sd">            &gt;&gt;&gt; n = 4</span>
+<span class="sd">            &gt;&gt;&gt; alpha = LinearMask(Variable(&quot;a0&quot;, n)), LinearMask(Variable(&quot;a1&quot;, n))</span>
+<span class="sd">            &gt;&gt;&gt; f = LinearModelBvXor(alpha)</span>
+<span class="sd">            &gt;&gt;&gt; w = Variable(&quot;w&quot;, f.weight_width())</span>
+<span class="sd">            &gt;&gt;&gt; f.weight_constraint(LinearMask(Variable(&quot;b&quot;, n)), w)</span>
+<span class="sd">            w == 0b0</span>
+
+<span class="sd">        See `OpModel.weight_constraint` for more information.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">weight_constraint</span><span class="p">(</span><span class="n">output_mask</span><span class="p">,</span> <span class="n">weight_variable</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LinearModelBvXor.max_weight"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvXor.max_weight">[docs]</a>    <span class="k">def</span> <span class="nf">max_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="LinearModelBvXor.weight_width"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvXor.weight_width">[docs]</a>    <span class="k">def</span> <span class="nf">weight_width</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="LinearModelBvXor.decimal_weight"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvXor.decimal_weight">[docs]</a>    <span class="k">def</span> <span class="nf">decimal_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_mask</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_assert_preconditions_decimal_weight</span><span class="p">(</span><span class="n">output_mask</span><span class="p">)</span>
+        <span class="n">dw</span> <span class="o">=</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bv_weight</span><span class="p">(</span><span class="n">output_mask</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_assert_postconditions_decimal_weight</span><span class="p">(</span><span class="n">output_mask</span><span class="p">,</span> <span class="n">dw</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dw</span></div>
+
+<div class="viewcode-block" id="LinearModelBvXor.num_frac_bits"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvXor.num_frac_bits">[docs]</a>    <span class="k">def</span> <span class="nf">num_frac_bits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="LinearModelBvXor.error"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvXor.error">[docs]</a>    <span class="k">def</span> <span class="nf">error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">0</span></div></div>
+
+
+<div class="viewcode-block" id="LinearModelBvAnd"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvAnd">[docs]</a><span class="k">class</span> <span class="nc">LinearModelBvAnd</span><span class="p">(</span><span class="n">OpModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent the `linear.opmodel.OpModel` of `BvAnd`.</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.linear.opmodel import LinearModelBvAnd</span>
+<span class="sd">        &gt;&gt;&gt; alpha = LinearMask(Constant(0, 4)), LinearMask(Constant(0, 4))</span>
+<span class="sd">        &gt;&gt;&gt; f = LinearModelBvAnd(alpha)</span>
+<span class="sd">        &gt;&gt;&gt; print(f.vrepr())</span>
+<span class="sd">        LinearModelBvAnd([LinearMask(Constant(0b0000, width=4)), LinearMask(Constant(0b0000, width=4))])</span>
+<span class="sd">        &gt;&gt;&gt; f.max_weight(), f.weight_width(), f.error(), f.num_frac_bits()</span>
+<span class="sd">        (4, 3, 0, 0)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">op</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvAnd</span>
+
+<div class="viewcode-block" id="LinearModelBvAnd.validity_constraint"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvAnd.validity_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">validity_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_mask</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the validity constraint for a given output `LinearMask`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.opmodel import LinearModelBvAnd</span>
+<span class="sd">            &gt;&gt;&gt; alpha = LinearMask(Constant(0, 4)), LinearMask(Constant(0, 4))</span>
+<span class="sd">            &gt;&gt;&gt; f = LinearModelBvAnd(alpha)</span>
+<span class="sd">            &gt;&gt;&gt; beta = LinearMask(Constant(0, 4))</span>
+<span class="sd">            &gt;&gt;&gt; f.validity_constraint(beta)</span>
+<span class="sd">            0b1</span>
+<span class="sd">            &gt;&gt;&gt; a0, a1, b = Variable(&quot;a0&quot;, 4), Variable(&quot;a1&quot;, 4), Variable(&quot;b&quot;, 4)</span>
+<span class="sd">            &gt;&gt;&gt; alpha = LinearMask(a0), LinearMask(a1)</span>
+<span class="sd">            &gt;&gt;&gt; f = LinearModelBvAnd(alpha)</span>
+<span class="sd">            &gt;&gt;&gt; beta = LinearMask(b)</span>
+<span class="sd">            &gt;&gt;&gt; result = f.validity_constraint(beta)</span>
+<span class="sd">            &gt;&gt;&gt; result</span>
+<span class="sd">            (~b &amp; (a0 | a1)) == 0x0</span>
+<span class="sd">            &gt;&gt;&gt; result.xreplace({a0: Constant(0, 4), a1: Constant(0, 4), b: Constant(0, 4)})</span>
+<span class="sd">            0b1</span>
+
+<span class="sd">        See `OpModel.validity_constraint` for more information.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># let f(x) = x0 &amp; x1, and LA=(a,b)=[(a0, a1), b0] 1-bit linear approximation</span>
+        <span class="c1"># &lt;a, x&gt; = a0x0 + a1x1, ‹f(x), b&gt; = b &amp; (x0 &amp; x1),</span>
+        <span class="c1"># if LA = [(0, 0), 0],</span>
+        <span class="c1">#   number of x such that &lt;a, x&gt; = ‹f(x), b&gt;? (right inputs)</span>
+        <span class="c1">#   0 and 0 are equal in 4/4 right inputs</span>
+        <span class="c1">#   C(a,b) = |2 x 4/4 - 1| = 1,             weight 0</span>
+        <span class="c1"># if LA in [(0, 0), 1],</span>
+        <span class="c1">#   0 and x0 &amp; x1 are equal in 3/4 right inputs ([x0, x1]!=[1,1])</span>
+        <span class="c1">#   C(a,b) = |2 x 3/4 - 1| = 0.5,           weight 1</span>
+        <span class="c1"># if LA in [(0, 1), 0], [(1, 0), 0]</span>
+        <span class="c1">#   for [(0, 1), 0]</span>
+        <span class="c1">#       x1 and 0 are equal in 2/4 right inputs (x0=*, x1=0)</span>
+        <span class="c1">#       C(a,b) = |2 x 2/4 - 1| = 0,         weight math.inf</span>
+        <span class="c1">#   for [(1, 0), 0] is similar</span>
+        <span class="c1"># if LA in [(u, v), 1], {u, v} = {0, 1},</span>
+        <span class="c1">#   for [(0, 1), 1]  (other is similar)</span>
+        <span class="c1">#       x1 and x0 &amp; x1 are equal in 3/4 right inputs ([x0, x1]!=[0,1])</span>
+        <span class="c1">#       C(a,b) = |2 x 3/4 - 1| = 0.5,       weight 1</span>
+        <span class="c1"># if LA in [(1, 1), 0],</span>
+        <span class="c1">#   x0 ^ x1 and 0 are equal in 2/4 right inputs (x0==x1)</span>
+        <span class="c1">#   C(a,b) = |2 x 2/4 - 1| = 0,             weight math.inf</span>
+        <span class="c1"># if LA in [(1, 1), 1],</span>
+        <span class="c1">#   x0 ^ x1 and x0 &amp; x1 are equal in 1/4 right inputs ([x0, x1]==[0,0])</span>
+        <span class="c1">#   C(a,b) = |2 x 1/4 - 1| = 0.5,           weight 1</span>
+
+        <span class="c1"># pseudo code</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        a0, a1 = [m.val for m in self.input_mask]</span>
+<span class="sd">        b0 = output_mask.val</span>
+<span class="sd">        dw = decimal.Decimal(0)</span>
+<span class="sd">        for i in range(a0.width):</span>
+<span class="sd">            la = [(int(a0[i]), int(a1[i])), int(b0[i])]</span>
+<span class="sd">            if la == [(0, 0), 0]:</span>
+<span class="sd">                dw += 0</span>
+<span class="sd">            elif la == [(0, 0), 1]:</span>
+<span class="sd">                dw += 1</span>
+<span class="sd">            elif la in [[(0, 1), 0], [(1, 0), 0]]:</span>
+<span class="sd">                raise ValueError(f&quot;linear approximation ((a0, a1), b0)={la} is not valid&quot;)</span>
+<span class="sd">            elif la in [[(0, 1), 1], [(1, 0), 1]]:</span>
+<span class="sd">                dw += 1</span>
+<span class="sd">            elif la == [(1, 1), 0]:</span>
+<span class="sd">                raise ValueError(f&quot;linear approximation ((a0, a1), b0)={la} is not valid&quot;)</span>
+<span class="sd">            elif la == [(1, 1), 1]:</span>
+<span class="sd">                dw += 1</span>
+<span class="sd">            else:</span>
+<span class="sd">                raise ValueError(f&quot;invalid la = {la}&quot;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">a0</span><span class="p">,</span> <span class="n">a1</span> <span class="o">=</span> <span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">val</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_mask</span><span class="p">]</span>
+        <span class="n">b0</span> <span class="o">=</span> <span class="n">output_mask</span><span class="o">.</span><span class="n">val</span>
+        <span class="c1"># bad_case == bad_case_1 | bad_case_2</span>
+        <span class="n">bad_case</span> <span class="o">=</span> <span class="p">(</span><span class="o">~</span><span class="n">b0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">a0</span> <span class="o">|</span> <span class="n">a1</span><span class="p">)</span>  <span class="c1"># [(0, 1), 0], [(1, 0), 0], [(1, 1), 0]</span>
+        <span class="k">return</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvComp</span><span class="p">(</span><span class="n">bad_case</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">a0</span><span class="o">.</span><span class="n">width</span><span class="p">))</span></div>
+        <span class="c1"># bad_case_1 = (~b0) &amp; (a0 ^ a1)  # [(0, 1), 0], [(1, 0), 0]</span>
+        <span class="c1"># bad_case_2 = (~b0) &amp; a0 &amp; a1  # [(1, 1), 0]</span>
+        <span class="c1"># return operation.BvComp(bad_case_1 | bad_case_2, core.Constant(0, a0.width))</span>
+
+<div class="viewcode-block" id="LinearModelBvAnd.pr_one_constraint"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvAnd.pr_one_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">pr_one_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_mask</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the probability-one constraint for a given output `LinearMask`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.opmodel import LinearModelBvAnd</span>
+<span class="sd">            &gt;&gt;&gt; alpha = LinearMask(Constant(0, 4)), LinearMask(Constant(0, 4))</span>
+<span class="sd">            &gt;&gt;&gt; f = LinearModelBvAnd(alpha)</span>
+<span class="sd">            &gt;&gt;&gt; f.pr_one_constraint(LinearMask(Constant(0, 4)))</span>
+<span class="sd">            0b1</span>
+
+<span class="sd">        See `abstractproperty.opmodel.OpModel.pr_one_constraint` for more information.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># (a0, a1) = (0, 0) -&gt; b0 = (0)</span>
+        <span class="n">a0</span><span class="p">,</span> <span class="n">a1</span> <span class="o">=</span> <span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">val</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_mask</span><span class="p">]</span>
+        <span class="n">b0</span> <span class="o">=</span> <span class="n">output_mask</span><span class="o">.</span><span class="n">val</span>
+        <span class="k">return</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvComp</span><span class="p">(</span><span class="n">a0</span> <span class="o">|</span> <span class="n">a1</span> <span class="o">|</span> <span class="n">b0</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">a0</span><span class="o">.</span><span class="n">width</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="LinearModelBvAnd.bv_weight"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvAnd.bv_weight">[docs]</a>    <span class="k">def</span> <span class="nf">bv_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_mask</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the bit-vector weight for a given output `LinearMask`.</span>
+
+<span class="sd">        See also `abstractproperty.opmodel.OpModel.bv_weight`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">b0</span> <span class="o">=</span> <span class="n">output_mask</span><span class="o">.</span><span class="n">val</span>
+        <span class="n">case</span> <span class="o">=</span> <span class="n">b0</span>  <span class="c1"># case == case_1 | case_2 | case_3</span>
+        <span class="c1"># case_1 = b0 &amp; (~a0) &amp; (~a1)  # [(0, 0), 1]</span>
+        <span class="c1"># case_2 = b0 &amp; (a0 ^ a1)  # [[(0, 1), 1], [(1, 0), 1]]</span>
+        <span class="c1"># case_3 = b0 &amp; a0 &amp; a1   # [(1, 1), 1]</span>
+        <span class="k">return</span> <span class="n">secondaryop</span><span class="o">.</span><span class="n">PopCount</span><span class="p">(</span><span class="n">case</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LinearModelBvAnd.weight_constraint"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvAnd.weight_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">weight_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_mask</span><span class="p">,</span> <span class="n">weight_variable</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the weight constraint for a given output `LinearMask` and weight `Variable`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.opmodel import LinearModelBvAnd</span>
+<span class="sd">            &gt;&gt;&gt; n = 4</span>
+<span class="sd">            &gt;&gt;&gt; alpha = LinearMask(Constant(0, n)), LinearMask(Constant(0, n))</span>
+<span class="sd">            &gt;&gt;&gt; f = LinearModelBvAnd(alpha)</span>
+<span class="sd">            &gt;&gt;&gt; w = Variable(&quot;w&quot;, f.weight_width())</span>
+<span class="sd">            &gt;&gt;&gt; f.weight_constraint(LinearMask(Constant(0, n)), w)</span>
+<span class="sd">            w == 0b000</span>
+<span class="sd">            &gt;&gt;&gt; a0, a1, b = Variable(&quot;a0&quot;, n), Variable(&quot;a1&quot;, n), Variable(&quot;b&quot;, n)</span>
+<span class="sd">            &gt;&gt;&gt; alpha = LinearMask(a0), LinearMask(a1,)</span>
+<span class="sd">            &gt;&gt;&gt; f = LinearModelBvAnd(alpha)</span>
+<span class="sd">            &gt;&gt;&gt; w = Variable(&quot;w&quot;, f.weight_width())</span>
+<span class="sd">            &gt;&gt;&gt; result = f.weight_constraint(LinearMask(b), w)</span>
+<span class="sd">            &gt;&gt;&gt; result  # doctest:+NORMALIZE_WHITESPACE</span>
+<span class="sd">            w == PopCount(b)</span>
+<span class="sd">            &gt;&gt;&gt; result.xreplace({a0: Constant(0, n), a1: Constant(0, n), b: Constant(0, n)})</span>
+<span class="sd">            w == 0b000</span>
+
+<span class="sd">        See `OpModel.weight_constraint` for more information.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">weight_constraint</span><span class="p">(</span><span class="n">output_mask</span><span class="p">,</span> <span class="n">weight_variable</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LinearModelBvAnd.max_weight"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvAnd.max_weight">[docs]</a>    <span class="k">def</span> <span class="nf">max_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_mask</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">width</span>
+        <span class="k">return</span> <span class="n">n</span></div>
+
+<div class="viewcode-block" id="LinearModelBvAnd.weight_width"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvAnd.weight_width">[docs]</a>    <span class="k">def</span> <span class="nf">weight_width</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_mask</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">width</span>
+        <span class="k">return</span> <span class="n">n</span><span class="o">.</span><span class="n">bit_length</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="LinearModelBvAnd.decimal_weight"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvAnd.decimal_weight">[docs]</a>    <span class="k">def</span> <span class="nf">decimal_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_mask</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_assert_preconditions_decimal_weight</span><span class="p">(</span><span class="n">output_mask</span><span class="p">)</span>
+        <span class="n">dw</span> <span class="o">=</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bv_weight</span><span class="p">(</span><span class="n">output_mask</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_assert_postconditions_decimal_weight</span><span class="p">(</span><span class="n">output_mask</span><span class="p">,</span> <span class="n">dw</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dw</span></div>
+
+<div class="viewcode-block" id="LinearModelBvAnd.num_frac_bits"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvAnd.num_frac_bits">[docs]</a>    <span class="k">def</span> <span class="nf">num_frac_bits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="LinearModelBvAnd.error"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvAnd.error">[docs]</a>    <span class="k">def</span> <span class="nf">error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">0</span></div></div>
+
+
+<div class="viewcode-block" id="LinearModelBvOr"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvOr">[docs]</a><span class="k">class</span> <span class="nc">LinearModelBvOr</span><span class="p">(</span><span class="n">LinearModelBvAnd</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent the `linear.opmodel.OpModel` of `BvOr`.</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.linear.opmodel import LinearModelBvOr</span>
+<span class="sd">        &gt;&gt;&gt; alpha = LinearMask(Constant(0, 4)), LinearMask(Constant(0, 4))</span>
+<span class="sd">        &gt;&gt;&gt; f = LinearModelBvOr(alpha)</span>
+<span class="sd">        &gt;&gt;&gt; print(f.vrepr())</span>
+<span class="sd">        LinearModelBvOr([LinearMask(Constant(0b0000, width=4)), LinearMask(Constant(0b0000, width=4))])</span>
+<span class="sd">        &gt;&gt;&gt; f.max_weight(), f.weight_width(), f.error(), f.num_frac_bits()</span>
+<span class="sd">        (4, 3, 0, 0)</span>
+
+<span class="sd">    The linear model of BvOr` is the same as `LinearModelBvAnd`</span>
+<span class="sd">    since ``~(x &amp; y) == ~x | ~y`` (and `BvNot` preserves masks).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">op</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvOr</span></div>
+
+
+<div class="viewcode-block" id="LinearModelBvAdd"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvAdd">[docs]</a><span class="k">class</span> <span class="nc">LinearModelBvAdd</span><span class="p">(</span><span class="n">OpModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent the `linear.opmodel.OpModel` of `BvAdd`.</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.linear.opmodel import LinearModelBvAdd</span>
+<span class="sd">        &gt;&gt;&gt; alpha = LinearMask(Constant(0, 4)), LinearMask(Constant(0, 4))</span>
+<span class="sd">        &gt;&gt;&gt; f = LinearModelBvAdd(alpha)</span>
+<span class="sd">        &gt;&gt;&gt; print(f.vrepr())</span>
+<span class="sd">        LinearModelBvAdd([LinearMask(Constant(0b0000, width=4)), LinearMask(Constant(0b0000, width=4))])</span>
+<span class="sd">        &gt;&gt;&gt; f.max_weight(), f.weight_width(), f.error(), f.num_frac_bits()</span>
+<span class="sd">        (3, 2, 0, 0)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">op</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvAdd</span>
+
+<div class="viewcode-block" id="LinearModelBvAdd.external_vars_validity_constraint"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvAdd.external_vars_validity_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">external_vars_validity_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_mask</span><span class="p">,</span> <span class="n">z_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">explicit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">v</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">val</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_mask</span><span class="p">]</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="n">output_mask</span><span class="o">.</span><span class="n">val</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">width</span>
+
+        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">x_i</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">)</span> <span class="k">for</span> <span class="n">x_i</span> <span class="ow">in</span> <span class="p">[</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">w</span><span class="p">])</span> <span class="ow">or</span> <span class="n">explicit</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="c1"># explicit definition of z (+50% slower than implicit in SMT problems)</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+        <span class="c1"># implicit definition of z</span>
+        <span class="c1"># - definition/statement from https://doi.org/10.1007/978-3-319-39555-5_26</span>
+        <span class="c1"># - following proof from On CCZ-equivalence of Addition mod 2n</span>
+        <span class="c1"># z = M^t(u ^ v ^ w) (1), where M = R(I ^ R)^(-1) and R = &gt;&gt; 1</span>
+        <span class="c1"># then (1) is equivalent to</span>
+        <span class="c1"># z = R(I ^ R)^(-1)(u ^ v ^ w), that is,</span>
+        <span class="c1"># (I ^ R)z     = R(u ^ v ^ w), that is,</span>
+        <span class="c1"># z ^ (z &gt;&gt; 1) = (u ^ v ^ w) &gt;&gt; 1</span>
+        <span class="c1"># (thus, z[n-1] == 0 is not needed)</span>
+
+        <span class="k">if</span> <span class="n">z_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">h</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">blake2b</span><span class="p">(</span><span class="n">digest_size</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+            <span class="n">h</span><span class="o">.</span><span class="n">update</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">vrepr</span><span class="p">()</span> <span class="o">+</span> <span class="n">output_mask</span><span class="o">.</span><span class="n">vrepr</span><span class="p">())</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+            <span class="n">hash_vwu</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+            <span class="n">z_name</span> <span class="o">=</span> <span class="s2">&quot;_tmp&quot;</span> <span class="o">+</span> <span class="n">hash_vwu</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="n">core</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">z_name</span><span class="p">,</span> <span class="n">n</span><span class="p">)]</span></div>
+
+<div class="viewcode-block" id="LinearModelBvAdd.external_vars_weight_constraint"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvAdd.external_vars_weight_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">external_vars_weight_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_mask</span><span class="p">,</span> <span class="n">weight_variable</span><span class="p">,</span> <span class="n">z_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">explicit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">external_vars_validity_constraint</span><span class="p">(</span><span class="n">output_mask</span><span class="p">,</span> <span class="n">z_name</span><span class="o">=</span><span class="n">z_name</span><span class="p">,</span> <span class="n">explicit</span><span class="o">=</span><span class="n">explicit</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LinearModelBvAdd.validity_constraint"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvAdd.validity_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">validity_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_mask</span><span class="p">,</span> <span class="n">z_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">explicit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the validity constraint for a given output `LinearMask`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.opmodel import LinearModelBvAdd</span>
+<span class="sd">            &gt;&gt;&gt; alpha = LinearMask(Constant(0, 4)), LinearMask(Constant(0, 4))</span>
+<span class="sd">            &gt;&gt;&gt; f = LinearModelBvAdd(alpha)</span>
+<span class="sd">            &gt;&gt;&gt; beta = LinearMask(Constant(0, 4))</span>
+<span class="sd">            &gt;&gt;&gt; f.validity_constraint(beta)</span>
+<span class="sd">            0b1</span>
+<span class="sd">            &gt;&gt;&gt; a0, a1, b = Variable(&quot;a0&quot;, 4), Variable(&quot;a1&quot;, 4), Variable(&quot;b&quot;, 4)</span>
+<span class="sd">            &gt;&gt;&gt; alpha = LinearMask(a0), LinearMask(a1)</span>
+<span class="sd">            &gt;&gt;&gt; f = LinearModelBvAdd(alpha)</span>
+<span class="sd">            &gt;&gt;&gt; beta = LinearMask(b)</span>
+<span class="sd">            &gt;&gt;&gt; result = f.validity_constraint(beta, z_name=&quot;z&quot;)</span>
+<span class="sd">            &gt;&gt;&gt; result  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">            ((~((b ^ a0) | (b ^ a1)) | z) == 0xf) &amp; ((z ^ (z &gt;&gt; 0x1) ^ ((b ^ a0 ^ a1) &gt;&gt; 0x1)) == 0x0)</span>
+<span class="sd">            &gt;&gt;&gt; result.xreplace({a0: Constant(0, 4), a1: Constant(0, 4), b: Constant(0, 4)})</span>
+<span class="sd">            (z ^ (z &gt;&gt; 0x1)) == 0x0</span>
+
+<span class="sd">        See `OpModel.validity_constraint` for more information.</span>
+
+<span class="sd">        Source: https://doi.org/10.1007/978-3-319-39555-5_26</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">v</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">val</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_mask</span><span class="p">]</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="n">output_mask</span><span class="o">.</span><span class="n">val</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">width</span>
+
+        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">x_i</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">)</span> <span class="k">for</span> <span class="n">x_i</span> <span class="ow">in</span> <span class="p">[</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">w</span><span class="p">])</span> <span class="ow">or</span> <span class="n">explicit</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">z</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span>
+            <span class="n">z</span><span class="p">[</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+                <span class="n">z</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">z</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">^</span> <span class="n">u</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">^</span> <span class="n">v</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">^</span> <span class="n">w</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">z</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">operation</span><span class="o">.</span><span class="n">Concat</span><span class="p">,</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">z</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">evs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">external_vars_validity_constraint</span><span class="p">(</span>
+                <span class="n">output_mask</span><span class="p">,</span> <span class="n">z_name</span><span class="o">=</span><span class="n">z_name</span><span class="p">,</span> <span class="n">explicit</span><span class="o">=</span><span class="n">explicit</span><span class="p">)</span>
+            <span class="n">z</span> <span class="o">=</span> <span class="n">evs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">z_eq</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvComp</span><span class="p">(</span><span class="n">z</span> <span class="o">^</span> <span class="p">(</span><span class="n">z</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">^</span> <span class="p">((</span><span class="n">u</span> <span class="o">^</span> <span class="n">v</span> <span class="o">^</span> <span class="n">w</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span><span class="p">),</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">z</span><span class="o">.</span><span class="n">width</span><span class="p">))</span>
+
+        <span class="c1"># z_eq &amp; (z[n-1] == 0b0 is redundant since</span>
+        <span class="c1">#  z[n-1] = ((z[n-1]) ^ ((z &gt;&gt; 1)[n-1]) ^ ((u ^ v ^ w) &gt;&gt; 1)[n-1])</span>
+        <span class="c1"># and right hand size is 0 (due to the shifts)</span>
+        <span class="c1"># (see also proof in external_vars_validity_constraint)</span>
+
+        <span class="c1"># &lt;= is equivalent to implication since both have as bad case (1, 0)</span>
+        <span class="k">def</span> <span class="nf">bitwise_implication</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">(</span><span class="o">~</span><span class="n">x</span><span class="p">)</span> <span class="o">|</span> <span class="n">y</span>
+
+        <span class="c1"># c1: u^v &lt;= z</span>
+        <span class="c1"># c2: u^w &lt;= z</span>
+        <span class="c1"># c1_2: (u^v|u^w) &lt;= z</span>
+        <span class="n">lhs</span> <span class="o">=</span> <span class="p">(</span><span class="n">u</span> <span class="o">^</span> <span class="n">v</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">u</span> <span class="o">^</span> <span class="n">w</span><span class="p">)</span>
+        <span class="n">rhs</span> <span class="o">=</span> <span class="n">z</span>
+        <span class="n">c1_2</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvComp</span><span class="p">(</span><span class="n">bitwise_implication</span><span class="p">(</span><span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span><span class="p">),</span> <span class="o">~</span><span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">lhs</span><span class="o">.</span><span class="n">width</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">c1_2</span> <span class="o">&amp;</span> <span class="n">z_eq</span></div>
+
+<div class="viewcode-block" id="LinearModelBvAdd.pr_one_constraint"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvAdd.pr_one_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">pr_one_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_mask</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the probability-one constraint for a given output `LinearMask`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.opmodel import LinearModelBvAdd</span>
+<span class="sd">            &gt;&gt;&gt; alpha = LinearMask(Constant(0, 4)), LinearMask(Constant(0, 4))</span>
+<span class="sd">            &gt;&gt;&gt; f = LinearModelBvAdd(alpha)</span>
+<span class="sd">            &gt;&gt;&gt; f.pr_one_constraint(LinearMask(Constant(0, 4)))</span>
+<span class="sd">            0b1</span>
+
+<span class="sd">        See `abstractproperty.opmodel.OpModel.pr_one_constraint` for more information.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">v</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">val</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_mask</span><span class="p">]</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="n">output_mask</span><span class="o">.</span><span class="n">val</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">width</span>
+
+        <span class="c1"># if z = 0, then (u ^ v ^ w)[:1] = 0; proof:</span>
+        <span class="c1">#   0 = z[n-2] = u[n-1] ^ v[n-1] ^ w[n-1] = 0</span>
+        <span class="c1">#   0 = z[n-1] = u[n-2] ^ v[n-2] ^ w[n-2] = 0</span>
+        <span class="c1">#   0 = z[0]   = u[1] ^ v[1] ^ w[1]</span>
+        <span class="c1"># moreover, bitwise_implication(x, 0) = ~x</span>
+
+        <span class="n">lhs</span> <span class="o">=</span> <span class="p">(</span><span class="n">u</span> <span class="o">^</span> <span class="n">v</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">u</span> <span class="o">^</span> <span class="n">w</span><span class="p">)</span>
+        <span class="n">c1_2</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvComp</span><span class="p">(</span><span class="o">~</span><span class="n">lhs</span><span class="p">,</span> <span class="o">~</span><span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">lhs</span><span class="o">.</span><span class="n">width</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">c1_2</span> <span class="o">&amp;</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvComp</span><span class="p">((</span><span class="n">u</span> <span class="o">^</span> <span class="n">v</span> <span class="o">^</span> <span class="n">w</span><span class="p">)[:</span><span class="mi">1</span><span class="p">],</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="LinearModelBvAdd.weight_constraint"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvAdd.weight_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">weight_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_mask</span><span class="p">,</span> <span class="n">weight_variable</span><span class="p">,</span> <span class="n">z_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">explicit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the weight constraint for a given output `LinearMask` and weight `Variable`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.opmodel import LinearModelBvAdd</span>
+<span class="sd">            &gt;&gt;&gt; n = 4</span>
+<span class="sd">            &gt;&gt;&gt; alpha = LinearMask(Constant(0, n)), LinearMask(Constant(0, n))</span>
+<span class="sd">            &gt;&gt;&gt; f = LinearModelBvAdd(alpha)</span>
+<span class="sd">            &gt;&gt;&gt; w = Variable(&quot;w&quot;, f.weight_width())</span>
+<span class="sd">            &gt;&gt;&gt; f.weight_constraint(LinearMask(Constant(0, n)), w)</span>
+<span class="sd">            0b00 == w</span>
+<span class="sd">            &gt;&gt;&gt; a0, a1, b = Variable(&quot;a0&quot;, n), Variable(&quot;a1&quot;, n), Variable(&quot;b&quot;, n)</span>
+<span class="sd">            &gt;&gt;&gt; alpha = LinearMask(a0), LinearMask(a1,)</span>
+<span class="sd">            &gt;&gt;&gt; f = LinearModelBvAdd(alpha)</span>
+<span class="sd">            &gt;&gt;&gt; w = Variable(&quot;w&quot;, f.weight_width())</span>
+<span class="sd">            &gt;&gt;&gt; result = f.weight_constraint(LinearMask(b), w, z_name=&quot;z&quot;)</span>
+<span class="sd">            &gt;&gt;&gt; result  # doctest:+NORMALIZE_WHITESPACE</span>
+<span class="sd">            (PopCount(z[2:]) == w) &amp; ((z ^ (z &gt;&gt; 0x1) ^ ((b ^ a0 ^ a1) &gt;&gt; 0x1)) == 0x0)</span>
+<span class="sd">            &gt;&gt;&gt; result.xreplace({a0: Constant(0, n), a1: Constant(0, n), b: Constant(0, n)})</span>
+<span class="sd">            (PopCount(z[2:]) == w) &amp; ((z ^ (z &gt;&gt; 0x1)) == 0x0)</span>
+
+<span class="sd">        See `OpModel.weight_constraint` for more information.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># weight variable name not used in z_name to ensure same name for z</span>
+        <span class="c1"># used in validity_constraint and weight_constraint</span>
+        <span class="n">bv_weight</span><span class="p">,</span> <span class="n">extra_constraints</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bvweight_and_extra_constraints</span><span class="p">(</span>
+            <span class="n">output_mask</span><span class="p">,</span> <span class="n">z_name</span><span class="o">=</span><span class="n">z_name</span><span class="p">,</span> <span class="n">explicit</span><span class="o">=</span><span class="n">explicit</span><span class="p">)</span>
+
+        <span class="n">weight_constraint</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvComp</span><span class="p">(</span><span class="n">bv_weight</span><span class="p">,</span> <span class="n">weight_variable</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">extra_constraints</span><span class="p">:</span>
+            <span class="n">weight_constraint</span> <span class="o">&amp;=</span> <span class="n">c</span>
+
+        <span class="k">return</span> <span class="n">weight_constraint</span></div>
+
+    <span class="k">def</span> <span class="nf">_bvweight_and_extra_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_mask</span><span class="p">,</span> <span class="n">z_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">explicit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">v</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">val</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_mask</span><span class="p">]</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="n">output_mask</span><span class="o">.</span><span class="n">val</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">width</span>
+
+        <span class="n">extra_constraints</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">x_i</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">)</span> <span class="k">for</span> <span class="n">x_i</span> <span class="ow">in</span> <span class="p">[</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">w</span><span class="p">])</span> <span class="ow">or</span> <span class="n">explicit</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">z</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span>
+            <span class="n">z</span><span class="p">[</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+                <span class="n">z</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">z</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">^</span> <span class="n">u</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">^</span> <span class="n">v</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">^</span> <span class="n">w</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">z</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">operation</span><span class="o">.</span><span class="n">Concat</span><span class="p">,</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">z</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">evs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">external_vars_weight_constraint</span><span class="p">(</span>
+                <span class="n">output_mask</span><span class="p">,</span> <span class="n">weight_variable</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">z_name</span><span class="o">=</span><span class="n">z_name</span><span class="p">,</span> <span class="n">explicit</span><span class="o">=</span><span class="n">explicit</span><span class="p">)</span>
+            <span class="n">z</span> <span class="o">=</span> <span class="n">evs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">z_eq</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvComp</span><span class="p">(</span><span class="n">z</span> <span class="o">^</span> <span class="p">(</span><span class="n">z</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">^</span> <span class="p">((</span><span class="n">u</span> <span class="o">^</span> <span class="n">v</span> <span class="o">^</span> <span class="n">w</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span><span class="p">),</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">z</span><span class="o">.</span><span class="n">width</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">z_eq</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">z_eq</span> <span class="o">==</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;OpModel </span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2"> with output mask </span><span class="si">{</span><span class="n">output_mask</span><span class="si">}</span><span class="s2"> is not valid&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">extra_constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">z_eq</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">secondaryop</span><span class="o">.</span><span class="n">PopCount</span><span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="n">n</span><span class="o">-</span><span class="mi">2</span><span class="p">:]),</span> <span class="n">extra_constraints</span>
+
+<div class="viewcode-block" id="LinearModelBvAdd.max_weight"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvAdd.max_weight">[docs]</a>    <span class="k">def</span> <span class="nf">max_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">width</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_mask</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">width</span> <span class="o">-</span> <span class="mi">1</span>  <span class="c1"># MSB is ignored</span>
+        <span class="k">return</span> <span class="n">width</span>  <span class="c1"># as an integer</span></div>
+
+<div class="viewcode-block" id="LinearModelBvAdd.weight_width"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvAdd.weight_width">[docs]</a>    <span class="k">def</span> <span class="nf">weight_width</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_mask</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">width</span> <span class="o">-</span> <span class="mi">1</span>  <span class="c1"># due to n-2</span>
+        <span class="k">return</span> <span class="n">n</span><span class="o">.</span><span class="n">bit_length</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="LinearModelBvAdd.decimal_weight"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvAdd.decimal_weight">[docs]</a>    <span class="k">def</span> <span class="nf">decimal_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_mask</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_assert_preconditions_decimal_weight</span><span class="p">(</span><span class="n">output_mask</span><span class="p">)</span>
+        <span class="n">bv_weight</span><span class="p">,</span> <span class="n">extra_constraints</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bvweight_and_extra_constraints</span><span class="p">(</span><span class="n">output_mask</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">extra_constraints</span>
+        <span class="n">dw</span> <span class="o">=</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">bv_weight</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_assert_postconditions_decimal_weight</span><span class="p">(</span><span class="n">output_mask</span><span class="p">,</span> <span class="n">dw</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dw</span></div>
+
+<div class="viewcode-block" id="LinearModelBvAdd.num_frac_bits"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvAdd.num_frac_bits">[docs]</a>    <span class="k">def</span> <span class="nf">num_frac_bits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="LinearModelBvAdd.error"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvAdd.error">[docs]</a>    <span class="k">def</span> <span class="nf">error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">0</span></div></div>
+
+
+<div class="viewcode-block" id="LinearModelBvSub"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvSub">[docs]</a><span class="k">class</span> <span class="nc">LinearModelBvSub</span><span class="p">(</span><span class="n">LinearModelBvAdd</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent the `linear.opmodel.OpModel` of `BvSub`.</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.linear.opmodel import LinearModelBvSub</span>
+<span class="sd">        &gt;&gt;&gt; alpha = LinearMask(Constant(0, 4)), LinearMask(Constant(0, 4))</span>
+<span class="sd">        &gt;&gt;&gt; f = LinearModelBvSub(alpha)</span>
+<span class="sd">        &gt;&gt;&gt; print(f.vrepr())</span>
+<span class="sd">        LinearModelBvSub([LinearMask(Constant(0b0000, width=4)), LinearMask(Constant(0b0000, width=4))])</span>
+<span class="sd">        &gt;&gt;&gt; f.max_weight(), f.weight_width(), f.error(), f.num_frac_bits()</span>
+<span class="sd">        (3, 2, 0, 0)</span>
+
+<span class="sd">    The linear model of BvSub` is the same as `LinearModelBvAdd`</span>
+<span class="sd">    since ``~(x - y) == ~x + y`` (and `BvNot` preserves masks).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">op</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvSub</span></div>
+
+
+<div class="viewcode-block" id="LinearModelBvAndCt"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvAndCt">[docs]</a><span class="k">class</span> <span class="nc">LinearModelBvAndCt</span><span class="p">(</span><span class="n">PartialOpModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent the `PartialOpModel` of `BvAnd` by a constant.</span>
+
+<span class="sd">    This class is not meant to be instantiated but to provide a base</span>
+<span class="sd">    class for subclasses generated through `make_partial_op_model`.</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.linear.opmodel import LinearModelBvAndCt, make_partial_op_model</span>
+<span class="sd">        &gt;&gt;&gt; LinearModelBvAndCt_1 = make_partial_op_model(LinearModelBvAndCt, (None, Constant(1, 4)))</span>
+<span class="sd">        &gt;&gt;&gt; alpha = LinearMask(Constant(0, 4))</span>
+<span class="sd">        &gt;&gt;&gt; f = LinearModelBvAndCt_1(alpha)</span>
+<span class="sd">        &gt;&gt;&gt; print(f.vrepr())</span>
+<span class="sd">        make_partial_op_model(LinearModelBvAndCt, (None, Constant(0b0001, width=4)))(LinearMask(Constant(0b0000, width=4)))</span>
+<span class="sd">        &gt;&gt;&gt; f.max_weight(), f.weight_width(), f.error(), f.num_frac_bits()</span>
+<span class="sd">        (0, 1, 0, 0)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">base_op</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvAnd</span>
+    <span class="c1"># op is a set through make_partial_op_model</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ct</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The constant operand.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">constant</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">constant</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="n">constant</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvNot</span><span class="p">(</span><span class="n">constant</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">constant</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="n">constant</span>
+
+<div class="viewcode-block" id="LinearModelBvAndCt.validity_constraint"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvAndCt.validity_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">validity_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_mask</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the validity constraint for a given output `LinearMask`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.opmodel import LinearModelBvAndCt, make_partial_op_model</span>
+<span class="sd">            &gt;&gt;&gt; LinearModelBvAndCt_1 = make_partial_op_model(LinearModelBvAndCt, (None, Constant(1, 4)))</span>
+<span class="sd">            &gt;&gt;&gt; alpha = LinearMask(Constant(0, 4))</span>
+<span class="sd">            &gt;&gt;&gt; f = LinearModelBvAndCt_1(alpha)</span>
+<span class="sd">            &gt;&gt;&gt; beta = LinearMask(Constant(0, 4))</span>
+<span class="sd">            &gt;&gt;&gt; f.validity_constraint(beta)</span>
+<span class="sd">            0b1</span>
+<span class="sd">            &gt;&gt;&gt; a, b = Variable(&quot;a&quot;, 4), Variable(&quot;b&quot;, 4)</span>
+<span class="sd">            &gt;&gt;&gt; alpha = LinearMask(a)</span>
+<span class="sd">            &gt;&gt;&gt; f = LinearModelBvAndCt_1(alpha)</span>
+<span class="sd">            &gt;&gt;&gt; beta = LinearMask(b)</span>
+<span class="sd">            &gt;&gt;&gt; result = f.validity_constraint(beta)</span>
+<span class="sd">            &gt;&gt;&gt; result</span>
+<span class="sd">            a == (b &amp; 0x1)</span>
+<span class="sd">            &gt;&gt;&gt; result.xreplace({a: Constant(0, 4), b: Constant(0, 4)})</span>
+<span class="sd">            0b1</span>
+
+<span class="sd">        See `OpModel.validity_constraint` for more information.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># let f(x) = x &amp; c, and (a,b) n-bit linear approximation</span>
+        <span class="c1"># &lt;a, x&gt; = a &amp; x, ‹f(x), b&gt; = x &amp; (c &amp; b),</span>
+        <span class="c1"># if a == c &amp; b</span>
+        <span class="c1">#   number of x such that &lt;a, x&gt; = ‹f(x), b&gt;? (right inputs)</span>
+        <span class="c1">#   x &amp; a == x &amp; (c &amp; b) for all x</span>
+        <span class="c1">#   2^n/2^n right inputs</span>
+        <span class="c1">#   C(a,b) = |2 x 2^n/2^n=1 - 1| = 1, weight 0</span>
+        <span class="c1"># if a != c &amp; b</span>
+        <span class="c1">#   number of x such that &lt;a, x&gt; = ‹f(x), b&gt;? (right inputs)</span>
+        <span class="c1">#   for 1-bit linear approximation</span>
+        <span class="c1">#       x &amp; 0 and x &amp; 1 are equal in 1/2 inputs (for x=0)</span>
+        <span class="c1">#       1/2 right inputs</span>
+        <span class="c1">#       C(a,b) = |2 x 1/2 - 1| = 0, weight math.inf</span>
+        <span class="c1">#   for 2-bit linear approximation</span>
+        <span class="c1">#       x &amp; 00 and x &amp; 10 are equal in 2/4 inputs (x0=0,x1=*)</span>
+        <span class="c1">#       x &amp; 00 and x &amp; 11 are equal in 2/4 inputs (x0+x1=0 LHS balanced)</span>
+        <span class="c1">#       x &amp; 10 and x &amp; 01 are equal in 2/4 inputs (x0=x1)</span>
+        <span class="c1">#       x &amp; 10 and x &amp; 11 are equal in 2/4 inputs (x0=*,x1=0)</span>
+        <span class="c1">#       2/4 right inputs</span>
+        <span class="c1">#       C(a,b) = |2 x 2/4 - 1| = 0, weight math.inf</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_mask</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">val</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">output_mask</span><span class="o">.</span><span class="n">val</span>
+        <span class="n">ct</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ct</span>
+        <span class="k">return</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvComp</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">&amp;</span> <span class="n">ct</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LinearModelBvAndCt.pr_one_constraint"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvAndCt.pr_one_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">pr_one_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_mask</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the probability-one constraint for a given output `LinearMask`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.opmodel import LinearModelBvAndCt, make_partial_op_model</span>
+<span class="sd">            &gt;&gt;&gt; LinearModelBvAndCt_1 = make_partial_op_model(LinearModelBvAndCt, (None, Constant(1, 4)))</span>
+<span class="sd">            &gt;&gt;&gt; alpha = LinearMask(Constant(0, 4))</span>
+<span class="sd">            &gt;&gt;&gt; f = LinearModelBvAndCt_1(alpha)</span>
+<span class="sd">            &gt;&gt;&gt; f.pr_one_constraint(LinearMask(Constant(0, 4)))</span>
+<span class="sd">            0b1</span>
+
+<span class="sd">        See `abstractproperty.opmodel.OpModel.pr_one_constraint` for more information.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">validity_constraint</span><span class="p">(</span><span class="n">output_mask</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LinearModelBvAndCt.bv_weight"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvAndCt.bv_weight">[docs]</a>    <span class="k">def</span> <span class="nf">bv_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_mask</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the bit-vector weight for a given output `LinearMask`.</span>
+
+<span class="sd">        For `LinearModelBvAndCt`, any valid linear approximation has weight 0.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LinearModelBvAndCt.weight_constraint"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvAndCt.weight_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">weight_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_mask</span><span class="p">,</span> <span class="n">weight_variable</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the weight constraint for a given output `LinearMask` and weight `Variable`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.opmodel import LinearModelBvAndCt, make_partial_op_model</span>
+<span class="sd">            &gt;&gt;&gt; LinearModelBvAndCt_1 = make_partial_op_model(LinearModelBvAndCt, (None, Constant(1, 4)))</span>
+<span class="sd">            &gt;&gt;&gt; n = 4</span>
+<span class="sd">            &gt;&gt;&gt; alpha = LinearMask(Variable(&quot;a0&quot;, n))</span>
+<span class="sd">            &gt;&gt;&gt; f = LinearModelBvAndCt_1(alpha)</span>
+<span class="sd">            &gt;&gt;&gt; w = Variable(&quot;w&quot;, f.weight_width())</span>
+<span class="sd">            &gt;&gt;&gt; f.weight_constraint(LinearMask(Variable(&quot;b&quot;, n)), w)</span>
+<span class="sd">            w == 0b0</span>
+
+<span class="sd">        See `OpModel.weight_constraint` for more information.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">weight_constraint</span><span class="p">(</span><span class="n">output_mask</span><span class="p">,</span> <span class="n">weight_variable</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LinearModelBvAndCt.max_weight"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvAndCt.max_weight">[docs]</a>    <span class="k">def</span> <span class="nf">max_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="LinearModelBvAndCt.weight_width"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvAndCt.weight_width">[docs]</a>    <span class="k">def</span> <span class="nf">weight_width</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="LinearModelBvAndCt.decimal_weight"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvAndCt.decimal_weight">[docs]</a>    <span class="k">def</span> <span class="nf">decimal_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_mask</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_assert_preconditions_decimal_weight</span><span class="p">(</span><span class="n">output_mask</span><span class="p">)</span>
+        <span class="n">dw</span> <span class="o">=</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bv_weight</span><span class="p">(</span><span class="n">output_mask</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_assert_postconditions_decimal_weight</span><span class="p">(</span><span class="n">output_mask</span><span class="p">,</span> <span class="n">dw</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dw</span></div>
+
+<div class="viewcode-block" id="LinearModelBvAndCt.num_frac_bits"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvAndCt.num_frac_bits">[docs]</a>    <span class="k">def</span> <span class="nf">num_frac_bits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="LinearModelBvAndCt.error"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvAndCt.error">[docs]</a>    <span class="k">def</span> <span class="nf">error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">0</span></div></div>
+
+
+<div class="viewcode-block" id="LinearModelBvOrCt"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvOrCt">[docs]</a><span class="k">class</span> <span class="nc">LinearModelBvOrCt</span><span class="p">(</span><span class="n">LinearModelBvAndCt</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent the `PartialOpModel` of `BvOr` by a constant.</span>
+
+<span class="sd">    This class is not meant to be instantiated but to provide a base</span>
+<span class="sd">    class for subclasses generated through `make_partial_op_model`.</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.linear.opmodel import LinearModelBvOrCt, make_partial_op_model</span>
+<span class="sd">        &gt;&gt;&gt; LinearModelBvOrCt_1 = make_partial_op_model(LinearModelBvOrCt, (None, Constant(1, 4)))</span>
+<span class="sd">        &gt;&gt;&gt; alpha = LinearMask(Constant(0, 4))</span>
+<span class="sd">        &gt;&gt;&gt; f = LinearModelBvOrCt_1(alpha)</span>
+<span class="sd">        &gt;&gt;&gt; print(f.vrepr())</span>
+<span class="sd">        make_partial_op_model(LinearModelBvOrCt, (None, Constant(0b0001, width=4)))(LinearMask(Constant(0b0000, width=4)))</span>
+<span class="sd">        &gt;&gt;&gt; f.max_weight(), f.weight_width(), f.error(), f.num_frac_bits()</span>
+<span class="sd">        (0, 1, 0, 0)</span>
+
+<span class="sd">    The partial linear model of BvOr` is similar as `LinearModelBvAndCt`</span>
+<span class="sd">    since ``~(x &amp; ct) == ~x | ~ct``. Since `BvNot` preserves masks,</span>
+<span class="sd">    the only difference is that the constant is negated.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">base_op</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvOr</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ct</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The constant operand (negated to reuse `LinearModelBvAndCt`).&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">constant</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">constant</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="n">constant</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">constant</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">constant</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="o">~</span><span class="n">constant</span></div>
+
+
+<div class="viewcode-block" id="LinearModelBvShlCt"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvShlCt">[docs]</a><span class="k">class</span> <span class="nc">LinearModelBvShlCt</span><span class="p">(</span><span class="n">PartialOpModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent the `PartialOpModel` of `BvShl` by a constant.</span>
+
+<span class="sd">    This class is not meant to be instantiated but to provide a base</span>
+<span class="sd">    class for subclasses generated through `make_partial_op_model`.</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.linear.opmodel import LinearModelBvShlCt, make_partial_op_model</span>
+<span class="sd">        &gt;&gt;&gt; LinearModelBvShlCt_1 = make_partial_op_model(LinearModelBvShlCt, (None, Constant(1, 4)))</span>
+<span class="sd">        &gt;&gt;&gt; alpha = LinearMask(Constant(0, 4))</span>
+<span class="sd">        &gt;&gt;&gt; f = LinearModelBvShlCt_1(alpha)</span>
+<span class="sd">        &gt;&gt;&gt; print(f.vrepr())</span>
+<span class="sd">        make_partial_op_model(LinearModelBvShlCt, (None, Constant(0b0001, width=4)))(LinearMask(Constant(0b0000, width=4)))</span>
+<span class="sd">        &gt;&gt;&gt; f.max_weight(), f.weight_width(), f.error(), f.num_frac_bits()</span>
+<span class="sd">        (0, 1, 0, 0)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">base_op</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvShl</span>
+    <span class="c1"># op is a set through make_partial_op_model</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_mask</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">op</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> need to be given to make_partial_op_model&quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot; to get the OpModel for the particular fixed operand&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> only supports the 2nd operand fixed&quot;</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">input_mask</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ct</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The constant operand.&quot;&quot;&quot;</span>
+        <span class="n">constant</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="n">constant</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">constant</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">constant</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="n">constant</span>
+
+<div class="viewcode-block" id="LinearModelBvShlCt.validity_constraint"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvShlCt.validity_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">validity_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_mask</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the validity constraint for a given output `LinearMask`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.opmodel import LinearModelBvShlCt, make_partial_op_model</span>
+<span class="sd">            &gt;&gt;&gt; LinearModelBvShlCt_1 = make_partial_op_model(LinearModelBvShlCt, (None, Constant(1, 4)))</span>
+<span class="sd">            &gt;&gt;&gt; alpha = LinearMask(Constant(0, 4))</span>
+<span class="sd">            &gt;&gt;&gt; f = LinearModelBvShlCt_1(alpha)</span>
+<span class="sd">            &gt;&gt;&gt; beta = LinearMask(Constant(0, 4))</span>
+<span class="sd">            &gt;&gt;&gt; f.validity_constraint(beta)</span>
+<span class="sd">            0b1</span>
+<span class="sd">            &gt;&gt;&gt; a, b = Variable(&quot;a&quot;, 4), Variable(&quot;b&quot;, 4)</span>
+<span class="sd">            &gt;&gt;&gt; alpha = LinearMask(a)</span>
+<span class="sd">            &gt;&gt;&gt; f = LinearModelBvShlCt_1(alpha)</span>
+<span class="sd">            &gt;&gt;&gt; beta = LinearMask(b)</span>
+<span class="sd">            &gt;&gt;&gt; result = f.validity_constraint(beta)</span>
+<span class="sd">            &gt;&gt;&gt; result</span>
+<span class="sd">            (b &gt;&gt; 0x1) == a</span>
+<span class="sd">            &gt;&gt;&gt; result.xreplace({a: Constant(0, 4), b: Constant(0, 4)})</span>
+<span class="sd">            0b1</span>
+
+<span class="sd">        See `OpModel.validity_constraint` for more information.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># BvShl is a linear operation</span>
+        <span class="c1"># Examples:</span>
+        <span class="c1"># 3-bit, (left shift) BvShl by 1,</span>
+        <span class="c1">#   BvShl(0bx2x1x0) = 0bx1x0_0, thus BvShl([x0, x1, x2]) = [0, x0, x1]</span>
+        <span class="c1">#   M = [0 0 0], M^T =  [0 1 0]</span>
+        <span class="c1">#       [1 0 0],        [0 0 1]</span>
+        <span class="c1">#       [0 1 0]         [0 0 0]</span>
+        <span class="c1">#   (a0,a1,a2) = M^T (b0,b1,b2) = (b1, b2, 0) = 0b_0b2b1 = BvLshr_1(0bb2b1b0) = ([b0,b1,b2])</span>
+        <span class="c1"># 3-bit, (left shift) BvShl by 2,</span>
+        <span class="c1">#   BvShl(0bx2x1x0) = 0bx0_0_0, thus BvShl([x0, x1, x2]) = [0, 0, x0]</span>
+        <span class="c1">#   M = [0 0 0], M^T =  [0 0 1]</span>
+        <span class="c1">#       [0 0 0],        [0 0 0]</span>
+        <span class="c1">#       [1 0 0]         [0 0 0]</span>
+        <span class="c1">#   (a0,a1,a2) = M^T (b0,b1,b2) = (b2, 0, 0) = 0b_0_0b2 = BvLshr_2(0bb2b1b0) = ([b0,b1,b2])</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_mask</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">val</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">output_mask</span><span class="o">.</span><span class="n">val</span>
+        <span class="n">ct</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ct</span>
+        <span class="k">return</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvComp</span><span class="p">(</span><span class="n">operation</span><span class="o">.</span><span class="n">BvLshr</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">ct</span><span class="p">),</span> <span class="n">a</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LinearModelBvShlCt.pr_one_constraint"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvShlCt.pr_one_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">pr_one_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_mask</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the probability-one constraint for a given output `LinearMask`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.opmodel import LinearModelBvShlCt, make_partial_op_model</span>
+<span class="sd">            &gt;&gt;&gt; LinearModelBvShlCt_1 = make_partial_op_model(LinearModelBvShlCt, (None, Constant(1, 4)))</span>
+<span class="sd">            &gt;&gt;&gt; alpha = LinearMask(Constant(0, 4))</span>
+<span class="sd">            &gt;&gt;&gt; f = LinearModelBvShlCt_1(alpha)</span>
+<span class="sd">            &gt;&gt;&gt; f.pr_one_constraint(LinearMask(Constant(0, 4)))</span>
+<span class="sd">            0b1</span>
+
+<span class="sd">        See `abstractproperty.opmodel.OpModel.pr_one_constraint` for more information.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">validity_constraint</span><span class="p">(</span><span class="n">output_mask</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LinearModelBvShlCt.bv_weight"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvShlCt.bv_weight">[docs]</a>    <span class="k">def</span> <span class="nf">bv_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_mask</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the bit-vector weight for a given output `LinearMask`.</span>
+
+<span class="sd">        For `LinearModelBvShlCt`, any valid linear approximation has weight 0.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LinearModelBvShlCt.weight_constraint"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvShlCt.weight_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">weight_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_mask</span><span class="p">,</span> <span class="n">weight_variable</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the weight constraint for a given output `LinearMask` and weight `Variable`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.opmodel import LinearModelBvShlCt, make_partial_op_model</span>
+<span class="sd">            &gt;&gt;&gt; LinearModelBvShlCt_1 = make_partial_op_model(LinearModelBvShlCt, (None, Constant(1, 4)))</span>
+<span class="sd">            &gt;&gt;&gt; n = 4</span>
+<span class="sd">            &gt;&gt;&gt; alpha = LinearMask(Variable(&quot;a0&quot;, n))</span>
+<span class="sd">            &gt;&gt;&gt; f = LinearModelBvShlCt_1(alpha)</span>
+<span class="sd">            &gt;&gt;&gt; w = Variable(&quot;w&quot;, f.weight_width())</span>
+<span class="sd">            &gt;&gt;&gt; f.weight_constraint(LinearMask(Variable(&quot;b&quot;, n)), w)</span>
+<span class="sd">            w == 0b0</span>
+
+<span class="sd">        See `OpModel.weight_constraint` for more information.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">weight_constraint</span><span class="p">(</span><span class="n">output_mask</span><span class="p">,</span> <span class="n">weight_variable</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LinearModelBvShlCt.max_weight"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvShlCt.max_weight">[docs]</a>    <span class="k">def</span> <span class="nf">max_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="LinearModelBvShlCt.weight_width"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvShlCt.weight_width">[docs]</a>    <span class="k">def</span> <span class="nf">weight_width</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="LinearModelBvShlCt.decimal_weight"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvShlCt.decimal_weight">[docs]</a>    <span class="k">def</span> <span class="nf">decimal_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_mask</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_assert_preconditions_decimal_weight</span><span class="p">(</span><span class="n">output_mask</span><span class="p">)</span>
+        <span class="n">dw</span> <span class="o">=</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bv_weight</span><span class="p">(</span><span class="n">output_mask</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_assert_postconditions_decimal_weight</span><span class="p">(</span><span class="n">output_mask</span><span class="p">,</span> <span class="n">dw</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dw</span></div>
+
+<div class="viewcode-block" id="LinearModelBvShlCt.num_frac_bits"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvShlCt.num_frac_bits">[docs]</a>    <span class="k">def</span> <span class="nf">num_frac_bits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="LinearModelBvShlCt.error"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvShlCt.error">[docs]</a>    <span class="k">def</span> <span class="nf">error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">0</span></div></div>
+
+
+<div class="viewcode-block" id="LinearModelBvLshrCt"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvLshrCt">[docs]</a><span class="k">class</span> <span class="nc">LinearModelBvLshrCt</span><span class="p">(</span><span class="n">LinearModelBvShlCt</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent the `PartialOpModel` of `BvLshr` by a constant.</span>
+
+<span class="sd">    This class is not meant to be instantiated but to provide a base</span>
+<span class="sd">    class for subclasses generated through `make_partial_op_model`.</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.linear.opmodel import LinearModelBvLshrCt, make_partial_op_model</span>
+<span class="sd">        &gt;&gt;&gt; LinearModelBvLshrCt_1 = make_partial_op_model(LinearModelBvLshrCt, (None, Constant(1, 4)))</span>
+<span class="sd">        &gt;&gt;&gt; alpha = LinearMask(Constant(0, 4))</span>
+<span class="sd">        &gt;&gt;&gt; f = LinearModelBvLshrCt_1(alpha)</span>
+<span class="sd">        &gt;&gt;&gt; print(f.vrepr())</span>
+<span class="sd">        make_partial_op_model(LinearModelBvLshrCt, (None, Constant(0b0001, width=4)))(LinearMask(Constant(0b0000, width=4)))</span>
+<span class="sd">        &gt;&gt;&gt; f.max_weight(), f.weight_width(), f.error(), f.num_frac_bits()</span>
+<span class="sd">        (0, 1, 0, 0)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">base_op</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvLshr</span>
+
+<div class="viewcode-block" id="LinearModelBvLshrCt.validity_constraint"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvLshrCt.validity_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">validity_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_mask</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the validity constraint for a given output `LinearMask`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.opmodel import LinearModelBvLshrCt, make_partial_op_model</span>
+<span class="sd">            &gt;&gt;&gt; LinearModelBvLshrCt_1 = make_partial_op_model(LinearModelBvLshrCt, (None, Constant(1, 4)))</span>
+<span class="sd">            &gt;&gt;&gt; alpha = LinearMask(Constant(0, 4))</span>
+<span class="sd">            &gt;&gt;&gt; f = LinearModelBvLshrCt_1(alpha)</span>
+<span class="sd">            &gt;&gt;&gt; beta = LinearMask(Constant(0, 4))</span>
+<span class="sd">            &gt;&gt;&gt; f.validity_constraint(beta)</span>
+<span class="sd">            0b1</span>
+<span class="sd">            &gt;&gt;&gt; a, b = Variable(&quot;a&quot;, 4), Variable(&quot;b&quot;, 4)</span>
+<span class="sd">            &gt;&gt;&gt; alpha = LinearMask(a)</span>
+<span class="sd">            &gt;&gt;&gt; f = LinearModelBvLshrCt_1(alpha)</span>
+<span class="sd">            &gt;&gt;&gt; beta = LinearMask(b)</span>
+<span class="sd">            &gt;&gt;&gt; result = f.validity_constraint(beta)</span>
+<span class="sd">            &gt;&gt;&gt; result</span>
+<span class="sd">            (b &lt;&lt; 0x1) == a</span>
+<span class="sd">            &gt;&gt;&gt; result.xreplace({a: Constant(0, 4), b: Constant(0, 4)})</span>
+<span class="sd">            0b1</span>
+
+<span class="sd">        See `OpModel.validity_constraint` for more information.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_mask</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">val</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">output_mask</span><span class="o">.</span><span class="n">val</span>
+        <span class="n">ct</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ct</span>
+        <span class="k">return</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvComp</span><span class="p">(</span><span class="n">operation</span><span class="o">.</span><span class="n">BvShl</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">ct</span><span class="p">),</span> <span class="n">a</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="LinearModelExtractCt"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelExtractCt">[docs]</a><span class="k">class</span> <span class="nc">LinearModelExtractCt</span><span class="p">(</span><span class="n">PartialOpModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent the `PartialOpModel` of `Extract` with fixed indices.</span>
+
+<span class="sd">    This class is not meant to be instantiated but to provide a base</span>
+<span class="sd">    class for subclasses generated through `make_partial_op_model`.</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.linear.opmodel import LinearModelExtractCt, make_partial_op_model</span>
+<span class="sd">        &gt;&gt;&gt; LinearModelExtractCt_21 = make_partial_op_model(LinearModelExtractCt, (None, 2, 1))</span>
+<span class="sd">        &gt;&gt;&gt; alpha = LinearMask(Constant(0, 4))</span>
+<span class="sd">        &gt;&gt;&gt; f = LinearModelExtractCt_21(alpha)</span>
+<span class="sd">        &gt;&gt;&gt; print(f.vrepr())</span>
+<span class="sd">        make_partial_op_model(LinearModelExtractCt, (None, 2, 1))(LinearMask(Constant(0b0000, width=4)))</span>
+<span class="sd">        &gt;&gt;&gt; f.max_weight(), f.weight_width(), f.error(), f.num_frac_bits()</span>
+<span class="sd">        (0, 1, 0, 0)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">base_op</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">Extract</span>
+    <span class="c1"># op is a set through make_partial_op_model</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_mask</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">op</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> need to be given to make_partial_op_model&quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot; to get the OpModel for the particular fixed operand&quot;</span><span class="p">)</span>
+        <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">i</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">j</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> only supports the 2nd and 3rd operands fixed&quot;</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">input_mask</span><span class="p">)</span>
+
+<div class="viewcode-block" id="LinearModelExtractCt.validity_constraint"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelExtractCt.validity_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">validity_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_mask</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the validity constraint for a given output `LinearMask`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.opmodel import LinearModelExtractCt, make_partial_op_model</span>
+<span class="sd">            &gt;&gt;&gt; LinearModelExtractCt_21 = make_partial_op_model(LinearModelExtractCt, (None, 2, 1))</span>
+<span class="sd">            &gt;&gt;&gt; alpha = LinearMask(Constant(0, 4))</span>
+<span class="sd">            &gt;&gt;&gt; f = LinearModelExtractCt_21(alpha)</span>
+<span class="sd">            &gt;&gt;&gt; beta = LinearMask(Constant(0, 2))</span>
+<span class="sd">            &gt;&gt;&gt; f.validity_constraint(beta)</span>
+<span class="sd">            0b1</span>
+<span class="sd">            &gt;&gt;&gt; a, b = Variable(&quot;a&quot;, 4), Variable(&quot;b&quot;, 2)</span>
+<span class="sd">            &gt;&gt;&gt; alpha = LinearMask(a)</span>
+<span class="sd">            &gt;&gt;&gt; f = LinearModelExtractCt_21(alpha)</span>
+<span class="sd">            &gt;&gt;&gt; beta = LinearMask(b)</span>
+<span class="sd">            &gt;&gt;&gt; result = f.validity_constraint(beta)</span>
+<span class="sd">            &gt;&gt;&gt; result</span>
+<span class="sd">            a == (0b0 :: b :: 0b0)</span>
+<span class="sd">            &gt;&gt;&gt; result.xreplace({a: Constant(0, 4), b: Constant(0, 2)})</span>
+<span class="sd">            0b1</span>
+
+<span class="sd">        See `OpModel.validity_constraint` for more information.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_mask</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">val</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">output_mask</span><span class="o">.</span><span class="n">val</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">width</span>
+        <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+        <span class="k">assert</span> <span class="n">output_mask</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">width</span> <span class="o">==</span> <span class="n">i</span> <span class="o">-</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="c1"># 3-bit, Extract 2nd bit</span>
+        <span class="c1">#   M = [0 1 0], (a0,a1,a2) = M^T b0 = (0,b0,0)</span>
+
+        <span class="n">m_t_b</span> <span class="o">=</span> <span class="n">b</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">m_t_b</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">Concat</span><span class="p">(</span><span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">i</span><span class="p">),</span> <span class="n">m_t_b</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">j</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">m_t_b</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">Concat</span><span class="p">(</span><span class="n">m_t_b</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">j</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvComp</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">m_t_b</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LinearModelExtractCt.pr_one_constraint"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelExtractCt.pr_one_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">pr_one_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_mask</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the probability-one constraint for a given output `LinearMask`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.opmodel import LinearModelExtractCt, make_partial_op_model</span>
+<span class="sd">            &gt;&gt;&gt; LinearModelExtractCt_21 = make_partial_op_model(LinearModelExtractCt, (None, 2, 1))</span>
+<span class="sd">            &gt;&gt;&gt; alpha = LinearMask(Constant(0, 4))</span>
+<span class="sd">            &gt;&gt;&gt; f = LinearModelExtractCt_21(alpha)</span>
+<span class="sd">            &gt;&gt;&gt; f.pr_one_constraint(LinearMask(Constant(0, 2)))</span>
+<span class="sd">            0b1</span>
+
+<span class="sd">        See `abstractproperty.opmodel.OpModel.pr_one_constraint` for more information.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">validity_constraint</span><span class="p">(</span><span class="n">output_mask</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LinearModelExtractCt.bv_weight"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelExtractCt.bv_weight">[docs]</a>    <span class="k">def</span> <span class="nf">bv_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_mask</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the bit-vector weight for a given output `LinearMask`.</span>
+
+<span class="sd">        For `LinearModelBvShlCt`, any valid linear approximation has weight 0.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">output_mask</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">width</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LinearModelExtractCt.weight_constraint"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelExtractCt.weight_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">weight_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_mask</span><span class="p">,</span> <span class="n">weight_variable</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the weight constraint for a given output `LinearMask` and weight `Variable`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.opmodel import LinearModelBvShlCt, make_partial_op_model</span>
+<span class="sd">            &gt;&gt;&gt; LinearModelExtractCt_21 = make_partial_op_model(LinearModelExtractCt, (None, 2, 1))</span>
+<span class="sd">            &gt;&gt;&gt; n = 4</span>
+<span class="sd">            &gt;&gt;&gt; alpha = LinearMask(Variable(&quot;a0&quot;, n))</span>
+<span class="sd">            &gt;&gt;&gt; f = LinearModelExtractCt_21(alpha)</span>
+<span class="sd">            &gt;&gt;&gt; w = Variable(&quot;w&quot;, f.weight_width())</span>
+<span class="sd">            &gt;&gt;&gt; f.weight_constraint(LinearMask(Variable(&quot;b&quot;, 2)), w)</span>
+<span class="sd">            w == 0b0</span>
+
+<span class="sd">        See `OpModel.weight_constraint` for more information.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">output_mask</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">width</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">weight_constraint</span><span class="p">(</span><span class="n">output_mask</span><span class="p">,</span> <span class="n">weight_variable</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LinearModelExtractCt.max_weight"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelExtractCt.max_weight">[docs]</a>    <span class="k">def</span> <span class="nf">max_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="LinearModelExtractCt.weight_width"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelExtractCt.weight_width">[docs]</a>    <span class="k">def</span> <span class="nf">weight_width</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="LinearModelExtractCt.decimal_weight"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelExtractCt.decimal_weight">[docs]</a>    <span class="k">def</span> <span class="nf">decimal_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_mask</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="n">output_mask</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">width</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_assert_preconditions_decimal_weight</span><span class="p">(</span><span class="n">output_mask</span><span class="p">)</span>
+        <span class="n">dw</span> <span class="o">=</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bv_weight</span><span class="p">(</span><span class="n">output_mask</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_assert_postconditions_decimal_weight</span><span class="p">(</span><span class="n">output_mask</span><span class="p">,</span> <span class="n">dw</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dw</span></div>
+
+<div class="viewcode-block" id="LinearModelExtractCt.num_frac_bits"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelExtractCt.num_frac_bits">[docs]</a>    <span class="k">def</span> <span class="nf">num_frac_bits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="LinearModelExtractCt.error"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelExtractCt.error">[docs]</a>    <span class="k">def</span> <span class="nf">error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">0</span></div></div>
+
+
+<span class="c1"># --------------------------</span>
+
+
+<div class="viewcode-block" id="get_weak_model"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.get_weak_model">[docs]</a><span class="nd">@functools</span><span class="o">.</span><span class="n">lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>  <span class="c1"># temporary hack to create singletons</span>
+<span class="k">def</span> <span class="nf">get_weak_model</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">nonzero2nonzero_weight</span><span class="p">,</span> <span class="n">zero2nonzero_weight</span><span class="o">=</span><span class="n">math</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the weak model of the given bit-vector operation ``op``.</span>
+
+<span class="sd">    Given the `SecondaryOperation` ``op``, return the</span>
+<span class="sd">    `WeakModel` of ``op`` with given class attributes</span>
+<span class="sd">    ``nonzero2nonzero_weight``, ``zero2nonzero_weight`` and  ``precision``</span>
+<span class="sd">    (see `WeakModel`).</span>
+<span class="sd">    The attribute ``nonzero2zero_weight`` is set to ``math.inf``,</span>
+<span class="sd">    and the attribute ``zero2zero_weight`` is set to 0.</span>
+
+<span class="sd">    The returned model is a subclass of `WeakModel` and `OpModel`.</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">        To link the returned model ``MyModel`` to ``op``</span>
+<span class="sd">        such that ``MyModel`` is used in ``propagate``,</span>
+<span class="sd">        set the ``linear_model`` attribute of ``op``</span>
+<span class="sd">        to ``MyModel`` (e.g., ``op.linear_model = MyModel``).</span>
+<span class="sd">        See also  `linear.mask.LinearMask.propagate`.</span>
+
+<span class="sd">    ::</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.secondaryop import LutOperation</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.linear.opmodel import get_weak_model</span>
+<span class="sd">        &gt;&gt;&gt; class MyLut(LutOperation): pass  # a 2-bit function</span>
+<span class="sd">        &gt;&gt;&gt; LinearWeakModelMyLut = get_weak_model(MyLut, 1, zero2nonzero_weight=2)</span>
+<span class="sd">        &gt;&gt;&gt; alpha, beta = LinearMask(Variable(&quot;a&quot;, 2)), LinearMask(Variable(&quot;b&quot;, 2))</span>
+<span class="sd">        &gt;&gt;&gt; f = LinearWeakModelMyLut(alpha)</span>
+<span class="sd">        &gt;&gt;&gt; print(f.vrepr())</span>
+<span class="sd">        LinearWeakModelMyLut(LinearMask(Variable(&#39;a&#39;, width=2)))</span>
+<span class="sd">        &gt;&gt;&gt; f.validity_constraint(beta)</span>
+<span class="sd">        (((a == 0b00) &amp; (b == 0b00)) == 0b1) | (((a == 0b00) &amp; ~(b == 0b00)) == 0b1) | ((~(a == 0b00) &amp; ~(b == 0b00)) == 0b1)</span>
+<span class="sd">        &gt;&gt;&gt; f.bv_weight(beta)</span>
+<span class="sd">        Ite(((a == 0b00) &amp; (b == 0b00)) == 0b1, 0b00, Ite(((a == 0b00) &amp; ~(b == 0b00)) == 0b1, 0b10, 0b01))</span>
+<span class="sd">        &gt;&gt;&gt; f.max_weight(), f.weight_width(), f.error(), f.num_frac_bits()</span>
+<span class="sd">        (2, 2, 0, 0)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">operation</span><span class="o">.</span><span class="n">SecondaryOperation</span><span class="p">)</span>
+
+    <span class="n">_op</span> <span class="o">=</span> <span class="n">op</span>
+    <span class="n">_nonzero2nonzero_weight</span> <span class="o">=</span> <span class="n">nonzero2nonzero_weight</span>
+    <span class="n">_zero2nonzero_weight</span> <span class="o">=</span> <span class="n">zero2nonzero_weight</span>
+    <span class="n">_precision</span> <span class="o">=</span> <span class="n">precision</span>
+
+    <span class="k">class</span> <span class="nc">MyWeakModel</span><span class="p">(</span><span class="n">abstractproperty</span><span class="o">.</span><span class="n">opmodel</span><span class="o">.</span><span class="n">WeakModel</span><span class="p">,</span> <span class="n">OpModel</span><span class="p">):</span>
+        <span class="n">op</span> <span class="o">=</span> <span class="n">_op</span>
+        <span class="n">zero2zero_weight</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">nonzero2nonzero_weight</span> <span class="o">=</span> <span class="n">_nonzero2nonzero_weight</span>
+        <span class="n">zero2nonzero_weight</span> <span class="o">=</span> <span class="n">_zero2nonzero_weight</span>
+        <span class="n">nonzero2zero_weight</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">inf</span>  <span class="c1"># for Pr. 1 hulls, an output propagates back to a unique input</span>
+        <span class="n">precision</span> <span class="o">=</span> <span class="n">_precision</span>
+
+        <span class="c1"># def error(self):  # maximum weight of a hull with n-bit input is n - 1</span>
+        <span class="c1">#     return sum(p.val.width for p in self.input_prop) - 1</span>
+
+    <span class="n">MyWeakModel</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Linear</span><span class="si">{</span><span class="n">abstractproperty</span><span class="o">.</span><span class="n">opmodel</span><span class="o">.</span><span class="n">WeakModel</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}{</span><span class="n">op</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">return</span> <span class="n">MyWeakModel</span></div>
+
+
+<div class="viewcode-block" id="get_branch_number_model"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.get_branch_number_model">[docs]</a><span class="nd">@functools</span><span class="o">.</span><span class="n">lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">get_branch_number_model</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">output_widths</span><span class="p">,</span> <span class="n">branch_number</span><span class="p">,</span> <span class="n">nonzero2nonzero_weight</span><span class="p">,</span>
+                            <span class="n">zero2nonzero_weight</span><span class="o">=</span><span class="n">math</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the branch-number model of the given bit-vector operation ``op``.</span>
+
+<span class="sd">    Given the `SecondaryOperation` ``op``, return the</span>
+<span class="sd">    `BranchNumberModel` of ``op`` with given class attributes</span>
+<span class="sd">    ``output_widths`` (given as a `tuple`),</span>
+<span class="sd">    `branch_number`, ``nonzero2nonzero_weight``,</span>
+<span class="sd">    ``zero2nonzero_weight`` and  ``precision`` (see `BranchNumberModel`).</span>
+<span class="sd">    The attribute ``nonzero2zero_weight`` is set to ``math.inf``,</span>
+<span class="sd">    and the attribute ``zero2zero_weight`` is set to 0.</span>
+
+<span class="sd">    The returned model is a subclass of `BranchNumberModel` and `OpModel`.</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">        To link the returned model ``MyModel`` to ``op``</span>
+<span class="sd">        such that ``MyModel`` is used in ``propagate``,</span>
+<span class="sd">        set the ``linear_model`` attribute of ``op``</span>
+<span class="sd">        to ``MyModel`` (e.g., ``op.linear_model = MyModel``).</span>
+<span class="sd">        See also  `linear.mask.LinearMask.propagate`.</span>
+
+<span class="sd">    ::</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.secondaryop import MatrixOperation</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.printing import BvWrapPrinter</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.linear.opmodel import get_branch_number_model</span>
+<span class="sd">        &gt;&gt;&gt; class MyMatrix(MatrixOperation): pass  # a (2,3) binary matrix</span>
+<span class="sd">        &gt;&gt;&gt; LinearBranchNumberModelMyMatrix = get_branch_number_model(</span>
+<span class="sd">        ...     MyMatrix, (1, 1), 2, decimal.Decimal(1.5), precision=2)</span>
+<span class="sd">        &gt;&gt;&gt; alpha, beta = LinearMask(Variable(&quot;a&quot;, 3)), LinearMask(Variable(&quot;b&quot;, 2))</span>
+<span class="sd">        &gt;&gt;&gt; f = LinearBranchNumberModelMyMatrix(alpha)</span>
+<span class="sd">        &gt;&gt;&gt; print(f.vrepr())</span>
+<span class="sd">        LinearBranchNumberModelMyMatrix(LinearMask(Variable(&#39;a&#39;, width=3)))</span>
+<span class="sd">        &gt;&gt;&gt; print(BvWrapPrinter().doprint(f.validity_constraint(beta)))</span>
+<span class="sd">        BvOr(((a == 0b000) &amp; (b == 0b00)) == 0b1,</span>
+<span class="sd">             BvAnd((~(a == 0b000) &amp; ~(b == 0b00)) == 0b1,</span>
+<span class="sd">                   ((0b0 :: ~(a == 0b000)) + (0b0 :: (b[0])) + (0b0 :: (b[1]))) &gt;= 0b10</span>
+<span class="sd">             )</span>
+<span class="sd">        )</span>
+<span class="sd">        &gt;&gt;&gt; f.bv_weight(beta)</span>
+<span class="sd">        Ite(((a == 0b000) &amp; (b == 0b00)) == 0b1, 0b000, 0b110)</span>
+<span class="sd">        &gt;&gt;&gt; f.max_weight(), f.weight_width(), f.error(), f.num_frac_bits()</span>
+<span class="sd">        (6, 3, 0, 2)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">operation</span><span class="o">.</span><span class="n">SecondaryOperation</span><span class="p">)</span>
+
+    <span class="n">_op</span> <span class="o">=</span> <span class="n">op</span>
+    <span class="n">_branch_number</span><span class="p">,</span> <span class="n">_output_widths</span> <span class="o">=</span> <span class="n">branch_number</span><span class="p">,</span> <span class="n">output_widths</span>
+    <span class="n">_nonzero2nonzero_weight</span> <span class="o">=</span> <span class="n">nonzero2nonzero_weight</span>
+    <span class="n">_zero2nonzero_weight</span> <span class="o">=</span> <span class="n">zero2nonzero_weight</span>
+    <span class="n">_precision</span> <span class="o">=</span> <span class="n">precision</span>
+
+    <span class="k">class</span> <span class="nc">MyBranchNumberModel</span><span class="p">(</span><span class="n">abstractproperty</span><span class="o">.</span><span class="n">opmodel</span><span class="o">.</span><span class="n">BranchNumberModel</span><span class="p">,</span> <span class="n">OpModel</span><span class="p">):</span>
+        <span class="n">op</span> <span class="o">=</span> <span class="n">_op</span>
+        <span class="n">branch_number</span><span class="p">,</span> <span class="n">output_widths</span> <span class="o">=</span> <span class="n">_branch_number</span><span class="p">,</span> <span class="n">_output_widths</span>
+        <span class="n">zero2zero_weight</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">nonzero2nonzero_weight</span> <span class="o">=</span> <span class="n">_nonzero2nonzero_weight</span>
+        <span class="n">zero2nonzero_weight</span> <span class="o">=</span> <span class="n">_zero2nonzero_weight</span>
+        <span class="n">nonzero2zero_weight</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">inf</span>  <span class="c1"># for Pr. 1 hulls, an output propagates back to a unique input</span>
+        <span class="n">precision</span> <span class="o">=</span> <span class="n">_precision</span>
+
+    <span class="n">MyBranchNumberModel</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Linear</span><span class="si">{</span><span class="n">abstractproperty</span><span class="o">.</span><span class="n">opmodel</span><span class="o">.</span><span class="n">BranchNumberModel</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}{</span><span class="n">op</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">return</span> <span class="n">MyBranchNumberModel</span></div>
+
+
+<div class="viewcode-block" id="get_wdt_model"><a class="viewcode-back" href="../../../cascada.linear.opmodel.html#cascada.linear.opmodel.get_wdt_model">[docs]</a><span class="nd">@functools</span><span class="o">.</span><span class="n">lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">get_wdt_model</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">weight_distribution_table</span><span class="p">,</span> <span class="n">loop_rows_then_columns</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the WDT-based model of the given bit-vector operation ``op``.</span>
+
+<span class="sd">    Given the `Operation` ``op``, return the `WDTModel`</span>
+<span class="sd">    of ``op`` with given class attributes ``weight_distribution_table``</span>
+<span class="sd">    (i.e., the Linear Approximation Table (LAT) given as a `tuple` of `tuple`</span>
+<span class="sd">    of correlation weights), ``loop_rows_then_columns`` and  ``precision``</span>
+<span class="sd">    (see `WDTModel`).</span>
+
+<span class="sd">    The returned model is a subclass of `WDTModel` and `OpModel`.</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">        To link the returned model ``MyModel`` to ``op``</span>
+<span class="sd">        such that ``MyModel`` is used in ``propagate``,</span>
+<span class="sd">        set the ``linear_model`` attribute of ``op``</span>
+<span class="sd">        to ``MyModel`` (e.g., ``op.linear_model = MyModel``).</span>
+<span class="sd">        See also  `linear.mask.LinearMask.propagate`.</span>
+
+<span class="sd">    ::</span>
+
+<span class="sd">        &gt;&gt;&gt; from decimal import Decimal</span>
+<span class="sd">        &gt;&gt;&gt; from math import inf</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.secondaryop import LutOperation</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.printing import BvWrapPrinter</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.linear.opmodel import get_wdt_model</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.abstractproperty.opmodel import log2_decimal</span>
+<span class="sd">        &gt;&gt;&gt; # 3-bit permutation with 4 different weights</span>
+<span class="sd">        &gt;&gt;&gt; class Inversion3b(LutOperation): lut = [Constant(i, 3) for i in (0, 1, 2, 4, 3, 6, 7, 5)]</span>
+<span class="sd">        &gt;&gt;&gt; lat = [(1, 0, 0, 0, 0, 0, 0, 0), (0, 0, -1/2, 1/2, 1/2, 1/2, 0, 0), (0, 0, 0, 0, 1/2, -1/2, 1/2, 1/2), (0, 0, 1/2, 1/2, 0, 0, -1/2, 1/2),</span>
+<span class="sd">        ... (0, 1/2, 1/2, 0, 1/2, 0, 0, -1/2), (0, 1/2, 0, -1/2, 0, 1/2, 0, 1/2), (0, -1/2, 1/2, 0, 0, 1/2, 1/2, 0), (0, 1/2, 0, 1/2, -1/2, 0, 1/2, 0)]</span>
+<span class="sd">        &gt;&gt;&gt; wdt = tuple([tuple(inf if x == 0 else -log2_decimal(Decimal(abs(x))) for x in row) for row in lat])</span>
+<span class="sd">        &gt;&gt;&gt; LinearWDTModelInversion3b = get_wdt_model(Inversion3b, wdt)</span>
+<span class="sd">        &gt;&gt;&gt; alpha, beta = LinearMask(Variable(&quot;a&quot;, 3)), LinearMask(Variable(&quot;b&quot;, 3))</span>
+<span class="sd">        &gt;&gt;&gt; f = LinearWDTModelInversion3b(alpha)</span>
+<span class="sd">        &gt;&gt;&gt; print(f.vrepr())</span>
+<span class="sd">        LinearWDTModelInversion3b(LinearMask(Variable(&#39;a&#39;, width=3)))</span>
+<span class="sd">        &gt;&gt;&gt; BvWrapPrinter.new_line_right_parenthesis = False</span>
+<span class="sd">        &gt;&gt;&gt; print(BvWrapPrinter().doprint(f.validity_constraint(beta)))</span>
+<span class="sd">        Ite(b == 0b110,</span>
+<span class="sd">            (a == 0b010) | (a == 0b011) | (a == 0b110) | (a == 0b111),</span>
+<span class="sd">            Ite(b == 0b101,</span>
+<span class="sd">                (a == 0b001) | (a == 0b010) | (a == 0b101) | (a == 0b110),</span>
+<span class="sd">                Ite(b == 0b100,</span>
+<span class="sd">                    (a == 0b001) | (a == 0b010) | (a == 0b100) | (a == 0b111),</span>
+<span class="sd">                    Ite(b == 0b011,</span>
+<span class="sd">                        (a == 0b001) | (a == 0b011) | (a == 0b101) | (a == 0b111),</span>
+<span class="sd">                        Ite(b == 0b010,</span>
+<span class="sd">                            (a == 0b001) | (a == 0b011) | (a == 0b100) | (a == 0b110),</span>
+<span class="sd">                            Ite(b == 0b001,</span>
+<span class="sd">                                (a == 0b100) | (a == 0b101) | (a == 0b110) | (a == 0b111),</span>
+<span class="sd">                                Ite(b == 0b000,</span>
+<span class="sd">                                    a == 0b000,</span>
+<span class="sd">                                    (a == 0b010) | (a == 0b011) | (a == 0b100) | (a == 0b101))))))))</span>
+<span class="sd">        &gt;&gt;&gt; f.pr_one_constraint(beta)</span>
+<span class="sd">        Ite(b == 0b000, a == 0b000, 0b0)</span>
+<span class="sd">        &gt;&gt;&gt; f.bv_weight(beta)</span>
+<span class="sd">        Ite(b == 0b000, 0b0, 0b1)</span>
+<span class="sd">        &gt;&gt;&gt; BvWrapPrinter.new_line_right_parenthesis = True</span>
+<span class="sd">        &gt;&gt;&gt; f.max_weight(), f.weight_width(), f.error(), f.num_frac_bits()</span>
+<span class="sd">        (1, 1, 0, 0)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">operation</span><span class="o">.</span><span class="n">Operation</span><span class="p">)</span>
+
+    <span class="n">num_rows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">weight_distribution_table</span><span class="p">)</span>
+    <span class="n">num_columns</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">weight_distribution_table</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_columns</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">weight_distribution_table</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="n">math</span><span class="o">.</span><span class="n">inf</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_rows</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;weight_distribution_table contains a column with only math.inf values&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">weight_distribution_table</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;weight_distribution_table[0][0] != 0&quot;</span><span class="p">)</span>
+
+    <span class="n">_op</span> <span class="o">=</span> <span class="n">op</span>
+    <span class="n">_weight_distribution_table</span> <span class="o">=</span> <span class="n">weight_distribution_table</span><span class="p">[:]</span>
+    <span class="n">_loop_rows_then_columns</span> <span class="o">=</span> <span class="n">loop_rows_then_columns</span>
+    <span class="n">_precision</span> <span class="o">=</span> <span class="n">precision</span>
+
+    <span class="k">class</span> <span class="nc">MyWDTModel</span><span class="p">(</span><span class="n">abstractproperty</span><span class="o">.</span><span class="n">opmodel</span><span class="o">.</span><span class="n">WDTModel</span><span class="p">,</span> <span class="n">OpModel</span><span class="p">):</span>
+        <span class="n">op</span> <span class="o">=</span> <span class="n">_op</span>
+        <span class="n">weight_distribution_table</span> <span class="o">=</span> <span class="n">_weight_distribution_table</span>
+        <span class="n">loop_rows_then_columns</span> <span class="o">=</span> <span class="n">_loop_rows_then_columns</span>
+        <span class="n">precision</span> <span class="o">=</span> <span class="n">_precision</span>
+
+    <span class="n">MyWDTModel</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Linear</span><span class="si">{</span><span class="n">abstractproperty</span><span class="o">.</span><span class="n">opmodel</span><span class="o">.</span><span class="n">WDTModel</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}{</span><span class="n">op</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">return</span> <span class="n">MyWDTModel</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Adrián Ranea.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

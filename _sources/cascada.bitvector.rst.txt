@@ -1,0 +1,16 @@
+cascada.bitvector module
+========================
+
+.. automodule:: cascada.bitvector
+   :members:
+   :show-inheritance:
+
+.. toctree::
+   :maxdepth: 4
+
+   cascada.bitvector.context
+   cascada.bitvector.core
+   cascada.bitvector.secondaryop
+   cascada.bitvector.operation
+   cascada.bitvector.printing
+   cascada.bitvector.ssa

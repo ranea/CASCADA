@@ -1,0 +1,6 @@
+cascada.primitives.xtea module
+==============================
+
+.. automodule:: cascada.primitives.xtea
+   :members:
+   :show-inheritance:

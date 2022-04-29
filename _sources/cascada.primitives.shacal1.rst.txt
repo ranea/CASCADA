@@ -1,0 +1,6 @@
+cascada.primitives.shacal1 module
+=================================
+
+.. automodule:: cascada.primitives.shacal1
+   :members:
+   :show-inheritance:

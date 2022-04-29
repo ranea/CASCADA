@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cascada.bitvector.printing &mdash; CASCADA 1.0.rc0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> CASCADA
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">CASCADA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../primitives_implemented.html">Primitives implemented</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cascada.html">API reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">CASCADA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>cascada.bitvector.printing</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cascada.bitvector.printing</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Manage the representation of bit-vector expressions.&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">sympy.printing</span> <span class="kn">import</span> <span class="nb">repr</span> <span class="k">as</span> <span class="n">sympy_repr</span>
+<span class="kn">from</span> <span class="nn">sympy.printing</span> <span class="kn">import</span> <span class="nb">str</span> <span class="k">as</span> <span class="n">sympy_str</span>
+
+
+<span class="c1"># noinspection PyPep8Naming,PyMethodMayBeStatic</span>
+<div class="viewcode-block" id="BvStrPrinter"><a class="viewcode-back" href="../../../cascada.bitvector.printing.html#cascada.bitvector.printing.BvStrPrinter">[docs]</a><span class="k">class</span> <span class="nc">BvStrPrinter</span><span class="p">(</span><span class="n">sympy_str</span><span class="o">.</span><span class="n">StrPrinter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Printing class that handles the `str` method of `Term`.&quot;&quot;&quot;</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_need_parentheses</span><span class="p">(</span><span class="n">bv</span><span class="p">,</span> <span class="n">parent</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return true if bv need parenthesis when used in infix notation.&quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">core</span>
+
+        <span class="c1"># assert isinstance(bv, (core.Term, int))</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bv</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bv</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Term</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">bv</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">bv</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="n">parent</span><span class="p">):</span>
+            <span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">operation</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvComp</span><span class="p">:</span>
+                <span class="c1"># printing (a == b) == (c == d) instead of a == b == c == d</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># printing a + b + c + d instead of (a + b) + (c + d)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">_print_Term</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bv</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="kc">False</span>
+        <span class="c1"># args = [self._print(a) for a in bv.args]</span>
+        <span class="c1"># return &quot;{}({})&quot;.format(type(bv).__name__, &quot;, &quot;.join(args))</span>
+
+    <span class="k">def</span> <span class="nf">_print_Constant</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bv</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">bv</span><span class="o">.</span><span class="n">width</span> <span class="o">%</span> <span class="mi">4</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">bv</span><span class="o">.</span><span class="n">hex</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">bv</span><span class="o">.</span><span class="n">bin</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_print_Variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bv</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">bv</span><span class="o">.</span><span class="n">name</span>
+
+    <span class="k">def</span> <span class="nf">_print_Operation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bv</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">cascada.bitvector.operation</span> <span class="kn">import</span> <span class="n">PartialOperation</span><span class="p">,</span> <span class="n">Extract</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bv</span><span class="p">,</span> <span class="n">PartialOperation</span><span class="p">)</span> <span class="ow">and</span> \
+                <span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="n">bv</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">base_op</span><span class="p">,</span> <span class="s2">&quot;infix_symbol&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">bv</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">base_op</span> <span class="o">==</span> <span class="n">Extract</span><span class="p">):</span>
+            <span class="c1"># infix_symbol not stored in the partial operation and</span>
+            <span class="c1"># Extract has a custom method in BvStrPrinter</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="n">bv</span><span class="o">.</span><span class="n">_get_base_op_expr</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">has_symbol</span> <span class="o">=</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">bv</span><span class="p">,</span> <span class="s2">&quot;unary_symbol&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">bv</span><span class="p">,</span> <span class="s2">&quot;infix_symbol&quot;</span><span class="p">)</span>
+            <span class="n">op_name</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">bv</span><span class="p">,</span> <span class="s2">&quot;alt_name&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">bv</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+
+            <span class="n">args</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">bv</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">has_symbol</span> <span class="ow">and</span> <span class="n">BvStrPrinter</span><span class="o">.</span><span class="n">_need_parentheses</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">bv</span><span class="p">):</span>
+                    <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;(</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="n">a</span><span class="p">)))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="n">a</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="n">has_symbol</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="nb">sum</span><span class="p">(</span><span class="n">bv</span><span class="o">.</span><span class="n">arity</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="n">bv</span><span class="o">.</span><span class="n">arity</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">bv</span><span class="o">.</span><span class="n">unary_symbol</span><span class="p">,</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="k">elif</span> <span class="nb">sum</span><span class="p">(</span><span class="n">bv</span><span class="o">.</span><span class="n">arity</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bv</span><span class="o">.</span><span class="n">infix_symbol</span><span class="p">,</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">(</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">op_name</span><span class="p">,</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_print_Extract</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bv</span><span class="p">):</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">=</span> <span class="n">bv</span><span class="o">.</span><span class="n">args</span>
+        <span class="n">delimiter</span> <span class="o">=</span> <span class="s2">&quot;:&quot;</span>
+
+        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">j</span><span class="p">:</span>
+            <span class="n">delimiter</span> <span class="o">=</span> <span class="n">i</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">j</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">j</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">x</span><span class="o">.</span><span class="n">width</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">i</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">BvStrPrinter</span><span class="o">.</span><span class="n">_need_parentheses</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">bv</span><span class="p">):</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="s2">&quot;(</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">[</span><span class="si">{}{}{}</span><span class="s2">]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">delimiter</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BvShortPrinter"><a class="viewcode-back" href="../../../cascada.bitvector.printing.html#cascada.bitvector.printing.BvShortPrinter">[docs]</a><span class="k">class</span> <span class="nc">BvShortPrinter</span><span class="p">(</span><span class="n">BvStrPrinter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Printing class that handles the `Term.srepr` method of `Term`.&quot;&quot;&quot;</span>
+
+    <span class="n">lvl</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">max_lvl</span> <span class="o">=</span> <span class="mi">5</span>
+
+    <span class="k">def</span> <span class="nf">_print_Term</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bv</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="kc">False</span>
+        <span class="c1"># args = [self._print(a) for a in bv.args]</span>
+        <span class="c1"># return &quot;{}({})&quot;.format(type(bv).__name__, &quot;, &quot;.join(args))</span>
+
+    <span class="k">def</span> <span class="nf">_print_Operation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bv</span><span class="p">):</span>
+        <span class="n">has_symbol</span> <span class="o">=</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">bv</span><span class="p">,</span> <span class="s2">&quot;unary_symbol&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">bv</span><span class="p">,</span> <span class="s2">&quot;infix_symbol&quot;</span><span class="p">)</span>
+        <span class="n">op_name</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">bv</span><span class="p">,</span> <span class="s2">&quot;alt_name&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">bv</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+
+        <span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">secondaryop</span>
+        <span class="c1"># if all(isinstance(a, (int, core.Constant, core.Variable))</span>
+        <span class="c1">#        or type(a) == type(bv) for a in bv.args):</span>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="p">(</span><span class="n">secondaryop</span><span class="o">.</span><span class="n">Reverse</span><span class="p">,</span> <span class="n">secondaryop</span><span class="o">.</span><span class="n">PopCount</span><span class="p">,</span> <span class="n">secondaryop</span><span class="o">.</span><span class="n">PopCountSum2</span><span class="p">,</span>
+                              <span class="n">secondaryop</span><span class="o">.</span><span class="n">PopCountSum3</span><span class="p">,</span> <span class="n">secondaryop</span><span class="o">.</span><span class="n">PopCountDiff</span><span class="p">))</span> <span class="ow">or</span>
+               <span class="nb">type</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="n">bv</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">bv</span><span class="o">.</span><span class="n">args</span><span class="p">):</span>
+            <span class="n">next_lvl</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">next_lvl</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">next_lvl</span><span class="p">:</span>
+            <span class="n">BvShortPrinter</span><span class="o">.</span><span class="n">lvl</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">bv</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">BvShortPrinter</span><span class="o">.</span><span class="n">lvl</span> <span class="o">&gt;</span> <span class="n">BvShortPrinter</span><span class="o">.</span><span class="n">max_lvl</span><span class="p">:</span>
+                <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;...&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">has_symbol</span> <span class="ow">and</span> <span class="n">BvStrPrinter</span><span class="o">.</span><span class="n">_need_parentheses</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">bv</span><span class="p">):</span>
+                <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;(</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="n">a</span><span class="p">)))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="n">a</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">next_lvl</span><span class="p">:</span>
+            <span class="n">BvShortPrinter</span><span class="o">.</span><span class="n">lvl</span> <span class="o">-=</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="n">has_symbol</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">sum</span><span class="p">(</span><span class="n">bv</span><span class="o">.</span><span class="n">arity</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="n">bv</span><span class="o">.</span><span class="n">arity</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">bv</span><span class="o">.</span><span class="n">unary_symbol</span><span class="p">,</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="nb">sum</span><span class="p">(</span><span class="n">bv</span><span class="o">.</span><span class="n">arity</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bv</span><span class="o">.</span><span class="n">infix_symbol</span><span class="p">,</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">(</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">op_name</span><span class="p">,</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="p">))</span></div>
+
+
+<span class="c1"># noinspection PyPep8Naming,PyMethodMayBeStatic</span>
+<div class="viewcode-block" id="BvReprPrinter"><a class="viewcode-back" href="../../../cascada.bitvector.printing.html#cascada.bitvector.printing.BvReprPrinter">[docs]</a><span class="k">class</span> <span class="nc">BvReprPrinter</span><span class="p">(</span><span class="n">sympy_repr</span><span class="o">.</span><span class="n">ReprPrinter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Printing class that handles the `Term.vrepr` method.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_print_Term</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bv</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="kc">False</span>
+        <span class="c1"># if bv.args:</span>
+        <span class="c1">#     args = &#39;, &#39;.join([self._print(a) for a in bv.args])</span>
+        <span class="c1">#     return &quot;{}({}, width={})&quot;.format(type(bv).__name__, args, bv.width)</span>
+        <span class="c1"># else:</span>
+        <span class="c1">#     return &quot;{}(width={})&quot;.format(type(bv).__name__, bv.width)</span>
+
+    <span class="k">def</span> <span class="nf">_print_Constant</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bv</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">(</span><span class="si">{}</span><span class="s2">, width=</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="nb">type</span><span class="p">(</span><span class="n">bv</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+            <span class="c1"># prevent a 128-bit vector to be fully printed</span>
+            <span class="n">bv</span><span class="o">.</span><span class="n">bin</span><span class="p">()</span> <span class="k">if</span> <span class="n">bv</span><span class="o">.</span><span class="n">width</span> <span class="o">&lt;=</span> <span class="mi">8</span> <span class="ow">or</span> <span class="n">bv</span><span class="o">.</span><span class="n">width</span> <span class="o">%</span> <span class="mi">4</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">bv</span><span class="o">.</span><span class="n">hex</span><span class="p">(),</span>
+            <span class="n">bv</span><span class="o">.</span><span class="n">width</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_print_Variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bv</span><span class="p">):</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="n">bv</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">(</span><span class="si">{}</span><span class="s2">, width=</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">bv</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bv</span><span class="o">.</span><span class="n">width</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_print_Operation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bv</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">cascada.bitvector.operation</span> <span class="kn">import</span> <span class="n">PartialOperation</span><span class="p">,</span> <span class="n">make_partial_operation</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bv</span><span class="p">,</span> <span class="n">PartialOperation</span><span class="p">):</span>
+            <span class="c1"># nfa_v similar as args below</span>
+            <span class="n">nfa_v</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">bv</span><span class="o">.</span><span class="n">args</span><span class="p">])</span>
+
+            <span class="c1"># fa_v needs to be a tuple so that it is hashable for lru_cache</span>
+            <span class="c1"># bv.fixed_args has always length 2+</span>
+            <span class="n">fa_v</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">bv</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">])</span>
+            <span class="n">fa_v</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">fa_v</span><span class="si">}</span><span class="s2">)&quot;</span>
+
+            <span class="n">foo_name</span> <span class="o">=</span> <span class="n">make_partial_operation</span><span class="o">.</span><span class="vm">__name__</span>
+
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">foo_name</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="n">bv</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">base_op</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">fa_v</span><span class="si">}</span><span class="s2">)(</span><span class="si">{</span><span class="n">nfa_v</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">bv</span><span class="o">.</span><span class="n">args</span><span class="p">])</span>
+            <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">(</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">bv</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BvWrapPrinter"><a class="viewcode-back" href="../../../cascada.bitvector.printing.html#cascada.bitvector.printing.BvWrapPrinter">[docs]</a><span class="k">class</span> <span class="nc">BvWrapPrinter</span><span class="p">(</span><span class="n">BvStrPrinter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Printing class similar to `BvStrPrinter` but prints bit-vector expressions in multiple compact lines.&quot;&quot;&quot;</span>
+
+    <span class="n">len_prefix</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">max_line_width</span> <span class="o">=</span> <span class="mi">100</span>
+
+    <span class="n">use_symbols</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">new_line_right_parenthesis</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">_print_Operation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bv</span><span class="p">):</span>
+        <span class="n">standard_repr</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_print_Operation</span><span class="p">(</span><span class="n">bv</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">standard_repr</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">len_prefix</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">max_line_width</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">standard_repr</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_symbols</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">bv</span><span class="p">,</span> <span class="s2">&quot;unary_symbol&quot;</span><span class="p">):</span>
+            <span class="n">op_name</span> <span class="o">=</span> <span class="n">bv</span><span class="o">.</span><span class="n">unary_symbol</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_symbols</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">bv</span><span class="p">,</span> <span class="s2">&quot;infix_symbol&quot;</span><span class="p">):</span>
+            <span class="n">op_name</span> <span class="o">=</span> <span class="n">bv</span><span class="o">.</span><span class="n">infix_symbol</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">op_name</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">bv</span><span class="p">,</span> <span class="s2">&quot;alt_name&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">bv</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+
+        <span class="n">old_len_prefix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">len_prefix</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">len_prefix</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">op_name</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="n">bv</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">bv</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">len_prefix</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="n">a</span><span class="p">))</span>
+
+        <span class="c1"># end = &quot;\n&quot; + &quot; &quot;*old_len_prefix + &quot;)&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">len_prefix</span> <span class="o">=</span> <span class="n">old_len_prefix</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_line_right_parenthesis</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">(</span><span class="si">{}{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">op_name</span><span class="p">,</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="p">),</span>
+                                    <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span><span class="o">*</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">len_prefix</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">(</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">op_name</span><span class="p">,</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="BvCCodePrinter"><a class="viewcode-back" href="../../../cascada.bitvector.printing.html#cascada.bitvector.printing.BvCCodePrinter">[docs]</a><span class="k">class</span> <span class="nc">BvCCodePrinter</span><span class="p">(</span><span class="n">sympy_str</span><span class="o">.</span><span class="n">StrPrinter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Printing class that handles the `Term.crepr` method.</span>
+
+<span class="sd">    .. Implementation details:</span>
+
+<span class="sd">        Since the C code of the secondary operations is automatically</span>
+<span class="sd">        obtained from the C code of the primary operations</span>
+<span class="sd">        (and the set of primary ones is fixed), the C code of the</span>
+<span class="sd">        primary operations is implemented here and not in the</span>
+<span class="sd">        class of the operations.</span>
+
+<span class="sd">        See also https://en.cppreference.com/w/c/types/integer ,</span>
+<span class="sd">        https://en.cppreference.com/w/c/language/integer_constant and</span>
+<span class="sd">        https://en.cppreference.com/w/c/language/arithmetic_types .</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.operation import Concat</span>
+<span class="sd">        &gt;&gt;&gt; for w in [1, 63, 64, 65, 128]: print(Constant(1, w).crepr())</span>
+<span class="sd">        0x1U</span>
+<span class="sd">        0x1ULL</span>
+<span class="sd">        0x1ULL</span>
+<span class="sd">        ((__uint128)(0x1ULL)) &amp; (((__uint128)(0x1ULL) &lt;&lt; 64) | ((__uint128)(0xffffffffffffffffULL)))</span>
+<span class="sd">        (__uint128)(0x1ULL)</span>
+<span class="sd">        &gt;&gt;&gt; for w in [7, 8]: print((~Variable(&quot;a&quot;, w)).crepr())</span>
+<span class="sd">        (~a) &amp; 0x7fU</span>
+<span class="sd">        (~a) &amp; 0xffU</span>
+<span class="sd">        &gt;&gt;&gt; for w in [7, 8]: print((Variable(&quot;a&quot;, w) &amp; Variable(&quot;b&quot;, w)).crepr())</span>
+<span class="sd">        a &amp; b</span>
+<span class="sd">        a &amp; b</span>
+<span class="sd">        &gt;&gt;&gt; for w in [7, 8]: print((Variable(&quot;a&quot;, w) * Variable(&quot;b&quot;, w)).crepr())</span>
+<span class="sd">        (a * b) &amp; 0x7fU</span>
+<span class="sd">        (a * b) &amp; 0xffU</span>
+<span class="sd">        &gt;&gt;&gt; for w in [7, 8]: print((Variable(&quot;a&quot;, w) &lt; Variable(&quot;b&quot;, w)).crepr())</span>
+<span class="sd">        (_Bool)((a &lt; b) &amp; 0x1U)</span>
+<span class="sd">        (_Bool)((a &lt; b) &amp; 0x1U)</span>
+<span class="sd">        &gt;&gt;&gt; for w in [7, 8]: print(Concat(Variable(&quot;a&quot;, w), Variable(&quot;b&quot;, w)).crepr())</span>
+<span class="sd">        (((uint16_t)(a) &lt;&lt; 0x7U) | ((uint16_t)(b))) &amp; 0x3fffU</span>
+<span class="sd">        (((uint16_t)(a) &lt;&lt; 0x8U) | ((uint16_t)(b))) &amp; 0xffffU</span>
+<span class="sd">        &gt;&gt;&gt; print(Variable(&#39;a&#39;, 8)[2:1].crepr(), &quot;,&quot;, Variable(&#39;a&#39;, 8)[0:0].crepr())</span>
+<span class="sd">        (a &gt;&gt; 0x1U) &amp; 0x3U , a &amp; 0x1U</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_width2C_type</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">width</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the integer C type associated to the given bit-vector width.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">width</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;_Bool&quot;</span>
+        <span class="k">elif</span> <span class="n">width</span> <span class="o">&lt;=</span> <span class="mi">8</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;uint8_t&quot;</span>
+        <span class="k">elif</span> <span class="n">width</span> <span class="o">&lt;=</span> <span class="mi">16</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;uint16_t&quot;</span>
+        <span class="k">elif</span> <span class="n">width</span> <span class="o">&lt;=</span> <span class="mi">32</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;uint32_t&quot;</span>
+        <span class="k">elif</span> <span class="n">width</span> <span class="o">&lt;=</span> <span class="mi">64</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;uint64_t&quot;</span>
+        <span class="k">elif</span> <span class="n">width</span> <span class="o">&lt;=</span> <span class="mi">128</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;__uint128&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;bit-vectors with more than 128-bits cannot be converted to C code&quot;</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_get_integer_suffix</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">width</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the integer C suffix associated to the given bit-vector width.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">width</span> <span class="o">&lt;=</span> <span class="mi">8</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;U&quot;</span>
+        <span class="k">elif</span> <span class="n">width</span> <span class="o">&lt;=</span> <span class="mi">16</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;U&quot;</span>
+        <span class="k">elif</span> <span class="n">width</span> <span class="o">&lt;=</span> <span class="mi">32</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;UL&quot;</span>
+        <span class="k">elif</span> <span class="n">width</span> <span class="o">&lt;=</span> <span class="mi">64</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;ULL&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;U&quot;</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_get_big_mask_C_code</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">width</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the mask for bit-vectors with more than 64 bits.&quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span>
+        <span class="k">assert</span> <span class="mi">64</span> <span class="o">&lt;</span> <span class="n">width</span> <span class="o">&lt;=</span> <span class="mi">128</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="n">width</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">iu_64</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_get_integer_suffix</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">64</span><span class="p">)</span>
+        <span class="n">mask_64_MS</span> <span class="o">=</span> <span class="nb">hex</span><span class="p">(</span><span class="nb">int</span><span class="p">((</span><span class="n">Constant</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="mi">128</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="mi">64</span><span class="p">),</span> <span class="mi">64</span><span class="p">))))</span>
+        <span class="n">mask_64_LS</span> <span class="o">=</span> <span class="nb">hex</span><span class="p">(</span><span class="nb">int</span><span class="p">((</span><span class="n">Constant</span><span class="p">(</span><span class="n">mask</span> <span class="o">&amp;</span> <span class="p">((</span><span class="mi">2</span> <span class="o">**</span> <span class="mi">64</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="mi">64</span><span class="p">))))</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;((__uint128)(</span><span class="si">{</span><span class="n">mask_64_MS</span><span class="si">}{</span><span class="n">iu_64</span><span class="si">}</span><span class="s2">) &lt;&lt; 64) | ((__uint128)(</span><span class="si">{</span><span class="n">mask_64_LS</span><span class="si">}{</span><span class="n">iu_64</span><span class="si">}</span><span class="s2">))&quot;</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_get_and_mask_C_code</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">width</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the ``&amp; mask`` operation.&quot;&quot;&quot;</span>
+        <span class="c1"># widths [1, 8, 16, 32, 64, 128] also need a mask</span>
+        <span class="k">if</span> <span class="n">width</span> <span class="o">&lt;=</span> <span class="mi">64</span><span class="p">:</span>
+            <span class="n">iu</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_get_integer_suffix</span><span class="p">(</span><span class="n">width</span><span class="p">)</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot; &amp; </span><span class="si">{</span><span class="nb">hex</span><span class="p">((</span><span class="mi">2</span> <span class="o">**</span> <span class="n">width</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="si">}{</span><span class="n">iu</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">elif</span> <span class="n">width</span> <span class="o">&lt;=</span> <span class="mi">128</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot; &amp; (</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">_get_big_mask_C_code</span><span class="p">(</span><span class="n">width</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;bit-vectors with more than 128-bits cannot be converted to C code&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_print_int</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expr</span><span class="p">):</span>
+        <span class="c1"># _get_integer_suffix cannot be used since original width is not known</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="n">expr</span><span class="p">)</span><span class="si">}</span><span class="s2">U&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_print_Term</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bv</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">_print_Constant</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bv</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span>
+        <span class="k">if</span> <span class="n">bv</span><span class="o">.</span><span class="n">width</span> <span class="o">&lt;=</span> <span class="mi">64</span><span class="p">:</span>
+            <span class="n">iu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">_get_integer_suffix</span><span class="p">(</span><span class="n">bv</span><span class="o">.</span><span class="n">width</span><span class="p">)</span>
+            <span class="n">c_code</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">hex</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">bv</span><span class="p">))</span><span class="si">}{</span><span class="n">iu</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">return</span> <span class="n">c_code</span>  <span class="c1"># mask not needed</span>
+        <span class="k">elif</span> <span class="n">bv</span><span class="o">.</span><span class="n">width</span> <span class="o">&lt;=</span> <span class="mi">128</span><span class="p">:</span>
+            <span class="n">iu_64</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">_get_integer_suffix</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">64</span><span class="p">)</span>
+            <span class="n">bv_64_MS_Cc</span> <span class="o">=</span> <span class="nb">hex</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">bv</span><span class="p">),</span> <span class="mi">128</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="mi">64</span><span class="p">),</span> <span class="mi">64</span><span class="p">)))</span>
+            <span class="n">bv_64_LS_Cc</span> <span class="o">=</span> <span class="nb">hex</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">bv</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">((</span><span class="mi">2</span> <span class="o">**</span> <span class="mi">64</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="mi">64</span><span class="p">)))</span>
+            <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">bv</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="mi">64</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># bv_64_MS_Cc</span>
+                <span class="n">c_code</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;(__uint128)(</span><span class="si">{</span><span class="n">bv_64_LS_Cc</span><span class="si">}{</span><span class="n">iu_64</span><span class="si">}</span><span class="s2">)&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">c_code</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;((__uint128)(</span><span class="si">{</span><span class="n">bv_64_MS_Cc</span><span class="si">}{</span><span class="n">iu_64</span><span class="si">}</span><span class="s2">) &lt;&lt; 64) | ((__uint128)(</span><span class="si">{</span><span class="n">bv_64_LS_Cc</span><span class="si">}{</span><span class="n">iu_64</span><span class="si">}</span><span class="s2">))&quot;</span>
+            <span class="k">if</span> <span class="n">bv</span><span class="o">.</span><span class="n">width</span> <span class="o">==</span> <span class="mi">128</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">c_code</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">c_code</span><span class="si">}</span><span class="s2">) &amp; (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">_get_big_mask_C_code</span><span class="p">(</span><span class="n">bv</span><span class="o">.</span><span class="n">width</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;bit-vectors with more than 128-bits cannot be converted to C code&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_print_Variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bv</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">bv</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_print_Operation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bv</span><span class="p">,</span> <span class="n">short_ccode</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">operation</span><span class="p">,</span> <span class="n">secondaryop</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bv</span><span class="p">,</span> <span class="n">operation</span><span class="o">.</span><span class="n">PartialOperation</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="n">bv</span><span class="o">.</span><span class="n">_get_base_op_expr</span><span class="p">())</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bv</span><span class="p">,</span> <span class="n">operation</span><span class="o">.</span><span class="n">SecondaryOperation</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bv</span><span class="p">,</span> <span class="n">secondaryop</span><span class="o">.</span><span class="n">LutOperation</span><span class="p">):</span>
+                <span class="c1"># no need and_out_mask</span>
+                <span class="n">arg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="n">bv</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">lut_ccode</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="n">x_i</span><span class="p">)</span> <span class="k">for</span> <span class="n">x_i</span> <span class="ow">in</span> <span class="n">bv</span><span class="o">.</span><span class="n">lut</span><span class="p">])</span>
+                <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">{{</span><span class="si">{</span><span class="n">lut_ccode</span><span class="si">}</span><span class="se">}}</span><span class="s2">[</span><span class="si">{</span><span class="n">arg</span><span class="si">}</span><span class="s2">]&quot;</span>  <span class="c1"># e,g, {0x0U,0x1U,0x2U,0x3U}[a]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="n">bv</span><span class="o">.</span><span class="n">doit</span><span class="p">(</span><span class="n">eval_sec_ops</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">index_a</span><span class="p">,</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bv</span><span class="o">.</span><span class="n">args</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bv</span><span class="p">,</span> <span class="n">operation</span><span class="o">.</span><span class="n">Ite</span><span class="p">)</span> <span class="ow">and</span> <span class="n">index_a</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> \
+                        <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="p">(</span><span class="n">operation</span><span class="o">.</span><span class="n">BvUlt</span><span class="p">,</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvUle</span><span class="p">,</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvUgt</span><span class="p">,</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvUge</span><span class="p">,</span>
+                                       <span class="n">operation</span><span class="o">.</span><span class="n">BvComp</span><span class="p">)):</span>  <span class="c1"># for LutOperation</span>
+                    <span class="n">a_ccode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_print_Operation</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">short_ccode</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">a_ccode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+                <span class="n">a_ccode</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">a_ccode</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="k">if</span> <span class="s2">&quot; &quot;</span> <span class="ow">in</span> <span class="n">a_ccode</span> <span class="k">else</span> <span class="n">a_ccode</span>
+                <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a_ccode</span><span class="p">)</span>
+
+            <span class="n">and_out_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">_get_and_mask_C_code</span><span class="p">(</span><span class="n">bv</span><span class="o">.</span><span class="n">width</span><span class="p">)</span>
+
+            <span class="c1"># - For each op, non-used bits are ensured to be zero</span>
+            <span class="c1"># - Only (_Bool) results are cast, rest are done when assigning to variables.</span>
+            <span class="c1"># - Unsigned integer arithmetic is always performed modulo 2n</span>
+            <span class="c1"># https://en.cppreference.com/w/c/language/operator_arithmetic</span>
+
+            <span class="n">lb</span> <span class="o">=</span> <span class="s2">&quot;(&quot;</span> <span class="k">if</span> <span class="n">and_out_mask</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">rb</span> <span class="o">=</span> <span class="s2">&quot;)&quot;</span> <span class="k">if</span> <span class="n">and_out_mask</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+
+            <span class="c1"># unary</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bv</span><span class="p">,</span> <span class="p">(</span><span class="n">operation</span><span class="o">.</span><span class="n">BvNot</span><span class="p">,</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvNeg</span><span class="p">)):</span>
+                <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">lb</span><span class="si">}{</span><span class="n">bv</span><span class="o">.</span><span class="n">unary_symbol</span><span class="si">}{</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}{</span><span class="n">rb</span><span class="si">}{</span><span class="n">and_out_mask</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bv</span><span class="p">,</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvIdentity</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="c1"># binary</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bv</span><span class="p">,</span> <span class="p">(</span><span class="n">operation</span><span class="o">.</span><span class="n">BvAnd</span><span class="p">,</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvOr</span><span class="p">,</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvXor</span><span class="p">,</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvLshr</span><span class="p">)):</span>
+                <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">bv</span><span class="o">.</span><span class="n">infix_symbol</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bv</span><span class="p">,</span> <span class="p">(</span><span class="n">operation</span><span class="o">.</span><span class="n">BvShl</span><span class="p">,</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvAdd</span><span class="p">,</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvSub</span><span class="p">,</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvMul</span><span class="p">,</span>
+                                 <span class="n">operation</span><span class="o">.</span><span class="n">BvUdiv</span><span class="p">,</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvUrem</span><span class="p">)):</span>
+                <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">lb</span><span class="si">}{</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">bv</span><span class="o">.</span><span class="n">infix_symbol</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}{</span><span class="n">rb</span><span class="si">}{</span><span class="n">and_out_mask</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bv</span><span class="p">,</span> <span class="p">(</span><span class="n">operation</span><span class="o">.</span><span class="n">BvUlt</span><span class="p">,</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvUle</span><span class="p">,</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvUgt</span><span class="p">,</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvUge</span><span class="p">,</span>
+                                 <span class="n">operation</span><span class="o">.</span><span class="n">BvComp</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="n">short_ccode</span><span class="p">:</span>
+                    <span class="c1"># ignoring (_Bool) and and_out_mask</span>
+                    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">bv</span><span class="o">.</span><span class="n">infix_symbol</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;(_Bool)(</span><span class="si">{</span><span class="n">lb</span><span class="si">}{</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">bv</span><span class="o">.</span><span class="n">infix_symbol</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}{</span><span class="n">rb</span><span class="si">}{</span><span class="n">and_out_mask</span><span class="si">}</span><span class="s2">)&quot;</span>
+            <span class="c1">#</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bv</span><span class="p">,</span> <span class="n">operation</span><span class="o">.</span><span class="n">RotateLeft</span><span class="p">):</span>
+                <span class="n">x</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">offset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="n">bv</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">width</span> <span class="o">-</span> <span class="n">bv</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">lb</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2"> &lt;&lt; </span><span class="si">{</span><span class="n">r</span><span class="si">}</span><span class="s2">) | (</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2"> &gt;&gt; </span><span class="si">{</span><span class="n">offset</span><span class="si">}</span><span class="s2">)</span><span class="si">{</span><span class="n">rb</span><span class="si">}{</span><span class="n">and_out_mask</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bv</span><span class="p">,</span> <span class="n">operation</span><span class="o">.</span><span class="n">RotateRight</span><span class="p">):</span>
+                <span class="n">x</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">offset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="n">bv</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">width</span> <span class="o">-</span> <span class="n">bv</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">lb</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2"> &gt;&gt; </span><span class="si">{</span><span class="n">r</span><span class="si">}</span><span class="s2">) | (</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2"> &lt;&lt; </span><span class="si">{</span><span class="n">offset</span><span class="si">}</span><span class="s2">)</span><span class="si">{</span><span class="n">rb</span><span class="si">}{</span><span class="n">and_out_mask</span><span class="si">}</span><span class="s2">&quot;</span>
+
+            <span class="c1"># ternary</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bv</span><span class="p">,</span> <span class="n">operation</span><span class="o">.</span><span class="n">Ite</span><span class="p">):</span>
+                <span class="c1"># https://en.cppreference.com/w/c/language/operator_other</span>
+                <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> ? </span><span class="si">{</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2"> : </span><span class="si">{</span><span class="n">args</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>  <span class="c1"># and_out_mask not needed</span>
+                <span class="c1"># return f&quot;{lb}{args[0]} ? {args[1]} : {args[2]}{rb}{and_out_mask}&quot;</span>
+
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bv</span><span class="p">,</span> <span class="n">operation</span><span class="o">.</span><span class="n">Concat</span><span class="p">):</span>
+                <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">args</span>
+                <span class="n">y_width</span> <span class="o">=</span> <span class="n">bv</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">width</span>
+                <span class="n">output_C_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">_width2C_type</span><span class="p">(</span><span class="n">bv</span><span class="o">.</span><span class="n">width</span><span class="p">)</span>
+                <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">lb</span><span class="si">}</span><span class="s2">((</span><span class="si">{</span><span class="n">output_C_type</span><span class="si">}</span><span class="s2">)(</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">) &lt;&lt; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="n">y_width</span><span class="p">)</span><span class="si">}</span><span class="s2">) | ((</span><span class="si">{</span><span class="n">output_C_type</span><span class="si">}</span><span class="s2">)(</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">))</span><span class="si">{</span><span class="n">rb</span><span class="si">}{</span><span class="n">and_out_mask</span><span class="si">}</span><span class="s2">&quot;</span>
+
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bv</span><span class="p">,</span> <span class="n">operation</span><span class="o">.</span><span class="n">Extract</span><span class="p">):</span>
+                <span class="n">x</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">=</span> <span class="n">args</span>  <span class="c1"># j == 0 means take LSB, i == j means take 1 bit</span>
+                <span class="n">extract_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="n">bv</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">bv</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">bv</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># (j is a string)</span>
+                    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2"> &amp; </span><span class="si">{</span><span class="n">extract_mask</span><span class="si">}</span><span class="s2">&quot;</span>  <span class="c1"># no need and_out_mask</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2"> &gt;&gt; </span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">) &amp; </span><span class="si">{</span><span class="n">extract_mask</span><span class="si">}</span><span class="s2">&quot;</span>  <span class="c1"># no need and_out_mask</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;C code of operation </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">bv</span><span class="p">)</span><span class="si">}</span><span class="s2"> has not been implemented&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="dotprinting"><a class="viewcode-back" href="../../../cascada.bitvector.printing.html#cascada.bitvector.printing.dotprinting">[docs]</a><span class="k">def</span> <span class="nf">dotprinting</span><span class="p">(</span><span class="n">bv</span><span class="p">,</span> <span class="n">repeat</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">vrepr_label</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the DOT description of a bit-vector `Term` expression tree.</span>
+
+<span class="sd">    For more information see</span>
+<span class="sd">    `SymPy&#39;s dotprinting method &lt;https://docs.sympy.org/latest/modules/printing.html#dotprint&gt;`_.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        bv: a bit-vector `Term`</span>
+<span class="sd">        repeat: whether to use different nodes for common subexpressions</span>
+<span class="sd">            (default True)</span>
+<span class="sd">        vrepr_label: wheter to use the verbose representation (`Term.vrepr`)</span>
+<span class="sd">            to label the nodes (default False)</span>
+<span class="sd">        kwargs: additional arguments passed to SymPy&#39;s dotprinting method</span>
+
+<span class="sd">    ::</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.operation import make_partial_operation, RotateLeft, Extract</span>
+<span class="sd">        &gt;&gt;&gt; LSB = make_partial_operation(Extract, (None, 0, 0))</span>
+<span class="sd">        &gt;&gt;&gt; expr = LSB(RotateLeft((Constant(1, 8) + Variable(&quot;x&quot;, 8)), 1))</span>
+<span class="sd">        &gt;&gt;&gt; print(dotprinting(expr))  # doctest:+NORMALIZE_WHITESPACE</span>
+<span class="sd">        digraph{</span>
+<span class="sd">        # Graph style</span>
+<span class="sd">        &quot;ordering&quot;=&quot;out&quot;</span>
+<span class="sd">        &quot;rankdir&quot;=&quot;TD&quot;</span>
+<span class="sd">        #########</span>
+<span class="sd">        # Nodes #</span>
+<span class="sd">        #########</span>
+<span class="sd">        &quot;Extract_{·, 0, 0}(RotateLeft(BvAdd(Constant(0b00000001, width=8), Variable(&#39;x&#39;, width=8)), 1))_()&quot; [&quot;color&quot;=&quot;black&quot;, &quot;label&quot;=&quot;Extract_{·, 0, 0}&quot;, &quot;shape&quot;=&quot;ellipse&quot;];</span>
+<span class="sd">        &quot;RotateLeft(BvAdd(Constant(0b00000001, width=8), Variable(&#39;x&#39;, width=8)), 1)_(0,)&quot; [&quot;color&quot;=&quot;black&quot;, &quot;label&quot;=&quot;RotateLeft&quot;, &quot;shape&quot;=&quot;ellipse&quot;];</span>
+<span class="sd">        &quot;BvAdd(Constant(0b00000001, width=8), Variable(&#39;x&#39;, width=8))_(0, 0)&quot; [&quot;color&quot;=&quot;black&quot;, &quot;label&quot;=&quot;BvAdd&quot;, &quot;shape&quot;=&quot;ellipse&quot;];</span>
+<span class="sd">        &quot;Constant(0b00000001, width=8)_(0, 0, 0)&quot; [&quot;color&quot;=&quot;blue1&quot;, &quot;label&quot;=&quot;0x01&quot;, &quot;shape&quot;=&quot;box&quot;];</span>
+<span class="sd">        &quot;Variable(&#39;x&#39;, width=8)_(0, 0, 1)&quot; [&quot;color&quot;=&quot;aquamarine3&quot;, &quot;label&quot;=&quot;x&quot;, &quot;shape&quot;=&quot;box&quot;];</span>
+<span class="sd">        &quot;1_(0, 1)&quot; [&quot;color&quot;=&quot;blue4&quot;, &quot;label&quot;=&quot;1&quot;, &quot;shape&quot;=&quot;box&quot;];</span>
+<span class="sd">        #########</span>
+<span class="sd">        # Edges #</span>
+<span class="sd">        #########</span>
+<span class="sd">        &quot;Extract_{·, 0, 0}(RotateLeft(BvAdd(Constant(0b00000001, width=8), Variable(&#39;x&#39;, width=8)), 1))_()&quot; -&gt; &quot;RotateLeft(BvAdd(Constant(0b00000001, width=8), Variable(&#39;x&#39;, width=8)), 1)_(0,)&quot;;</span>
+<span class="sd">        &quot;RotateLeft(BvAdd(Constant(0b00000001, width=8), Variable(&#39;x&#39;, width=8)), 1)_(0,)&quot; -&gt; &quot;BvAdd(Constant(0b00000001, width=8), Variable(&#39;x&#39;, width=8))_(0, 0)&quot;;</span>
+<span class="sd">        &quot;RotateLeft(BvAdd(Constant(0b00000001, width=8), Variable(&#39;x&#39;, width=8)), 1)_(0,)&quot; -&gt; &quot;1_(0, 1)&quot;;</span>
+<span class="sd">        &quot;BvAdd(Constant(0b00000001, width=8), Variable(&#39;x&#39;, width=8))_(0, 0)&quot; -&gt; &quot;Constant(0b00000001, width=8)_(0, 0, 0)&quot;;</span>
+<span class="sd">        &quot;BvAdd(Constant(0b00000001, width=8), Variable(&#39;x&#39;, width=8))_(0, 0)&quot; -&gt; &quot;Variable(&#39;x&#39;, width=8)_(0, 0, 1)&quot;;</span>
+<span class="sd">        }</span>
+<span class="sd">        &gt;&gt;&gt; print(dotprinting(expr, repeat=False, vrepr_label=True))  # doctest:+NORMALIZE_WHITESPACE</span>
+<span class="sd">        digraph{</span>
+<span class="sd">        # Graph style</span>
+<span class="sd">        &quot;ordering&quot;=&quot;out&quot;</span>
+<span class="sd">        &quot;rankdir&quot;=&quot;TD&quot;</span>
+<span class="sd">        #########</span>
+<span class="sd">        # Nodes #</span>
+<span class="sd">        #########</span>
+<span class="sd">        &quot;Extract_{·, 0, 0}(RotateLeft(BvAdd(Constant(0b00000001, width=8), Variable(&#39;x&#39;, width=8)), 1))&quot; [&quot;color&quot;=&quot;black&quot;, &quot;label&quot;=&quot;Extract_{·, 0, 0}&quot;, &quot;shape&quot;=&quot;ellipse&quot;];</span>
+<span class="sd">        &quot;RotateLeft(BvAdd(Constant(0b00000001, width=8), Variable(&#39;x&#39;, width=8)), 1)&quot; [&quot;color&quot;=&quot;black&quot;, &quot;label&quot;=&quot;RotateLeft&quot;, &quot;shape&quot;=&quot;ellipse&quot;];</span>
+<span class="sd">        &quot;BvAdd(Constant(0b00000001, width=8), Variable(&#39;x&#39;, width=8))&quot; [&quot;color&quot;=&quot;black&quot;, &quot;label&quot;=&quot;BvAdd&quot;, &quot;shape&quot;=&quot;ellipse&quot;];</span>
+<span class="sd">        &quot;Constant(0b00000001, width=8)&quot; [&quot;color&quot;=&quot;blue1&quot;, &quot;label&quot;=&quot;Constant(0b00000001, width=8)&quot;, &quot;shape&quot;=&quot;box&quot;];</span>
+<span class="sd">        &quot;Variable(&#39;x&#39;, width=8)&quot; [&quot;color&quot;=&quot;aquamarine3&quot;, &quot;label&quot;=&quot;Variable(&#39;x&#39;, width=8)&quot;, &quot;shape&quot;=&quot;box&quot;];</span>
+<span class="sd">        &quot;1&quot; [&quot;color&quot;=&quot;blue4&quot;, &quot;label&quot;=&quot;int(1)&quot;, &quot;shape&quot;=&quot;box&quot;];</span>
+<span class="sd">        #########</span>
+<span class="sd">        # Edges #</span>
+<span class="sd">        #########</span>
+<span class="sd">        &quot;Extract_{·, 0, 0}(RotateLeft(BvAdd(Constant(0b00000001, width=8), Variable(&#39;x&#39;, width=8)), 1))&quot; -&gt; &quot;RotateLeft(BvAdd(Constant(0b00000001, width=8), Variable(&#39;x&#39;, width=8)), 1)&quot;;</span>
+<span class="sd">        &quot;RotateLeft(BvAdd(Constant(0b00000001, width=8), Variable(&#39;x&#39;, width=8)), 1)&quot; -&gt; &quot;BvAdd(Constant(0b00000001, width=8), Variable(&#39;x&#39;, width=8))&quot;;</span>
+<span class="sd">        &quot;RotateLeft(BvAdd(Constant(0b00000001, width=8), Variable(&#39;x&#39;, width=8)), 1)&quot; -&gt; &quot;1&quot;;</span>
+<span class="sd">        &quot;BvAdd(Constant(0b00000001, width=8), Variable(&#39;x&#39;, width=8))&quot; -&gt; &quot;Constant(0b00000001, width=8)&quot;;</span>
+<span class="sd">        &quot;BvAdd(Constant(0b00000001, width=8), Variable(&#39;x&#39;, width=8))&quot; -&gt; &quot;Variable(&#39;x&#39;, width=8)&quot;;</span>
+<span class="sd">        }</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">         This method requires `graphviz &lt;https://www.graphviz.org/&gt;`_</span>
+<span class="sd">         and its `python interface &lt;https://pypi.org/project/graphviz/&gt;`_</span>
+<span class="sd">         to be installed.</span>
+
+<span class="sd">    .. Useful links</span>
+
+<span class="sd">        * http://matthiaseisen.com/articles/graphviz/</span>
+<span class="sd">        * https://graphviz.readthedocs.io/</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Term</span>
+    <span class="kn">from</span> <span class="nn">cascada.bitvector.dot</span> <span class="kn">import</span> <span class="n">dotprint</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">vrepr_label</span><span class="p">:</span>
+        <span class="n">labelfunc</span> <span class="o">=</span> <span class="nb">str</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">def</span> <span class="nf">labelfunc</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">Term</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">vrepr</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">)&quot;</span>
+    <span class="k">return</span> <span class="n">dotprint</span><span class="p">(</span><span class="n">bv</span><span class="p">,</span> <span class="n">repeat</span><span class="o">=</span><span class="n">repeat</span><span class="p">,</span> <span class="n">labelfunc</span><span class="o">=</span><span class="n">labelfunc</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Adrián Ranea.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

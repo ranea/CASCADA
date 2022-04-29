@@ -1,0 +1,15 @@
+cascada.abstractproperty module
+===============================
+
+.. automodule:: cascada.abstractproperty
+   :members:
+   :show-inheritance:
+
+.. toctree::
+   :maxdepth: 4
+
+   cascada.abstractproperty.property
+   cascada.abstractproperty.opmodel
+   cascada.abstractproperty.tests.test_opmodel
+   cascada.abstractproperty.chmodel
+   cascada.abstractproperty.characteristic

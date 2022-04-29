@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cascada.bitvector.context &mdash; CASCADA 1.0.rc0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> CASCADA
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">CASCADA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../primitives_implemented.html">Primitives implemented</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cascada.html">API reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">CASCADA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>cascada.bitvector.context</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cascada.bitvector.context</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Provide context managers to modify the creation and evaluation of bit-vector expressions.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">contextlib</span>
+
+<span class="kn">import</span> <span class="nn">bidict</span>
+
+<span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">core</span>
+
+
+<div class="viewcode-block" id="StatefulContext"><a class="viewcode-back" href="../../../cascada.bitvector.context.html#cascada.bitvector.context.StatefulContext">[docs]</a><span class="k">class</span> <span class="nc">StatefulContext</span><span class="p">(</span><span class="n">contextlib</span><span class="o">.</span><span class="n">AbstractContextManager</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base class for context managers with history.&quot;&quot;&quot;</span>
+
+    <span class="n">current_context</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_context</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize the context.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">new_context</span> <span class="o">=</span> <span class="n">new_context</span>
+
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">previous_context</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">current_context</span>
+        <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">current_context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_context</span>
+        <span class="c1"># return self.new_context</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">current_context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">previous_context</span></div>
+
+
+<div class="viewcode-block" id="Cache"><a class="viewcode-back" href="../../../cascada.bitvector.context.html#cascada.bitvector.context.Cache">[docs]</a><span class="k">class</span> <span class="nc">Cache</span><span class="p">(</span><span class="n">StatefulContext</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Control the Cache context.</span>
+
+<span class="sd">    Control whether or not the cache is used operating with bit-vectors.</span>
+<span class="sd">    By default, the cache is enabled.</span>
+
+<span class="sd">    Note that the Cache context cannot be enabled when the</span>
+<span class="sd">    `Simplification` or `PrimaryOperationEvaluation` context are disabled,</span>
+<span class="sd">    or when `SecondaryOperationEvaluation` is enabled.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">current_context</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_context</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize the context.&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">new_context</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">]</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">new_context</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_context</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">Simplification</span><span class="o">.</span><span class="n">current_context</span> <span class="ow">is</span> <span class="kc">True</span>
+            <span class="k">assert</span> <span class="n">PrimaryOperationEvaluation</span><span class="o">.</span><span class="n">current_context</span> <span class="ow">is</span> <span class="kc">True</span>
+            <span class="k">assert</span> <span class="n">SecondaryOperationEvaluation</span><span class="o">.</span><span class="n">current_context</span> <span class="ow">is</span> <span class="kc">False</span>
+            <span class="k">assert</span> <span class="n">Memoization</span><span class="o">.</span><span class="n">current_context</span> <span class="ow">is</span> <span class="kc">False</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__enter__</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Simplification"><a class="viewcode-back" href="../../../cascada.bitvector.context.html#cascada.bitvector.context.Simplification">[docs]</a><span class="k">class</span> <span class="nc">Simplification</span><span class="p">(</span><span class="n">StatefulContext</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Control the Simplification context.</span>
+
+<span class="sd">    Control whether or not bit-vector expressions are automatically simplified.</span>
+<span class="sd">    By default, automatic simplification is enabled.</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.context import Simplification</span>
+<span class="sd">        &gt;&gt;&gt; x, y = Variable(&quot;x&quot;, 8), Variable(&quot;y&quot;, 8)</span>
+<span class="sd">        &gt;&gt;&gt; (x | y) | x</span>
+<span class="sd">        x | y</span>
+<span class="sd">        &gt;&gt;&gt; with Simplification(False):</span>
+<span class="sd">        ...     expr = (x | y) | x</span>
+<span class="sd">        &gt;&gt;&gt; expr</span>
+<span class="sd">        x | y | x</span>
+
+<span class="sd">    When the Simplification context is disabled, the `Cache` context is</span>
+<span class="sd">    also disabled.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        Disabling `Simplification` and `Validation` speeds up</span>
+<span class="sd">        non-symbolic computations with bit-vectors.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">current_context</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_context</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize the context.&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">new_context</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">]</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">new_context</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_context</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cache_context</span> <span class="o">=</span> <span class="n">Cache</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cache_context</span><span class="o">.</span><span class="fm">__enter__</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__enter__</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_context</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cache_context</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="PrimaryOperationEvaluation"><a class="viewcode-back" href="../../../cascada.bitvector.context.html#cascada.bitvector.context.PrimaryOperationEvaluation">[docs]</a><span class="k">class</span> <span class="nc">PrimaryOperationEvaluation</span><span class="p">(</span><span class="n">StatefulContext</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Control the PrimaryOperationEvaluation context.</span>
+
+<span class="sd">    Control whether `PrimaryOperation` objects with symbolic inputs</span>
+<span class="sd">    are evaluated  (True by default).</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.context import PrimaryOperationEvaluation</span>
+<span class="sd">        &gt;&gt;&gt; Constant(1, 8) - Constant(1, 8) + Variable(&quot;x&quot;, 8) - Variable(&quot;x&quot;, 8)</span>
+<span class="sd">        0x00</span>
+<span class="sd">        &gt;&gt;&gt; with PrimaryOperationEvaluation(False):</span>
+<span class="sd">        ...     expr = Constant(1, 8) - Constant(1, 8) + Variable(&quot;x&quot;, 8) - Variable(&quot;x&quot;, 8)</span>
+<span class="sd">        &gt;&gt;&gt; expr</span>
+<span class="sd">        (0x00 + x) - x</span>
+<span class="sd">        &gt;&gt;&gt; expr.doit()</span>
+<span class="sd">        0x00</span>
+
+<span class="sd">    When the `PrimaryOperationEvaluation` context is disabled,</span>
+<span class="sd">    the `Simplification` and `Cache` contexts are also disabled.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">current_context</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_context</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize the context.&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">new_context</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">]</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">new_context</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_context</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">simplify_context</span> <span class="o">=</span> <span class="n">Simplification</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">simplify_context</span><span class="o">.</span><span class="fm">__enter__</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__enter__</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_context</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">simplify_context</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="SecondaryOperationEvaluation"><a class="viewcode-back" href="../../../cascada.bitvector.context.html#cascada.bitvector.context.SecondaryOperationEvaluation">[docs]</a><span class="k">class</span> <span class="nc">SecondaryOperationEvaluation</span><span class="p">(</span><span class="n">StatefulContext</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Control the SecondaryOperationEvaluation context.</span>
+
+<span class="sd">    Control whether `SecondaryOperation` objects with symbolic inputs</span>
+<span class="sd">    are evaluated (False by default).</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.context import SecondaryOperationEvaluation</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.secondaryop import BvMaj</span>
+<span class="sd">        &gt;&gt;&gt; BvMaj(Constant(1, 8), Constant(1, 8), Constant(2, 8))</span>
+<span class="sd">        0x01</span>
+<span class="sd">        &gt;&gt;&gt; expr = BvMaj(Variable(&quot;x&quot;, 8), Variable(&quot;y&quot;, 8), Variable(&quot;z&quot;, 8))</span>
+<span class="sd">        &gt;&gt;&gt; expr</span>
+<span class="sd">        BvMaj(x, y, z)</span>
+<span class="sd">        &gt;&gt;&gt; expr.doit()</span>
+<span class="sd">        (x &amp; y) | (x &amp; z) | (y &amp; z)</span>
+<span class="sd">        &gt;&gt;&gt; with SecondaryOperationEvaluation(True):</span>
+<span class="sd">        ...     BvMaj(Variable(&quot;x&quot;, 8), Variable(&quot;y&quot;, 8), Variable(&quot;z&quot;, 8))</span>
+<span class="sd">        (x &amp; y) | (x &amp; z) | (y &amp; z)</span>
+
+<span class="sd">    When the `SecondaryOperation` context is enabled, the `Cache` context is disabled.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">current_context</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_context</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize the context.&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">new_context</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">]</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">new_context</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_context</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cache_context</span> <span class="o">=</span> <span class="n">Cache</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cache_context</span><span class="o">.</span><span class="fm">__enter__</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__enter__</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_context</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cache_context</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Validation"><a class="viewcode-back" href="../../../cascada.bitvector.context.html#cascada.bitvector.context.Validation">[docs]</a><span class="k">class</span> <span class="nc">Validation</span><span class="p">(</span><span class="n">StatefulContext</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Control the Validation context.</span>
+
+<span class="sd">    Control whether or not arguments of bit-vector operators are validated</span>
+<span class="sd">    (e.g., the integer value when creating a `Constant` fits for the width given).</span>
+<span class="sd">    By default, validation of arguments is enabled.</span>
+
+<span class="sd">    Note that when it is disabled,  Automatic Constant Conversion is no longer</span>
+<span class="sd">    available (see `Operation`).</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Constant</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.context import Validation</span>
+<span class="sd">        &gt;&gt;&gt; Constant(1, 8) + 1</span>
+<span class="sd">        0x02</span>
+<span class="sd">        &gt;&gt;&gt; with Validation(False):</span>
+<span class="sd">        ...     Constant(1, 5) + 2</span>
+<span class="sd">        Traceback (most recent call last):</span>
+<span class="sd">         ...</span>
+<span class="sd">        AttributeError: &#39;int&#39; object has no attribute &#39;width&#39;</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        Disabling `Simplification` and `Validation` speeds up</span>
+<span class="sd">        non-symbolic computations with bit-vectors.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">current_context</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_context</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize the context.&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">new_context</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">]</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">new_context</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Memoization"><a class="viewcode-back" href="../../../cascada.bitvector.context.html#cascada.bitvector.context.Memoization">[docs]</a><span class="k">class</span> <span class="nc">Memoization</span><span class="p">(</span><span class="n">StatefulContext</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Control the Memoization context.</span>
+
+<span class="sd">    Control whether or not bit-vector operations are evaluated in the</span>
+<span class="sd">    *memoization mode*. By default, it is disabled.</span>
+
+<span class="sd">    In the memoization mode, the result of each bit-vector operation is</span>
+<span class="sd">    stored in a table (with a unique identifier). When the same inputs</span>
+<span class="sd">    occurs again, the result is retrieved from the table. See also</span>
+<span class="sd">    `Memoization &lt;https://en.wikipedia.org/wiki/Memoization&gt;`_.</span>
+
+<span class="sd">    Note that in the memoization mode, bit-vector operations don&#39;t return</span>
+<span class="sd">    the actual values but their identifiers in the memoization table.</span>
+<span class="sd">    The actual values can be obtained from the `MemoizationTable`.</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.context import Memoization, MemoizationTable</span>
+<span class="sd">        &gt;&gt;&gt; x, y, z = Variable(&quot;x&quot;, 8), Variable(&quot;y&quot;, 8), Variable(&quot;z&quot;, 8),</span>
+<span class="sd">        &gt;&gt;&gt; ~((x + y) ^ ((z + 1) &amp; y))</span>
+<span class="sd">        ~((x + y) ^ ((z + 0x01) &amp; y))</span>
+<span class="sd">        &gt;&gt;&gt; non_memoized_expr = (z + 1)</span>
+<span class="sd">        &gt;&gt;&gt; lut = MemoizationTable()</span>
+<span class="sd">        &gt;&gt;&gt; with Memoization(lut):</span>
+<span class="sd">        ...     expr = ~((x + y) ^ (non_memoized_expr &amp; y))</span>
+<span class="sd">        &gt;&gt;&gt; expr</span>
+<span class="sd">        x3</span>
+<span class="sd">        &gt;&gt;&gt; lut</span>
+<span class="sd">        MemoizationTable([(x0, x + y), (x1, (z + 0x01) &amp; y), (x2, x0 ^ x1), (x3, ~x2)])</span>
+
+<span class="sd">    The Memoization context is useful to efficiently compute large symbolic</span>
+<span class="sd">    expressions since the identifiers are used instead of the full expressions.</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.context import Memoization, MemoizationTable</span>
+<span class="sd">        &gt;&gt;&gt; x = Variable(&quot;x&quot;, 8)</span>
+<span class="sd">        &gt;&gt;&gt; expr = x</span>
+<span class="sd">        &gt;&gt;&gt; for i in range(3): expr += expr</span>
+<span class="sd">        &gt;&gt;&gt; expr</span>
+<span class="sd">        x + x + x + x + x + x + x + x</span>
+<span class="sd">        &gt;&gt;&gt; lut = MemoizationTable()</span>
+<span class="sd">        &gt;&gt;&gt; with Memoization(lut):</span>
+<span class="sd">        ...     expr = x</span>
+<span class="sd">        ...     for i in range(3): expr += expr</span>
+<span class="sd">        &gt;&gt;&gt; expr</span>
+<span class="sd">        x2</span>
+<span class="sd">        &gt;&gt;&gt; lut  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        MemoizationTable([(x0, x + x), (x1, x0 + x0), (x2, x1 + x1)])</span>
+
+<span class="sd">    When the Memoization context is enabled, the `Simplification` and `Cache`</span>
+<span class="sd">    contexts are disabled.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">current_context</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_context</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize the context.&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">new_context</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new_context</span><span class="p">,</span> <span class="n">MemoizationTable</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">new_context</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_context</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">simplify_context</span> <span class="o">=</span> <span class="n">Simplification</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">simplify_context</span><span class="o">.</span><span class="fm">__enter__</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__enter__</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_context</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">simplify_context</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="MemoizationTable"><a class="viewcode-back" href="../../../cascada.bitvector.context.html#cascada.bitvector.context.MemoizationTable">[docs]</a><span class="k">class</span> <span class="nc">MemoizationTable</span><span class="p">(</span><span class="n">collections</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">MutableMapping</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Store bit-vector expressions with unique identifiers.</span>
+
+<span class="sd">    The MemoizationTable is a dictionary-like structure</span>
+<span class="sd">    (implementing the usual methods of a dictionary and</span>
+<span class="sd">    some additional methods, and remembering the order</span>
+<span class="sd">    entries were added as collections.Counter)</span>
+<span class="sd">    used for evaluating bit-vector operations</span>
+<span class="sd">    in the *memoization mode* (see `Memoization`).</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.context import Memoization, MemoizationTable</span>
+<span class="sd">        &gt;&gt;&gt; x, y = Variable(&quot;x&quot;, 8), Variable(&quot;y&quot;, 8)</span>
+<span class="sd">        &gt;&gt;&gt; lut = MemoizationTable()</span>
+<span class="sd">        &gt;&gt;&gt; with Memoization(lut):</span>
+<span class="sd">        ...     expr = ~(x + y)</span>
+<span class="sd">        &gt;&gt;&gt; lut</span>
+<span class="sd">        MemoizationTable([(x0, x + y), (x1, ~x0)])</span>
+<span class="sd">        &gt;&gt;&gt; lut[Variable(&quot;x0&quot;, 8)]</span>
+<span class="sd">        x + y</span>
+<span class="sd">        &gt;&gt;&gt; lut.get_id(x + y)</span>
+<span class="sd">        x0</span>
+<span class="sd">        &gt;&gt;&gt; lut.add_op(Variable(&quot;x1&quot;, 8) &amp; Variable(&quot;z&quot;, 8))</span>
+<span class="sd">        x2</span>
+<span class="sd">        &gt;&gt;&gt; lut</span>
+<span class="sd">        MemoizationTable([(x0, x + y), (x1, ~x0), (x2, x1 &amp; z)])</span>
+<span class="sd">        &gt;&gt;&gt; lut.replace_id(Variable(&quot;x0&quot;, 8), Variable(&quot;x_0&quot;, 8))</span>
+<span class="sd">        &gt;&gt;&gt; lut</span>
+<span class="sd">        MemoizationTable([(x_0, x + y), (x1, ~x_0), (x2, x1 &amp; z)])</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">id_prefix</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize an MemoizationTable.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table</span> <span class="o">=</span> <span class="n">bidict</span><span class="o">.</span><span class="n">OrderedBidict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id_prefix</span> <span class="o">=</span> <span class="n">id_prefix</span>
+
+<div class="viewcode-block" id="MemoizationTable.from_list_of_assignments"><a class="viewcode-back" href="../../../cascada.bitvector.context.html#cascada.bitvector.context.MemoizationTable.from_list_of_assignments">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_list_of_assignments</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">assignments</span><span class="p">,</span> <span class="n">new_id_prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a new `MemoizationTable` with the given list of assignments.</span>
+
+<span class="sd">        The argument ``assignments`` is a list of pairs (`Variable`, `Operation`)</span>
+<span class="sd">        where the variable represents the output of the operation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">cascada.bitvector.operation</span> <span class="kn">import</span> <span class="n">Operation</span>
+        <span class="k">for</span> <span class="n">v_i</span><span class="p">,</span> <span class="n">op_i</span> <span class="ow">in</span> <span class="n">assignments</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v_i</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Variable</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">op_i</span><span class="p">,</span> <span class="n">Operation</span><span class="p">)</span>
+
+        <span class="n">my_table</span> <span class="o">=</span> <span class="n">MemoizationTable</span><span class="p">()</span>
+        <span class="n">my_table</span><span class="o">.</span><span class="n">counter</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">assignments</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">new_id_prefix</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">first_var</span> <span class="o">=</span> <span class="n">assignments</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">first_var</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+                    <span class="n">index_first_digit</span> <span class="o">=</span> <span class="n">i</span>
+                    <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">index_first_digit</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">first_var</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">my_table</span><span class="o">.</span><span class="n">id_prefix</span> <span class="o">=</span> <span class="n">first_var</span><span class="o">.</span><span class="n">name</span><span class="p">[:</span><span class="n">index_first_digit</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">my_table</span><span class="o">.</span><span class="n">id_prefix</span> <span class="o">=</span> <span class="n">new_id_prefix</span>
+
+        <span class="k">for</span> <span class="n">v_i</span><span class="p">,</span> <span class="n">op_i</span> <span class="ow">in</span> <span class="n">assignments</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">v_i</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">my_table</span><span class="o">.</span><span class="n">id_prefix</span><span class="p">)</span> <span class="ow">and</span> \
+                    <span class="n">v_i</span><span class="o">.</span><span class="n">name</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">my_table</span><span class="o">.</span><span class="n">id_prefix</span><span class="p">):]</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()</span> <span class="ow">and</span> \
+                    <span class="nb">int</span><span class="p">(</span><span class="n">v_i</span><span class="o">.</span><span class="n">name</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">my_table</span><span class="o">.</span><span class="n">id_prefix</span><span class="p">):])</span> <span class="o">&gt;</span> <span class="n">my_table</span><span class="o">.</span><span class="n">counter</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;invalid var name </span><span class="si">{}</span><span class="s2"> due to id_prefix </span><span class="si">{}</span><span class="s2"> and counter </span><span class="si">{}</span><span class="se">\n</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">v_i</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">my_table</span><span class="o">.</span><span class="n">id_prefix</span><span class="p">,</span> <span class="n">my_table</span><span class="o">.</span><span class="n">counter</span><span class="p">,</span> <span class="n">assignments</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="n">my_table</span><span class="o">.</span><span class="n">table</span> <span class="o">=</span> <span class="n">bidict</span><span class="o">.</span><span class="n">OrderedBidict</span><span class="p">(</span><span class="n">assignments</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">my_table</span></div>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">expr</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;use add_op and replace_id instead&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">op</span><span class="o">.</span><span class="n">atoms</span><span class="p">()</span> <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="fm">__delitem__</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="fm">__len__</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="fm">__iter__</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">(</span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
+
+    <span class="fm">__repr__</span> <span class="o">=</span> <span class="fm">__str__</span>
+
+<div class="viewcode-block" id="MemoizationTable.add_op"><a class="viewcode-back" href="../../../cascada.bitvector.context.html#cascada.bitvector.context.MemoizationTable.add_op">[docs]</a>    <span class="k">def</span> <span class="nf">add_op</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expr</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add an bit-vector expression and return its identifier.&quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">operation</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">operation</span><span class="o">.</span><span class="n">Operation</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">contain_op</span><span class="p">(</span><span class="n">expr</span><span class="p">)</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id_prefix</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">counter</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">identifier</span> <span class="o">=</span> <span class="n">core</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">expr</span><span class="o">.</span><span class="n">width</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="n">identifier</span><span class="p">]</span> <span class="o">=</span> <span class="n">expr</span>
+
+        <span class="k">return</span> <span class="n">identifier</span></div>
+
+<div class="viewcode-block" id="MemoizationTable.get_id"><a class="viewcode-back" href="../../../cascada.bitvector.context.html#cascada.bitvector.context.MemoizationTable.get_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expr</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the identifier of a bit-vector expression.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">inv</span><span class="p">[</span><span class="n">expr</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="MemoizationTable.contain_op"><a class="viewcode-back" href="../../../cascada.bitvector.context.html#cascada.bitvector.context.MemoizationTable.contain_op">[docs]</a>    <span class="k">def</span> <span class="nf">contain_op</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expr</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check if the bit-vector expression is stored.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">expr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">inv</span></div>
+
+<div class="viewcode-block" id="MemoizationTable.replace_id"><a class="viewcode-back" href="../../../cascada.bitvector.context.html#cascada.bitvector.context.MemoizationTable.replace_id">[docs]</a>    <span class="k">def</span> <span class="nf">replace_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">old_id</span><span class="p">,</span> <span class="n">new_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Replace the old identifier by the given new identifier.&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">old_id</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Variable</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new_id</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Variable</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">old_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span> <span class="ow">and</span> <span class="n">new_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span>
+
+        <span class="n">table</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">op</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">table</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="n">old_id</span><span class="p">:</span>
+                <span class="n">new_key</span> <span class="o">=</span> <span class="n">new_id</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">new_key</span> <span class="o">=</span> <span class="n">key</span>
+
+            <span class="n">table</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">new_key</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">xreplace</span><span class="p">({</span><span class="n">old_id</span><span class="p">:</span> <span class="n">new_id</span><span class="p">}))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">table</span> <span class="o">=</span> <span class="n">bidict</span><span class="o">.</span><span class="n">OrderedBidict</span><span class="p">(</span><span class="n">table</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MemoizationTable.clear"><a class="viewcode-back" href="../../../cascada.bitvector.context.html#cascada.bitvector.context.MemoizationTable.clear">[docs]</a>    <span class="k">def</span> <span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Empty the table.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Adrián Ranea.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

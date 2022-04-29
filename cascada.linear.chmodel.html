@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cascada.linear.chmodel module &mdash; CASCADA 1.0.rc0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="cascada.linear.characteristic module" href="cascada.linear.characteristic.html" />
+    <link rel="prev" title="cascada.linear.opmodel module" href="cascada.linear.opmodel.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> CASCADA
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">CASCADA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="primitives_implemented.html">Primitives implemented</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="cascada.html">API reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="cascada.bitvector.html">cascada.bitvector module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.primitives.html">cascada.primitives module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.abstractproperty.html">cascada.abstractproperty module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.differential.html">cascada.differential module</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="cascada.linear.html">cascada.linear module</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="cascada.linear.mask.html">cascada.linear.mask module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.linear.opmodel.html">cascada.linear.opmodel module</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">cascada.linear.chmodel module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.linear.characteristic.html">cascada.linear.characteristic module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.algebraic.html">cascada.algebraic module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.smt.html">cascada.smt module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">CASCADA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="cascada.html">API reference</a> &raquo;</li>
+          <li><a href="cascada.linear.html">cascada.linear module</a> &raquo;</li>
+      <li>cascada.linear.chmodel module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/cascada.linear.chmodel.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-cascada.linear.chmodel">
+<span id="cascada-linear-chmodel-module"></span><h1>cascada.linear.chmodel module<a class="headerlink" href="#module-cascada.linear.chmodel" title="Permalink to this headline"></a></h1>
+<p>Manage bit-vector models of linear characteristics.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.linear.chmodel.ChModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.linear.chmodel.</span></span><span class="sig-name descname"><span class="pre">ChModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_mask_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mx'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">external_var2mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op_model_class2options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/linear/chmodel.html#ChModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.linear.chmodel.ChModel" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel" title="cascada.abstractproperty.chmodel.ChModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.abstractproperty.chmodel.ChModel</span></code></a></p>
+<p>Represent bit-vector models of linear characteristics over bit-vector functions.</p>
+<p>Internally, this class is a subclass of <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel" title="cascada.abstractproperty.chmodel.ChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.chmodel.ChModel</span></code></a>,
+where the <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> is a <a class="reference internal" href="cascada.linear.mask.html#cascada.linear.mask.LinearMask" title="cascada.linear.mask.LinearMask"><code class="xref any py py-class docutils literal notranslate"><span class="pre">LinearMask</span></code></a> type and the probability of the
+characteristic here considered is the product of the
+absolute linear correlation of the linear approximations
+<span class="math notranslate nohighlight">\((\Delta_{x_{i}} \mapsto \Delta_{x_{i+1}})\)</span> composing
+the characteristic (see <a class="reference internal" href="cascada.linear.characteristic.html#cascada.linear.characteristic.Characteristic" title="cascada.linear.characteristic.Characteristic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">linear.characteristic.Characteristic</span></code></a>).</p>
+<p>To handle the propagation of masks through branching subroutines
+(i.e., <span class="math notranslate nohighlight">\(x \mapsto (x, x)\)</span>), the <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.SSA" title="cascada.bitvector.ssa.SSA"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SSA</span></code></a> of the <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.BvFunction" title="cascada.bitvector.ssa.BvFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvFunction</span></code></a> is computed
+with the initialization argument <code class="docutils literal notranslate"><span class="pre">replace_multiuse_vars</span></code> set to <code class="docutils literal notranslate"><span class="pre">True</span></code>
+and the new free masks are wrapped in <a class="reference internal" href="cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelFreeBranch" title="cascada.linear.opmodel.LinearModelFreeBranch"><code class="xref any py py-class docutils literal notranslate"><span class="pre">LinearModelFreeBranch</span></code></a> objects
+(see also <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.SSA" title="cascada.bitvector.ssa.SSA"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SSA</span></code></a> and <a class="reference internal" href="cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelFreeBranch" title="cascada.linear.opmodel.LinearModelFreeBranch"><code class="xref any py py-class docutils literal notranslate"><span class="pre">LinearModelFreeBranch</span></code></a>).</p>
+<p>If the <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.SSA" title="cascada.bitvector.ssa.SSA"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SSA</span></code></a> of the <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.BvFunction" title="cascada.bitvector.ssa.BvFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvFunction</span></code></a> contains external <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Variable" title="cascada.bitvector.core.Variable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Variable</span></code></a> objects
+and their <a class="reference internal" href="cascada.linear.mask.html#cascada.linear.mask.LinearMask" title="cascada.linear.mask.LinearMask"><code class="xref any py py-class docutils literal notranslate"><span class="pre">LinearMask</span></code></a> objects are not provided in the initialization
+through <code class="docutils literal notranslate"><span class="pre">external_var2mask</span></code>, these free external masks
+are wrapped in <a class="reference internal" href="cascada.linear.mask.html#cascada.linear.mask.LinearMask" title="cascada.linear.mask.LinearMask"><code class="xref any py py-class docutils literal notranslate"><span class="pre">LinearMask</span></code></a> objects.</p>
+<p>Linear characteristic models of functions with unused input vars
+is currently not supported.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.linear.mask</span> <span class="kn">import</span> <span class="n">LinearMask</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.linear.chmodel</span> <span class="kn">import</span> <span class="n">ChModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">speck</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32_KS</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span><span class="o">.</span><span class="n">key_schedule</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32_KS</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model</span> <span class="o">=</span> <span class="n">ChModel</span><span class="p">(</span><span class="n">Speck32_KS</span><span class="p">,</span> <span class="n">LinearMask</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;mk0&quot;</span><span class="p">,</span> <span class="s2">&quot;mk1&quot;</span><span class="p">,</span> <span class="s2">&quot;mk2&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model</span>  
+<span class="go">ChModel(func=SpeckKeySchedule_2R,</span>
+<span class="go">        input_mask=[LinearMask(mk0), LinearMask(mk1), LinearMask(mk2)],</span>
+<span class="go">        output_mask=[LinearMask(mk2_out), LinearMask(mx3_out), LinearMask(mx8_out)],</span>
+<span class="go">        assign_outmask2op_model=[(LinearMask(mk2__0), LinearModelFreeBranch(LinearMask(mk2))),</span>
+<span class="go">            (LinearMask(mk2__1), LinearModelFreeBranch(LinearMask(mk2))),</span>
+<span class="go">            (LinearMask(mx1), LinearModelBvAdd([LinearMask(mk1 &gt;&gt;&gt; 7), LinearMask(mk2__0)])),</span>
+<span class="go">            (LinearMask(mx3), LinearModelBvXor([LinearMask(mk2__1 &lt;&lt;&lt; 2), LinearMask(mx1)])),</span>
+<span class="go">            (LinearMask(mx3__0), LinearModelFreeBranch(LinearMask(mx3))),</span>
+<span class="go">            (LinearMask(mx3__1), LinearModelFreeBranch(LinearMask(mx3))),</span>
+<span class="go">            (LinearMask(mx5), LinearModelBvAdd([LinearMask(mk0 &gt;&gt;&gt; 7), LinearMask(mx3__0)])),</span>
+<span class="go">            (LinearMask(mx8), LinearModelBvXor([LinearMask(mx3__1 &lt;&lt;&lt; 2), LinearMask(mx5)])),</span>
+<span class="go">            (LinearMask(mk2_out), LinearModelId(LinearMask(mk2 ^ mk2__0 ^ mk2__1))),</span>
+<span class="go">            (LinearMask(mx3_out), LinearModelId(LinearMask(mx3 ^ mx3__0 ^ mx3__1))),</span>
+<span class="go">            (LinearMask(mx8_out), LinearModelId(LinearMask(mx8)))])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model</span><span class="o">.</span><span class="n">ssa</span>  
+<span class="go">SSA(input_vars=[mk0, mk1, mk2],</span>
+<span class="go">    output_vars=[mk2_out, mx3_out, mx8_out],</span>
+<span class="go">    assignments=[(mx0, mk1 &gt;&gt;&gt; 7), (mk2__0, Id(mk2)), (mk2__1, Id(mk2)), (mk2__2, Id(mk2)),</span>
+<span class="go">            (mx1, mx0 + mk2__0), (mx2, mk2__1 &lt;&lt;&lt; 2), (mx3, mx2 ^ mx1),</span>
+<span class="go">        (mx4, mk0 &gt;&gt;&gt; 7), (mx3__0, Id(mx3)), (mx3__1, Id(mx3)), (mx3__2, Id(mx3)),</span>
+<span class="go">            (mx5, mx4 + mx3__0), (mx6, mx5 ^ 0x0001), (mx7, mx3__1 &lt;&lt;&lt; 2), (mx8, mx7 ^ mx6),</span>
+<span class="go">        (mk2_out, Id(mk2__2)), (mx3_out, Id(mx3__2)), (mx8_out, Id(mx8))])</span>
+</pre></div>
+</div>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.linear.chmodel.ChModel.mask_type">
+<span class="sig-name descname"><span class="pre">mask_type</span></span><a class="headerlink" href="#cascada.linear.chmodel.ChModel.mask_type" title="Permalink to this definition"></a></dt>
+<dd><p>the mask type (currently only <a class="reference internal" href="cascada.linear.mask.html#cascada.linear.mask.LinearMask" title="cascada.linear.mask.LinearMask"><code class="xref any py py-class docutils literal notranslate"><span class="pre">LinearMask</span></code></a> is supported);
+alias of <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel.prop_type" title="cascada.abstractproperty.chmodel.ChModel.prop_type"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">abstractproperty.chmodel.ChModel.prop_type</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.linear.chmodel.ChModel.input_mask">
+<span class="sig-name descname"><span class="pre">input_mask</span></span><a class="headerlink" href="#cascada.linear.chmodel.ChModel.input_mask" title="Permalink to this definition"></a></dt>
+<dd><p>a list of <a class="reference internal" href="cascada.linear.mask.html#cascada.linear.mask.LinearMask" title="cascada.linear.mask.LinearMask"><code class="xref any py py-class docutils literal notranslate"><span class="pre">LinearMask</span></code></a> objects containing
+the (symbolic) input mask (alias of
+<a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel.input_prop" title="cascada.abstractproperty.chmodel.ChModel.input_prop"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">abstractproperty.chmodel.ChModel.input_prop</span></code></a>).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.linear.chmodel.ChModel.output_mask">
+<span class="sig-name descname"><span class="pre">output_mask</span></span><a class="headerlink" href="#cascada.linear.chmodel.ChModel.output_mask" title="Permalink to this definition"></a></dt>
+<dd><p>a list of <a class="reference internal" href="cascada.linear.mask.html#cascada.linear.mask.LinearMask" title="cascada.linear.mask.LinearMask"><code class="xref any py py-class docutils literal notranslate"><span class="pre">LinearMask</span></code></a> objects containing
+the (symbolic) output mask (alias of
+<a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel.output_prop" title="cascada.abstractproperty.chmodel.ChModel.output_prop"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">abstractproperty.chmodel.ChModel.output_prop</span></code></a>).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.linear.chmodel.ChModel.external_var2mask">
+<span class="sig-name descname"><span class="pre">external_var2mask</span></span><a class="headerlink" href="#cascada.linear.chmodel.ChModel.external_var2mask" title="Permalink to this definition"></a></dt>
+<dd><p>a <a class="reference external" href="https://docs.python.org/3/library/collections.html#collections.OrderedDict" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">collections.OrderedDict</span></code></a> mapping the external
+variables of <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel.ssa" title="cascada.abstractproperty.chmodel.ChModel.ssa"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">abstractproperty.chmodel.ChModel.ssa</span></code></a> to their
+associated (symbolic or constant) <a class="reference internal" href="cascada.linear.mask.html#cascada.linear.mask.LinearMask" title="cascada.linear.mask.LinearMask"><code class="xref any py py-class docutils literal notranslate"><span class="pre">LinearMask</span></code></a> objects (alias of
+<a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel.external_var2prop" title="cascada.abstractproperty.chmodel.ChModel.external_var2prop"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">abstractproperty.chmodel.ChModel.external_var2prop</span></code></a>).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.linear.chmodel.ChModel.assign_outmask2op_model">
+<span class="sig-name descname"><span class="pre">assign_outmask2op_model</span></span><a class="headerlink" href="#cascada.linear.chmodel.ChModel.assign_outmask2op_model" title="Permalink to this definition"></a></dt>
+<dd><p>a <a class="reference external" href="https://docs.python.org/3/library/collections.html#collections.OrderedDict" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">collections.OrderedDict</span></code></a> mapping the
+output <a class="reference internal" href="cascada.linear.mask.html#cascada.linear.mask.LinearMask" title="cascada.linear.mask.LinearMask"><code class="xref any py py-class docutils literal notranslate"><span class="pre">LinearMask</span></code></a> <span class="math notranslate nohighlight">\(\Delta_{x_{i+1}}\)</span> of
+the non-trivial assignment  <span class="math notranslate nohighlight">\(x_{i+1} \leftarrow f_i(x_i)\)</span> to
+the <a class="reference internal" href="cascada.linear.opmodel.html#cascada.linear.opmodel.OpModel" title="cascada.linear.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">linear.opmodel.OpModel</span></code></a> of this assignment (alias of
+<a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel.assign_outprop2op_model" title="cascada.abstractproperty.chmodel.ChModel.assign_outprop2op_model"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">abstractproperty.chmodel.ChModel.assign_outprop2op_model</span></code></a>).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.linear.chmodel.ChModel.var2mask">
+<span class="sig-name descname"><span class="pre">var2mask</span></span><a class="headerlink" href="#cascada.linear.chmodel.ChModel.var2mask" title="Permalink to this definition"></a></dt>
+<dd><p>a <a class="reference external" href="https://docs.python.org/3/library/collections.html#collections.OrderedDict" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">collections.OrderedDict</span></code></a> mapping each variable in
+<a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel.ssa" title="cascada.abstractproperty.chmodel.ChModel.ssa"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">abstractproperty.chmodel.ChModel.ssa</span></code></a>
+to its associated <a class="reference internal" href="cascada.linear.mask.html#cascada.linear.mask.LinearMask" title="cascada.linear.mask.LinearMask"><code class="xref any py py-class docutils literal notranslate"><span class="pre">LinearMask</span></code></a> object (alias of
+<a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel.var2prop" title="cascada.abstractproperty.chmodel.ChModel.var2prop"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">abstractproperty.chmodel.ChModel.var2prop</span></code></a>).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.linear.chmodel.ChModel.vrepr">
+<span class="sig-name descname"><span class="pre">vrepr</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/linear/chmodel.html#ChModel.vrepr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.linear.chmodel.ChModel.vrepr" title="Permalink to this definition"></a></dt>
+<dd><p>Return an executable string representation.</p>
+<p>See also <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel.vrepr" title="cascada.abstractproperty.chmodel.ChModel.vrepr"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">abstractproperty.chmodel.ChModel.vrepr</span></code></a>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.linear.mask</span> <span class="kn">import</span> <span class="n">LinearMask</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.linear.chmodel</span> <span class="kn">import</span> <span class="n">ChModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">speck</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32_KS</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span><span class="o">.</span><span class="n">key_schedule</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32_KS</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model</span> <span class="o">=</span> <span class="n">ChModel</span><span class="p">(</span><span class="n">Speck32_KS</span><span class="p">,</span> <span class="n">LinearMask</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;mk0&quot;</span><span class="p">,</span> <span class="s2">&quot;mk1&quot;</span><span class="p">,</span> <span class="s2">&quot;mk2&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model</span><span class="o">.</span><span class="n">vrepr</span><span class="p">()</span>  
+<span class="go">&quot;ChModel(func=SpeckKeySchedule.set_num_rounds_and_return(2), mask_type=LinearMask,</span>
+<span class="go">         input_mask_names=[&#39;mk0&#39;, &#39;mk1&#39;, &#39;mk2&#39;], prefix=&#39;mx&#39;)&quot;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.linear.chmodel.ChModel.validity_assertions">
+<span class="sig-name descname"><span class="pre">validity_assertions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/linear/chmodel.html#ChModel.validity_assertions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.linear.chmodel.ChModel.validity_assertions" title="Permalink to this definition"></a></dt>
+<dd><p>Return the validity constraint as a list of assertions.</p>
+<p>See also <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel.validity_assertions" title="cascada.abstractproperty.chmodel.ChModel.validity_assertions"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">abstractproperty.chmodel.ChModel.validity_assertions</span></code></a>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">reduce</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.operation</span> <span class="kn">import</span> <span class="n">BvAnd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.linear.mask</span> <span class="kn">import</span> <span class="n">LinearMask</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.linear.chmodel</span> <span class="kn">import</span> <span class="n">ChModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">speck</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32_KS</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span><span class="o">.</span><span class="n">key_schedule</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32_KS</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model</span> <span class="o">=</span> <span class="n">ChModel</span><span class="p">(</span><span class="n">Speck32_KS</span><span class="p">,</span> <span class="n">LinearMask</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;mk0&quot;</span><span class="p">,</span> <span class="s2">&quot;mk1&quot;</span><span class="p">,</span> <span class="s2">&quot;mk2&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">assertions</span> <span class="o">=</span> <span class="n">ch_model</span><span class="o">.</span><span class="n">validity_assertions</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">assertions</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>  
+<span class="go">((~((mx1 ^ (mk1 &gt;&gt;&gt; 7)) | (mx1 ^ mk2__0)) | _tmp5b87dfbff36ecd792bff9b4a837080cc) == 0xffff) &amp;</span>
+<span class="go">    ((_tmp5b87dfbff36ecd792bff9b4a837080cc ^ (_tmp5b87dfbff36ecd792bff9b4a837080cc &gt;&gt; 0x0001) ^</span>
+<span class="go">    ((mx1 ^ (mk1 &gt;&gt;&gt; 7) ^ mk2__0) &gt;&gt; 0x0001)) == 0x0000)</span>
+<span class="go">((mk2__1 &lt;&lt;&lt; 2) == mx1) &amp; ((mk2__1 &lt;&lt;&lt; 2) == mx3)</span>
+<span class="go">((~((mx5 ^ (mk0 &gt;&gt;&gt; 7)) | (mx5 ^ mx3__0)) | _tmp496354c626556f9b918d51527d988998) == 0xffff) &amp;</span>
+<span class="go">    ((_tmp496354c626556f9b918d51527d988998 ^ (_tmp496354c626556f9b918d51527d988998 &gt;&gt; 0x0001) ^</span>
+<span class="go">    ((mx5 ^ (mk0 &gt;&gt;&gt; 7) ^ mx3__0) &gt;&gt; 0x0001)) == 0x0000)</span>
+<span class="go">((mx3__1 &lt;&lt;&lt; 2) == mx5) &amp; ((mx3__1 &lt;&lt;&lt; 2) == mx8)</span>
+<span class="go">(mk2 ^ mk2__0 ^ mk2__1) == mk2_out</span>
+<span class="go">(mx3 ^ mx3__0 ^ mx3__1) == mx3_out</span>
+<span class="go">mx8 == mx8_out</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">validity_constraint</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span><span class="n">BvAnd</span><span class="p">,</span> <span class="n">assertions</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">validity_constraint</span>  
+<span class="go">((~((mx1 ^ (mk1 &gt;&gt;&gt; 7)) | (mx1 ^ mk2__0)) | ...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.linear.chmodel.ChModel.pr_one_assertions">
+<span class="sig-name descname"><span class="pre">pr_one_assertions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/linear/chmodel.html#ChModel.pr_one_assertions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.linear.chmodel.ChModel.pr_one_assertions" title="Permalink to this definition"></a></dt>
+<dd><p>Return the probability-one constraint as a list of assertions.</p>
+<p>See also <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel.pr_one_assertions" title="cascada.abstractproperty.chmodel.ChModel.pr_one_assertions"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">abstractproperty.chmodel.ChModel.pr_one_assertions</span></code></a>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.linear.mask</span> <span class="kn">import</span> <span class="n">LinearMask</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.linear.chmodel</span> <span class="kn">import</span> <span class="n">ChModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">speck</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32_KS</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span><span class="o">.</span><span class="n">key_schedule</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32_KS</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model</span> <span class="o">=</span> <span class="n">ChModel</span><span class="p">(</span><span class="n">Speck32_KS</span><span class="p">,</span> <span class="n">LinearMask</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;mk0&quot;</span><span class="p">,</span> <span class="s2">&quot;mk1&quot;</span><span class="p">,</span> <span class="s2">&quot;mk2&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">ch_model</span><span class="o">.</span><span class="n">pr_one_assertions</span><span class="p">():</span> <span class="nb">print</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>  
+<span class="go">(~((mx1 ^ (mk1 &gt;&gt;&gt; 7)) | (mx1 ^ mk2__0)) == 0xffff) &amp; (((mx1 ^ (mk1 &gt;&gt;&gt; 7) ^ mk2__0)[:1]) == 0b000000000000000)</span>
+<span class="go">((mk2__1 &lt;&lt;&lt; 2) == mx1) &amp; ((mk2__1 &lt;&lt;&lt; 2) == mx3)</span>
+<span class="go">(~((mx5 ^ (mk0 &gt;&gt;&gt; 7)) | (mx5 ^ mx3__0)) == 0xffff) &amp; (((mx5 ^ (mk0 &gt;&gt;&gt; 7) ^ mx3__0)[:1]) == 0b000000000000000)</span>
+<span class="go">((mx3__1 &lt;&lt;&lt; 2) == mx5) &amp; ((mx3__1 &lt;&lt;&lt; 2) == mx8)</span>
+<span class="go">(mk2 ^ mk2__0 ^ mk2__1) == mk2_out</span>
+<span class="go">(mx3 ^ mx3__0 ^ mx3__1) == mx3_out</span>
+<span class="go">mx8 == mx8_out</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.linear.chmodel.ChModel.weight_assertions">
+<span class="sig-name descname"><span class="pre">weight_assertions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ch_weight_variable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assign_weight_variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">truncate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/linear/chmodel.html#ChModel.weight_assertions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.linear.chmodel.ChModel.weight_assertions" title="Permalink to this definition"></a></dt>
+<dd><p>Return the weight constraint as a list of assertions.</p>
+<p>See also <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel.weight_assertions" title="cascada.abstractproperty.chmodel.ChModel.weight_assertions"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">abstractproperty.chmodel.ChModel.weight_assertions</span></code></a>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.linear.mask</span> <span class="kn">import</span> <span class="n">LinearMask</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.linear.chmodel</span> <span class="kn">import</span> <span class="n">ChModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">speck</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32_KS</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span><span class="o">.</span><span class="n">key_schedule</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32_KS</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cm</span> <span class="o">=</span> <span class="n">ChModel</span><span class="p">(</span><span class="n">Speck32_KS</span><span class="p">,</span> <span class="n">LinearMask</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;mk0&quot;</span><span class="p">,</span> <span class="s2">&quot;mk1&quot;</span><span class="p">,</span> <span class="s2">&quot;mk2&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cwv</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">cm</span><span class="o">.</span><span class="n">weight_width</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">omvs</span> <span class="o">=</span> <span class="p">[</span><span class="n">Variable</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;w</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">om</span><span class="o">.</span><span class="n">weight_width</span><span class="p">())</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">om</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cm</span><span class="o">.</span><span class="n">assign_outmask2op_model</span><span class="o">.</span><span class="n">values</span><span class="p">())]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">cm</span><span class="o">.</span><span class="n">weight_assertions</span><span class="p">(</span><span class="n">cwv</span><span class="p">,</span> <span class="n">omvs</span><span class="p">):</span> <span class="nb">print</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>  
+<span class="go">w0 == 0b0</span>
+<span class="go">w1 == 0b0</span>
+<span class="go">(PopCount(_tmp5b87dfbff36ecd792bff9b4a837080cc[14:]) == w2) &amp; ((_tmp5b87dfbff36ecd792bff9b4a837080cc ^</span>
+<span class="go">    (_tmp5b87dfbff36ecd792bff9b4a837080cc &gt;&gt; 0x0001) ^ ((mx1 ^ (mk1 &gt;&gt;&gt; 7) ^ mk2__0) &gt;&gt; 0x0001)) == 0x0000)</span>
+<span class="go">w3 == 0b0</span>
+<span class="go">w4 == 0b0</span>
+<span class="go">w5 == 0b0</span>
+<span class="go">(PopCount(_tmp496354c626556f9b918d51527d988998[14:]) == w6) &amp; ((_tmp496354c626556f9b918d51527d988998 ^</span>
+<span class="go">    (_tmp496354c626556f9b918d51527d988998 &gt;&gt; 0x0001) ^ ((mx5 ^ (mk0 &gt;&gt;&gt; 7) ^ mx3__0) &gt;&gt; 0x0001)) == 0x0000)</span>
+<span class="go">w7 == 0b0</span>
+<span class="go">w8 == 0b0</span>
+<span class="go">w9 == 0b0</span>
+<span class="go">w10 == 0b0</span>
+<span class="go">w == ((0b0 :: w2) + (0b0 :: w6))</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.linear.chmodel.ChModel.max_weight">
+<span class="sig-name descname"><span class="pre">max_weight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">truncate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/linear/chmodel.html#ChModel.max_weight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.linear.chmodel.ChModel.max_weight" title="Permalink to this definition"></a></dt>
+<dd><p>Return the maximum value the ch. weight variable can achieve in <a class="reference internal" href="#cascada.linear.chmodel.ChModel.weight_assertions" title="cascada.linear.chmodel.ChModel.weight_assertions"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">weight_assertions</span></code></a>.</p>
+<p>See also <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel.max_weight" title="cascada.abstractproperty.chmodel.ChModel.max_weight"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">abstractproperty.chmodel.ChModel.max_weight</span></code></a>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.linear.mask</span> <span class="kn">import</span> <span class="n">LinearMask</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.linear.chmodel</span> <span class="kn">import</span> <span class="n">ChModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">speck</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32_KS</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span><span class="o">.</span><span class="n">key_schedule</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32_KS</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cm</span> <span class="o">=</span> <span class="n">ChModel</span><span class="p">(</span><span class="n">Speck32_KS</span><span class="p">,</span> <span class="n">LinearMask</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;mk0&quot;</span><span class="p">,</span> <span class="s2">&quot;mk1&quot;</span><span class="p">,</span> <span class="s2">&quot;mk2&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cm</span><span class="o">.</span><span class="n">max_weight</span><span class="p">(),</span> <span class="n">cm</span><span class="o">.</span><span class="n">weight_width</span><span class="p">(),</span> <span class="n">cm</span><span class="o">.</span><span class="n">num_frac_bits</span><span class="p">()</span>
+<span class="go">(30, 5, 0)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.linear.chmodel.ChModel.error">
+<span class="sig-name descname"><span class="pre">error</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/linear/chmodel.html#ChModel.error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.linear.chmodel.ChModel.error" title="Permalink to this definition"></a></dt>
+<dd><p>Return the maximum difference between <a class="reference internal" href="#cascada.linear.chmodel.ChModel.weight_assertions" title="cascada.linear.chmodel.ChModel.weight_assertions"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">weight_assertions</span></code></a> and the exact weight.</p>
+<p>See also <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel.error" title="cascada.abstractproperty.chmodel.ChModel.error"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">abstractproperty.chmodel.ChModel.error</span></code></a>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.linear.mask</span> <span class="kn">import</span> <span class="n">LinearMask</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.linear.chmodel</span> <span class="kn">import</span> <span class="n">ChModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">speck</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32_KS</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span><span class="o">.</span><span class="n">key_schedule</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32_KS</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ChModel</span><span class="p">(</span><span class="n">Speck32_KS</span><span class="p">,</span> <span class="n">LinearMask</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;mk0&quot;</span><span class="p">,</span> <span class="s2">&quot;mk1&quot;</span><span class="p">,</span> <span class="s2">&quot;mk2&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">error</span><span class="p">()</span>
+<span class="go">0</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.linear.chmodel.ChModel.signature">
+<span class="sig-name descname"><span class="pre">signature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sig_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/linear/chmodel.html#ChModel.signature"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.linear.chmodel.ChModel.signature" title="Permalink to this definition"></a></dt>
+<dd><p>Return the signature of the characteristic model.</p>
+<p>See also <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel.signature" title="cascada.abstractproperty.chmodel.ChModel.signature"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">abstractproperty.chmodel.ChModel.signature</span></code></a>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.linear.mask</span> <span class="kn">import</span> <span class="n">LinearMask</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.linear.chmodel</span> <span class="kn">import</span> <span class="n">ChModel</span><span class="p">,</span> <span class="n">ChModelSigType</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">speck</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32_KS</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span><span class="o">.</span><span class="n">key_schedule</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32_KS</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model</span> <span class="o">=</span> <span class="n">ChModel</span><span class="p">(</span><span class="n">Speck32_KS</span><span class="p">,</span> <span class="n">LinearMask</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;mk0&quot;</span><span class="p">,</span> <span class="s2">&quot;mk1&quot;</span><span class="p">,</span> <span class="s2">&quot;mk2&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">ChModelSigType</span><span class="o">.</span><span class="n">Unique</span><span class="p">)</span>
+<span class="go">[mk2, mk1, mk2__0, mx3, mk0, mx3__0, mk2_out, mx3_out, mx8_out]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">ChModelSigType</span><span class="o">.</span><span class="n">InputOutput</span><span class="p">)</span>
+<span class="go">[mk0, mk1, mk2, mk2_out, mx3_out, mx8_out]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.linear.chmodel.ChModel.split">
+<span class="sig-name descname"><span class="pre">split</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask_separators</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/linear/chmodel.html#ChModel.split"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.linear.chmodel.ChModel.split" title="Permalink to this definition"></a></dt>
+<dd><p>Split into multiple <a class="reference internal" href="#cascada.linear.chmodel.ChModel" title="cascada.linear.chmodel.ChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChModel</span></code></a> objects given the list of mask separators.</p>
+<p>See also <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel.split" title="cascada.abstractproperty.chmodel.ChModel.split"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">abstractproperty.chmodel.ChModel.split</span></code></a>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.linear.mask</span> <span class="kn">import</span> <span class="n">LinearMask</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.linear.chmodel</span> <span class="kn">import</span> <span class="n">ChModel</span><span class="p">,</span> <span class="n">ChModelSigType</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">speck</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32_KS</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span><span class="o">.</span><span class="n">key_schedule</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32_KS</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model</span> <span class="o">=</span> <span class="n">ChModel</span><span class="p">(</span><span class="n">Speck32_KS</span><span class="p">,</span> <span class="n">LinearMask</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;mk0&quot;</span><span class="p">,</span> <span class="s2">&quot;mk1&quot;</span><span class="p">,</span> <span class="s2">&quot;mk2&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">tuple</span><span class="p">(</span><span class="n">ch_model</span><span class="o">.</span><span class="n">ssa</span><span class="o">.</span><span class="n">assignments</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>  
+<span class="go">((mx0, mk1 &gt;&gt;&gt; 7), (mk2__0, Id(mk2)), (mk2__1, Id(mk2)), (mk2__2, Id(mk2)),</span>
+<span class="go">    (mx1, mx0 + mk2__0), (mx2, mk2__1 &lt;&lt;&lt; 2), (mx3, mx2 ^ mx1),</span>
+<span class="go">(mx4, mk0 &gt;&gt;&gt; 7), (mx3__0, Id(mx3)), (mx3__1, Id(mx3)), (mx3__2, Id(mx3)),</span>
+<span class="go">    (mx5, mx4 + mx3__0), (mx6, mx5 ^ 0x0001), (mx7, mx3__1 &lt;&lt;&lt; 2), (mx8, mx7 ^ mx6),</span>
+<span class="go">(mk2_out, Id(mk2__2)), (mx3_out, Id(mx3__2)), (mx8_out, Id(mx8)))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mask_separators</span> <span class="o">=</span> <span class="p">[</span> <span class="p">(</span><span class="n">LinearMask</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;mx2&quot;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">16</span><span class="p">)),</span> <span class="n">LinearMask</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;mx3&quot;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">16</span><span class="p">))),</span> <span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">cm</span> <span class="ow">in</span> <span class="n">ch_model</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">mask_separators</span><span class="p">):</span> <span class="nb">print</span><span class="p">(</span><span class="n">cm</span><span class="p">)</span>  
+<span class="go">ChModel(func=SpeckKeySchedule_2R_0S,</span>
+<span class="go">        input_mask=[LinearMask(mk0), LinearMask(mk1), LinearMask(mk2)],</span>
+<span class="go">        output_mask=[LinearMask(mk0_out), LinearMask(mx3_out), LinearMask(mk2__2_out)],</span>
+<span class="go">        assign_outmask2op_model=[(LinearMask(mk2__0), LinearModelFreeBranch(LinearMask(mk2))),</span>
+<span class="go">            (LinearMask(mk2__1), LinearModelFreeBranch(LinearMask(mk2))),</span>
+<span class="go">            (LinearMask(mx1), LinearModelBvAdd([LinearMask(mk1 &gt;&gt;&gt; 7), LinearMask(mk2__0)])),</span>
+<span class="go">            (LinearMask(mx3), LinearModelBvXor([LinearMask(mk2__1 &lt;&lt;&lt; 2), LinearMask(mx1)])),</span>
+<span class="go">            (LinearMask(mk0_out), LinearModelId(LinearMask(mk0))),</span>
+<span class="go">            (LinearMask(mx3_out), LinearModelId(LinearMask(mx3))),</span>
+<span class="go">            (LinearMask(mk2__2_out), LinearModelId(LinearMask(mk2 ^ mk2__0 ^ mk2__1)))])</span>
+<span class="go">ChModel(func=SpeckKeySchedule_2R_1S,</span>
+<span class="go">        input_mask=[LinearMask(mk0), LinearMask(mx3), LinearMask(mk2__2)],</span>
+<span class="go">        output_mask=[LinearMask(mk2_out), LinearMask(mx3_out), LinearMask(mx8_out)],</span>
+<span class="go">        assign_outmask2op_model=[(LinearMask(mx3__0), LinearModelFreeBranch(LinearMask(mx3))),</span>
+<span class="go">            (LinearMask(mx3__1), LinearModelFreeBranch(LinearMask(mx3))),</span>
+<span class="go">            (LinearMask(mx5), LinearModelBvAdd([LinearMask(mk0 &gt;&gt;&gt; 7), LinearMask(mx3__0)])),</span>
+<span class="go">            (LinearMask(mx8), LinearModelBvXor([LinearMask(mx3__1 &lt;&lt;&lt; 2), LinearMask(mx5)])),</span>
+<span class="go">            (LinearMask(mk2_out), LinearModelId(LinearMask(mk2__2))),</span>
+<span class="go">            (LinearMask(mx3_out), LinearModelId(LinearMask(mx3 ^ mx3__0 ^ mx3__1))),</span>
+<span class="go">            (LinearMask(mx8_out), LinearModelId(LinearMask(mx8)))])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.linear.chmodel.ChModel.get_round_separators">
+<span class="sig-name descname"><span class="pre">get_round_separators</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/linear/chmodel.html#ChModel.get_round_separators"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.linear.chmodel.ChModel.get_round_separators" title="Permalink to this definition"></a></dt>
+<dd><p>Return the round separators if <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel.func" title="cascada.abstractproperty.chmodel.ChModel.func"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">func</span></code></a> is a <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.RoundBasedFunction" title="cascada.bitvector.ssa.RoundBasedFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RoundBasedFunction</span></code></a>.</p>
+<p>See also <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel.get_round_separators" title="cascada.abstractproperty.chmodel.ChModel.get_round_separators"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">abstractproperty.chmodel.ChModel.get_round_separators</span></code></a>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.linear.mask</span> <span class="kn">import</span> <span class="n">LinearMask</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.linear.chmodel</span> <span class="kn">import</span> <span class="n">ChModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">speck</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32_KS</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span><span class="o">.</span><span class="n">key_schedule</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32_KS</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model</span> <span class="o">=</span> <span class="n">ChModel</span><span class="p">(</span><span class="n">Speck32_KS</span><span class="p">,</span> <span class="n">LinearMask</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;mk0&quot;</span><span class="p">,</span> <span class="s2">&quot;mk1&quot;</span><span class="p">,</span> <span class="s2">&quot;mk2&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sub_cms</span> <span class="o">=</span> <span class="n">ch_model</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">ch_model</span><span class="o">.</span><span class="n">get_round_separators</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">cm</span> <span class="ow">in</span> <span class="n">sub_cms</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="n">cm</span><span class="p">)</span>  
+<span class="go">ChModel(func=SpeckKeySchedule_2R_0S,</span>
+<span class="go">        input_mask=[LinearMask(mk0), LinearMask(mk1), LinearMask(mk2)],</span>
+<span class="go">        output_mask=[LinearMask(mk0_out), LinearMask(mx3_out), LinearMask(mk2__2_out)],</span>
+<span class="go">        assign_outmask2op_model=[(LinearMask(mk2__0), LinearModelFreeBranch(LinearMask(mk2))),</span>
+<span class="go">            (LinearMask(mk2__1), LinearModelFreeBranch(LinearMask(mk2))),</span>
+<span class="go">            (LinearMask(mx1), LinearModelBvAdd([LinearMask(mk1 &gt;&gt;&gt; 7), LinearMask(mk2__0)])),</span>
+<span class="go">            (LinearMask(mx3), LinearModelBvXor([LinearMask(mk2__1 &lt;&lt;&lt; 2), LinearMask(mx1)])),</span>
+<span class="go">            (LinearMask(mk0_out), LinearModelId(LinearMask(mk0))),</span>
+<span class="go">            (LinearMask(mx3_out), LinearModelId(LinearMask(mx3))),</span>
+<span class="go">            (LinearMask(mk2__2_out), LinearModelId(LinearMask(mk2 ^ mk2__0 ^ mk2__1)))])</span>
+<span class="go">ChModel(func=SpeckKeySchedule_2R_1S,</span>
+<span class="go">        input_mask=[LinearMask(mk0), LinearMask(mx3), LinearMask(mk2__2)],</span>
+<span class="go">        output_mask=[LinearMask(mk2_out), LinearMask(mx3_out), LinearMask(mx8_out)],</span>
+<span class="go">        assign_outmask2op_model=[(LinearMask(mx3__0), LinearModelFreeBranch(LinearMask(mx3))),</span>
+<span class="go">            (LinearMask(mx3__1), LinearModelFreeBranch(LinearMask(mx3))),</span>
+<span class="go">            (LinearMask(mx5), LinearModelBvAdd([LinearMask(mk0 &gt;&gt;&gt; 7), LinearMask(mx3__0)])),</span>
+<span class="go">            (LinearMask(mx8), LinearModelBvXor([LinearMask(mx3__1 &lt;&lt;&lt; 2), LinearMask(mx5)])),</span>
+<span class="go">            (LinearMask(mk2_out), LinearModelId(LinearMask(mk2__2))),</span>
+<span class="go">            (LinearMask(mx3_out), LinearModelId(LinearMask(mx3 ^ mx3__0 ^ mx3__1))),</span>
+<span class="go">            (LinearMask(mx8_out), LinearModelId(LinearMask(mx8)))])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.linear.chmodel.EncryptionChModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.linear.chmodel.</span></span><span class="sig-name descname"><span class="pre">EncryptionChModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cipher</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op_model_class2options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/linear/chmodel.html#EncryptionChModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.linear.chmodel.EncryptionChModel" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.EncryptionChModel" title="cascada.abstractproperty.chmodel.EncryptionChModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.abstractproperty.chmodel.EncryptionChModel</span></code></a>, <a class="reference internal" href="#cascada.linear.chmodel.ChModel" title="cascada.linear.chmodel.ChModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.linear.chmodel.ChModel</span></code></a></p>
+<p>Represent linear characteristic models of encryption functions.</p>
+<p>Given a <a class="reference internal" href="cascada.primitives.blockcipher.html#cascada.primitives.blockcipher.Cipher" title="cascada.primitives.blockcipher.Cipher"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Cipher</span></code></a>, an <a class="reference internal" href="#cascada.linear.chmodel.EncryptionChModel" title="cascada.linear.chmodel.EncryptionChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">EncryptionChModel</span></code></a> is a bit-vector model
+(see <a class="reference internal" href="#cascada.linear.chmodel.ChModel" title="cascada.linear.chmodel.ChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChModel</span></code></a>) of a linear characteristic over
+the <a class="reference internal" href="cascada.primitives.blockcipher.html#cascada.primitives.blockcipher.Cipher.encryption" title="cascada.primitives.blockcipher.Cipher.encryption"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">Cipher.encryption</span></code></a>
+(where the <a class="reference internal" href="cascada.primitives.blockcipher.html#cascada.primitives.blockcipher.Cipher.key_schedule" title="cascada.primitives.blockcipher.Cipher.key_schedule"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">Cipher.key_schedule</span></code></a> is ignored and round key masks
+are set to <a class="reference internal" href="cascada.linear.mask.html#cascada.linear.mask.LinearMask" title="cascada.linear.mask.LinearMask"><code class="xref any py py-class docutils literal notranslate"><span class="pre">LinearMask</span></code></a> objects containing <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Variable" title="cascada.bitvector.core.Variable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Variable</span></code></a> objects).</p>
+<p>See also <a class="reference internal" href="cascada.linear.characteristic.html#cascada.linear.characteristic.EncryptionCharacteristic" title="cascada.linear.characteristic.EncryptionCharacteristic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">linear.characteristic.EncryptionCharacteristic</span></code></a>.</p>
+<p>In an <a class="reference internal" href="#cascada.linear.chmodel.EncryptionChModel" title="cascada.linear.chmodel.EncryptionChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">EncryptionChModel</span></code></a>, the plaintext masks start with the prefix <code class="docutils literal notranslate"><span class="pre">&quot;mp&quot;</span></code>,
+the intermediate and output masks start with the prefix <code class="docutils literal notranslate"><span class="pre">&quot;mx&quot;</span></code>,
+and the round key masks (the masks of the external variables
+of the encryption <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.SSA" title="cascada.bitvector.ssa.SSA"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SSA</span></code></a>) start with the prefix <code class="docutils literal notranslate"><span class="pre">&quot;mk&quot;</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.linear.mask</span> <span class="kn">import</span> <span class="n">LinearMask</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.linear.chmodel</span> <span class="kn">import</span> <span class="n">EncryptionChModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">speck</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model</span> <span class="o">=</span> <span class="n">EncryptionChModel</span><span class="p">(</span><span class="n">Speck32</span><span class="p">,</span> <span class="n">LinearMask</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model</span>  
+<span class="go">EncryptionChModel(cipher=SpeckCipher_2R,</span>
+<span class="go">    input_mask=[LinearMask(mp0), LinearMask(mp1)],</span>
+<span class="go">    output_mask=[LinearMask(mx7_out), LinearMask(mx9_out)],</span>
+<span class="go">    external_var2mask=[(mk0, LinearMask(mk0)), (mk1, LinearMask(mk1))],</span>
+<span class="go">    assign_outmask2op_model=[(LinearMask(mp1__0), LinearModelFreeBranch(LinearMask(mp1))),</span>
+<span class="go">        (LinearMask(mx1), LinearModelBvAdd([LinearMask(mp0 &gt;&gt;&gt; 7), LinearMask(mp1__0)])),</span>
+<span class="go">        (LinearMask(mx2), LinearModelBvXor([LinearMask(mx1), LinearMask(mk0)])),</span>
+<span class="go">        (LinearMask(mx2__0), LinearModelFreeBranch(LinearMask(mx2))),</span>
+<span class="go">        (LinearMask(mx4), LinearModelBvXor([LinearMask((mp1 ^ mp1__0) &lt;&lt;&lt; 2), LinearMask(mx2__0)])),</span>
+<span class="go">        (LinearMask(mx4__0), LinearModelFreeBranch(LinearMask(mx4))),</span>
+<span class="go">        (LinearMask(mx6), LinearModelBvAdd([LinearMask((mx2 ^ mx2__0) &gt;&gt;&gt; 7), LinearMask(mx4__0)])),</span>
+<span class="go">        (LinearMask(mx7), LinearModelBvXor([LinearMask(mx6), LinearMask(mk1)])),</span>
+<span class="go">        (LinearMask(mx7__0), LinearModelFreeBranch(LinearMask(mx7))),</span>
+<span class="go">        (LinearMask(mx9), LinearModelBvXor([LinearMask((mx4 ^ mx4__0) &lt;&lt;&lt; 2), LinearMask(mx7__0)])),</span>
+<span class="go">        (LinearMask(mx7_out), LinearModelId(LinearMask(mx7 ^ mx7__0))),</span>
+<span class="go">        (LinearMask(mx9_out), LinearModelId(LinearMask(mx9)))])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model</span><span class="o">.</span><span class="n">ssa</span>  
+<span class="go">SSA(input_vars=[mp0, mp1], output_vars=[mx7_out, mx9_out], external_vars=[mk0, mk1],</span>
+<span class="go">assignments=[(mx0, mp0 &gt;&gt;&gt; 7), (mp1__0, Id(mp1)), (mp1__1, Id(mp1)),</span>
+<span class="go">    (mx1, mx0 + mp1__0), (mx2, mx1 ^ mk0), (mx3, mp1__1 &lt;&lt;&lt; 2), (mx2__0, Id(mx2)), (mx2__1, Id(mx2)),</span>
+<span class="go">        (mx4, mx3 ^ mx2__0), (mx5, mx2__1 &gt;&gt;&gt; 7), (mx4__0, Id(mx4)), (mx4__1, Id(mx4)),</span>
+<span class="go">    (mx6, mx5 + mx4__0), (mx7, mx6 ^ mk1), (mx8, mx4__1 &lt;&lt;&lt; 2), (mx7__0, Id(mx7)), (mx7__1, Id(mx7)),</span>
+<span class="go">        (mx9, mx8 ^ mx7__0), (mx7_out, Id(mx7__1)), (mx9_out, Id(mx9))])</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.linear.chmodel.EncryptionChModel.vrepr">
+<span class="sig-name descname"><span class="pre">vrepr</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/linear/chmodel.html#EncryptionChModel.vrepr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.linear.chmodel.EncryptionChModel.vrepr" title="Permalink to this definition"></a></dt>
+<dd><p>Return an executable string representation.</p>
+<p>See also <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.EncryptionChModel.vrepr" title="cascada.abstractproperty.chmodel.EncryptionChModel.vrepr"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">abstractproperty.chmodel.EncryptionChModel.vrepr</span></code></a>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.linear.mask</span> <span class="kn">import</span> <span class="n">LinearMask</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.linear.chmodel</span> <span class="kn">import</span> <span class="n">EncryptionChModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">speck</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">EncryptionChModel</span><span class="p">(</span><span class="n">Speck32</span><span class="p">,</span> <span class="n">LinearMask</span><span class="p">)</span><span class="o">.</span><span class="n">vrepr</span><span class="p">()</span>
+<span class="go">&#39;EncryptionChModel(cipher=SpeckCipher.set_num_rounds_and_return(2), mask_type=LinearMask)&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cascada.linear.opmodel.html" class="btn btn-neutral float-left" title="cascada.linear.opmodel module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cascada.linear.characteristic.html" class="btn btn-neutral float-right" title="cascada.linear.characteristic module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Adrián Ranea.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

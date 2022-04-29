@@ -1,0 +1,6 @@
+cascada.primitives.speck module
+===============================
+
+.. automodule:: cascada.primitives.speck
+   :members:
+   :show-inheritance:

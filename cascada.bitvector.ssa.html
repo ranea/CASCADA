@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cascada.bitvector.ssa module &mdash; CASCADA 1.0.rc0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="cascada.primitives module" href="cascada.primitives.html" />
+    <link rel="prev" title="cascada.bitvector.printing module" href="cascada.bitvector.printing.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> CASCADA
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">CASCADA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="primitives_implemented.html">Primitives implemented</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="cascada.html">API reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="cascada.bitvector.html">cascada.bitvector module</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="cascada.bitvector.context.html">cascada.bitvector.context module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.bitvector.core.html">cascada.bitvector.core module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.bitvector.secondaryop.html">cascada.bitvector.secondaryop module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.bitvector.operation.html">cascada.bitvector.operation module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.bitvector.printing.html">cascada.bitvector.printing module</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">cascada.bitvector.ssa module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.primitives.html">cascada.primitives module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.abstractproperty.html">cascada.abstractproperty module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.differential.html">cascada.differential module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.linear.html">cascada.linear module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.algebraic.html">cascada.algebraic module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.smt.html">cascada.smt module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">CASCADA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="cascada.html">API reference</a> &raquo;</li>
+          <li><a href="cascada.bitvector.html">cascada.bitvector module</a> &raquo;</li>
+      <li>cascada.bitvector.ssa module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/cascada.bitvector.ssa.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-cascada.bitvector.ssa">
+<span id="cascada-bitvector-ssa-module"></span><h1>cascada.bitvector.ssa module<a class="headerlink" href="#module-cascada.bitvector.ssa" title="Permalink to this headline"></a></h1>
+<p>Represent bit-vector functions and their representation in static single assignment (SSA) form.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.bitvector.ssa.BvFunction">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.bitvector.ssa.</span></span><span class="sig-name descname"><span class="pre">BvFunction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/ssa.html#BvFunction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.ssa.BvFunction" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Represent fixed-width bit-vector functions.</p>
+<p>A <a class="reference internal" href="#cascada.bitvector.ssa.BvFunction" title="cascada.bitvector.ssa.BvFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvFunction</span></code></a> takes fixed-width <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Constant" title="cascada.bitvector.core.Constant"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a> operands and return a
+tuple of fixed-width <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Constant" title="cascada.bitvector.core.Constant"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a>.</p>
+<p>Similar to <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.Operation" title="cascada.bitvector.operation.Operation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Operation</span></code></a>, <a class="reference internal" href="#cascada.bitvector.ssa.BvFunction" title="cascada.bitvector.ssa.BvFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvFunction</span></code></a> is evaluated
+using the operator <code class="docutils literal notranslate"><span class="pre">()</span></code> and provides <em>Automatic Constant Conversion</em>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference internal" href="#cascada.bitvector.ssa.BvFunction" title="cascada.bitvector.ssa.BvFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvFunction</span></code></a> only supports <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Constant" title="cascada.bitvector.core.Constant"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a> operands and
+must return a tuple of <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Constant" title="cascada.bitvector.core.Constant"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a> values
+(as opposed to <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.Operation" title="cascada.bitvector.operation.Operation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Operation</span></code></a> that accepts <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term" title="cascada.bitvector.core.Term"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Term</span></code></a> and scalar operands
+and returns a single <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term" title="cascada.bitvector.core.Term"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Term</span></code></a>).</p>
+<p><a class="reference internal" href="#cascada.bitvector.ssa.BvFunction" title="cascada.bitvector.ssa.BvFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvFunction</span></code></a> does not support returned values that independent
+of the inputs.</p>
+</div>
+<p>This class is not meant to be instantiated but to provide a base class for
+bit-vector functions with fixed operands. To define a bit-vector function,
+subclass <a class="reference internal" href="#cascada.bitvector.ssa.BvFunction" title="cascada.bitvector.ssa.BvFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvFunction</span></code></a>, set the class attributes <a class="reference internal" href="#cascada.bitvector.ssa.BvFunction.input_widths" title="cascada.bitvector.ssa.BvFunction.input_widths"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">input_widths</span></code></a> and
+<a class="reference internal" href="#cascada.bitvector.ssa.BvFunction.output_widths" title="cascada.bitvector.ssa.BvFunction.output_widths"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">output_widths</span></code></a> and implement <a class="reference internal" href="#cascada.bitvector.ssa.BvFunction.eval" title="cascada.bitvector.ssa.BvFunction.eval"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">eval</span></code></a> with bit-vector operations.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.ssa</span> <span class="kn">import</span> <span class="n">BvFunction</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">MyFoo</span><span class="p">(</span><span class="n">BvFunction</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">input_widths</span><span class="p">,</span> <span class="n">output_widths</span> <span class="o">=</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">],</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">]</span>
+<span class="gp">... </span>    <span class="nd">@classmethod</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>  <span class="k">return</span> <span class="n">x</span> <span class="o">^</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">MyFoo</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span>
+<span class="go">&#39;MyFoo&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">MyFoo</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># automatic conversion from int to Constant</span>
+<span class="go">(0x00, 0x01)</span>
+</pre></div>
+</div>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.bitvector.ssa.BvFunction.input_widths">
+<span class="sig-name descname"><span class="pre">input_widths</span></span><a class="headerlink" href="#cascada.bitvector.ssa.BvFunction.input_widths" title="Permalink to this definition"></a></dt>
+<dd><p>a list containing the widths of the inputs</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.bitvector.ssa.BvFunction.output_widths">
+<span class="sig-name descname"><span class="pre">output_widths</span></span><a class="headerlink" href="#cascada.bitvector.ssa.BvFunction.output_widths" title="Permalink to this definition"></a></dt>
+<dd><p>a list containing the widths of the outputs</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.ssa.BvFunction.get_name">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/ssa.html#BvFunction.get_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.ssa.BvFunction.get_name" title="Permalink to this definition"></a></dt>
+<dd><p>Return the name of the function (by default <code class="docutils literal notranslate"><span class="pre">cls.__name__</span></code>).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.ssa.BvFunction.vrepr">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">vrepr</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/ssa.html#BvFunction.vrepr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.ssa.BvFunction.vrepr" title="Permalink to this definition"></a></dt>
+<dd><p>Return an executable string representation.</p>
+<p>This method returns a string so that <code class="docutils literal notranslate"><span class="pre">eval(cls.vrepr())</span></code>
+returns a new <a class="reference internal" href="#cascada.bitvector.ssa.BvFunction" title="cascada.bitvector.ssa.BvFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvFunction</span></code></a> object with the same content.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.ssa.BvFunction.eval">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">eval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/ssa.html#BvFunction.eval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.ssa.BvFunction.eval" title="Permalink to this definition"></a></dt>
+<dd><p>Evaluate the function (internal method).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.ssa.BvFunction.to_ssa">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">to_ssa</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id_prefix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decompose_sec_ops</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">ssa_options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/ssa.html#BvFunction.to_ssa"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.ssa.BvFunction.to_ssa" title="Permalink to this definition"></a></dt>
+<dd><p>Return the <a class="reference internal" href="#cascada.bitvector.ssa.SSA" title="cascada.bitvector.ssa.SSA"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SSA</span></code></a> object of the bit-vector function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_names</strong> – the names for the input variables</p></li>
+<li><p><strong>id_prefix</strong> – the prefix to denote the intermediate variables</p></li>
+<li><p><strong>decompose_sec_ops</strong> – if <code class="docutils literal notranslate"><span class="pre">decompose_sec_ops</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>,
+<a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.SecondaryOperation" title="cascada.bitvector.operation.SecondaryOperation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SecondaryOperation</span></code></a> objects within the bit-vector function are
+replaced by their decompositions into  <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.PrimaryOperation" title="cascada.bitvector.operation.PrimaryOperation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">PrimaryOperation</span></code></a> objects.</p></li>
+<li><p><strong>ssa_options</strong> – options passed to the <code class="docutils literal notranslate"><span class="pre">__init__</span></code> method of <a class="reference internal" href="#cascada.bitvector.ssa.SSA" title="cascada.bitvector.ssa.SSA"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SSA</span></code></a>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.ssa.BvFunction.log_msg">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">log_msg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">format_string</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format_field_objects</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/ssa.html#BvFunction.log_msg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.ssa.BvFunction.log_msg" title="Permalink to this definition"></a></dt>
+<dd><p>Log a message during the evaluation of the bit-vector function.</p>
+<p>This method is meant to be used within <a class="reference internal" href="#cascada.bitvector.ssa.BvFunction.eval" title="cascada.bitvector.ssa.BvFunction.eval"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">eval</span></code></a> to log the values
+of internal variables. At the beggining of each evaluation,
+messages logged from the last evaluation are automatically removed.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.ssa</span> <span class="kn">import</span> <span class="n">BvFunction</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">MyFoo</span><span class="p">(</span><span class="n">BvFunction</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">input_widths</span><span class="p">,</span> <span class="n">output_widths</span> <span class="o">=</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">],</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">]</span>
+<span class="gp">... </span>    <span class="nd">@classmethod</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="bp">cls</span><span class="o">.</span><span class="n">log_msg</span><span class="p">(</span><span class="s1">&#39;input variables = [</span><span class="si">{}</span><span class="s1">, </span><span class="si">{}</span><span class="s1">]&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">])</span>
+<span class="gp">... </span>        <span class="k">return</span> <span class="n">x</span> <span class="o">^</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">MyFoo</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="go">(0x01, 0x00)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">MyFoo</span><span class="o">.</span><span class="n">get_formatted_logged_msgs</span><span class="p">()</span>
+<span class="go">[&#39;input variables = [0x00, 0x01]&#39;]</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>format_string</strong> – a Python <a class="reference external" href="https://docs.python.org/3/library/string.html#formatstrings">format string</a></p></li>
+<li><p><strong>format_field_objects</strong> – an optional list with the objects that will
+replace the format fields in the format_string (i.e.,
+the arguments associated to <code class="docutils literal notranslate"><span class="pre">format_string.format()</span></code>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.ssa.BvFunction.get_formatted_logged_msgs">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_formatted_logged_msgs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/ssa.html#BvFunction.get_formatted_logged_msgs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.ssa.BvFunction.get_formatted_logged_msgs" title="Permalink to this definition"></a></dt>
+<dd><p>Return the list of logged messages.</p>
+<p>If the bit-vector function includes <a class="reference internal" href="#cascada.bitvector.ssa.BvFunction.log_msg" title="cascada.bitvector.ssa.BvFunction.log_msg"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">log_msg</span></code></a> calls in its <code class="docutils literal notranslate"><span class="pre">eval</span></code>,
+this method return the list of messages logged in the last evaluation
+with the format field objects applied. Otherwise, an exception is raised.</p>
+<p>See also <a class="reference internal" href="#cascada.bitvector.ssa.BvFunction.log_msg" title="cascada.bitvector.ssa.BvFunction.log_msg"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">log_msg</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.ssa.BvFunction.dotprinting">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dotprinting</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repeat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vrepr_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/ssa.html#BvFunction.dotprinting"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.ssa.BvFunction.dotprinting" title="Permalink to this definition"></a></dt>
+<dd><p>Return the DOT description of the expression tree of the function.</p>
+<p>See also <a class="reference internal" href="cascada.bitvector.printing.html#cascada.bitvector.printing.dotprinting" title="cascada.bitvector.printing.dotprinting"><code class="xref any py py-func docutils literal notranslate"><span class="pre">printing.dotprinting</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_names</strong> – the names for the input variables</p></li>
+<li><p><strong>repeat</strong> – whether to use different nodes for common subexpressions
+(default True)</p></li>
+<li><p><strong>vrepr_label</strong> – wheter to use the verbose representation (<a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term.vrepr" title="cascada.bitvector.core.Term.vrepr"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">Term.vrepr</span></code></a>)
+to label the nodes (default False)</p></li>
+<li><p><strong>kwargs</strong> – additional arguments passed to <a class="reference internal" href="cascada.bitvector.printing.html#cascada.bitvector.printing.dotprinting" title="cascada.bitvector.printing.dotprinting"><code class="xref any py py-func docutils literal notranslate"><span class="pre">printing.dotprinting</span></code></a></p></li>
+</ul>
+</dd>
+</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.ssa</span> <span class="kn">import</span> <span class="n">BvFunction</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">MyFoo</span><span class="p">(</span><span class="n">BvFunction</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">input_widths</span><span class="p">,</span> <span class="n">output_widths</span> <span class="o">=</span> <span class="p">[</span><span class="mi">8</span><span class="p">],</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">]</span>
+<span class="gp">... </span>    <span class="nd">@classmethod</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>  <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">x</span> <span class="o">^</span> <span class="mi">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">MyFoo</span><span class="o">.</span><span class="n">dotprinting</span><span class="p">([</span><span class="s2">&quot;x&quot;</span><span class="p">],</span> <span class="n">repeat</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>  
+<span class="go">digraph{</span>
+<span class="go"># Graph style</span>
+<span class="go">&quot;ordering&quot;=&quot;out&quot;</span>
+<span class="go">&quot;rankdir&quot;=&quot;TD&quot;</span>
+<span class="go">#########</span>
+<span class="go"># Nodes #</span>
+<span class="go">#########</span>
+<span class="go">&quot;Tuple(Variable(&#39;x&#39;, width=8), BvXor(Variable(&#39;x&#39;, width=8), Constant(0b00000001, width=8)))&quot;</span>
+<span class="go">    [&quot;color&quot;=&quot;grey&quot;, &quot;label&quot;=&quot;Tuple&quot;, &quot;shape&quot;=&quot;ellipse&quot;];</span>
+<span class="go">&quot;Variable(&#39;x&#39;, width=8)&quot; [&quot;color&quot;=&quot;aquamarine3&quot;, &quot;label&quot;=&quot;x&quot;, &quot;shape&quot;=&quot;box&quot;];</span>
+<span class="go">&quot;BvXor(Variable(&#39;x&#39;, width=8), Constant(0b00000001, width=8))&quot;</span>
+<span class="go">    [&quot;color&quot;=&quot;black&quot;, &quot;label&quot;=&quot;BvXor&quot;, &quot;shape&quot;=&quot;ellipse&quot;];</span>
+<span class="go">&quot;Constant(0b00000001, width=8)&quot; [&quot;color&quot;=&quot;blue1&quot;, &quot;label&quot;=&quot;0x01&quot;, &quot;shape&quot;=&quot;box&quot;];</span>
+
+<span class="go">#########</span>
+<span class="go"># Edges #</span>
+<span class="go">#########</span>
+<span class="go">&quot;Tuple(Variable(&#39;x&#39;, width=8), BvXor(Variable(&#39;x&#39;, width=8), Constant(0b00000001, width=8)))&quot; -&gt;</span>
+<span class="go">    &quot;Variable(&#39;x&#39;, width=8)&quot;;</span>
+<span class="go">&quot;Tuple(Variable(&#39;x&#39;, width=8), BvXor(Variable(&#39;x&#39;, width=8), Constant(0b00000001, width=8)))&quot; -&gt;</span>
+<span class="go">    &quot;BvXor(Variable(&#39;x&#39;, width=8), Constant(0b00000001, width=8))&quot;;</span>
+<span class="go">&quot;BvXor(Variable(&#39;x&#39;, width=8), Constant(0b00000001, width=8))&quot; -&gt; &quot;Variable(&#39;x&#39;, width=8)&quot;;</span>
+<span class="go">&quot;BvXor(Variable(&#39;x&#39;, width=8), Constant(0b00000001, width=8))&quot; -&gt; &quot;Constant(0b00000001, width=8)&quot;;</span>
+<span class="go">}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.bitvector.ssa.RoundBasedFunction">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.bitvector.ssa.</span></span><span class="sig-name descname"><span class="pre">RoundBasedFunction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/ssa.html#RoundBasedFunction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.ssa.RoundBasedFunction" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cascada.bitvector.ssa.BvFunction" title="cascada.bitvector.ssa.BvFunction"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.bitvector.ssa.BvFunction</span></code></a></p>
+<p>Represent round-based fixed-width bit-vector functions.</p>
+<p>A <a class="reference internal" href="#cascada.bitvector.ssa.RoundBasedFunction" title="cascada.bitvector.ssa.RoundBasedFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RoundBasedFunction</span></code></a> is a <a class="reference internal" href="#cascada.bitvector.ssa.BvFunction" title="cascada.bitvector.ssa.BvFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvFunction</span></code></a> that can be decomposed
+into <em>rounds</em>, where in each round some subroutine is computed
+(not necessarily the same). Moreoever, the next round not only
+can use the outputs of the previous round but also any of the
+previous variables computed.</p>
+<p>In practice, the <code class="docutils literal notranslate"><span class="pre">eval</span></code> method of <a class="reference internal" href="#cascada.bitvector.ssa.RoundBasedFunction" title="cascada.bitvector.ssa.RoundBasedFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RoundBasedFunction</span></code></a>
+depends on the class attribute <a class="reference internal" href="#cascada.bitvector.ssa.RoundBasedFunction.num_rounds" title="cascada.bitvector.ssa.RoundBasedFunction.num_rounds"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">num_rounds</span></code></a>, which can be changed by
+calling the method <a class="reference internal" href="#cascada.bitvector.ssa.RoundBasedFunction.set_num_rounds" title="cascada.bitvector.ssa.RoundBasedFunction.set_num_rounds"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">set_num_rounds</span></code></a>.</p>
+<p>This class is not meant to be instantiated but to provide a base class for
+round-based bit-vector functions with fixed operands. To define such a
+function, subclass <a class="reference internal" href="#cascada.bitvector.ssa.RoundBasedFunction" title="cascada.bitvector.ssa.RoundBasedFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RoundBasedFunction</span></code></a>, set the class attributes
+<a class="reference internal" href="#cascada.bitvector.ssa.BvFunction.input_widths" title="cascada.bitvector.ssa.BvFunction.input_widths"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">input_widths</span></code></a> and <code class="docutils literal notranslate"><span class="pre">output_widths</span></code> and implement <code class="docutils literal notranslate"><span class="pre">eval</span></code> with bit-vector
+operations (similar as <a class="reference internal" href="#cascada.bitvector.ssa.BvFunction" title="cascada.bitvector.ssa.BvFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvFunction</span></code></a>). Moreover, set the class attribute
+<a class="reference internal" href="#cascada.bitvector.ssa.RoundBasedFunction.num_rounds" title="cascada.bitvector.ssa.RoundBasedFunction.num_rounds"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">num_rounds</span></code></a> and implement <a class="reference internal" href="#cascada.bitvector.ssa.RoundBasedFunction.set_num_rounds" title="cascada.bitvector.ssa.RoundBasedFunction.set_num_rounds"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">set_num_rounds</span></code></a>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.ssa</span> <span class="kn">import</span> <span class="n">RoundBasedFunction</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">MyFoo</span><span class="p">(</span><span class="n">RoundBasedFunction</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">input_widths</span><span class="p">,</span> <span class="n">output_widths</span><span class="p">,</span> <span class="n">num_rounds</span> <span class="o">=</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">],</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">],</span> <span class="mi">1</span>
+<span class="gp">... </span>    <span class="nd">@classmethod</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span><span class="p">):</span>  <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">1</span>
+<span class="gp">... </span>        <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span>
+<span class="gp">... </span>    <span class="nd">@classmethod</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">set_num_rounds</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">new_num_rounds</span><span class="p">):</span>  <span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span> <span class="o">=</span> <span class="n">new_num_rounds</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">MyFoo</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span>
+<span class="go">&#39;MyFoo_1R&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">MyFoo</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="go">(0x00, 0x01)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">MyFoo</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">MyFoo</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span>
+<span class="go">&#39;MyFoo_2R&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">MyFoo</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="go">(0x01, 0x01)</span>
+</pre></div>
+</div>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.bitvector.ssa.RoundBasedFunction.num_rounds">
+<span class="sig-name descname"><span class="pre">num_rounds</span></span><a class="headerlink" href="#cascada.bitvector.ssa.RoundBasedFunction.num_rounds" title="Permalink to this definition"></a></dt>
+<dd><p>the number of rounds</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.ssa.RoundBasedFunction.get_name">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/ssa.html#RoundBasedFunction.get_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.ssa.RoundBasedFunction.get_name" title="Permalink to this definition"></a></dt>
+<dd><p>Return the class name and the current number of rounds.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.ssa.RoundBasedFunction.to_ssa">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">to_ssa</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id_prefix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decompose_sec_ops</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">ssa_options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/ssa.html#RoundBasedFunction.to_ssa"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.ssa.RoundBasedFunction.to_ssa" title="Permalink to this definition"></a></dt>
+<dd><p>Return the <a class="reference internal" href="#cascada.bitvector.ssa.SSA" title="cascada.bitvector.ssa.SSA"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SSA</span></code></a> object of the round-based bit-vector function.</p>
+<p>This method calls <a class="reference internal" href="#cascada.bitvector.ssa.BvFunction.to_ssa" title="cascada.bitvector.ssa.BvFunction.to_ssa"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">BvFunction.to_ssa</span></code></a> with the same argument list,
+and stores the round outputs in the <a class="reference internal" href="#cascada.bitvector.ssa.SSA" title="cascada.bitvector.ssa.SSA"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SSA</span></code></a> object if <a class="reference internal" href="#cascada.bitvector.ssa.RoundBasedFunction.add_round_outputs" title="cascada.bitvector.ssa.RoundBasedFunction.add_round_outputs"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">add_round_outputs</span></code></a>
+calls were added in <code class="docutils literal notranslate"><span class="pre">eval</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.ssa.RoundBasedFunction.set_num_rounds">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_num_rounds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_num_rounds</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/ssa.html#RoundBasedFunction.set_num_rounds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.ssa.RoundBasedFunction.set_num_rounds" title="Permalink to this definition"></a></dt>
+<dd><p>Set <a class="reference internal" href="#cascada.bitvector.ssa.RoundBasedFunction.num_rounds" title="cascada.bitvector.ssa.RoundBasedFunction.num_rounds"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">RoundBasedFunction.num_rounds</span></code></a> and update <a class="reference internal" href="#cascada.bitvector.ssa.BvFunction.input_widths" title="cascada.bitvector.ssa.BvFunction.input_widths"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">input_widths</span></code></a> and <code class="docutils literal notranslate"><span class="pre">output_widths</span></code> if necessary.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.ssa.RoundBasedFunction.set_num_rounds_and_return">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_num_rounds_and_return</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_num_rounds</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/ssa.html#RoundBasedFunction.set_num_rounds_and_return"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.ssa.RoundBasedFunction.set_num_rounds_and_return" title="Permalink to this definition"></a></dt>
+<dd><p>Call <a class="reference internal" href="#cascada.bitvector.ssa.RoundBasedFunction.set_num_rounds" title="cascada.bitvector.ssa.RoundBasedFunction.set_num_rounds"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">set_num_rounds</span></code></a> and return <code class="docutils literal notranslate"><span class="pre">cls</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.ssa.RoundBasedFunction.vrepr">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">vrepr</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/ssa.html#RoundBasedFunction.vrepr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.ssa.RoundBasedFunction.vrepr" title="Permalink to this definition"></a></dt>
+<dd><p>Return an executable string representation.</p>
+<p>This method returns a string so that <code class="docutils literal notranslate"><span class="pre">eval(cls.vrepr())</span></code>
+returns a new <a class="reference internal" href="#cascada.bitvector.ssa.RoundBasedFunction" title="cascada.bitvector.ssa.RoundBasedFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RoundBasedFunction</span></code></a> object with the same content.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.ssa.RoundBasedFunction.add_round_outputs">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">add_round_outputs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/ssa.html#RoundBasedFunction.add_round_outputs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.ssa.RoundBasedFunction.add_round_outputs" title="Permalink to this definition"></a></dt>
+<dd><p>Store the current round outputs in the evaluation of the round-based function.</p>
+<p>This method is meant to be used within <code class="docutils literal notranslate"><span class="pre">eval</span></code> to store the outputs
+of each round. At the beggining of each evaluation, round ouputs stored
+in the last evaluation are automatically removed.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.ssa</span> <span class="kn">import</span> <span class="n">RoundBasedFunction</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">MyFoo</span><span class="p">(</span><span class="n">RoundBasedFunction</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">input_widths</span><span class="p">,</span> <span class="n">output_widths</span><span class="p">,</span> <span class="n">num_rounds</span> <span class="o">=</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">],</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">],</span> <span class="mi">1</span>
+<span class="gp">... </span>    <span class="nd">@classmethod</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span><span class="p">):</span>
+<span class="gp">... </span>            <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">1</span>
+<span class="gp">... </span>            <span class="bp">cls</span><span class="o">.</span><span class="n">add_round_outputs</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="gp">... </span>        <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span>
+<span class="gp">... </span>    <span class="nd">@classmethod</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">set_num_rounds</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">new_num_rounds</span><span class="p">):</span>  <span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span> <span class="o">=</span> <span class="n">new_num_rounds</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">MyFoo</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">MyFoo</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="go">(0x01, 0x02)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">MyFoo</span><span class="o">.</span><span class="n">get_rounds_outputs</span><span class="p">()</span>
+<span class="go">((0x00, 0x01), (0x01, 0x01), (0x01, 0x02))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">MyFoo</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">symbolic_inputs</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">(y + 0x01, x + 0x02)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">MyFoo</span><span class="o">.</span><span class="n">get_rounds_outputs</span><span class="p">()</span>
+<span class="go">((y, x + 0x01), (x + 0x01, y + 0x01), (y + 0x01, x + 0x02))</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>args</strong> – a list of bit-vectors representing the outputs of the current round.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.ssa.RoundBasedFunction.get_rounds_outputs">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_rounds_outputs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/ssa.html#RoundBasedFunction.get_rounds_outputs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.ssa.RoundBasedFunction.get_rounds_outputs" title="Permalink to this definition"></a></dt>
+<dd><p>Return the list of round outputs obtained in the last evaluation.</p>
+<p>See also <a class="reference internal" href="#cascada.bitvector.ssa.RoundBasedFunction.add_round_outputs" title="cascada.bitvector.ssa.RoundBasedFunction.add_round_outputs"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">add_round_outputs</span></code></a>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.bitvector.ssa.SSAReturn">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.bitvector.ssa.</span></span><span class="sig-name descname"><span class="pre">SSAReturn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/ssa.html#SSAReturn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.ssa.SSAReturn" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.BvIdentity" title="cascada.bitvector.operation.BvIdentity"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.bitvector.operation.BvIdentity</span></code></a></p>
+<p>Subclass of <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.BvIdentity" title="cascada.bitvector.operation.BvIdentity"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvIdentity</span></code></a> used to denote the returned variables in <a class="reference internal" href="#cascada.bitvector.ssa.SSA" title="cascada.bitvector.ssa.SSA"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SSA</span></code></a>.</p>
+<p>Note that both <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.BvIdentity" title="cascada.bitvector.operation.BvIdentity"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvIdentity</span></code></a> and <a class="reference internal" href="#cascada.bitvector.ssa.SSAReturn" title="cascada.bitvector.ssa.SSAReturn"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SSAReturn</span></code></a> have the same string representation
+(but different <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term.vrepr" title="cascada.bitvector.core.Term.vrepr"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">Term.vrepr</span></code></a>).</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span><span class="p">,</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.operation</span> <span class="kn">import</span> <span class="n">BvIdentity</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.ssa</span> <span class="kn">import</span> <span class="n">SSAReturn</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">BvIdentity</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="mh">0x1</span><span class="p">,</span> <span class="mi">4</span><span class="p">)),</span> <span class="n">SSAReturn</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="mh">0x1</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="go">(0x1, 0x1)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">BvIdentity</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">)),</span> <span class="n">SSAReturn</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="go">(Id(x), Id(x))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">BvIdentity</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span><span class="o">.</span><span class="n">vrepr</span><span class="p">(),</span> <span class="n">SSAReturn</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span><span class="o">.</span><span class="n">vrepr</span><span class="p">()</span>
+<span class="go">(&quot;BvIdentity(Variable(&#39;x&#39;, width=8))&quot;, &quot;SSAReturn(Variable(&#39;x&#39;, width=8))&quot;)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.bitvector.ssa.SSA">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.bitvector.ssa.</span></span><span class="sig-name descname"><span class="pre">SSA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_vars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_vars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assignments</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replace_multiuse_vars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/ssa.html#SSA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.ssa.SSA" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Represent a <a class="reference internal" href="#cascada.bitvector.ssa.BvFunction" title="cascada.bitvector.ssa.BvFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvFunction</span></code></a> as a static single assignment program.</p>
+<p>An <a class="reference internal" href="#cascada.bitvector.ssa.SSA" title="cascada.bitvector.ssa.SSA"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SSA</span></code></a> object represents a decomposition of a <a class="reference internal" href="#cascada.bitvector.ssa.BvFunction" title="cascada.bitvector.ssa.BvFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvFunction</span></code></a>
+into a list of <em>simple</em> assignments <span class="math notranslate nohighlight">\(x_{i+1} \leftarrow f_i(x_i)\)</span>,
+similar as the method <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.Operation.memoization_table" title="cascada.bitvector.operation.Operation.memoization_table"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">memoization_table</span></code></a> for <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.Operation" title="cascada.bitvector.operation.Operation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Operation</span></code></a> objects.
+Recall a <em>simple</em> assignment is given by the output <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Variable" title="cascada.bitvector.core.Variable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Variable</span></code></a>
+<span class="math notranslate nohighlight">\(x_{i+1}\)</span> representing the output of the given
+<a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.Operation" title="cascada.bitvector.operation.Operation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Operation</span></code></a> <span class="math notranslate nohighlight">\(f_i(x_i)\)</span>, where <span class="math notranslate nohighlight">\(x_i\)</span> is an input or
+previous output <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Variable" title="cascada.bitvector.core.Variable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Variable</span></code></a>, a <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Constant" title="cascada.bitvector.core.Constant"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a>, a scalar, or a list of them
+(but not an <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.Operation" title="cascada.bitvector.operation.Operation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Operation</span></code></a> object).</p>
+<p>An <a class="reference internal" href="#cascada.bitvector.ssa.SSA" title="cascada.bitvector.ssa.SSA"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SSA</span></code></a> object is defined for</p>
+<ul class="simple">
+<li><p>A list of <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Variable" title="cascada.bitvector.core.Variable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Variable</span></code></a> objects representing the inputs of the bit-vector function.</p></li>
+<li><p>A list of <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Variable" title="cascada.bitvector.core.Variable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Variable</span></code></a> objects representing the outputs of the function.</p></li>
+<li><p>The list of of assignments as a <a class="reference external" href="https://docs.python.org/3/library/collections.html#collections.OrderedDict" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">collections.OrderedDict</span></code></a> mapping
+each intermediate <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Variable" title="cascada.bitvector.core.Variable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Variable</span></code></a> <span class="math notranslate nohighlight">\(x_{i+1}\)</span> to the <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.Operation" title="cascada.bitvector.operation.Operation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Operation</span></code></a> <span class="math notranslate nohighlight">\(f_i(x_i)\)</span>.</p></li>
+</ul>
+<p>The assignments might contain variables not defined in previous assignments
+nor contained in the input variables.
+These variables are called <em>external variables</em> and are stored
+in the attribute <a class="reference internal" href="#cascada.bitvector.ssa.SSA.external_vars" title="cascada.bitvector.ssa.SSA.external_vars"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">external_vars</span></code></a>.</p>
+<p>Apart from these three initialization argument,
+if the initialization argument <code class="docutils literal notranslate"><span class="pre">replace_multiuse_vars</span></code> is set
+to <code class="docutils literal notranslate"><span class="pre">True</span></code>, variables appearing two or more times
+in the list of assignments (as arguments of <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.Operation" title="cascada.bitvector.operation.Operation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Operation</span></code></a> objects
+excluding <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.BvIdentity" title="cascada.bitvector.operation.BvIdentity"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvIdentity</span></code></a>) are replaced by new variables (ending in
+<code class="docutils literal notranslate"><span class="pre">__d</span></code> where <code class="docutils literal notranslate"><span class="pre">d</span></code> is the occurrence index) that are used only once.
+In this case, the mapping from the old multiuse variables
+to the new singleuse variables is stored in <code class="docutils literal notranslate"><span class="pre">multiuse_var2singleuse_vars</span></code>.
+In other words, new variables are created to uniquely label each
+branch of the forking subroutine (see <a class="reference internal" href="cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelFreeBranch" title="cascada.linear.opmodel.LinearModelFreeBranch"><code class="xref any py py-class docutils literal notranslate"><span class="pre">LinearModelFreeBranch</span></code></a>).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For example, with <code class="docutils literal notranslate"><span class="pre">replace_multiuse_vars=True</span></code> the assignment list
+<code class="docutils literal notranslate"><span class="pre">(a0,</span> <span class="pre">x</span> <span class="pre">+</span> <span class="pre">1),</span> <span class="pre">(a1,</span> <span class="pre">x</span> <span class="pre">&amp;</span> <span class="pre">1)</span></code> is replaced by
+<code class="docutils literal notranslate"><span class="pre">(x__0,</span> <span class="pre">Id(x)),</span> <span class="pre">(x__1,</span> <span class="pre">Id(x))</span> <span class="pre">(a0,</span> <span class="pre">x__0</span> <span class="pre">+</span> <span class="pre">1),</span> <span class="pre">(a1,</span> <span class="pre">x__1</span> <span class="pre">&amp;</span> <span class="pre">1)</span></code>.</p>
+</div>
+<p><a class="reference internal" href="#cascada.bitvector.ssa.SSA" title="cascada.bitvector.ssa.SSA"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SSA</span></code></a> objects can be easily created from <a class="reference internal" href="#cascada.bitvector.ssa.BvFunction.to_ssa" title="cascada.bitvector.ssa.BvFunction.to_ssa"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">BvFunction.to_ssa</span></code></a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When initializing the SSA object, external variables are
+automatically obtained, redundant assignments are automatically
+removed (and a warning is printed in this case), and
+partial operations are automatically created from
+operations with constant or scalar operands.</p>
+<p>Moreover, additional assignments with the operations <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.BvIdentity" title="cascada.bitvector.operation.BvIdentity"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvIdentity</span></code></a>
+and <a class="reference internal" href="#cascada.bitvector.ssa.SSAReturn" title="cascada.bitvector.ssa.SSAReturn"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SSAReturn</span></code></a> might be added at the end.
+These last assignemnts are added to ensure that each output
+variable of the <a class="reference internal" href="#cascada.bitvector.ssa.SSA" title="cascada.bitvector.ssa.SSA"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SSA</span></code></a> has a unique name (ending in <code class="docutils literal notranslate"><span class="pre">_out</span></code>)
+and to ensure that the output variables of the last assignments
+are actually the output variables of the <a class="reference internal" href="#cascada.bitvector.ssa.SSA" title="cascada.bitvector.ssa.SSA"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SSA</span></code></a>.
+If these assignments are already present in the given
+list of assigments no additional ones are added.</p>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.ssa</span> <span class="kn">import</span> <span class="n">BvFunction</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">MyFoo</span><span class="p">(</span><span class="n">BvFunction</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">input_widths</span><span class="p">,</span> <span class="n">output_widths</span> <span class="o">=</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">],</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">]</span>
+<span class="gp">... </span>    <span class="nd">@classmethod</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>  <span class="k">return</span> <span class="n">x</span> <span class="o">^</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">MyFoo</span><span class="o">.</span><span class="n">to_ssa</span><span class="p">([</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">],</span> <span class="s2">&quot;a&quot;</span><span class="p">)</span>  
+<span class="go">SSA(input_vars=[x, y], output_vars=[a0_out, x_out],</span>
+<span class="go">    assignments=[(a0, x ^ y), (a0_out, Id(a0)), (x_out, Id(x))])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ssa</span> <span class="o">=</span> <span class="n">MyFoo</span><span class="o">.</span><span class="n">to_ssa</span><span class="p">([</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">],</span> <span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">replace_multiuse_vars</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ssa</span>  
+<span class="go">SSA(input_vars=[x, y], output_vars=[a0_out, x_out],</span>
+<span class="go">    assignments=[(x__0, Id(x)), (x__1, Id(x)), (a0, x__0 ^ y), (a0_out, Id(a0)), (x_out, Id(x__1))])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ssa</span><span class="o">.</span><span class="n">multiuse_var2singleuse_vars</span><span class="p">,</span> <span class="n">ssa</span><span class="o">.</span><span class="n">singleuse_var2multiuse_var</span>
+<span class="go">(OrderedDict([(x, [x__0, x__1])]), OrderedDict([(x__0, x), (x__1, x)]))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">last_assignments</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">ssa</span><span class="o">.</span><span class="n">assignments</span><span class="o">.</span><span class="n">items</span><span class="p">())[</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">ssa</span><span class="o">.</span><span class="n">output_vars</span><span class="p">):]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">var</span><span class="p">,</span> <span class="n">expr</span> <span class="ow">in</span> <span class="n">last_assignments</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">vrepr</span><span class="p">(),</span> <span class="s2">&quot;, &quot;</span><span class="p">,</span> <span class="n">expr</span><span class="o">.</span><span class="n">vrepr</span><span class="p">(),</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="go">Variable(&#39;a0_out&#39;, width=8), SSAReturn(Variable(&#39;a0&#39;, width=8))</span>
+<span class="go">Variable(&#39;x_out&#39;, width=8), SSAReturn(Variable(&#39;x__1&#39;, width=8))</span>
+</pre></div>
+</div>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.bitvector.ssa.SSA.input_vars">
+<span class="sig-name descname"><span class="pre">input_vars</span></span><a class="headerlink" href="#cascada.bitvector.ssa.SSA.input_vars" title="Permalink to this definition"></a></dt>
+<dd><p>a list of <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Variable" title="cascada.bitvector.core.Variable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Variable</span></code></a> objects representing the inputs.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.bitvector.ssa.SSA.output_vars">
+<span class="sig-name descname"><span class="pre">output_vars</span></span><a class="headerlink" href="#cascada.bitvector.ssa.SSA.output_vars" title="Permalink to this definition"></a></dt>
+<dd><p>a list of <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Variable" title="cascada.bitvector.core.Variable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Variable</span></code></a> objects representing the outputs.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.bitvector.ssa.SSA.assignments">
+<span class="sig-name descname"><span class="pre">assignments</span></span><a class="headerlink" href="#cascada.bitvector.ssa.SSA.assignments" title="Permalink to this definition"></a></dt>
+<dd><p>a <a class="reference external" href="https://docs.python.org/3/library/collections.html#collections.OrderedDict" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">collections.OrderedDict</span></code></a> containing the assignments
+(<a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Variable" title="cascada.bitvector.core.Variable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Variable</span></code></a>, <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.Operation" title="cascada.bitvector.operation.Operation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Operation</span></code></a>) of the SSA program.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.bitvector.ssa.SSA.external_vars">
+<span class="sig-name descname"><span class="pre">external_vars</span></span><a class="headerlink" href="#cascada.bitvector.ssa.SSA.external_vars" title="Permalink to this definition"></a></dt>
+<dd><p>a list of <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Variable" title="cascada.bitvector.core.Variable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Variable</span></code></a> objects which appear in the
+assignments but are not defined in previous assignments
+nor contained in the input variables.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.bitvector.ssa.SSA.multiuse_var2singleuse_vars">
+<span class="sig-name descname"><span class="pre">multiuse_var2singleuse_vars</span></span><a class="headerlink" href="#cascada.bitvector.ssa.SSA.multiuse_var2singleuse_vars" title="Permalink to this definition"></a></dt>
+<dd><p>an empty dictionary if the initialization
+argument <code class="docutils literal notranslate"><span class="pre">replace_multiuse_vars</span></code> is set to <code class="docutils literal notranslate"><span class="pre">False</span></code>, otherwise
+a <a class="reference external" href="https://docs.python.org/3/library/collections.html#collections.OrderedDict" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">collections.OrderedDict</span></code></a> mapping the old multiuse variables
+to the new singleused variables.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.bitvector.ssa.SSA.singleuse_var2multiuse_var">
+<span class="sig-name descname"><span class="pre">singleuse_var2multiuse_var</span></span><a class="headerlink" href="#cascada.bitvector.ssa.SSA.singleuse_var2multiuse_var" title="Permalink to this definition"></a></dt>
+<dd><p>the inverse mapping of
+<code class="docutils literal notranslate"><span class="pre">multiuse_var2singleuse_vars</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.ssa.SSA.vrepr">
+<span class="sig-name descname"><span class="pre">vrepr</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/ssa.html#SSA.vrepr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.ssa.SSA.vrepr" title="Permalink to this definition"></a></dt>
+<dd><p>Return an executable string representation.</p>
+<p>This method returns a string so that
+<code class="docutils literal notranslate"><span class="pre">eval(self.vrepr())</span></code> returns a new <a class="reference internal" href="#cascada.bitvector.ssa.SSA" title="cascada.bitvector.ssa.SSA"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SSA</span></code></a> object
+with the same content.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.operation</span> <span class="kn">import</span> <span class="n">BvXor</span><span class="p">,</span> <span class="n">BvIdentity</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.ssa</span> <span class="kn">import</span> <span class="n">BvFunction</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">z</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">MyFoo</span><span class="p">(</span><span class="n">BvFunction</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">input_widths</span><span class="p">,</span> <span class="n">output_widths</span> <span class="o">=</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">],</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">]</span>
+<span class="gp">... </span>    <span class="nd">@classmethod</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>  <span class="k">return</span> <span class="n">y</span> <span class="o">^</span> <span class="n">z</span><span class="p">,</span> <span class="n">x</span> <span class="o">^</span> <span class="mi">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">MyFoo</span><span class="o">.</span><span class="n">to_ssa</span><span class="p">([</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">],</span> <span class="s2">&quot;i&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">vrepr</span><span class="p">()</span>  
+<span class="go">&quot;SSA(input_vars=[Variable(&#39;x&#39;, width=8), Variable(&#39;y&#39;, width=8)],</span>
+<span class="go">    output_vars=[Variable(&#39;i0_out&#39;, width=8), Variable(&#39;i1_out&#39;, width=8)],</span>
+<span class="go">    assignments=[(Variable(&#39;i0&#39;, width=8), BvXor(Variable(&#39;y&#39;, width=8), Variable(&#39;z&#39;, width=8))),</span>
+<span class="go">        (Variable(&#39;i1&#39;, width=8),</span>
+<span class="go">            make_partial_operation(BvXor, (None, Constant(0b00000001, width=8)))(Variable(&#39;x&#39;, width=8))),</span>
+<span class="go">        (Variable(&#39;i0_out&#39;, width=8), SSAReturn(Variable(&#39;i0&#39;, width=8))),</span>
+<span class="go">        (Variable(&#39;i1_out&#39;, width=8), SSAReturn(Variable(&#39;i1&#39;, width=8)))])&quot;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.ssa.SSA.get_C_code">
+<span class="sig-name descname"><span class="pre">get_C_code</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">C_function_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/ssa.html#SSA.get_C_code"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.ssa.SSA.get_C_code" title="Permalink to this definition"></a></dt>
+<dd><p>Return two strings (header and body) of a C function evalauting the SSA.</p>
+<p>This method returns two strings (the function header and the function body)
+of a function in the C programming language that computes the SSA.</p>
+<p>The C function is of <code class="docutils literal notranslate"><span class="pre">void</span></code> type and its list of arguments consists of
+the input variables, the external variables (if any) and the output variables.
+The output variables are defined as pointers to store the results.</p>
+<p>See also <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term.crepr" title="cascada.bitvector.core.Term.crepr"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">crepr</span></code></a>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.operation</span> <span class="kn">import</span> <span class="n">BvXor</span><span class="p">,</span> <span class="n">BvIdentity</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.ssa</span> <span class="kn">import</span> <span class="n">BvFunction</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">z</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">MyFoo</span><span class="p">(</span><span class="n">BvFunction</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">input_widths</span><span class="p">,</span> <span class="n">output_widths</span> <span class="o">=</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">],</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">]</span>
+<span class="gp">... </span>    <span class="nd">@classmethod</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>  <span class="k">return</span> <span class="n">y</span> <span class="o">^</span> <span class="n">z</span><span class="p">,</span> <span class="n">x</span> <span class="o">^</span> <span class="mi">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">header</span><span class="p">,</span> <span class="n">body</span> <span class="o">=</span> <span class="n">MyFoo</span><span class="o">.</span><span class="n">to_ssa</span><span class="p">([</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">],</span> <span class="s2">&quot;i&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get_C_code</span><span class="p">(</span><span class="s2">&quot;MyFoo&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">header</span>
+<span class="go">&#39;void MyFoo(uint8_t x, uint8_t y, uint8_t z, uint8_t *i0_out, uint8_t *i1_out);&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>  
+<span class="go">#include &lt;stdint.h&gt;</span>
+<span class="go">void MyFoo(uint8_t x, uint8_t y, uint8_t z, uint8_t *i0_out, uint8_t *i1_out){</span>
+<span class="go">    uint8_t i0 = y ^ z;</span>
+<span class="go">    uint8_t i1 = x ^ 0x1U;</span>
+<span class="go">    *i0_out = i0;</span>
+<span class="go">    *i1_out = i1;</span>
+<span class="go">};</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.ssa.SSA.eval">
+<span class="sig-name descname"><span class="pre">eval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_vals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">external_var2val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">C_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/ssa.html#SSA.eval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.ssa.SSA.eval" title="Permalink to this definition"></a></dt>
+<dd><p>Evaluate the SSA with <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Constant" title="cascada.bitvector.core.Constant"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a> inputs and return the <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Constant" title="cascada.bitvector.core.Constant"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a> outputs.</p>
+<p>If some external variable is not given, it is replaced by the zero bit-vector.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Variable</span><span class="p">,</span> <span class="n">Constant</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.ssa</span> <span class="kn">import</span> <span class="n">BvFunction</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">z</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">MyFoo</span><span class="p">(</span><span class="n">BvFunction</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">input_widths</span><span class="p">,</span> <span class="n">output_widths</span> <span class="o">=</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">],</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">]</span>
+<span class="gp">... </span>    <span class="nd">@classmethod</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>  <span class="k">return</span> <span class="n">y</span> <span class="o">^</span> <span class="n">z</span><span class="p">,</span> <span class="n">x</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_ssa</span> <span class="o">=</span> <span class="n">MyFoo</span><span class="o">.</span><span class="n">to_ssa</span><span class="p">([</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">],</span> <span class="s2">&quot;i&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_ssa</span>  
+<span class="go">SSA(input_vars=[x, y], output_vars=[i0_out, x_out], external_vars=[z],</span>
+<span class="go">    assignments=[(i0, y ^ z), (i0_out, Id(i0)), (x_out, Id(x))])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_ssa</span><span class="o">.</span><span class="n">external_vars</span>
+<span class="go">(z,)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_ssa</span><span class="o">.</span><span class="n">eval</span><span class="p">([</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">8</span><span class="p">)])</span>
+<span class="go">(0x00, 0x00)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_vals</strong> – a list of <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Constant" title="cascada.bitvector.core.Constant"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a> objects representing the inputs.</p></li>
+<li><p><strong>external_var2val</strong> – a dictionary mapping the external variables
+to its <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Constant" title="cascada.bitvector.core.Constant"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a> values.</p></li>
+<li><p><strong>C_code</strong> – whether to evaluate the SSA by compiling and running
+its C code (see also <a class="reference internal" href="#cascada.bitvector.ssa.SSA.get_C_code" title="cascada.bitvector.ssa.SSA.get_C_code"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">get_C_code</span></code></a>).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.ssa.SSA.to_bvfunction">
+<span class="sig-name descname"><span class="pre">to_bvfunction</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/ssa.html#SSA.to_bvfunction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.ssa.SSA.to_bvfunction" title="Permalink to this definition"></a></dt>
+<dd><p>Return a <a class="reference internal" href="#cascada.bitvector.ssa.BvFunction" title="cascada.bitvector.ssa.BvFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvFunction</span></code></a> that evaluates  <code class="docutils literal notranslate"><span class="pre">self</span></code>.</p>
+<p>The returned <a class="reference internal" href="#cascada.bitvector.ssa.BvFunction" title="cascada.bitvector.ssa.BvFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvFunction</span></code></a> stores <code class="docutils literal notranslate"><span class="pre">self</span></code> in the <code class="docutils literal notranslate"><span class="pre">_ssa</span></code> attribute.
+Moreover, the method <a class="reference internal" href="#cascada.bitvector.ssa.BvFunction.to_ssa" title="cascada.bitvector.ssa.BvFunction.to_ssa"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">BvFunction.to_ssa</span></code></a> of the returned <a class="reference internal" href="#cascada.bitvector.ssa.BvFunction" title="cascada.bitvector.ssa.BvFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvFunction</span></code></a>
+raises an exception unless it is called with the same arguments that
+were used to create <code class="docutils literal notranslate"><span class="pre">_ssa</span></code> (in this case <code class="docutils literal notranslate"><span class="pre">_ssa</span></code> is returned).</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.ssa</span> <span class="kn">import</span> <span class="n">BvFunction</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">MyFoo</span><span class="p">(</span><span class="n">BvFunction</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">input_widths</span><span class="p">,</span> <span class="n">output_widths</span> <span class="o">=</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">],</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">]</span>
+<span class="gp">... </span>    <span class="nd">@classmethod</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>  <span class="k">return</span> <span class="n">x</span> <span class="o">^</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">MyFoo</span><span class="o">.</span><span class="n">to_ssa</span><span class="p">([</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">],</span> <span class="s2">&quot;a&quot;</span><span class="p">)</span>  
+<span class="go">SSA(input_vars=[x, y], output_vars=[a0_out, x_out],</span>
+<span class="go">    assignments=[(a0, x ^ y), (a0_out, Id(a0)), (x_out, Id(x))])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">MyFoo_v2</span> <span class="o">=</span> <span class="n">MyFoo</span><span class="o">.</span><span class="n">to_ssa</span><span class="p">([</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">],</span> <span class="s2">&quot;a&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">to_bvfunction</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">MyFoo_v2</span><span class="o">.</span><span class="n">to_ssa</span><span class="p">([</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">],</span> <span class="s2">&quot;a&quot;</span><span class="p">)</span>  
+<span class="go">SSA(input_vars=[x, y], output_vars=[a0_out, x_out],</span>
+<span class="go">    assignments=[(a0, x ^ y), (a0_out, Id(a0)), (x_out, Id(x))])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.ssa.SSA.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/ssa.html#SSA.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.ssa.SSA.copy" title="Permalink to this definition"></a></dt>
+<dd><p>Return a deep copy of <code class="docutils literal notranslate"><span class="pre">self</span></code>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.ssa</span> <span class="kn">import</span> <span class="n">BvFunction</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">MyFoo</span><span class="p">(</span><span class="n">BvFunction</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">input_widths</span><span class="p">,</span> <span class="n">output_widths</span> <span class="o">=</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">],</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">]</span>
+<span class="gp">... </span>    <span class="nd">@classmethod</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>  <span class="k">return</span> <span class="n">x</span> <span class="o">^</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ssa</span> <span class="o">=</span> <span class="n">MyFoo</span><span class="o">.</span><span class="n">to_ssa</span><span class="p">([</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">],</span> <span class="s2">&quot;a&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ssa</span>  
+<span class="go">SSA(input_vars=[x, y], output_vars=[a0_out, x_out],</span>
+<span class="go">    assignments=[(a0, x ^ y), (a0_out, Id(a0)), (x_out, Id(x))])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ssa_copy</span> <span class="o">=</span> <span class="n">ssa</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ssa_copy</span>  
+<span class="go">SSA(input_vars=[x, y], output_vars=[a0_out, x_out],</span>
+<span class="go">    assignments=[(a0, x ^ y), (a0_out, Id(a0)), (x_out, Id(x))])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ssa_copy</span><span class="o">.</span><span class="n">input_vars</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ssa_copy</span><span class="o">.</span><span class="n">output_vars</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ssa_copy</span><span class="o">.</span><span class="n">assignments</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ssa_copy</span>
+<span class="go">SSA(input_vars=[], output_vars=[], assignments=[])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ssa</span>  
+<span class="go">SSA(input_vars=[x, y], output_vars=[a0_out, x_out],</span>
+<span class="go">    assignments=[(a0, x ^ y), (a0_out, Id(a0)), (x_out, Id(x))])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.ssa.SSA.split">
+<span class="sig-name descname"><span class="pre">split</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var_separators</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/ssa.html#SSA.split"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.ssa.SSA.split" title="Permalink to this definition"></a></dt>
+<dd><p>Split into multiple <a class="reference internal" href="#cascada.bitvector.ssa.SSA" title="cascada.bitvector.ssa.SSA"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SSA</span></code></a> objects given the list of variable separators.</p>
+<p>Given the <a class="reference internal" href="#cascada.bitvector.ssa.SSA" title="cascada.bitvector.ssa.SSA"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SSA</span></code></a> <span class="math notranslate nohighlight">\(s\)</span>, this method returns a list of <a class="reference internal" href="#cascada.bitvector.ssa.SSA" title="cascada.bitvector.ssa.SSA"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SSA</span></code></a> objects
+<span class="math notranslate nohighlight">\(s_1, s_2, ..., s_n\)</span>, such that their composition
+<span class="math notranslate nohighlight">\(s_n \circ s_{n-1} \dots \circ s_1\)</span> is functionally equivalent to
+<span class="math notranslate nohighlight">\(s\)</span>.</p>
+<p>The argument <code class="docutils literal notranslate"><span class="pre">var_separators</span></code> is a list containing lists of variables.
+The <span class="math notranslate nohighlight">\(i\)</span>-th variable list denote the last variables of <span class="math notranslate nohighlight">\(s_i\)</span>.
+In other words, the list of assignments of <span class="math notranslate nohighlight">\(s_{i+1}\)</span> immediately
+starts after the last assignments of the last variable in
+<code class="docutils literal notranslate"><span class="pre">var_separators[i]</span></code>.</p>
+<p>To split into <span class="math notranslate nohighlight">\(n\)</span> <a class="reference internal" href="#cascada.bitvector.ssa.SSA" title="cascada.bitvector.ssa.SSA"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SSA</span></code></a> objects, <code class="docutils literal notranslate"><span class="pre">var_separators</span></code> must contain
+<span class="math notranslate nohighlight">\(n-1\)</span> lists, as the variable list for <span class="math notranslate nohighlight">\(s_n\)</span> is not given
+(its last variables are the output variables of <span class="math notranslate nohighlight">\(s\)</span>).</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.ssa</span> <span class="kn">import</span> <span class="n">BvFunction</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">z</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">var_separators</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">MyFoo</span><span class="p">(</span><span class="n">BvFunction</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">input_widths</span><span class="p">,</span> <span class="n">output_widths</span> <span class="o">=</span> <span class="p">[</span><span class="mi">8</span><span class="p">],</span> <span class="p">[</span><span class="mi">8</span><span class="p">]</span>
+<span class="gp">... </span>    <span class="nd">@classmethod</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x0</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="n">var_separators</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+<span class="gp">... </span>        <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span> <span class="o">=</span> <span class="p">(</span><span class="n">x0</span> <span class="o">+</span> <span class="n">x0</span><span class="p">),</span> <span class="n">x0</span>
+<span class="gp">... </span>        <span class="n">non_used_var</span> <span class="o">=</span> <span class="n">x1</span> <span class="o">+</span> <span class="n">y1</span>
+<span class="gp">... </span>        <span class="n">var_separators</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">non_used_var</span><span class="p">])</span>
+<span class="gp">... </span>        <span class="k">return</span> <span class="p">[(</span><span class="n">x1</span> <span class="o">|</span> <span class="n">y1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">z</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ssa</span> <span class="o">=</span> <span class="n">MyFoo</span><span class="o">.</span><span class="n">to_ssa</span><span class="p">([</span><span class="s2">&quot;x&quot;</span><span class="p">],</span> <span class="s2">&quot;a&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ssa</span>  
+<span class="go">SSA(input_vars=[x], output_vars=[a3_out], external_vars=[z],</span>
+<span class="go">    assignments=[(a0, x + x), (a2, a0 | x), (a3, a2 &amp; z), (a3_out, Id(a3))])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">var_separators</span>
+<span class="go">[[a0, x, a1]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">sub_ssa</span> <span class="ow">in</span> <span class="n">ssa</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">var_separators</span><span class="p">):</span> <span class="nb">print</span><span class="p">(</span><span class="n">sub_ssa</span><span class="p">)</span>  
+<span class="go">SSA(input_vars=[x], output_vars=[a0_out, x_out],</span>
+<span class="go">    assignments=[(a0, x + x), (a0_out, Id(a0)), (x_out, Id(x))])</span>
+<span class="go">SSA(input_vars=[a0, x], output_vars=[a3_out], external_vars=[z],</span>
+<span class="go">    assignments=[(a2, a0 | x), (a3, a2 &amp; z), (a3_out, Id(a3))])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.ssa.SSA.get_round_separators">
+<span class="sig-name descname"><span class="pre">get_round_separators</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/ssa.html#SSA.get_round_separators"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.ssa.SSA.get_round_separators" title="Permalink to this definition"></a></dt>
+<dd><p>Return the round separators if the SSA was obtained from a <a class="reference internal" href="#cascada.bitvector.ssa.RoundBasedFunction" title="cascada.bitvector.ssa.RoundBasedFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RoundBasedFunction</span></code></a>.</p>
+<p>If the <a class="reference internal" href="#cascada.bitvector.ssa.SSA" title="cascada.bitvector.ssa.SSA"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SSA</span></code></a> object was obtained from <a class="reference internal" href="#cascada.bitvector.ssa.RoundBasedFunction.to_ssa" title="cascada.bitvector.ssa.RoundBasedFunction.to_ssa"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">RoundBasedFunction.to_ssa</span></code></a> of a
+<a class="reference internal" href="#cascada.bitvector.ssa.RoundBasedFunction" title="cascada.bitvector.ssa.RoundBasedFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RoundBasedFunction</span></code></a> including <a class="reference internal" href="#cascada.bitvector.ssa.RoundBasedFunction.add_round_outputs" title="cascada.bitvector.ssa.RoundBasedFunction.add_round_outputs"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">add_round_outputs</span></code></a> calls in its <code class="docutils literal notranslate"><span class="pre">eval</span></code>,
+this method returns a list with the round outputs delimiting the rounds.
+Otherwise, <code class="docutils literal notranslate"><span class="pre">None</span></code> is returned.</p>
+<p>In the first case, this list contains <code class="docutils literal notranslate"><span class="pre">num_rounds</span> <span class="pre">-</span> <span class="pre">1</span></code> entries,
+where the <code class="docutils literal notranslate"><span class="pre">i</span></code>-th entry is the list of outputs of the <code class="docutils literal notranslate"><span class="pre">i</span></code>-th round.
+In particular, the outputs of the last round are not included in this list.</p>
+<p>The list returned by this method is meant to be used as the argument
+of <a class="reference internal" href="#cascada.bitvector.ssa.SSA.split" title="cascada.bitvector.ssa.SSA.split"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">split</span></code></a> to get the <a class="reference internal" href="#cascada.bitvector.ssa.SSA" title="cascada.bitvector.ssa.SSA"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SSA</span></code></a> object of each round.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.ssa</span> <span class="kn">import</span> <span class="n">RoundBasedFunction</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">MyFoo</span><span class="p">(</span><span class="n">RoundBasedFunction</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">input_widths</span><span class="p">,</span> <span class="n">output_widths</span><span class="p">,</span> <span class="n">num_rounds</span> <span class="o">=</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">],</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">],</span> <span class="mi">1</span>
+<span class="gp">... </span>    <span class="nd">@classmethod</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span><span class="p">):</span>
+<span class="gp">... </span>            <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">1</span>
+<span class="gp">... </span>            <span class="bp">cls</span><span class="o">.</span><span class="n">add_round_outputs</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="gp">... </span>        <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span>
+<span class="gp">... </span>    <span class="nd">@classmethod</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">set_num_rounds</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">new_num_rounds</span><span class="p">):</span>  <span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span> <span class="o">=</span> <span class="n">new_num_rounds</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">MyFoo</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ssa</span> <span class="o">=</span> <span class="n">MyFoo</span><span class="o">.</span><span class="n">to_ssa</span><span class="p">([</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">],</span> <span class="s2">&quot;a&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ssa</span>  
+<span class="go">SSA(input_vars=[x, y], output_vars=[a1_out, a2_out],</span>
+<span class="go">    assignments=[(a0, x + 0x01), (a1, y + 0x01), (a2, a0 + 0x01),</span>
+<span class="go">        (a1_out, Id(a1)), (a2_out, Id(a2))])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">round_separators</span> <span class="o">=</span> <span class="n">ssa</span><span class="o">.</span><span class="n">get_round_separators</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">round_separators</span>
+<span class="go">((y, a0), (a0, a1))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">sub_ssa</span> <span class="ow">in</span> <span class="n">ssa</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">round_separators</span><span class="p">):</span> <span class="nb">print</span><span class="p">(</span><span class="n">sub_ssa</span><span class="p">)</span>  
+<span class="go">SSA(input_vars=[x, y], output_vars=[y_out, a0_out],</span>
+<span class="go">    assignments=[(a0, x + 0x01), (y_out, Id(y)), (a0_out, Id(a0))])</span>
+<span class="go">SSA(input_vars=[y, a0], output_vars=[a0_out, a1_out],</span>
+<span class="go">    assignments=[(a1, y + 0x01), (a0_out, Id(a0)), (a1_out, Id(a1))])</span>
+<span class="go">SSA(input_vars=[a0, a1], output_vars=[a1_out, a2_out],</span>
+<span class="go">    assignments=[(a2, a0 + 0x01), (a1_out, Id(a1)), (a2_out, Id(a2))])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.ssa.SSA.dotprinting">
+<span class="sig-name descname"><span class="pre">dotprinting</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">repeat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vrepr_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/ssa.html#SSA.dotprinting"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.ssa.SSA.dotprinting" title="Permalink to this definition"></a></dt>
+<dd><p>Return the DOT description of the expression tree of the assignments.</p>
+<p>See also <a class="reference internal" href="cascada.bitvector.printing.html#cascada.bitvector.printing.dotprinting" title="cascada.bitvector.printing.dotprinting"><code class="xref any py py-func docutils literal notranslate"><span class="pre">printing.dotprinting</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>repeat</strong> – whether to use different nodes for common subexpressions
+(default True)</p></li>
+<li><p><strong>vrepr_label</strong> – whether to use the verbose representation (<a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term.vrepr" title="cascada.bitvector.core.Term.vrepr"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">Term.vrepr</span></code></a>)
+to label the nodes (default False)</p></li>
+<li><p><strong>kwargs</strong> – additional arguments passed to <a class="reference internal" href="cascada.bitvector.printing.html#cascada.bitvector.printing.dotprinting" title="cascada.bitvector.printing.dotprinting"><code class="xref any py py-func docutils literal notranslate"><span class="pre">printing.dotprinting</span></code></a></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cascada.bitvector.ssa.get_random_bvfunction">
+<span class="sig-prename descclassname"><span class="pre">cascada.bitvector.ssa.</span></span><span class="sig-name descname"><span class="pre">get_random_bvfunction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_inputs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_outputs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_assignments</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">external_variable_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operation_set_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_rounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_operations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/ssa.html#get_random_bvfunction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.ssa.get_random_bvfunction" title="Permalink to this definition"></a></dt>
+<dd><p>Return a random <a class="reference internal" href="#cascada.bitvector.ssa.BvFunction" title="cascada.bitvector.ssa.BvFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvFunction</span></code></a> with given shape.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>width</strong> – the common bitsize of the input and output variables of the function</p></li>
+<li><p><strong>num_inputs</strong> – the number of inputs of the function</p></li>
+<li><p><strong>num_outputs</strong> – the number of outputs of the function</p></li>
+<li><p><strong>num_assignments</strong> – an estimation of the number of operations within the function</p></li>
+<li><p><strong>seed</strong> – the seed used when sampling</p></li>
+<li><p><strong>external_variable_prefix</strong> – if not <code class="docutils literal notranslate"><span class="pre">None</span></code>, external variables are used
+with the given prefix (at least one)</p></li>
+<li><p><strong>operation_set_index</strong> – four set of operations to choose indexed by 0, 1, 2 and 3</p></li>
+<li><p><strong>num_rounds</strong> – if not <code class="docutils literal notranslate"><span class="pre">None</span></code>, returns a random <a class="reference internal" href="#cascada.bitvector.ssa.RoundBasedFunction" title="cascada.bitvector.ssa.RoundBasedFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RoundBasedFunction</span></code></a> with
+the given number of rounds</p></li>
+<li><p><strong>extra_operations</strong> – an optional <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">tuple</span></code></a> containing <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.Operation" title="cascada.bitvector.operation.Operation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Operation</span></code></a> subclasses
+to add to the list of operations to choose</p></li>
+</ul>
+</dd>
+</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.ssa</span> <span class="kn">import</span> <span class="n">get_random_bvfunction</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_foo</span> <span class="o">=</span> <span class="n">get_random_bvfunction</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_foo</span><span class="o">.</span><span class="n">to_ssa</span><span class="p">([</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">],</span> <span class="s2">&quot;a&quot;</span><span class="p">)</span>  
+<span class="go">SSA(input_vars=[x, y], output_vars=[a0_out, a1_out],</span>
+<span class="go">    assignments=[(a0, y &gt;&gt; 0x2), (a1, ~y), (a0_out, Id(a0)), (a1_out, Id(a1))])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_foo</span> <span class="o">=</span> <span class="n">get_random_bvfunction</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_foo</span><span class="o">.</span><span class="n">to_ssa</span><span class="p">([</span><span class="s2">&quot;x&quot;</span><span class="p">],</span> <span class="s2">&quot;a&quot;</span><span class="p">)</span>  
+<span class="go">SSA(input_vars=[x], output_vars=[a7_out],</span>
+<span class="go">    assignments=[(a0, x[0]), (a1, x[1]), (a2, x[2]), (a3, x[3]),</span>
+<span class="go">    (a4, a0 :: a1), (a5, a4 :: a2), (a6, a5 :: a3), (a7, a6 + 0xe), (a7_out, Id(a7))])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cascada.bitvector.printing.html" class="btn btn-neutral float-left" title="cascada.bitvector.printing module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cascada.primitives.html" class="btn btn-neutral float-right" title="cascada.primitives module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Adrián Ranea.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

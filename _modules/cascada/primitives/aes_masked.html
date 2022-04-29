@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cascada.primitives.aes_masked &mdash; CASCADA 1.0.rc0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> CASCADA
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">CASCADA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../primitives_implemented.html">Primitives implemented</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cascada.html">API reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">CASCADA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>cascada.primitives.aes_masked</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cascada.primitives.aes_masked</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;SMT-based experiments of `A Low-Randomness Second-Order Masked AES</span>
+<span class="sd">&lt;https://eprint.iacr.org/2021/1111&gt;`_.</span>
+
+<span class="sd">To run, call `find_best_key_schedule_characteristic` or `find_best_encryption_characteristic`.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">from</span> <span class="nn">decimal</span> <span class="kn">import</span> <span class="n">Decimal</span>
+
+<span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span><span class="p">,</span> <span class="n">Term</span>
+<span class="kn">from</span> <span class="nn">cascada.bitvector.operation</span> <span class="kn">import</span> <span class="n">BvOr</span><span class="p">,</span> <span class="n">BvComp</span><span class="p">,</span> <span class="n">Concat</span><span class="p">,</span> <span class="n">BvIdentity</span>
+<span class="kn">from</span> <span class="nn">cascada.bitvector.secondaryop</span> <span class="kn">import</span> <span class="n">LutOperation</span><span class="p">,</span> <span class="n">PopCount</span>
+<span class="kn">from</span> <span class="nn">cascada.linear.mask</span> <span class="kn">import</span> <span class="n">LinearMask</span>
+<span class="kn">from</span> <span class="nn">cascada.linear.opmodel</span> <span class="kn">import</span> <span class="n">get_weak_model</span>
+<span class="kn">from</span> <span class="nn">cascada.linear.chmodel</span> <span class="kn">import</span> <span class="n">ChModel</span>
+<span class="kn">from</span> <span class="nn">cascada.smt.chsearch</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ChModelAssertType</span><span class="p">,</span> <span class="n">ChFinder</span><span class="p">,</span> <span class="n">PrintingMode</span><span class="p">,</span> <span class="n">_get_smart_print</span>
+<span class="p">)</span>
+
+
+<span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">aes</span>
+
+
+<div class="viewcode-block" id="SboxA"><a class="viewcode-back" href="../../../cascada.primitives.aes_masked.html#cascada.primitives.aes_masked.SboxA">[docs]</a><span class="k">class</span> <span class="nc">SboxA</span><span class="p">(</span><span class="n">aes</span><span class="o">.</span><span class="n">SboxLut</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent a generic S-box with the following absolute correlations:</span>
+
+<span class="sd">      - zero -&gt; zero: :math:`1`</span>
+<span class="sd">      - non-zero -&gt; non-zero: :math:`2^{-3}`</span>
+<span class="sd">      - zero -&gt; non-zero: :math:`2^{-3.8}`</span>
+
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="SboxB"><a class="viewcode-back" href="../../../cascada.primitives.aes_masked.html#cascada.primitives.aes_masked.SboxB">[docs]</a><span class="k">class</span> <span class="nc">SboxB</span><span class="p">(</span><span class="n">aes</span><span class="o">.</span><span class="n">SboxLut</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent a generic S-box with the following absolute correlations:</span>
+
+<span class="sd">      - zero -&gt; zero: :math:`1`</span>
+<span class="sd">      - non-zero -&gt; non-zero: :math:`2^{-2.6}`</span>
+<span class="sd">      - zero -&gt; non-zero: :math:`2^{-4}`</span>
+
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="SboxZeroWeight"><a class="viewcode-back" href="../../../cascada.primitives.aes_masked.html#cascada.primitives.aes_masked.SboxZeroWeight">[docs]</a><span class="k">class</span> <span class="nc">SboxZeroWeight</span><span class="p">(</span><span class="n">aes</span><span class="o">.</span><span class="n">SboxLut</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent a generic S-box with the following absolute correlations:</span>
+
+<span class="sd">     - zero -&gt; zero: 1</span>
+<span class="sd">     - non-zero -&gt; non-zero: 1</span>
+<span class="sd">     - zero -&gt; non-zero: 1</span>
+
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<span class="n">SboxA</span><span class="o">.</span><span class="n">linear_model</span> <span class="o">=</span> <span class="n">get_weak_model</span><span class="p">(</span>
+    <span class="n">SboxA</span><span class="p">,</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">zero2nonzero_weight</span><span class="o">=</span><span class="n">Decimal</span><span class="p">(</span><span class="mf">3.8</span><span class="p">),</span> <span class="n">precision</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">SboxB</span><span class="o">.</span><span class="n">linear_model</span> <span class="o">=</span> <span class="n">get_weak_model</span><span class="p">(</span>
+    <span class="n">SboxB</span><span class="p">,</span> <span class="n">Decimal</span><span class="p">(</span><span class="mf">2.6</span><span class="p">),</span> <span class="n">zero2nonzero_weight</span><span class="o">=</span><span class="n">Decimal</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span> <span class="n">precision</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">SboxZeroWeight</span><span class="o">.</span><span class="n">linear_model</span> <span class="o">=</span> <span class="n">get_weak_model</span><span class="p">(</span>
+    <span class="n">SboxZeroWeight</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">zero2nonzero_weight</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="AESMaskedKeySchedule"><a class="viewcode-back" href="../../../cascada.primitives.aes_masked.html#cascada.primitives.aes_masked.AESMaskedKeySchedule">[docs]</a><span class="k">class</span> <span class="nc">AESMaskedKeySchedule</span><span class="p">(</span><span class="n">aes</span><span class="o">.</span><span class="n">AESKeySchedule</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Key schedule of masked AES-128.&quot;&quot;&quot;</span>
+    <span class="n">num_rounds</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">input_widths</span> <span class="o">=</span> <span class="p">[</span><span class="mi">8</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">16</span><span class="p">)]</span> <span class="o">+</span> <span class="p">[</span><span class="mi">8</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="mi">10</span><span class="p">)]</span>
+    <span class="n">output_widths</span> <span class="o">=</span> <span class="p">[</span><span class="mi">8</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">16</span><span class="p">)]</span>
+    <span class="n">logging_mode</span> <span class="o">=</span> <span class="n">aes</span><span class="o">.</span><span class="n">LoggingMode</span><span class="o">.</span><span class="n">Silent</span>
+
+    <span class="n">num_extra_cells</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="mi">10</span>
+    <span class="n">ignore_first_last_sbox_weights</span> <span class="o">=</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="AESMaskedKeySchedule.set_num_rounds"><a class="viewcode-back" href="../../../cascada.primitives.aes_masked.html#cascada.primitives.aes_masked.AESMaskedKeySchedule.set_num_rounds">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">set_num_rounds</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">new_num_rounds</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span> <span class="o">=</span> <span class="n">new_num_rounds</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">num_extra_cells</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">input_widths</span> <span class="o">=</span> <span class="p">[</span><span class="mi">8</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">16</span><span class="p">)]</span> <span class="o">+</span> <span class="p">[</span><span class="mi">8</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_extra_cells</span><span class="p">)]</span></div>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_sub_word</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">my_word</span><span class="p">,</span> <span class="n">extra_cell</span><span class="p">,</span> <span class="n">my_sbox</span><span class="p">):</span>
+        <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="n">my_word</span>
+
+        <span class="n">sbox_inputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">]]</span>
+        <span class="n">xor_values</span> <span class="o">=</span> <span class="p">[</span><span class="n">BvIdentity</span><span class="p">(</span><span class="n">xv</span><span class="p">)</span> <span class="k">for</span> <span class="n">xv</span> <span class="ow">in</span> <span class="p">[</span><span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">extra_cell</span><span class="p">]]</span>  <span class="c1"># new copies with != names</span>
+
+        <span class="n">sbox_outputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">my_sbox</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sbox_inputs</span><span class="p">]</span>
+
+        <span class="c1"># changing of the guards</span>
+        <span class="n">a_</span> <span class="o">=</span> <span class="n">sbox_outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">^</span> <span class="n">xor_values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">b_</span> <span class="o">=</span> <span class="n">sbox_outputs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">^</span> <span class="n">xor_values</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">c_</span> <span class="o">=</span> <span class="n">sbox_outputs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">^</span> <span class="n">xor_values</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">d_</span> <span class="o">=</span> <span class="n">sbox_outputs</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">^</span> <span class="n">xor_values</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+
+        <span class="n">new_word</span> <span class="o">=</span> <span class="p">[</span><span class="n">a_</span><span class="p">,</span> <span class="n">b_</span><span class="p">,</span> <span class="n">c_</span><span class="p">,</span> <span class="n">d_</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">logging_mode</span> <span class="o">==</span> <span class="n">aes</span><span class="o">.</span><span class="n">LoggingMode</span><span class="o">.</span><span class="n">Debug</span><span class="p">:</span>
+            <span class="c1"># ensuring the correct values are logged (i.e., not intermediate branches) by</span>
+            <span class="c1"># using different names for sbox_inputs and xor_values</span>
+            <span class="n">name_sbox</span> <span class="o">=</span> <span class="n">my_sbox</span><span class="o">.</span><span class="vm">__name__</span>
+            <span class="c1"># cls.log_msg(&quot; - word: [{},{},{},{}]\n - sbox_inputs: [{},{},{},{}]\n - xor_values: [{},{},{},{}]&quot;,</span>
+            <span class="c1">#             my_word + sbox_inputs + xor_values)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sbox_outputs</span><span class="p">)):</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">log_msg</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; - </span><span class="si">{</span><span class="n">name_sbox</span><span class="si">}</span><span class="s2">(</span><span class="se">{{}}</span><span class="s2">) -&gt; </span><span class="se">{{}}</span><span class="s2">   XOR   </span><span class="se">{{}}</span><span class="s2">) -&gt; </span><span class="se">{{}}</span><span class="s2">&quot;</span><span class="p">,</span>
+                            <span class="p">[</span><span class="n">sbox_inputs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">sbox_outputs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">xor_values</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">new_word</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span>
+
+        <span class="k">return</span> <span class="n">new_word</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">sub_word</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">my_word</span><span class="p">):</span>
+        <span class="n">output_word</span> <span class="o">=</span> <span class="n">my_word</span><span class="p">[:]</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_current_sub_word_round</span>
+
+        <span class="k">if</span> <span class="n">r</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">cls</span><span class="o">.</span><span class="n">ignore_first_last_sbox_weights</span><span class="p">:</span>
+            <span class="n">my_sbox</span> <span class="o">=</span> <span class="n">SboxZeroWeight</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">my_sbox</span> <span class="o">=</span> <span class="n">SboxA</span>
+        <span class="n">output_word</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_sub_word</span><span class="p">(</span><span class="n">output_word</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_list_extra_cells</span><span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">r</span> <span class="o">+</span> <span class="mi">0</span><span class="p">],</span> <span class="n">my_sbox</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">r</span> <span class="o">==</span> <span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span> <span class="o">-</span> <span class="mi">1</span> <span class="ow">and</span> <span class="bp">cls</span><span class="o">.</span><span class="n">ignore_first_last_sbox_weights</span><span class="p">:</span>
+            <span class="n">my_sbox</span> <span class="o">=</span> <span class="n">SboxZeroWeight</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">my_sbox</span> <span class="o">=</span> <span class="n">SboxB</span>
+        <span class="n">output_word</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_sub_word</span><span class="p">(</span><span class="n">output_word</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_list_extra_cells</span><span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">r</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">my_sbox</span><span class="p">)</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">_current_sub_word_round</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">output_word</span>
+
+<div class="viewcode-block" id="AESMaskedKeySchedule.eval"><a class="viewcode-back" href="../../../cascada.primitives.aes_masked.html#cascada.primitives.aes_masked.AESMaskedKeySchedule.eval">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">master_key</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">_current_sub_word_round</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">assert</span> <span class="bp">cls</span><span class="o">.</span><span class="n">num_extra_cells</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">_list_extra_cells</span> <span class="o">=</span> <span class="n">master_key</span><span class="p">[</span><span class="o">-</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_extra_cells</span><span class="p">:]</span>
+
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">logging_mode</span> <span class="o">!=</span> <span class="n">aes</span><span class="o">.</span><span class="n">LoggingMode</span><span class="o">.</span><span class="n">Silent</span><span class="p">:</span>
+            <span class="n">format_string</span> <span class="o">=</span> <span class="s2">&quot;extra cells:</span><span class="se">\n</span><span class="s2">(&quot;</span> <span class="o">+</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">]</span><span class="o">*</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_extra_cells</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">log_msg</span><span class="p">(</span><span class="n">format_string</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_list_extra_cells</span><span class="p">[:]))</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="o">*</span><span class="n">master_key</span><span class="p">)</span>
+
+        <span class="k">assert</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_current_sub_word_round</span> <span class="o">==</span> <span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span>
+        <span class="k">return</span> <span class="n">result</span><span class="p">[</span><span class="o">-</span><span class="mi">16</span><span class="p">:]</span></div></div>
+
+
+<div class="viewcode-block" id="get_key_schedule_constraints"><a class="viewcode-back" href="../../../cascada.primitives.aes_masked.html#cascada.primitives.aes_masked.get_key_schedule_constraints">[docs]</a><span class="k">def</span> <span class="nf">get_key_schedule_constraints</span><span class="p">(</span><span class="n">ch_model</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get the following initial constraints:</span>
+
+<span class="sd">      - extra cells not active</span>
+<span class="sd">      - (at most 2 adjacent cells in the last column of the input) OR (at most 1 row active in the input)</span>
+<span class="sd">      - (at most 2 adjacent cells in the last column of the output) OR (at most 1 row active in the output)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">initial_constraints</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">smart_print</span> <span class="o">=</span> <span class="n">_get_smart_print</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+    <span class="n">num_rows</span><span class="p">,</span> <span class="n">num_columns</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span>
+    <span class="n">num_extra_cells</span> <span class="o">=</span> <span class="n">ch_model</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">num_extra_cells</span>
+    <span class="k">assert</span> <span class="n">num_extra_cells</span> <span class="o">&gt;</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">to_1b</span><span class="p">(</span><span class="n">my_val</span><span class="p">):</span>
+        <span class="c1"># return 0b0 if my_val == 0 and 0b1 if my_val != 0 (active)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">my_val</span><span class="p">,</span> <span class="n">Term</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">my_val</span><span class="o">.</span><span class="n">width</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">my_val</span>
+        <span class="k">return</span> <span class="o">~</span><span class="p">(</span><span class="n">BvComp</span><span class="p">(</span><span class="n">my_val</span><span class="p">,</span> <span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">my_val</span><span class="o">.</span><span class="n">width</span><span class="p">)))</span>
+
+    <span class="n">input_state_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">val</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">ch_model</span><span class="o">.</span><span class="n">input_mask</span><span class="p">]</span>
+    <span class="n">output_state_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">val</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">ch_model</span><span class="o">.</span><span class="n">output_mask</span><span class="p">]</span>
+    <span class="n">extra_cells_mask</span> <span class="o">=</span> <span class="n">input_state_list</span><span class="p">[</span><span class="o">-</span><span class="n">num_extra_cells</span><span class="p">:]</span>
+    <span class="n">input_state_list</span> <span class="o">=</span> <span class="n">input_state_list</span><span class="p">[:</span><span class="o">-</span><span class="n">num_extra_cells</span><span class="p">]</span>  <span class="c1"># without extra cells</span>
+
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="n">smart_print</span><span class="p">(</span><span class="s2">&quot;get_key_schedule_constraints:&quot;</span><span class="p">)</span>
+
+        <span class="k">class</span> <span class="nc">AuxAESLikeFunction</span><span class="p">(</span><span class="n">aes</span><span class="o">.</span><span class="n">AESLikeFunction</span><span class="p">):</span>
+            <span class="n">num_rows</span><span class="p">,</span> <span class="n">num_columns</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span>
+            <span class="n">cell_width</span> <span class="o">=</span> <span class="mi">8</span>
+            <span class="n">logging_mode</span> <span class="o">=</span> <span class="n">aes</span><span class="o">.</span><span class="n">LoggingMode</span><span class="o">.</span><span class="n">Debug</span>
+
+        <span class="n">my_matrix</span> <span class="o">=</span> <span class="n">AuxAESLikeFunction</span><span class="o">.</span><span class="n">list2matrix</span><span class="p">(</span><span class="n">input_state_list</span><span class="p">)</span>
+        <span class="n">fs</span><span class="p">,</span> <span class="n">ffo</span> <span class="o">=</span> <span class="n">AuxAESLikeFunction</span><span class="o">.</span><span class="n">log_activity_matrix_state</span><span class="p">(</span><span class="n">my_matrix</span><span class="p">,</span> <span class="n">return_format</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">smart_print</span><span class="p">(</span><span class="s2">&quot;Input masks: </span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">+</span><span class="n">fs</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">ffo</span><span class="p">))</span>
+        <span class="n">smart_print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Extra cell masks: </span><span class="si">{</span><span class="n">extra_cells_mask</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">my_matrix</span> <span class="o">=</span> <span class="n">AuxAESLikeFunction</span><span class="o">.</span><span class="n">list2matrix</span><span class="p">(</span><span class="n">output_state_list</span><span class="p">)</span>
+        <span class="n">fs</span><span class="p">,</span> <span class="n">ffo</span> <span class="o">=</span> <span class="n">AuxAESLikeFunction</span><span class="o">.</span><span class="n">log_activity_matrix_state</span><span class="p">(</span><span class="n">my_matrix</span><span class="p">,</span> <span class="n">return_format</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">smart_print</span><span class="p">(</span><span class="s2">&quot;Output masks:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">+</span><span class="n">fs</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">ffo</span><span class="p">))</span>
+
+    <span class="n">extra_cells_mask</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">BvOr</span><span class="p">,</span> <span class="p">[</span><span class="n">m</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">extra_cells_mask</span><span class="p">])</span>
+    <span class="n">initial_constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">BvComp</span><span class="p">(</span><span class="n">extra_cells_mask</span><span class="p">,</span> <span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">extra_cells_mask</span><span class="o">.</span><span class="n">width</span><span class="p">)))</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="n">smart_print</span><span class="p">(</span><span class="s2">&quot;Extra cell constraint:&quot;</span><span class="p">)</span>
+        <span class="n">smart_print</span><span class="p">(</span><span class="s2">&quot; - extra cells == 0 &lt;==&gt;&quot;</span><span class="p">,</span> <span class="n">initial_constraints</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="k">for</span> <span class="n">index_state</span><span class="p">,</span> <span class="n">state_list</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([</span><span class="n">input_state_list</span><span class="p">,</span> <span class="n">output_state_list</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">index_state</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">smart_print</span><span class="p">(</span><span class="s2">&quot;Input state constraints: (c11 &amp; c12) | c2&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">smart_print</span><span class="p">(</span><span class="s2">&quot;Output state constraints: (c11 &amp; c12) | c2&quot;</span><span class="p">)</span>
+
+        <span class="c1"># - c1</span>
+
+        <span class="c1"># state ordered by columns</span>
+        <span class="n">last_column_cell_active</span> <span class="o">=</span> <span class="p">[</span><span class="n">to_1b</span><span class="p">(</span><span class="n">cell</span><span class="p">)</span> <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">state_list</span><span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">:]]</span>  <span class="c1"># last_column_cell_active[i] == 1 if i-th cell in last column is active</span>
+        <span class="n">last_column_cell_pair_active</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># last_column_cell_pair_active[j] == 1 if j-th pair on consecutive column cell is active</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_rows</span><span class="p">):</span>
+            <span class="n">last_column_cell_pair_active</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">last_column_cell_active</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">|</span> <span class="n">last_column_cell_active</span><span class="p">[(</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">num_rows</span><span class="p">])</span>
+        <span class="n">last_column_cell_pair_active</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">Concat</span><span class="p">,</span> <span class="p">[</span><span class="n">m</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">last_column_cell_pair_active</span><span class="p">])</span>
+        <span class="n">num_active</span> <span class="o">=</span> <span class="n">PopCount</span><span class="p">(</span><span class="n">last_column_cell_pair_active</span><span class="p">)</span>
+        <span class="n">c11</span> <span class="o">=</span> <span class="n">BvComp</span><span class="p">(</span><span class="n">num_active</span><span class="p">,</span> <span class="n">Constant</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">num_active</span><span class="o">.</span><span class="n">width</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="n">smart_print</span><span class="p">(</span><span class="s2">&quot; - c11: 2 == HW( Concat(column_cell_pair_active) = </span><span class="si">{}</span><span class="s2"> ) &lt;==&gt; </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">last_column_cell_pair_active</span><span class="p">,</span> <span class="n">c11</span><span class="p">))</span>
+
+        <span class="c1"># first_columns_cells[i] is the i-th cell (containing all cells in every but last column)</span>
+        <span class="n">first_columns_cells</span> <span class="o">=</span> <span class="n">state_list</span><span class="p">[:</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span>
+        <span class="n">first_columns_cells</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">BvOr</span><span class="p">,</span> <span class="p">[</span><span class="n">m</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">first_columns_cells</span><span class="p">])</span>
+        <span class="n">c12</span> <span class="o">=</span> <span class="n">BvComp</span><span class="p">(</span><span class="n">first_columns_cells</span><span class="p">,</span> <span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">first_columns_cells</span><span class="o">.</span><span class="n">width</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="n">smart_print</span><span class="p">(</span><span class="s2">&quot; - c12: 0 == Concat(column0,column1,column2) = </span><span class="si">{}</span><span class="s2"> &lt;==&gt; </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">first_columns_cells</span><span class="p">,</span> <span class="n">c12</span><span class="p">))</span>
+
+        <span class="n">c1</span> <span class="o">=</span> <span class="n">c11</span> <span class="o">&amp;</span> <span class="n">c12</span>
+
+        <span class="c1"># - c2</span>
+
+        <span class="k">def</span> <span class="nf">has_hw_1</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">BvComp</span><span class="p">(</span><span class="n">x</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">width</span><span class="p">))</span>
+
+        <span class="n">row_active</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># row_active[i] == 1 if i-th row is active</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_rows</span><span class="p">):</span>
+            <span class="n">my_row</span> <span class="o">=</span> <span class="p">[</span><span class="n">state_list</span><span class="p">[</span><span class="n">row</span> <span class="o">+</span> <span class="p">(</span><span class="n">column</span> <span class="o">*</span> <span class="n">num_rows</span><span class="p">)]</span> <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_columns</span><span class="p">)]</span>
+            <span class="n">row_active</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">to_1b</span><span class="p">(</span><span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">Concat</span><span class="p">,</span> <span class="n">my_row</span><span class="p">)))</span>
+        <span class="n">row_active</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">Concat</span><span class="p">,</span> <span class="p">[</span><span class="n">m</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">row_active</span><span class="p">])</span>
+        <span class="n">c2</span> <span class="o">=</span> <span class="n">has_hw_1</span><span class="p">(</span><span class="n">row_active</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="n">smart_print</span><span class="p">(</span><span class="s2">&quot; - c2: 1 == HW( Concat(row_active) = </span><span class="si">{}</span><span class="s2"> ) &lt;==&gt; </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">row_active</span><span class="p">,</span> <span class="n">c2</span><span class="p">))</span>
+
+        <span class="n">initial_constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c1</span> <span class="o">|</span> <span class="n">c2</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="n">smart_print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">initial_constraints</span></div>
+
+
+<div class="viewcode-block" id="find_best_key_schedule_characteristic"><a class="viewcode-back" href="../../../cascada.primitives.aes_masked.html#cascada.primitives.aes_masked.find_best_key_schedule_characteristic">[docs]</a><span class="k">def</span> <span class="nf">find_best_key_schedule_characteristic</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Find the best trail spanning eight rounds and activating 21 masked S-boxes,</span>
+<span class="sd">    with total absolute correlation :math:`2^{−63.60}`.</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.primitives.aes_masked import find_best_key_schedule_characteristic</span>
+<span class="sd">        &gt;&gt;&gt; found_ch = find_best_key_schedule_characteristic(verbose=False)</span>
+<span class="sd">        &gt;&gt;&gt; print(found_ch.srepr())  # doctest:+NORMALIZE_WHITESPACE</span>
+<span class="sd">        Ch(w=63.60, id=00 04 00 00 00 53 00 00 00 24 00 00 00 72 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00,</span>
+<span class="sd">                    od=00 04 00 00 00 53 00 00 00 24 00 00 00 72 00 00)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">num_rounds</span> <span class="o">=</span> <span class="mi">8</span>
+    <span class="n">logging_mode</span> <span class="o">=</span> <span class="n">aes</span><span class="o">.</span><span class="n">LoggingMode</span><span class="o">.</span><span class="n">Debug</span> <span class="k">if</span> <span class="n">verbose</span> <span class="k">else</span> <span class="n">aes</span><span class="o">.</span><span class="n">LoggingMode</span><span class="o">.</span><span class="n">Silent</span>
+    <span class="n">printing_mode</span> <span class="o">=</span> <span class="n">PrintingMode</span><span class="o">.</span><span class="n">Debug</span> <span class="k">if</span> <span class="n">verbose</span> <span class="k">else</span> <span class="n">PrintingMode</span><span class="o">.</span><span class="n">Silent</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">AESMaskedKeySchedule</span><span class="o">.</span><span class="n">logging_mode</span> <span class="o">=</span> <span class="n">logging_mode</span>
+    <span class="n">AESMaskedKeySchedule</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="n">num_rounds</span><span class="p">)</span>
+
+    <span class="n">input_names</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;k</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">16</span><span class="p">)]</span> <span class="o">+</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;r</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">num_rounds</span><span class="p">)]</span>
+    <span class="n">ch_model</span> <span class="o">=</span> <span class="n">ChModel</span><span class="p">(</span><span class="n">AESMaskedKeySchedule</span><span class="p">,</span> <span class="n">LinearMask</span><span class="p">,</span> <span class="n">input_names</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">)</span>
+
+    <span class="n">initial_constraints</span> <span class="o">=</span> <span class="n">get_key_schedule_constraints</span><span class="p">(</span><span class="n">ch_model</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">)</span>
+
+    <span class="n">assert_type</span> <span class="o">=</span> <span class="n">ChModelAssertType</span><span class="o">.</span><span class="n">ValidityAndWeight</span>
+    <span class="n">ch_finder</span> <span class="o">=</span> <span class="n">ChFinder</span><span class="p">(</span><span class="n">ch_model</span><span class="p">,</span> <span class="n">assert_type</span><span class="p">,</span> <span class="s2">&quot;btor&quot;</span><span class="p">,</span> <span class="n">solver_seed</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                         <span class="n">initial_constraints</span><span class="o">=</span><span class="n">initial_constraints</span><span class="p">,</span>
+                         <span class="n">printing_mode</span><span class="o">=</span><span class="n">printing_mode</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">)</span>
+
+    <span class="n">ch_found</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">ch_finder</span><span class="o">.</span><span class="n">find_next_ch_increasing_weight</span><span class="p">(</span><span class="n">initial_weight</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="n">smart_print</span> <span class="o">=</span> <span class="n">_get_smart_print</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="n">smart_print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Found trail:&quot;</span><span class="p">,</span> <span class="n">ch_found</span><span class="o">.</span><span class="n">srepr</span><span class="p">(),</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">smart_print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ch_found</span><span class="o">.</span><span class="n">get_formatted_logged_msgs</span><span class="p">()))</span>
+
+    <span class="k">return</span> <span class="n">ch_found</span></div>
+
+
+<div class="viewcode-block" id="AESMaskedEncryption"><a class="viewcode-back" href="../../../cascada.primitives.aes_masked.html#cascada.primitives.aes_masked.AESMaskedEncryption">[docs]</a><span class="k">class</span> <span class="nc">AESMaskedEncryption</span><span class="p">(</span><span class="n">aes</span><span class="o">.</span><span class="n">AESLikeFunction</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Encryption of masked AES-128.&quot;&quot;&quot;</span>
+    <span class="n">num_rounds</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">num_rows</span><span class="p">,</span> <span class="n">num_columns</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span>
+    <span class="n">cell_width</span> <span class="o">=</span> <span class="mi">8</span>
+
+    <span class="n">mix_columns_bit_matrix</span> <span class="o">=</span> <span class="n">aes</span><span class="o">.</span><span class="n">MixColumnsBitMatrix</span>
+
+    <span class="n">ignore_first_subcell</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">ignore_last_subcell</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">ignore_first_last_sbox_weights</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="n">name_sub_cells</span> <span class="o">=</span> <span class="s2">&quot;SubBytes&quot;</span>
+    <span class="n">logging_mode</span> <span class="o">=</span> <span class="n">aes</span><span class="o">.</span><span class="n">LoggingMode</span><span class="o">.</span><span class="n">Silent</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">sub_cells</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">my_matrix_state</span><span class="p">,</span> <span class="n">my_sbox</span><span class="p">):</span>
+        <span class="n">new_matrix_state</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span><span class="p">[:]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">my_matrix_state</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_rows</span><span class="p">):</span>
+            <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">e</span> <span class="o">=</span> <span class="n">my_matrix_state</span><span class="p">[</span><span class="n">row</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">row</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">xor_values</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">a</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">row</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">xor_values</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">row</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">xor_values</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">row</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">xor_values</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;invalid row&quot;</span><span class="p">)</span>
+
+            <span class="n">sbox_inputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">]]</span>
+            <span class="n">xor_values</span> <span class="o">=</span> <span class="p">[</span><span class="n">BvIdentity</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">xor_values</span><span class="p">]</span>  <span class="c1"># new copies with != names</span>
+
+            <span class="n">sbox_outputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">my_sbox</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sbox_inputs</span><span class="p">]</span>
+
+            <span class="c1"># changing of the guards</span>
+            <span class="n">a_</span> <span class="o">=</span> <span class="n">sbox_outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">^</span> <span class="n">xor_values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">b_</span> <span class="o">=</span> <span class="n">sbox_outputs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">^</span> <span class="n">xor_values</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">c_</span> <span class="o">=</span> <span class="n">sbox_outputs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">^</span> <span class="n">xor_values</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">d_</span> <span class="o">=</span> <span class="n">sbox_outputs</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">^</span> <span class="n">xor_values</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+            <span class="n">e_</span> <span class="o">=</span> <span class="n">BvIdentity</span><span class="p">(</span><span class="n">xor_values</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>  <span class="c1"># new copy with != name</span>
+
+            <span class="n">new_matrix_state</span><span class="p">[</span><span class="n">row</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">a_</span><span class="p">,</span> <span class="n">b_</span><span class="p">,</span> <span class="n">c_</span><span class="p">,</span> <span class="n">d_</span><span class="p">,</span> <span class="n">e_</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">logging_mode</span> <span class="o">==</span> <span class="n">aes</span><span class="o">.</span><span class="n">LoggingMode</span><span class="o">.</span><span class="n">Debug</span><span class="p">:</span>
+                <span class="c1"># ensuring the correct values are logged (i.e., not intermediate branches) by</span>
+                <span class="c1">#  - using different names for sbox_inputs and xor_values</span>
+                <span class="c1">#  - using a new name for each output cell</span>
+                <span class="n">name_sbox</span> <span class="o">=</span> <span class="n">my_sbox</span><span class="o">.</span><span class="vm">__name__</span>
+                <span class="c1"># cls.log_msg(&quot; - row: [{},{},{},{},{}]\n - sbox_inputs: [{},{},{},{}]\n - xor_values: [{},{},{},{}]&quot;,</span>
+                <span class="c1">#             my_matrix_state[row] + sbox_inputs + xor_values)</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">log_msg</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s1">&#39;name_sub_cells&#39;</span><span class="p">,</span> <span class="s1">&#39;SubCells&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2"> row </span><span class="si">{</span><span class="n">row</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sbox_outputs</span><span class="p">)):</span>
+                    <span class="bp">cls</span><span class="o">.</span><span class="n">log_msg</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; - </span><span class="si">{</span><span class="n">name_sbox</span><span class="si">}</span><span class="s2">(</span><span class="se">{{}}</span><span class="s2">) -&gt; </span><span class="se">{{}}</span><span class="s2">   XOR   </span><span class="se">{{}}</span><span class="s2">) -&gt; </span><span class="se">{{}}</span><span class="s2">&quot;</span><span class="p">,</span>
+                                <span class="p">[</span><span class="n">sbox_inputs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">sbox_outputs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">xor_values</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">new_matrix_state</span><span class="p">[</span><span class="n">row</span><span class="p">][</span><span class="n">i</span><span class="p">]])</span>
+
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">logging_mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">aes</span><span class="o">.</span><span class="n">LoggingMode</span><span class="o">.</span><span class="n">Silent</span><span class="p">,</span> <span class="n">aes</span><span class="o">.</span><span class="n">LoggingMode</span><span class="o">.</span><span class="n">RoundOutputs</span><span class="p">]:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">log_msg</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;output of </span><span class="si">{</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s1">&#39;name_sub_cells&#39;</span><span class="p">,</span> <span class="s1">&#39;SubCells&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">log_activity_matrix_state</span><span class="p">(</span><span class="n">new_matrix_state</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">new_matrix_state</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">shift_rows</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">my_matrix_state</span><span class="p">):</span>
+        <span class="n">new_matrix_state</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span><span class="p">[:]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">my_matrix_state</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
+            <span class="n">offset</span> <span class="o">=</span> <span class="n">r</span>  <span class="c1"># shift offset (0 for r=0, 1 for r=1, ...)</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
+                <span class="n">new_matrix_state</span><span class="p">[</span><span class="n">r</span><span class="p">][</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">my_matrix_state</span><span class="p">[</span><span class="n">r</span><span class="p">][(</span><span class="n">c</span> <span class="o">+</span> <span class="n">offset</span><span class="p">)</span> <span class="o">%</span> <span class="mi">4</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">logging_mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">aes</span><span class="o">.</span><span class="n">LoggingMode</span><span class="o">.</span><span class="n">Silent</span><span class="p">,</span> <span class="n">aes</span><span class="o">.</span><span class="n">LoggingMode</span><span class="o">.</span><span class="n">RoundOutputs</span><span class="p">]:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">log_msg</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;output of </span><span class="si">{</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s1">&#39;name_shift_rows&#39;</span><span class="p">,</span> <span class="s1">&#39;ShiftRows&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">log_activity_matrix_state</span><span class="p">(</span><span class="n">new_matrix_state</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">new_matrix_state</span>
+
+<div class="viewcode-block" id="AESMaskedEncryption.eval"><a class="viewcode-back" href="../../../cascada.primitives.aes_masked.html#cascada.primitives.aes_masked.AESMaskedEncryption.eval">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">plaintext</span><span class="p">):</span>
+        <span class="n">matrix_state</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">list2matrix</span><span class="p">(</span><span class="n">plaintext</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">logging_mode</span> <span class="o">!=</span> <span class="n">aes</span><span class="o">.</span><span class="n">LoggingMode</span><span class="o">.</span><span class="n">Silent</span><span class="p">:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">log_msg</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">plaintext:&quot;</span><span class="p">)</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">log_activity_matrix_state</span><span class="p">(</span><span class="n">matrix_state</span><span class="p">)</span>
+
+        <span class="n">ign</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">ignore_first_last_sbox_weights</span>
+
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">r</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">ignore_first_subcell</span><span class="p">:</span>
+                    <span class="c1">#</span>
+                    <span class="n">matrix_state</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">sub_cells</span><span class="p">(</span><span class="n">matrix_state</span><span class="p">,</span> <span class="n">my_sbox</span><span class="o">=</span><span class="n">SboxB</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">ign</span> <span class="k">else</span> <span class="n">SboxZeroWeight</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">matrix_state</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">sub_cells</span><span class="p">(</span><span class="n">matrix_state</span><span class="p">,</span> <span class="n">my_sbox</span><span class="o">=</span><span class="n">SboxA</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">ign</span> <span class="k">else</span> <span class="n">SboxZeroWeight</span><span class="p">)</span>
+                    <span class="n">matrix_state</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">sub_cells</span><span class="p">(</span><span class="n">matrix_state</span><span class="p">,</span> <span class="n">my_sbox</span><span class="o">=</span><span class="n">SboxB</span><span class="p">)</span>
+                <span class="n">matrix_state</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">shift_rows</span><span class="p">(</span><span class="n">matrix_state</span><span class="p">)</span>
+                <span class="n">matrix_state</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">mix_columns</span><span class="p">(</span><span class="n">matrix_state</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">r</span> <span class="o">&lt;</span> <span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">matrix_state</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">sub_cells</span><span class="p">(</span><span class="n">matrix_state</span><span class="p">,</span> <span class="n">my_sbox</span><span class="o">=</span><span class="n">SboxA</span><span class="p">)</span>
+                <span class="n">matrix_state</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">sub_cells</span><span class="p">(</span><span class="n">matrix_state</span><span class="p">,</span> <span class="n">my_sbox</span><span class="o">=</span><span class="n">SboxB</span><span class="p">)</span>
+                <span class="n">matrix_state</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">shift_rows</span><span class="p">(</span><span class="n">matrix_state</span><span class="p">)</span>
+                <span class="n">matrix_state</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">mix_columns</span><span class="p">(</span><span class="n">matrix_state</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">r</span> <span class="o">==</span> <span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">ignore_last_subcell</span><span class="p">:</span>
+                    <span class="n">matrix_state</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">sub_cells</span><span class="p">(</span><span class="n">matrix_state</span><span class="p">,</span> <span class="n">my_sbox</span><span class="o">=</span><span class="n">SboxA</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">ign</span> <span class="k">else</span> <span class="n">SboxZeroWeight</span><span class="p">)</span>
+                    <span class="c1">#</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">matrix_state</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">sub_cells</span><span class="p">(</span><span class="n">matrix_state</span><span class="p">,</span> <span class="n">my_sbox</span><span class="o">=</span><span class="n">SboxA</span><span class="p">)</span>
+                    <span class="n">matrix_state</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">sub_cells</span><span class="p">(</span><span class="n">matrix_state</span><span class="p">,</span> <span class="n">my_sbox</span><span class="o">=</span><span class="n">SboxB</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">ign</span> <span class="k">else</span> <span class="n">SboxZeroWeight</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">logging_mode</span> <span class="o">!=</span> <span class="n">aes</span><span class="o">.</span><span class="n">LoggingMode</span><span class="o">.</span><span class="n">Silent</span><span class="p">:</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">log_msg</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;output of round </span><span class="si">{</span><span class="n">r</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>  <span class="c1"># 1 &lt;= {r+1} &lt;= {cls.num_rounds}</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">log_activity_matrix_state</span><span class="p">(</span><span class="n">matrix_state</span><span class="p">)</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">log_msg</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="p">[])</span>  <span class="c1"># new line</span>
+
+            <span class="bp">cls</span><span class="o">.</span><span class="n">add_round_outputs</span><span class="p">(</span><span class="o">*</span><span class="bp">cls</span><span class="o">.</span><span class="n">matrix2list</span><span class="p">(</span><span class="n">matrix_state</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">matrix2list</span><span class="p">(</span><span class="n">matrix_state</span><span class="p">))</span></div></div>
+
+
+<div class="viewcode-block" id="get_encryption_constraints"><a class="viewcode-back" href="../../../cascada.primitives.aes_masked.html#cascada.primitives.aes_masked.get_encryption_constraints">[docs]</a><span class="k">def</span> <span class="nf">get_encryption_constraints</span><span class="p">(</span><span class="n">ch_model</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get the initial constraint ensuring exactly 1 cell active in the input and 1 cell active in the output.&quot;&quot;&quot;</span>
+    <span class="n">initial_constraints</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">smart_print</span> <span class="o">=</span> <span class="n">_get_smart_print</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="n">smart_print</span><span class="p">(</span><span class="s2">&quot;get_encryption_constraints:&quot;</span><span class="p">)</span>
+        <span class="n">my_matrix</span> <span class="o">=</span> <span class="n">ch_model</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">list2matrix</span><span class="p">([</span><span class="n">m</span><span class="o">.</span><span class="n">val</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">ch_model</span><span class="o">.</span><span class="n">input_mask</span><span class="p">])</span>
+        <span class="n">fs</span><span class="p">,</span> <span class="n">ffo</span> <span class="o">=</span> <span class="n">ch_model</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">log_activity_matrix_state</span><span class="p">(</span><span class="n">my_matrix</span><span class="p">,</span> <span class="n">return_format</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">smart_print</span><span class="p">(</span><span class="s2">&quot;Input masks: </span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">+</span><span class="n">fs</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">ffo</span><span class="p">))</span>
+        <span class="n">my_matrix</span> <span class="o">=</span> <span class="n">ch_model</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">list2matrix</span><span class="p">([</span><span class="n">m</span><span class="o">.</span><span class="n">val</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">ch_model</span><span class="o">.</span><span class="n">output_mask</span><span class="p">])</span>
+        <span class="n">fs</span><span class="p">,</span> <span class="n">ffo</span> <span class="o">=</span> <span class="n">ch_model</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">log_activity_matrix_state</span><span class="p">(</span><span class="n">my_matrix</span><span class="p">,</span> <span class="n">return_format</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">smart_print</span><span class="p">(</span><span class="s2">&quot;Output masks:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">+</span><span class="n">fs</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">ffo</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">has_hw_1</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">BvComp</span><span class="p">(</span><span class="n">x</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">width</span><span class="p">))</span>
+
+    <span class="n">concat_input_mask</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">Concat</span><span class="p">,</span> <span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">val</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">ch_model</span><span class="o">.</span><span class="n">input_mask</span><span class="p">])</span>
+    <span class="n">initial_constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">has_hw_1</span><span class="p">(</span><span class="n">concat_input_mask</span><span class="p">))</span>
+
+    <span class="n">concat_output_mask</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">Concat</span><span class="p">,</span> <span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">val</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">ch_model</span><span class="o">.</span><span class="n">output_mask</span><span class="p">])</span>
+    <span class="n">initial_constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">has_hw_1</span><span class="p">(</span><span class="n">concat_output_mask</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="n">smart_print</span><span class="p">(</span><span class="s2">&quot; - 1 == HW( </span><span class="si">{}</span><span class="s2"> ) &lt;==&gt; </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">concat_input_mask</span><span class="p">,</span> <span class="n">initial_constraints</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="n">smart_print</span><span class="p">(</span><span class="s2">&quot; - 1 == HW( </span><span class="si">{}</span><span class="s2"> ) &lt;==&gt; </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">concat_output_mask</span><span class="p">,</span> <span class="n">initial_constraints</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+    <span class="k">return</span> <span class="n">initial_constraints</span></div>
+
+
+<div class="viewcode-block" id="find_best_encryption_characteristic"><a class="viewcode-back" href="../../../cascada.primitives.aes_masked.html#cascada.primitives.aes_masked.find_best_encryption_characteristic">[docs]</a><span class="k">def</span> <span class="nf">find_best_encryption_characteristic</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Find the best trail spanning 3 rounds and activating 21 masked S-boxes,</span>
+<span class="sd">    with total absolute correlation :math:`2^{-51.60}`.</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.primitives.aes_masked import find_best_encryption_characteristic</span>
+<span class="sd">        &gt;&gt;&gt; found_ch = find_best_encryption_characteristic(verbose=False)</span>
+<span class="sd">        &gt;&gt;&gt; print(found_ch.srepr())  # doctest:+NORMALIZE_WHITESPACE</span>
+<span class="sd">        Ch(w=52.20, id=00 02 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00,</span>
+<span class="sd">                    od=00 00 00 00 00 00 00 00 40 00 00 00 00 00 00 00 00 00 00 00)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">num_rounds</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">logging_mode</span> <span class="o">=</span> <span class="n">aes</span><span class="o">.</span><span class="n">LoggingMode</span><span class="o">.</span><span class="n">Debug</span> <span class="k">if</span> <span class="n">verbose</span> <span class="k">else</span> <span class="n">aes</span><span class="o">.</span><span class="n">LoggingMode</span><span class="o">.</span><span class="n">Silent</span>
+    <span class="n">printing_mode</span> <span class="o">=</span> <span class="n">PrintingMode</span><span class="o">.</span><span class="n">Debug</span> <span class="k">if</span> <span class="n">verbose</span> <span class="k">else</span> <span class="n">PrintingMode</span><span class="o">.</span><span class="n">Silent</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">AESMaskedEncryption</span><span class="o">.</span><span class="n">logging_mode</span> <span class="o">=</span> <span class="n">logging_mode</span>
+    <span class="n">AESMaskedEncryption</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="n">num_rounds</span><span class="p">)</span>
+
+    <span class="n">input_names</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;p</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="o">*</span><span class="mi">5</span><span class="p">)]</span>
+    <span class="n">ch_model</span> <span class="o">=</span> <span class="n">ChModel</span><span class="p">(</span><span class="n">AESMaskedEncryption</span><span class="p">,</span> <span class="n">LinearMask</span><span class="p">,</span> <span class="n">input_names</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">)</span>
+
+    <span class="n">initial_constraints</span> <span class="o">=</span> <span class="n">get_encryption_constraints</span><span class="p">(</span><span class="n">ch_model</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">)</span>
+
+    <span class="n">assert_type</span> <span class="o">=</span> <span class="n">ChModelAssertType</span><span class="o">.</span><span class="n">ValidityAndWeight</span>
+    <span class="n">ch_finder</span> <span class="o">=</span> <span class="n">ChFinder</span><span class="p">(</span><span class="n">ch_model</span><span class="p">,</span> <span class="n">assert_type</span><span class="p">,</span> <span class="s2">&quot;btor&quot;</span><span class="p">,</span> <span class="n">solver_seed</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                         <span class="n">initial_constraints</span><span class="o">=</span><span class="n">initial_constraints</span><span class="p">,</span>
+                         <span class="n">printing_mode</span><span class="o">=</span><span class="n">printing_mode</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">)</span>
+
+    <span class="n">ch_found</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">ch_finder</span><span class="o">.</span><span class="n">find_next_ch_increasing_weight</span><span class="p">(</span><span class="n">initial_weight</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="n">smart_print</span> <span class="o">=</span> <span class="n">_get_smart_print</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="n">smart_print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Found trail:&quot;</span><span class="p">,</span> <span class="n">ch_found</span><span class="o">.</span><span class="n">srepr</span><span class="p">(),</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">smart_print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ch_found</span><span class="o">.</span><span class="n">get_formatted_logged_msgs</span><span class="p">()))</span>
+
+    <span class="k">return</span> <span class="n">ch_found</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Adrián Ranea.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

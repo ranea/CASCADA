@@ -1,0 +1,6 @@
+cascada.smt.chsearch module
+===========================
+
+.. automodule:: cascada.smt.chsearch
+   :members:
+   :show-inheritance:

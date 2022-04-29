@@ -1,0 +1,6 @@
+cascada.primitives.blockcipher module
+=====================================
+
+.. automodule:: cascada.primitives.blockcipher
+   :members:
+   :show-inheritance:

@@ -1,0 +1,31 @@
+cascada.primitives module
+=========================
+
+.. automodule:: cascada.primitives
+   :members:
+   :show-inheritance:
+
+.. toctree::
+   :maxdepth: 4
+
+   cascada.primitives.blockcipher
+   cascada.primitives.aes
+   cascada.primitives.aes_like
+   cascada.primitives.aes_masked
+   cascada.primitives.cham
+   cascada.primitives.chaskey
+   cascada.primitives.feal
+   cascada.primitives.hight
+   cascada.primitives.lea
+   cascada.primitives.multi2
+   cascada.primitives.picipher
+   cascada.primitives.shacal1
+   cascada.primitives.shacal2
+   cascada.primitives.simeck
+   cascada.primitives.simon
+   cascada.primitives.simon_rf
+   cascada.primitives.speck
+   cascada.primitives.skinny64
+   cascada.primitives.skinny128
+   cascada.primitives.tea
+   cascada.primitives.xtea

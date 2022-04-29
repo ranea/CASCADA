@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cascada.bitvector.context module &mdash; CASCADA 1.0.rc0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="cascada.bitvector.core module" href="cascada.bitvector.core.html" />
+    <link rel="prev" title="cascada.bitvector module" href="cascada.bitvector.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> CASCADA
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">CASCADA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="primitives_implemented.html">Primitives implemented</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="cascada.html">API reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="cascada.bitvector.html">cascada.bitvector module</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">cascada.bitvector.context module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.bitvector.core.html">cascada.bitvector.core module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.bitvector.secondaryop.html">cascada.bitvector.secondaryop module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.bitvector.operation.html">cascada.bitvector.operation module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.bitvector.printing.html">cascada.bitvector.printing module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.bitvector.ssa.html">cascada.bitvector.ssa module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.primitives.html">cascada.primitives module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.abstractproperty.html">cascada.abstractproperty module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.differential.html">cascada.differential module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.linear.html">cascada.linear module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.algebraic.html">cascada.algebraic module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.smt.html">cascada.smt module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">CASCADA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="cascada.html">API reference</a> &raquo;</li>
+          <li><a href="cascada.bitvector.html">cascada.bitvector module</a> &raquo;</li>
+      <li>cascada.bitvector.context module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/cascada.bitvector.context.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-cascada.bitvector.context">
+<span id="cascada-bitvector-context-module"></span><h1>cascada.bitvector.context module<a class="headerlink" href="#module-cascada.bitvector.context" title="Permalink to this headline"></a></h1>
+<p>Provide context managers to modify the creation and evaluation of bit-vector expressions.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.bitvector.context.StatefulContext">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.bitvector.context.</span></span><span class="sig-name descname"><span class="pre">StatefulContext</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/context.html#StatefulContext"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.context.StatefulContext" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/contextlib.html#contextlib.AbstractContextManager" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">contextlib.AbstractContextManager</span></code></a></p>
+<p>Base class for context managers with history.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.bitvector.context.Cache">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.bitvector.context.</span></span><span class="sig-name descname"><span class="pre">Cache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/context.html#Cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.context.Cache" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cascada.bitvector.context.StatefulContext" title="cascada.bitvector.context.StatefulContext"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.bitvector.context.StatefulContext</span></code></a></p>
+<p>Control the Cache context.</p>
+<p>Control whether or not the cache is used operating with bit-vectors.
+By default, the cache is enabled.</p>
+<p>Note that the Cache context cannot be enabled when the
+<a class="reference internal" href="#cascada.bitvector.context.Simplification" title="cascada.bitvector.context.Simplification"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Simplification</span></code></a> or <a class="reference internal" href="#cascada.bitvector.context.PrimaryOperationEvaluation" title="cascada.bitvector.context.PrimaryOperationEvaluation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">PrimaryOperationEvaluation</span></code></a> context are disabled,
+or when <a class="reference internal" href="#cascada.bitvector.context.SecondaryOperationEvaluation" title="cascada.bitvector.context.SecondaryOperationEvaluation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SecondaryOperationEvaluation</span></code></a> is enabled.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.bitvector.context.Simplification">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.bitvector.context.</span></span><span class="sig-name descname"><span class="pre">Simplification</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/context.html#Simplification"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.context.Simplification" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cascada.bitvector.context.StatefulContext" title="cascada.bitvector.context.StatefulContext"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.bitvector.context.StatefulContext</span></code></a></p>
+<p>Control the Simplification context.</p>
+<p>Control whether or not bit-vector expressions are automatically simplified.
+By default, automatic simplification is enabled.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.context</span> <span class="kn">import</span> <span class="n">Simplification</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">x</span> <span class="o">|</span> <span class="n">y</span><span class="p">)</span> <span class="o">|</span> <span class="n">x</span>
+<span class="go">x | y</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">Simplification</span><span class="p">(</span><span class="kc">False</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">expr</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">|</span> <span class="n">y</span><span class="p">)</span> <span class="o">|</span> <span class="n">x</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">expr</span>
+<span class="go">x | y | x</span>
+</pre></div>
+</div>
+<p>When the Simplification context is disabled, the <a class="reference internal" href="#cascada.bitvector.context.Cache" title="cascada.bitvector.context.Cache"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Cache</span></code></a> context is
+also disabled.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Disabling <a class="reference internal" href="#cascada.bitvector.context.Simplification" title="cascada.bitvector.context.Simplification"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Simplification</span></code></a> and <a class="reference internal" href="#cascada.bitvector.context.Validation" title="cascada.bitvector.context.Validation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Validation</span></code></a> speeds up
+non-symbolic computations with bit-vectors.</p>
+</div>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.bitvector.context.PrimaryOperationEvaluation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.bitvector.context.</span></span><span class="sig-name descname"><span class="pre">PrimaryOperationEvaluation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/context.html#PrimaryOperationEvaluation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.context.PrimaryOperationEvaluation" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cascada.bitvector.context.StatefulContext" title="cascada.bitvector.context.StatefulContext"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.bitvector.context.StatefulContext</span></code></a></p>
+<p>Control the PrimaryOperationEvaluation context.</p>
+<p>Control whether <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.PrimaryOperation" title="cascada.bitvector.operation.PrimaryOperation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">PrimaryOperation</span></code></a> objects with symbolic inputs
+are evaluated  (True by default).</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span><span class="p">,</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.context</span> <span class="kn">import</span> <span class="n">PrimaryOperationEvaluation</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Constant</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span> <span class="o">-</span> <span class="n">Constant</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span> <span class="o">+</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span> <span class="o">-</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+<span class="go">0x00</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">PrimaryOperationEvaluation</span><span class="p">(</span><span class="kc">False</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">expr</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span> <span class="o">-</span> <span class="n">Constant</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span> <span class="o">+</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span> <span class="o">-</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">expr</span>
+<span class="go">(0x00 + x) - x</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">expr</span><span class="o">.</span><span class="n">doit</span><span class="p">()</span>
+<span class="go">0x00</span>
+</pre></div>
+</div>
+<p>When the <a class="reference internal" href="#cascada.bitvector.context.PrimaryOperationEvaluation" title="cascada.bitvector.context.PrimaryOperationEvaluation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">PrimaryOperationEvaluation</span></code></a> context is disabled,
+the <a class="reference internal" href="#cascada.bitvector.context.Simplification" title="cascada.bitvector.context.Simplification"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Simplification</span></code></a> and <a class="reference internal" href="#cascada.bitvector.context.Cache" title="cascada.bitvector.context.Cache"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Cache</span></code></a> contexts are also disabled.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.bitvector.context.SecondaryOperationEvaluation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.bitvector.context.</span></span><span class="sig-name descname"><span class="pre">SecondaryOperationEvaluation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/context.html#SecondaryOperationEvaluation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.context.SecondaryOperationEvaluation" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cascada.bitvector.context.StatefulContext" title="cascada.bitvector.context.StatefulContext"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.bitvector.context.StatefulContext</span></code></a></p>
+<p>Control the SecondaryOperationEvaluation context.</p>
+<p>Control whether <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.SecondaryOperation" title="cascada.bitvector.operation.SecondaryOperation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SecondaryOperation</span></code></a> objects with symbolic inputs
+are evaluated (False by default).</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span><span class="p">,</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.context</span> <span class="kn">import</span> <span class="n">SecondaryOperationEvaluation</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.secondaryop</span> <span class="kn">import</span> <span class="n">BvMaj</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">BvMaj</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">Constant</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">Constant</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="go">0x01</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">expr</span> <span class="o">=</span> <span class="n">BvMaj</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">expr</span>
+<span class="go">BvMaj(x, y, z)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">expr</span><span class="o">.</span><span class="n">doit</span><span class="p">()</span>
+<span class="go">(x &amp; y) | (x &amp; z) | (y &amp; z)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">SecondaryOperationEvaluation</span><span class="p">(</span><span class="kc">True</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">BvMaj</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="go">(x &amp; y) | (x &amp; z) | (y &amp; z)</span>
+</pre></div>
+</div>
+<p>When the <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.SecondaryOperation" title="cascada.bitvector.operation.SecondaryOperation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SecondaryOperation</span></code></a> context is enabled, the <a class="reference internal" href="#cascada.bitvector.context.Cache" title="cascada.bitvector.context.Cache"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Cache</span></code></a> context is disabled.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.bitvector.context.Validation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.bitvector.context.</span></span><span class="sig-name descname"><span class="pre">Validation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/context.html#Validation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.context.Validation" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cascada.bitvector.context.StatefulContext" title="cascada.bitvector.context.StatefulContext"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.bitvector.context.StatefulContext</span></code></a></p>
+<p>Control the Validation context.</p>
+<p>Control whether or not arguments of bit-vector operators are validated
+(e.g., the integer value when creating a <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Constant" title="cascada.bitvector.core.Constant"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a> fits for the width given).
+By default, validation of arguments is enabled.</p>
+<p>Note that when it is disabled,  Automatic Constant Conversion is no longer
+available (see <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.Operation" title="cascada.bitvector.operation.Operation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Operation</span></code></a>).</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.context</span> <span class="kn">import</span> <span class="n">Validation</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Constant</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+<span class="go">0x02</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">Validation</span><span class="p">(</span><span class="kc">False</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">Constant</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span>
+<span class="gt">Traceback (most recent call last):</span>
+ <span class="c">...</span>
+<span class="gr">AttributeError</span>: <span class="n">&#39;int&#39; object has no attribute &#39;width&#39;</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Disabling <a class="reference internal" href="#cascada.bitvector.context.Simplification" title="cascada.bitvector.context.Simplification"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Simplification</span></code></a> and <a class="reference internal" href="#cascada.bitvector.context.Validation" title="cascada.bitvector.context.Validation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Validation</span></code></a> speeds up
+non-symbolic computations with bit-vectors.</p>
+</div>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.bitvector.context.Memoization">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.bitvector.context.</span></span><span class="sig-name descname"><span class="pre">Memoization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/context.html#Memoization"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.context.Memoization" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cascada.bitvector.context.StatefulContext" title="cascada.bitvector.context.StatefulContext"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.bitvector.context.StatefulContext</span></code></a></p>
+<p>Control the Memoization context.</p>
+<p>Control whether or not bit-vector operations are evaluated in the
+<em>memoization mode</em>. By default, it is disabled.</p>
+<p>In the memoization mode, the result of each bit-vector operation is
+stored in a table (with a unique identifier). When the same inputs
+occurs again, the result is retrieved from the table. See also
+<a class="reference external" href="https://en.wikipedia.org/wiki/Memoization">Memoization</a>.</p>
+<p>Note that in the memoization mode, bit-vector operations don’t return
+the actual values but their identifiers in the memoization table.
+The actual values can be obtained from the <a class="reference internal" href="#cascada.bitvector.context.MemoizationTable" title="cascada.bitvector.context.MemoizationTable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">MemoizationTable</span></code></a>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.context</span> <span class="kn">import</span> <span class="n">Memoization</span><span class="p">,</span> <span class="n">MemoizationTable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">~</span><span class="p">((</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">)</span> <span class="o">^</span> <span class="p">((</span><span class="n">z</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">y</span><span class="p">))</span>
+<span class="go">~((x + y) ^ ((z + 0x01) &amp; y))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">non_memoized_expr</span> <span class="o">=</span> <span class="p">(</span><span class="n">z</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lut</span> <span class="o">=</span> <span class="n">MemoizationTable</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">Memoization</span><span class="p">(</span><span class="n">lut</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">expr</span> <span class="o">=</span> <span class="o">~</span><span class="p">((</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">)</span> <span class="o">^</span> <span class="p">(</span><span class="n">non_memoized_expr</span> <span class="o">&amp;</span> <span class="n">y</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">expr</span>
+<span class="go">x3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lut</span>
+<span class="go">MemoizationTable([(x0, x + y), (x1, (z + 0x01) &amp; y), (x2, x0 ^ x1), (x3, ~x2)])</span>
+</pre></div>
+</div>
+<p>The Memoization context is useful to efficiently compute large symbolic
+expressions since the identifiers are used instead of the full expressions.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.context</span> <span class="kn">import</span> <span class="n">Memoization</span><span class="p">,</span> <span class="n">MemoizationTable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">expr</span> <span class="o">=</span> <span class="n">x</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span> <span class="n">expr</span> <span class="o">+=</span> <span class="n">expr</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">expr</span>
+<span class="go">x + x + x + x + x + x + x + x</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lut</span> <span class="o">=</span> <span class="n">MemoizationTable</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">Memoization</span><span class="p">(</span><span class="n">lut</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">expr</span> <span class="o">=</span> <span class="n">x</span>
+<span class="gp">... </span>    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span> <span class="n">expr</span> <span class="o">+=</span> <span class="n">expr</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">expr</span>
+<span class="go">x2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lut</span>  
+<span class="go">MemoizationTable([(x0, x + x), (x1, x0 + x0), (x2, x1 + x1)])</span>
+</pre></div>
+</div>
+<p>When the Memoization context is enabled, the <a class="reference internal" href="#cascada.bitvector.context.Simplification" title="cascada.bitvector.context.Simplification"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Simplification</span></code></a> and <a class="reference internal" href="#cascada.bitvector.context.Cache" title="cascada.bitvector.context.Cache"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Cache</span></code></a>
+contexts are disabled.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.bitvector.context.MemoizationTable">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.bitvector.context.</span></span><span class="sig-name descname"><span class="pre">MemoizationTable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'x'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/context.html#MemoizationTable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.context.MemoizationTable" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.MutableMapping" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">collections.abc.MutableMapping</span></code></a></p>
+<p>Store bit-vector expressions with unique identifiers.</p>
+<p>The MemoizationTable is a dictionary-like structure
+(implementing the usual methods of a dictionary and
+some additional methods, and remembering the order
+entries were added as collections.Counter)
+used for evaluating bit-vector operations
+in the <em>memoization mode</em> (see <a class="reference internal" href="#cascada.bitvector.context.Memoization" title="cascada.bitvector.context.Memoization"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Memoization</span></code></a>).</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.context</span> <span class="kn">import</span> <span class="n">Memoization</span><span class="p">,</span> <span class="n">MemoizationTable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lut</span> <span class="o">=</span> <span class="n">MemoizationTable</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">Memoization</span><span class="p">(</span><span class="n">lut</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">expr</span> <span class="o">=</span> <span class="o">~</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lut</span>
+<span class="go">MemoizationTable([(x0, x + y), (x1, ~x0)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lut</span><span class="p">[</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;x0&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">)]</span>
+<span class="go">x + y</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lut</span><span class="o">.</span><span class="n">get_id</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">)</span>
+<span class="go">x0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lut</span><span class="o">.</span><span class="n">add_op</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;x1&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="go">x2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lut</span>
+<span class="go">MemoizationTable([(x0, x + y), (x1, ~x0), (x2, x1 &amp; z)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lut</span><span class="o">.</span><span class="n">replace_id</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;x0&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;x_0&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lut</span>
+<span class="go">MemoizationTable([(x_0, x + y), (x1, ~x_0), (x2, x1 &amp; z)])</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.context.MemoizationTable.from_list_of_assignments">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_list_of_assignments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">assignments</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_id_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/context.html#MemoizationTable.from_list_of_assignments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.context.MemoizationTable.from_list_of_assignments" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a new <a class="reference internal" href="#cascada.bitvector.context.MemoizationTable" title="cascada.bitvector.context.MemoizationTable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">MemoizationTable</span></code></a> with the given list of assignments.</p>
+<p>The argument <code class="docutils literal notranslate"><span class="pre">assignments</span></code> is a list of pairs (<a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Variable" title="cascada.bitvector.core.Variable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Variable</span></code></a>, <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.Operation" title="cascada.bitvector.operation.Operation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Operation</span></code></a>)
+where the variable represents the output of the operation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.context.MemoizationTable.add_op">
+<span class="sig-name descname"><span class="pre">add_op</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/context.html#MemoizationTable.add_op"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.context.MemoizationTable.add_op" title="Permalink to this definition"></a></dt>
+<dd><p>Add an bit-vector expression and return its identifier.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.context.MemoizationTable.get_id">
+<span class="sig-name descname"><span class="pre">get_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/context.html#MemoizationTable.get_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.context.MemoizationTable.get_id" title="Permalink to this definition"></a></dt>
+<dd><p>Return the identifier of a bit-vector expression.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.context.MemoizationTable.contain_op">
+<span class="sig-name descname"><span class="pre">contain_op</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/context.html#MemoizationTable.contain_op"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.context.MemoizationTable.contain_op" title="Permalink to this definition"></a></dt>
+<dd><p>Check if the bit-vector expression is stored.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.context.MemoizationTable.replace_id">
+<span class="sig-name descname"><span class="pre">replace_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">old_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/context.html#MemoizationTable.replace_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.context.MemoizationTable.replace_id" title="Permalink to this definition"></a></dt>
+<dd><p>Replace the old identifier by the given new identifier.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.context.MemoizationTable.clear">
+<span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/context.html#MemoizationTable.clear"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.context.MemoizationTable.clear" title="Permalink to this definition"></a></dt>
+<dd><p>Empty the table.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cascada.bitvector.html" class="btn btn-neutral float-left" title="cascada.bitvector module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cascada.bitvector.core.html" class="btn btn-neutral float-right" title="cascada.bitvector.core module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Adrián Ranea.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cascada.smt.wrappedchmodel module &mdash; CASCADA 1.0.rc0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="cascada.smt.invalidpropsearch module" href="cascada.smt.invalidpropsearch.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> CASCADA
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">CASCADA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="primitives_implemented.html">Primitives implemented</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="cascada.html">API reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="cascada.bitvector.html">cascada.bitvector module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.primitives.html">cascada.primitives module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.abstractproperty.html">cascada.abstractproperty module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.differential.html">cascada.differential module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.linear.html">cascada.linear module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.algebraic.html">cascada.algebraic module</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="cascada.smt.html">cascada.smt module</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="cascada.smt.pysmttypes.html">cascada.smt.pysmttypes module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.smt.chsearch.html">cascada.smt.chsearch module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.smt.invalidpropsearch.html">cascada.smt.invalidpropsearch module</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">cascada.smt.wrappedchmodel module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">CASCADA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="cascada.html">API reference</a> &raquo;</li>
+          <li><a href="cascada.smt.html">cascada.smt module</a> &raquo;</li>
+      <li>cascada.smt.wrappedchmodel module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/cascada.smt.wrappedchmodel.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-cascada.smt.wrappedchmodel">
+<span id="cascada-smt-wrappedchmodel-module"></span><h1>cascada.smt.wrappedchmodel module<a class="headerlink" href="#module-cascada.smt.wrappedchmodel" title="Permalink to this headline"></a></h1>
+<p>Wrap bit-vector functions for characteristics with one non-trivial transition.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.smt.wrappedchmodel.ChFuncAsOp">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.smt.wrappedchmodel.</span></span><span class="sig-name descname"><span class="pre">ChFuncAsOp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/smt/wrappedchmodel.html#ChFuncAsOp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.smt.wrappedchmodel.ChFuncAsOp" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.SecondaryOperation" title="cascada.bitvector.operation.SecondaryOperation"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.bitvector.operation.SecondaryOperation</span></code></a></p>
+<p>Represent bit-vector operations wrapping functions of characteristic models.</p>
+<p>Given a characteristic model
+(i.e., <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel" title="cascada.abstractproperty.chmodel.ChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.chmodel.ChModel</span></code></a>),
+a <a class="reference internal" href="#cascada.smt.wrappedchmodel.ChFuncAsOp" title="cascada.smt.wrappedchmodel.ChFuncAsOp"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChFuncAsOp</span></code></a> operation is a <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.SecondaryOperation" title="cascada.bitvector.operation.SecondaryOperation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SecondaryOperation</span></code></a> that wraps
+the underlying bit-vector function of the characteristic model.</p>
+<p>The operands of the wrapping operation are the
+input operands of the bit-vector function and its external variables.
+The <code class="docutils literal notranslate"><span class="pre">eval</span></code> method of wrapping operation calls the <code class="docutils literal notranslate"><span class="pre">eval</span></code> method
+of the bit-vector function and concatenates (with <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.PropConcat" title="cascada.abstractproperty.property.PropConcat"><code class="xref any py py-class docutils literal notranslate"><span class="pre">PropConcat</span></code></a>)
+the outputs of the bit-vector function into a single bit-vector.
+This single bit-vector is the output of the wrapping operation.</p>
+<p>This class is not meant to be instantiated but to provide a base
+class to define secondary operators wrapping bit-vector functions
+generated through <a class="reference internal" href="#cascada.smt.wrappedchmodel.make_chfunc_as_op" title="cascada.smt.wrappedchmodel.make_chfunc_as_op"><code class="xref any py py-func docutils literal notranslate"><span class="pre">make_chfunc_as_op</span></code></a>.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.smt.wrappedchmodel.ChFuncAsOp.ch_model">
+<span class="sig-name descname"><span class="pre">ch_model</span></span><a class="headerlink" href="#cascada.smt.wrappedchmodel.ChFuncAsOp.ch_model" title="Permalink to this definition"></a></dt>
+<dd><p>the characteristic model of the bit-vector function.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.smt.wrappedchmodel.ChFuncAsOp.vrepr">
+<span class="sig-name descname"><span class="pre">vrepr</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/smt/wrappedchmodel.html#ChFuncAsOp.vrepr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.smt.wrappedchmodel.ChFuncAsOp.vrepr" title="Permalink to this definition"></a></dt>
+<dd><p>Return an executable string representation.</p>
+<p>This method returns a string so that the relation
+<code class="docutils literal notranslate"><span class="pre">eval(expr.vrepr()))</span> <span class="pre">==</span> <span class="pre">expr</span></code> holds when <code class="docutils literal notranslate"><span class="pre">expr</span></code> is a <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term" title="cascada.bitvector.core.Term"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Term</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.smt.wrappedchmodel.ChFuncAsOp.condition">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">condition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/smt/wrappedchmodel.html#ChFuncAsOp.condition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.smt.wrappedchmodel.ChFuncAsOp.condition" title="Permalink to this definition"></a></dt>
+<dd><p>Check if the operands verify the restrictions of the operator.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.smt.wrappedchmodel.ChFuncAsOp.output_width">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">output_width</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/smt/wrappedchmodel.html#ChFuncAsOp.output_width"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.smt.wrappedchmodel.ChFuncAsOp.output_width" title="Permalink to this definition"></a></dt>
+<dd><p>Return the bit-width of the resulting bit-vector.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.smt.wrappedchmodel.ChFuncAsOp.eval">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">eval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/smt/wrappedchmodel.html#ChFuncAsOp.eval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.smt.wrappedchmodel.ChFuncAsOp.eval" title="Permalink to this definition"></a></dt>
+<dd><p>Evaluate the operator with given operands.</p>
+<p>This is an internal method that assumes the list <code class="docutils literal notranslate"><span class="pre">args</span></code> has been parsed.
+To evaluate a bit-vector operation, instantiate a new object with
+the operands as the object arguments (i.e., use the Python operator <code class="docutils literal notranslate"><span class="pre">()</span></code>).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cascada.smt.wrappedchmodel.make_chfunc_as_op">
+<span class="sig-prename descclassname"><span class="pre">cascada.smt.wrappedchmodel.</span></span><span class="sig-name descname"><span class="pre">make_chfunc_as_op</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ch_model</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/smt/wrappedchmodel.html#make_chfunc_as_op"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.smt.wrappedchmodel.make_chfunc_as_op" title="Permalink to this definition"></a></dt>
+<dd><p>Return the <a class="reference internal" href="#cascada.smt.wrappedchmodel.ChFuncAsOp" title="cascada.smt.wrappedchmodel.ChFuncAsOp"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChFuncAsOp</span></code></a> of the given characteristic model.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.difference</span> <span class="kn">import</span> <span class="n">XorDiff</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.chmodel</span> <span class="kn">import</span> <span class="n">EncryptionChModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.smt.wrappedchmodel</span> <span class="kn">import</span> <span class="n">make_chfunc_as_op</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">speck</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plaintext</span> <span class="o">=</span> <span class="p">[</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;p0&quot;</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;p1&quot;</span><span class="p">,</span> <span class="mi">16</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">round_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;k0&quot;</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;k1&quot;</span><span class="p">,</span> <span class="mi">16</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span><span class="o">.</span><span class="n">encryption</span><span class="o">.</span><span class="n">round_keys</span> <span class="o">=</span> <span class="n">round_keys</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span><span class="o">.</span><span class="n">encryption</span><span class="p">(</span><span class="o">*</span><span class="n">plaintext</span><span class="p">,</span> <span class="n">symbolic_inputs</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  
+<span class="go">((((((p0 &gt;&gt;&gt; 7) + p1) ^ k0) &gt;&gt;&gt; 7) + ((p1 &lt;&lt;&lt; 2) ^ ((p0 &gt;&gt;&gt; 7) + p1) ^ k0)) ^ k1,</span>
+<span class="go">(((p1 &lt;&lt;&lt; 2) ^ ((p0 &gt;&gt;&gt; 7) + p1) ^ k0) &lt;&lt;&lt; 2) ^ (((((p0 &gt;&gt;&gt; 7) + p1) ^ k0) &gt;&gt;&gt; 7) + ((p1 &lt;&lt;&lt; 2) ^ ((p0 &gt;&gt;&gt; 7) + p1) ^ k0)) ^ k1)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SpeckEncAsOp</span> <span class="o">=</span> <span class="n">make_chfunc_as_op</span><span class="p">(</span><span class="n">EncryptionChModel</span><span class="p">(</span><span class="n">Speck32</span><span class="p">,</span> <span class="n">XorDiff</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SpeckEncAsOp</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">plaintext</span> <span class="o">+</span> <span class="n">round_keys</span><span class="p">))</span>
+<span class="go">SpeckEncryption_2RAsOp(p0, p1, k0, k1)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SpeckEncAsOp</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">plaintext</span> <span class="o">+</span> <span class="n">round_keys</span><span class="p">))</span><span class="o">.</span><span class="n">doit</span><span class="p">()</span>  
+<span class="go">Id((p1 &lt;&lt;&lt; 2 ^ (p0 &gt;&gt;&gt; 7 + p1) ^ k0) &lt;&lt;&lt; 2 ^ (((p0 &gt;&gt;&gt; 7 + p1) ^ k0) &gt;&gt;&gt; 7 + (p1 &lt;&lt;&lt; 2 ^ (p0 &gt;&gt;&gt; 7 + p1) ^ k0)) ^ k1) ::</span>
+<span class="go">Id((((p0 &gt;&gt;&gt; 7 + p1) ^ k0) &gt;&gt;&gt; 7 + (p1 &lt;&lt;&lt; 2 ^ (p0 &gt;&gt;&gt; 7 + p1) ^ k0)) ^ k1)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.smt.wrappedchmodel.ModelChFuncAsOp">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.smt.wrappedchmodel.</span></span><span class="sig-name descname"><span class="pre">ModelChFuncAsOp</span></span><a class="reference internal" href="_modules/cascada/smt/wrappedchmodel.html#ModelChFuncAsOp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.smt.wrappedchmodel.ModelChFuncAsOp" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Represent models of <a class="reference internal" href="#cascada.smt.wrappedchmodel.ChFuncAsOp" title="cascada.smt.wrappedchmodel.ChFuncAsOp"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChFuncAsOp</span></code></a> operations.</p>
+<p>The model of a <a class="reference internal" href="#cascada.smt.wrappedchmodel.ChFuncAsOp" title="cascada.smt.wrappedchmodel.ChFuncAsOp"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChFuncAsOp</span></code></a> operation is the set of bit-vector constraints
+that models the propagation probability over the <a class="reference internal" href="#cascada.smt.wrappedchmodel.ChFuncAsOp" title="cascada.smt.wrappedchmodel.ChFuncAsOp"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChFuncAsOp</span></code></a> operation
+(see <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel" title="cascada.abstractproperty.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.opmodel.OpModel</span></code></a>).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The model of a <a class="reference internal" href="#cascada.smt.wrappedchmodel.ChFuncAsOp" title="cascada.smt.wrappedchmodel.ChFuncAsOp"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChFuncAsOp</span></code></a> operation models the probability
+that the input property <span class="math notranslate nohighlight">\(\alpha\)</span>
+propagates to the output property <span class="math notranslate nohighlight">\(\beta\)</span>
+over the <a class="reference internal" href="#cascada.smt.wrappedchmodel.ChFuncAsOp" title="cascada.smt.wrappedchmodel.ChFuncAsOp"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChFuncAsOp</span></code></a> operation, and ignores the properties
+of the intermediate values of the <a class="reference internal" href="#cascada.smt.wrappedchmodel.ChFuncAsOp" title="cascada.smt.wrappedchmodel.ChFuncAsOp"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChFuncAsOp</span></code></a> operation.</p>
+<p>For the <a class="reference internal" href="cascada.differential.difference.html#cascada.differential.difference.Difference" title="cascada.differential.difference.Difference"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Difference</span></code></a>/<a class="reference internal" href="cascada.linear.mask.html#cascada.linear.mask.LinearMask" title="cascada.linear.mask.LinearMask"><code class="xref any py py-class docutils literal notranslate"><span class="pre">LinearMask</span></code></a> property types,
+the model of a <a class="reference internal" href="#cascada.smt.wrappedchmodel.ChFuncAsOp" title="cascada.smt.wrappedchmodel.ChFuncAsOp"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChFuncAsOp</span></code></a> models the probability of the
+differential/hull (instead of the probability of the characteristic).</p>
+</div>
+<p>The constraints of the model of a <a class="reference internal" href="#cascada.smt.wrappedchmodel.ChFuncAsOp" title="cascada.smt.wrappedchmodel.ChFuncAsOp"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChFuncAsOp</span></code></a> operation are obtained
+from the underlying characteristic model.
+Specifically, the methods
+<a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel.validity_constraint" title="cascada.abstractproperty.opmodel.OpModel.validity_constraint"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">abstractproperty.opmodel.OpModel.validity_constraint</span></code></a>,
+<a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel.pr_one_constraint" title="cascada.abstractproperty.opmodel.OpModel.pr_one_constraint"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">abstractproperty.opmodel.OpModel.pr_one_constraint</span></code></a>
+and <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel.weight_constraint" title="cascada.abstractproperty.opmodel.OpModel.weight_constraint"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">abstractproperty.opmodel.OpModel.weight_constraint</span></code></a>
+of <a class="reference internal" href="#cascada.smt.wrappedchmodel.ModelChFuncAsOp" title="cascada.smt.wrappedchmodel.ModelChFuncAsOp"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ModelChFuncAsOp</span></code></a> used the methods
+<a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel.validity_assertions" title="cascada.abstractproperty.chmodel.ChModel.validity_assertions"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">abstractproperty.chmodel.ChModel.validity_assertions</span></code></a>,
+<a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel.pr_one_assertions" title="cascada.abstractproperty.chmodel.ChModel.pr_one_assertions"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">abstractproperty.chmodel.ChModel.pr_one_assertions</span></code></a> and
+<a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel.weight_assertions" title="cascada.abstractproperty.chmodel.ChModel.weight_assertions"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">abstractproperty.chmodel.ChModel.weight_assertions</span></code></a>
+of the characteristic model respectively.
+Note that the external variables of <code class="docutils literal notranslate"><span class="pre">validity_constraint</span></code>,
+<code class="docutils literal notranslate"><span class="pre">pr_one_constraint</span></code> and <code class="docutils literal notranslate"><span class="pre">weight_constraint</span></code> include
+the intermediate properties in the characteristic model
+(the external variables of <code class="docutils literal notranslate"><span class="pre">weight_constraint</span></code> also include
+the intermediate weight variables).</p>
+<p>The weight returned by the <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel.decimal_weight" title="cascada.abstractproperty.opmodel.OpModel.decimal_weight"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">abstractproperty.opmodel.OpModel.decimal_weight</span></code></a>
+method of <a class="reference internal" href="#cascada.smt.wrappedchmodel.ModelChFuncAsOp" title="cascada.smt.wrappedchmodel.ModelChFuncAsOp"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ModelChFuncAsOp</span></code></a> is computed by internally calling
+<a class="reference internal" href="cascada.smt.chsearch.html#cascada.smt.chsearch.ChFinder.find_next_ch" title="cascada.smt.chsearch.ChFinder.find_next_ch"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">ChFinder.find_next_ch</span></code></a> using the underlying characteristic model.
+In other words, the returned weight is a very weak approximation (with
+big <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel.error" title="cascada.abstractproperty.opmodel.OpModel.error"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">abstractproperty.opmodel.OpModel.error</span></code></a>) of the actual weight,
+since the returned weight is the weight of a random characteristic
+satisfying the underlying characteristic model.</p>
+<p>This class is not meant to be instantiated but to provide a base
+class for models generated through <a class="reference internal" href="#cascada.smt.wrappedchmodel.make_chfuncasop_model" title="cascada.smt.wrappedchmodel.make_chfuncasop_model"><code class="xref any py py-func docutils literal notranslate"><span class="pre">make_chfuncasop_model</span></code></a>.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="cascada.smt.wrappedchmodel.ModelChFuncAsOp.ch_model">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ch_model</span></span><a class="headerlink" href="#cascada.smt.wrappedchmodel.ModelChFuncAsOp.ch_model" title="Permalink to this definition"></a></dt>
+<dd><p>The underlying characteristic model of <a class="reference internal" href="#cascada.smt.wrappedchmodel.ChFuncAsOp" title="cascada.smt.wrappedchmodel.ChFuncAsOp"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChFuncAsOp</span></code></a>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cascada.smt.wrappedchmodel.make_chfuncasop_model">
+<span class="sig-prename descclassname"><span class="pre">cascada.smt.wrappedchmodel.</span></span><span class="sig-name descname"><span class="pre">make_chfuncasop_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">my_chfunc_as_op</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/smt/wrappedchmodel.html#make_chfuncasop_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.smt.wrappedchmodel.make_chfuncasop_model" title="Permalink to this definition"></a></dt>
+<dd><p>Return the <a class="reference internal" href="#cascada.smt.wrappedchmodel.ModelChFuncAsOp" title="cascada.smt.wrappedchmodel.ModelChFuncAsOp"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ModelChFuncAsOp</span></code></a> of the given <a class="reference internal" href="#cascada.smt.wrappedchmodel.ChFuncAsOp" title="cascada.smt.wrappedchmodel.ChFuncAsOp"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChFuncAsOp</span></code></a>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span><span class="p">,</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.difference</span> <span class="kn">import</span> <span class="n">XorDiff</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.chmodel</span> <span class="kn">import</span> <span class="n">EncryptionChModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.smt.wrappedchmodel</span> <span class="kn">import</span> <span class="n">make_chfunc_as_op</span><span class="p">,</span> <span class="n">make_chfuncasop_model</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">speck</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SpeckEncAsOp</span> <span class="o">=</span> <span class="n">make_chfunc_as_op</span><span class="p">(</span><span class="n">EncryptionChModel</span><span class="p">(</span><span class="n">Speck32</span><span class="p">,</span> <span class="n">XorDiff</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ModelSpeckEncAsOp</span> <span class="o">=</span> <span class="n">make_chfuncasop_model</span><span class="p">(</span><span class="n">SpeckEncAsOp</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">input_diff</span> <span class="o">=</span> <span class="p">[</span><span class="n">XorDiff</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">16</span><span class="p">))]</span><span class="o">*</span><span class="mi">4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">ModelSpeckEncAsOp</span><span class="p">(</span><span class="n">input_diff</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">vrepr</span><span class="p">())</span>  
+<span class="go">XorModelSpeckEncryption_2RAsOp([XorDiff(Constant(0x0000, width=16)), XorDiff(Constant(0x0000, width=16)),</span>
+<span class="go">    XorDiff(Constant(0x0000, width=16)), XorDiff(Constant(0x0000, width=16))])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">validity_constraint</span><span class="p">(</span><span class="n">XorDiff</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">32</span><span class="p">)))</span>  
+<span class="go">(0x00000000 == (dx9_out :: dx7_out)) &amp;</span>
+<span class="go">((~(dx1 &lt;&lt; 0x0001) &amp; dx1) == 0x0000) &amp;</span>
+<span class="go">(((~((dx1 &gt;&gt;&gt; 7) &lt;&lt; 0x0001) ^ (dx1 &lt;&lt; 0x0001)) &amp; (~((dx1 &gt;&gt;&gt; 7) &lt;&lt; 0x0001) ^ (dx6 &lt;&lt; 0x0001)) &amp;</span>
+<span class="go">    ((dx1 &gt;&gt;&gt; 7) ^ dx1 ^ dx6 ^ ((dx1 &gt;&gt;&gt; 7) &lt;&lt; 0x0001))) == 0x0000) &amp;</span>
+<span class="go">(dx6 == dx7_out) &amp; (((dx1 &lt;&lt;&lt; 2) ^ dx6) == dx9_out)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">external_vars_validity_constraint</span><span class="p">(</span><span class="n">XorDiff</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">32</span><span class="p">)))</span>
+<span class="go">[dx1, dx6, dx7_out, dx9_out]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">w</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">weight_width</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">weight_constraint</span><span class="p">(</span><span class="n">XorDiff</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">32</span><span class="p">)),</span> <span class="n">w</span><span class="p">)</span>  
+<span class="go">(0x00000000 == (dx9_out :: dx7_out)) &amp;</span>
+<span class="go">(w == _w_tmp74c4f05762c354cc149091e363577700) &amp;</span>
+<span class="go">(_w_tmp74c4f05762c354cc149091e363577700_0 == PopCount(dx1[14:])) &amp;</span>
+<span class="go">(_w_tmp74c4f05762c354cc149091e363577700_1 == PopCount(~((~(dx1 &gt;&gt;&gt; 7) ^ dx1) &amp; (~(dx1 &gt;&gt;&gt; 7) ^ dx6))[14:])) &amp;</span>
+<span class="go">(_w_tmp74c4f05762c354cc149091e363577700_2 == 0b0) &amp;</span>
+<span class="go">(_w_tmp74c4f05762c354cc149091e363577700_3 == 0b0) &amp;</span>
+<span class="go">(_w_tmp74c4f05762c354cc149091e363577700 == ((0b0 :: _w_tmp74c4f05762c354cc149091e363577700_0) +</span>
+<span class="go">    (0b0 :: _w_tmp74c4f05762c354cc149091e363577700_1)))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">external_vars_weight_constraint</span><span class="p">(</span><span class="n">XorDiff</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">32</span><span class="p">)),</span> <span class="n">w</span><span class="p">)</span>  
+<span class="go">[_w_tmp74c4f05762c354cc149091e363577700, _w_tmp74c4f05762c354cc149091e363577700_0,</span>
+<span class="go">_w_tmp74c4f05762c354cc149091e363577700_1, _w_tmp74c4f05762c354cc149091e363577700_2,</span>
+<span class="go">_w_tmp74c4f05762c354cc149091e363577700_3, dx1, dx6, dx7_out, dx9_out]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">max_weight</span><span class="p">(),</span> <span class="n">f</span><span class="o">.</span><span class="n">weight_width</span><span class="p">(),</span> <span class="n">f</span><span class="o">.</span><span class="n">error</span><span class="p">(),</span> <span class="n">f</span><span class="o">.</span><span class="n">num_frac_bits</span><span class="p">()</span>
+<span class="go">(30, 5, 30, 0)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cascada.smt.wrappedchmodel.get_wrapped_chfunc">
+<span class="sig-prename descclassname"><span class="pre">cascada.smt.wrappedchmodel.</span></span><span class="sig-name descname"><span class="pre">get_wrapped_chfunc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ch_model</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/smt/wrappedchmodel.html#get_wrapped_chfunc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.smt.wrappedchmodel.get_wrapped_chfunc" title="Permalink to this definition"></a></dt>
+<dd><p>Wrap and return the underlying bit-vector function of a characteristic model.</p>
+<p>Given a characteristic model (i.e., <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel" title="cascada.abstractproperty.chmodel.ChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.chmodel.ChModel</span></code></a>)
+of a bit-vector function <span class="math notranslate nohighlight">\(f\)</span>, returns a functionally-equivalent
+(same input-output behaviour) bit-vector function <span class="math notranslate nohighlight">\(g\)</span> that contains
+the <a class="reference internal" href="#cascada.smt.wrappedchmodel.ChFuncAsOp" title="cascada.smt.wrappedchmodel.ChFuncAsOp"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChFuncAsOp</span></code></a> of <span class="math notranslate nohighlight">\(f\)</span> and the output extraction (using <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.PropExtract" title="cascada.abstractproperty.property.PropExtract"><code class="xref any py py-class docutils literal notranslate"><span class="pre">PropExtract</span></code></a>)
+of the single-output of <a class="reference internal" href="#cascada.smt.wrappedchmodel.ChFuncAsOp" title="cascada.smt.wrappedchmodel.ChFuncAsOp"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChFuncAsOp</span></code></a>.</p>
+<p>Note that the returned wrapped function <span class="math notranslate nohighlight">\(g\)</span> is a
+<a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.BvFunction" title="cascada.bitvector.ssa.BvFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvFunction</span></code></a> (and not a <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.RoundBasedFunction" title="cascada.bitvector.ssa.RoundBasedFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RoundBasedFunction</span></code></a>)
+even if <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel.func" title="cascada.abstractproperty.chmodel.ChModel.func"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">func</span></code></a> is a <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.RoundBasedFunction" title="cascada.bitvector.ssa.RoundBasedFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RoundBasedFunction</span></code></a>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.ssa</span> <span class="kn">import</span> <span class="n">RoundBasedFunction</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.linear.mask</span> <span class="kn">import</span> <span class="n">LinearMask</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.linear.chmodel</span> <span class="kn">import</span> <span class="n">ChModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.smt.wrappedchmodel</span> <span class="kn">import</span> <span class="n">get_wrapped_chfunc</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">speck</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32_KS</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span><span class="o">.</span><span class="n">key_schedule</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32_KS</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model</span> <span class="o">=</span> <span class="n">ChModel</span><span class="p">(</span><span class="n">Speck32_KS</span><span class="p">,</span> <span class="n">LinearMask</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;mk0&quot;</span><span class="p">,</span> <span class="s2">&quot;mk1&quot;</span><span class="p">,</span> <span class="s2">&quot;mk2&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">WrappedSpeck32KS</span> <span class="o">=</span> <span class="n">get_wrapped_chfunc</span><span class="p">(</span><span class="n">ch_model</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">get_name</span><span class="p">(),</span> <span class="n">WrappedSpeck32KS</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span>
+<span class="go">(&#39;SpeckKeySchedule_2R&#39;, &#39;WrappedSpeckKeySchedule_2R&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">to_ssa</span><span class="p">([</span><span class="s2">&quot;mk0&quot;</span><span class="p">,</span> <span class="s2">&quot;mk1&quot;</span><span class="p">,</span> <span class="s2">&quot;mk2&quot;</span><span class="p">],</span> <span class="s2">&quot;k&quot;</span><span class="p">)</span>  
+<span class="go">SSA(input_vars=[mk0, mk1, mk2], output_vars=[mk2_out, k3_out, k8_out],</span>
+<span class="go">    assignments=[(k0, mk1 &gt;&gt;&gt; 7), (k1, k0 + mk2), (k2, mk2 &lt;&lt;&lt; 2), (k3, k2 ^ k1),</span>
+<span class="go">    (k4, mk0 &gt;&gt;&gt; 7), (k5, k4 + k3), (k6, k5 ^ 0x0001), (k7, k3 &lt;&lt;&lt; 2), (k8, k7 ^ k6),</span>
+<span class="go">    (mk2_out, Id(mk2)), (k3_out, Id(k3)), (k8_out, Id(k8))])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">WrappedSpeck32KS</span><span class="o">.</span><span class="n">to_ssa</span><span class="p">([</span><span class="s2">&quot;mk0&quot;</span><span class="p">,</span> <span class="s2">&quot;mk1&quot;</span><span class="p">,</span> <span class="s2">&quot;mk2&quot;</span><span class="p">],</span> <span class="s2">&quot;k&quot;</span><span class="p">)</span> 
+<span class="go">SSA(input_vars=[mk0, mk1, mk2], output_vars=[k1_out, k2_out, k3_out],</span>
+<span class="go">    assignments=[(k0, SpeckKeySchedule_2RAsOp(mk0, mk1, mk2)),</span>
+<span class="go">    (k1, PropExtract_{·, 15, 0}(k0)), (k2, PropExtract_{·, 31, 16}(k0)), (k3, PropExtract_{·, 47, 32}(k0)),</span>
+<span class="go">    (k1_out, Id(k1)), (k2_out, Id(k2)), (k3_out, Id(k3))])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">masterkey</span> <span class="o">=</span> <span class="p">[</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">16</span><span class="p">)]</span><span class="o">*</span><span class="mi">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">masterkey</span><span class="p">)</span>
+<span class="go">(0x0000, 0x0000, 0x0001)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">WrappedSpeck32KS</span><span class="p">(</span><span class="o">*</span><span class="n">masterkey</span><span class="p">)</span>
+<span class="go">(0x0000, 0x0000, 0x0001)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">issubclass</span><span class="p">(</span><span class="n">ch_model</span><span class="o">.</span><span class="n">func</span><span class="p">,</span> <span class="n">RoundBasedFunction</span><span class="p">),</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">WrappedSpeck32KS</span><span class="p">,</span> <span class="n">RoundBasedFunction</span><span class="p">)</span>
+<span class="go">(True, False)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cascada.smt.wrappedchmodel.get_wrapped_chcipher">
+<span class="sig-prename descclassname"><span class="pre">cascada.smt.wrappedchmodel.</span></span><span class="sig-name descname"><span class="pre">get_wrapped_chcipher</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ch_model</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/smt/wrappedchmodel.html#get_wrapped_chcipher"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.smt.wrappedchmodel.get_wrapped_chcipher" title="Permalink to this definition"></a></dt>
+<dd><p>Wrap and return the underlying cipher of a characteristic model.</p>
+<p>Given a characteristic model (i.e., <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.CipherChModel" title="cascada.abstractproperty.chmodel.CipherChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.chmodel.CipherChModel</span></code></a>)
+of a <a class="reference internal" href="cascada.primitives.blockcipher.html#cascada.primitives.blockcipher.Cipher" title="cascada.primitives.blockcipher.Cipher"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Cipher</span></code></a>, returns a functionally-equivalent cipher where the
+key-schedule and encryption functions are wrapped by <a class="reference internal" href="#cascada.smt.wrappedchmodel.get_wrapped_chfunc" title="cascada.smt.wrappedchmodel.get_wrapped_chfunc"><code class="xref any py py-func docutils literal notranslate"><span class="pre">get_wrapped_chfunc</span></code></a>.</p>
+<p>If the given characteristic model is an <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.EncryptionChModel" title="cascada.abstractproperty.chmodel.EncryptionChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.chmodel.EncryptionChModel</span></code></a>
+of a <a class="reference internal" href="cascada.primitives.blockcipher.html#cascada.primitives.blockcipher.Cipher.encryption" title="cascada.primitives.blockcipher.Cipher.encryption"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">Cipher.encryption</span></code></a>, then a functionally-equivalent cipher is returned
+where only the encryption function is wrapped by <a class="reference internal" href="#cascada.smt.wrappedchmodel.get_wrapped_chfunc" title="cascada.smt.wrappedchmodel.get_wrapped_chfunc"><code class="xref any py py-func docutils literal notranslate"><span class="pre">get_wrapped_chfunc</span></code></a>.</p>
+<p>Note that the returned wrapped cipher is not iterated (see <a class="reference internal" href="cascada.primitives.blockcipher.html#cascada.primitives.blockcipher.Cipher" title="cascada.primitives.blockcipher.Cipher"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Cipher</span></code></a>)
+even if the given cipher is iterated.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.difference</span> <span class="kn">import</span> <span class="n">XorDiff</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.chmodel</span> <span class="kn">import</span> <span class="n">EncryptionChModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.smt.wrappedchmodel</span> <span class="kn">import</span> <span class="n">get_wrapped_chcipher</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">speck</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model</span> <span class="o">=</span> <span class="n">EncryptionChModel</span><span class="p">(</span><span class="n">Speck32</span><span class="p">,</span> <span class="n">XorDiff</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">WrappedSpeck32</span> <span class="o">=</span> <span class="n">get_wrapped_chcipher</span><span class="p">(</span><span class="n">ch_model</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">WrappedSpeck32Enc</span> <span class="o">=</span> <span class="n">WrappedSpeck32</span><span class="o">.</span><span class="n">encryption</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">get_name</span><span class="p">(),</span> <span class="n">WrappedSpeck32Enc</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span>
+<span class="go">(&#39;SpeckEncryption_2R&#39;, &#39;WrappedSpeckEncryption_2R&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">to_ssa</span><span class="p">([</span><span class="s2">&quot;p0&quot;</span><span class="p">,</span> <span class="s2">&quot;p1&quot;</span><span class="p">],</span> <span class="s2">&quot;x&quot;</span><span class="p">)</span>  
+<span class="go">SSA(input_vars=[p0, p1], output_vars=[x7_out, x9_out], external_vars=[dk0, dk1],</span>
+<span class="go">    assignments=[(x0, p0 &gt;&gt;&gt; 7), (x1, x0 + p1), (x2, x1 ^ dk0), (x3, p1 &lt;&lt;&lt; 2), (x4, x3 ^ x2),</span>
+<span class="go">        (x5, x2 &gt;&gt;&gt; 7), (x6, x5 + x4), (x7, x6 ^ dk1), (x8, x4 &lt;&lt;&lt; 2), (x9, x8 ^ x7),</span>
+<span class="go">        (x7_out, Id(x7)), (x9_out, Id(x9))])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">WrappedSpeck32Enc</span><span class="o">.</span><span class="n">round_keys</span> <span class="o">=</span> <span class="n">ch_model</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">round_keys</span><span class="p">[:]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">WrappedSpeck32Enc</span><span class="o">.</span><span class="n">to_ssa</span><span class="p">([</span><span class="s2">&quot;p0&quot;</span><span class="p">,</span> <span class="s2">&quot;p1&quot;</span><span class="p">],</span> <span class="s2">&quot;x&quot;</span><span class="p">)</span>  
+<span class="go">SSA(input_vars=[p0, p1], output_vars=[x1_out, x2_out], external_vars=[dk0, dk1],</span>
+<span class="go">    assignments=[(x0, SpeckEncryption_2RAsOp(p0, p1, dk0, dk1)),</span>
+<span class="go">        (x1, PropExtract_{·, 15, 0}(x0)), (x2, PropExtract_{·, 31, 16}(x0)),</span>
+<span class="go">        (x1_out, Id(x1)), (x2_out, Id(x2))])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plaintext</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span> <span class="n">Constant</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">ch_model</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">plaintext</span><span class="p">,</span> <span class="n">symbolic_inputs</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>  
+<span class="go">[(((0x0202 ^ dk0) &gt;&gt;&gt; 7) + (0x020a ^ dk0)) ^ dk1,</span>
+<span class="go">((0x020a ^ dk0) &lt;&lt;&lt; 2) ^ (((0x0202 ^ dk0) &gt;&gt;&gt; 7) + (0x020a ^ dk0)) ^ dk1]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">doit</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">WrappedSpeck32Enc</span><span class="p">(</span><span class="o">*</span><span class="n">plaintext</span><span class="p">,</span> <span class="n">symbolic_inputs</span><span class="o">=</span><span class="kc">True</span><span class="p">)]</span>  
+<span class="go">[Id(((0x0202 ^ dk0) &gt;&gt;&gt; 7 + (0x020a ^ dk0)) ^ dk1),</span>
+<span class="go">Id((0x020a ^ dk0) &lt;&lt;&lt; 2 ^ ((0x0202 ^ dk0) &gt;&gt;&gt; 7 + (0x020a ^ dk0)) ^ dk1)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span><span class="o">.</span><span class="n">num_rounds</span><span class="p">,</span> <span class="n">WrappedSpeck32</span><span class="o">.</span><span class="n">num_rounds</span>
+<span class="go">(2, None)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cascada.smt.wrappedchmodel.get_wrapped_chmodel">
+<span class="sig-prename descclassname"><span class="pre">cascada.smt.wrappedchmodel.</span></span><span class="sig-name descname"><span class="pre">get_wrapped_chmodel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ch_model</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/smt/wrappedchmodel.html#get_wrapped_chmodel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.smt.wrappedchmodel.get_wrapped_chmodel" title="Permalink to this definition"></a></dt>
+<dd><p>Return a wrapped model of the given characteristic model.</p>
+<p>Given a characteristic model of a bit-vector function <span class="math notranslate nohighlight">\(f\)</span>
+(i.e., <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel" title="cascada.abstractproperty.chmodel.ChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.chmodel.ChModel</span></code></a>),
+a wrapped model is a characteristic model of the wrapped function
+of <span class="math notranslate nohighlight">\(f\)</span> through <a class="reference internal" href="#cascada.smt.wrappedchmodel.get_wrapped_chfunc" title="cascada.smt.wrappedchmodel.get_wrapped_chfunc"><code class="xref any py py-func docutils literal notranslate"><span class="pre">get_wrapped_chfunc</span></code></a>.
+If the given characteristic model is an
+<a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.EncryptionChModel" title="cascada.abstractproperty.chmodel.EncryptionChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.chmodel.EncryptionChModel</span></code></a>, the wrapped encryption
+is obtained through <a class="reference internal" href="#cascada.smt.wrappedchmodel.get_wrapped_chcipher" title="cascada.smt.wrappedchmodel.get_wrapped_chcipher"><code class="xref any py py-func docutils literal notranslate"><span class="pre">get_wrapped_chcipher</span></code></a>.</p>
+<p>The wrapped model only has one non-<a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.ModelIdentity" title="cascada.abstractproperty.opmodel.ModelIdentity"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ModelIdentity</span></code></a> transition:
+the <a class="reference internal" href="#cascada.smt.wrappedchmodel.ModelChFuncAsOp" title="cascada.smt.wrappedchmodel.ModelChFuncAsOp"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ModelChFuncAsOp</span></code></a> of the <a class="reference internal" href="#cascada.smt.wrappedchmodel.ChFuncAsOp" title="cascada.smt.wrappedchmodel.ChFuncAsOp"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChFuncAsOp</span></code></a> of <span class="math notranslate nohighlight">\(f\)</span>.</p>
+<p>To avoid name collisions between the given characteristic model and the
+returned wrapped model (except for the external variables),
+an underscore is added to the variable prefix of the returned wrapped model.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.difference</span> <span class="kn">import</span> <span class="n">XorDiff</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.chmodel</span> <span class="kn">import</span> <span class="n">EncryptionChModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.smt.wrappedchmodel</span> <span class="kn">import</span> <span class="n">get_wrapped_chmodel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">speck</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model</span> <span class="o">=</span> <span class="n">EncryptionChModel</span><span class="p">(</span><span class="n">Speck32</span><span class="p">,</span> <span class="n">XorDiff</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">wrapped_ch_model</span> <span class="o">=</span> <span class="n">get_wrapped_chmodel</span><span class="p">(</span><span class="n">ch_model</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">wrapped_ch_model</span>  
+<span class="go"> EncryptionChModel(cipher=WrappedSpeckCipher_2R,</span>
+<span class="go">    input_diff=[XorDiff(_dp0), XorDiff(_dp1)],</span>
+<span class="go">    output_diff=[XorDiff(_dx1_out), XorDiff(_dx2_out)],</span>
+<span class="go">    external_var2diff=[(_dk0, XorDiff(0x0000)), (_dk1, XorDiff(0x0000))],</span>
+<span class="go">    assign_outdiff2op_model=[(XorDiff(_dx0), XorModelSpeckEncryption_2RAsOp([XorDiff(_dp0), XorDiff(_dp1), XorDiff(0x0000), XorDiff(0x0000)])),</span>
+<span class="go">        (XorDiff(_dx1_out), XorModelId(XorDiff(PropExtract_{·, 15, 0}(_dx0)))),</span>
+<span class="go">        (XorDiff(_dx2_out), XorModelId(XorDiff(PropExtract_{·, 31, 16}(_dx0))))])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.linear.mask</span> <span class="kn">import</span> <span class="n">LinearMask</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.linear.chmodel</span> <span class="kn">import</span> <span class="n">ChModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32_KS</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span><span class="o">.</span><span class="n">key_schedule</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32_KS</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model</span> <span class="o">=</span> <span class="n">ChModel</span><span class="p">(</span><span class="n">Speck32_KS</span><span class="p">,</span> <span class="n">LinearMask</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;mk0&quot;</span><span class="p">,</span> <span class="s2">&quot;mk1&quot;</span><span class="p">,</span> <span class="s2">&quot;mk2&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">wrapped_ch_model</span> <span class="o">=</span> <span class="n">get_wrapped_chmodel</span><span class="p">(</span><span class="n">ch_model</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">wrapped_ch_model</span>  
+<span class="go">ChModel(func=WrappedSpeckKeySchedule_2R,</span>
+<span class="go">    input_mask=[LinearMask(_mk0), LinearMask(_mk1), LinearMask(_mk2)],</span>
+<span class="go">    output_mask=[LinearMask(_mx1_out), LinearMask(_mx2_out), LinearMask(_mx3_out)],</span>
+<span class="go">    assign_outmask2op_model=[(LinearMask(_mx0), LinearModelSpeckKeySchedule_2RAsOp([LinearMask(_mk0), LinearMask(_mk1), LinearMask(_mk2)])),</span>
+<span class="go">        (LinearMask(_mx1_out), LinearModelId(LinearMask(PropExtract_{·, 15, 0}(_mx0)))),</span>
+<span class="go">        (LinearMask(_mx2_out), LinearModelId(LinearMask(PropExtract_{·, 31, 16}(_mx0)))),</span>
+<span class="go">        (LinearMask(_mx3_out), LinearModelId(LinearMask(PropExtract_{·, 47, 32}(_mx0))))])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cascada.smt.wrappedchmodel.get_wrapped_cipher_chmodel">
+<span class="sig-prename descclassname"><span class="pre">cascada.smt.wrappedchmodel.</span></span><span class="sig-name descname"><span class="pre">get_wrapped_cipher_chmodel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cipher_ch_model</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/smt/wrappedchmodel.html#get_wrapped_cipher_chmodel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.smt.wrappedchmodel.get_wrapped_cipher_chmodel" title="Permalink to this definition"></a></dt>
+<dd><p>Return a wrapped model of the given cipher characteristic model.</p>
+<p>Given a characteristic model of a <a class="reference internal" href="cascada.primitives.blockcipher.html#cascada.primitives.blockcipher.Cipher" title="cascada.primitives.blockcipher.Cipher"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Cipher</span></code></a>
+(i.e., <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.CipherChModel" title="cascada.abstractproperty.chmodel.CipherChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.chmodel.CipherChModel</span></code></a>),
+a wrapped model is a characteristic model of the wrapped cipher
+through <a class="reference internal" href="#cascada.smt.wrappedchmodel.get_wrapped_chcipher" title="cascada.smt.wrappedchmodel.get_wrapped_chcipher"><code class="xref any py py-func docutils literal notranslate"><span class="pre">get_wrapped_chcipher</span></code></a>.</p>
+<p>The wrapped model only has two non-<a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.ModelIdentity" title="cascada.abstractproperty.opmodel.ModelIdentity"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ModelIdentity</span></code></a> transitions:
+the <a class="reference internal" href="#cascada.smt.wrappedchmodel.ModelChFuncAsOp" title="cascada.smt.wrappedchmodel.ModelChFuncAsOp"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ModelChFuncAsOp</span></code></a> of the <a class="reference internal" href="#cascada.smt.wrappedchmodel.ChFuncAsOp" title="cascada.smt.wrappedchmodel.ChFuncAsOp"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChFuncAsOp</span></code></a> of the key-schedule function
+and the <a class="reference internal" href="#cascada.smt.wrappedchmodel.ModelChFuncAsOp" title="cascada.smt.wrappedchmodel.ModelChFuncAsOp"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ModelChFuncAsOp</span></code></a> of the <a class="reference internal" href="#cascada.smt.wrappedchmodel.ChFuncAsOp" title="cascada.smt.wrappedchmodel.ChFuncAsOp"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChFuncAsOp</span></code></a> of the encryption function.</p>
+<p>To avoid name collisions between the given cipher characteristic model
+and the returned wrapped model, an underscore is added to the variable
+prefix of the returned wrapped model.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.difference</span> <span class="kn">import</span> <span class="n">RXDiff</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.chmodel</span> <span class="kn">import</span> <span class="n">CipherChModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.smt.wrappedchmodel</span> <span class="kn">import</span> <span class="n">get_wrapped_cipher_chmodel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">speck</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model</span> <span class="o">=</span> <span class="n">CipherChModel</span><span class="p">(</span><span class="n">Speck32</span><span class="p">,</span> <span class="n">RXDiff</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">wrapped_ch_model</span> <span class="o">=</span> <span class="n">get_wrapped_cipher_chmodel</span><span class="p">(</span><span class="n">ch_model</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">wrapped_ch_model</span>  
+<span class="go">CipherChModel(ks_ch_model=ChModel(func=WrappedSpeckKeySchedule_1R,</span>
+<span class="go">    input_diff=[RXDiff(_dmk0), RXDiff(_dmk1)],</span>
+<span class="go">    output_diff=[RXDiff(_dk1_out), RXDiff(_dk2_out)],</span>
+<span class="go">    assign_outdiff2op_model=[(RXDiff(_dk0), RXModelSpeckKeySchedule_1RAsOp([RXDiff(_dmk0), RXDiff(_dmk1)])),</span>
+<span class="go">        (RXDiff(_dk1_out), RXModelId(RXDiff(PropExtract_{·, 15, 0}(_dk0)))),</span>
+<span class="go">        (RXDiff(_dk2_out), RXModelId(RXDiff(PropExtract_{·, 31, 16}(_dk0))))]),</span>
+<span class="go">    enc_ch_model=ChModel(func=WrappedSpeckEncryption_2R,</span>
+<span class="go">        input_diff=[RXDiff(_dp0), RXDiff(_dp1)],</span>
+<span class="go">        output_diff=[RXDiff(_dx1_out), RXDiff(_dx2_out)],</span>
+<span class="go">        external_var2diff=[(_dk1_out, RXDiff(_dk1_out)), (_dk2_out, RXDiff(_dk2_out))],</span>
+<span class="go">        assign_outdiff2op_model=[(RXDiff(_dx0), RXModelSpeckEncryption_2RAsOp([RXDiff(_dp0), RXDiff(_dp1), RXDiff(_dk1_out), RXDiff(_dk2_out)])),</span>
+<span class="go">            (RXDiff(_dx1_out), RXModelId(RXDiff(PropExtract_{·, 15, 0}(_dx0)))),</span>
+<span class="go">            (RXDiff(_dx2_out), RXModelId(RXDiff(PropExtract_{·, 31, 16}(_dx0))))]))</span>
+</pre></div>
+</div>
+<p>See also <a class="reference internal" href="#cascada.smt.wrappedchmodel.get_wrapped_chmodel" title="cascada.smt.wrappedchmodel.get_wrapped_chmodel"><code class="xref any py py-func docutils literal notranslate"><span class="pre">get_wrapped_chmodel</span></code></a>.</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cascada.smt.invalidpropsearch.html" class="btn btn-neutral float-left" title="cascada.smt.invalidpropsearch module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Adrián Ranea.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

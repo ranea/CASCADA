@@ -1,0 +1,6 @@
+cascada.primitives.skinny64 module
+==================================
+
+.. automodule:: cascada.primitives.skinny64
+   :members:
+   :show-inheritance:

@@ -1,0 +1,6 @@
+cascada.bitvector.secondaryop module
+====================================
+
+.. automodule:: cascada.bitvector.secondaryop
+   :members:
+   :show-inheritance:

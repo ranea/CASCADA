@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cascada.linear.mask &mdash; CASCADA 1.0.rc0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> CASCADA
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">CASCADA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../primitives_implemented.html">Primitives implemented</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cascada.html">API reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">CASCADA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>cascada.linear.mask</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cascada.linear.mask</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Represent linear mask properties in the context of linear cryptanalysis.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">core</span>
+<span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">operation</span>
+<span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">ssa</span> <span class="k">as</span> <span class="n">cascada_ssa</span>
+
+<span class="kn">from</span> <span class="nn">cascada</span> <span class="kn">import</span> <span class="n">abstractproperty</span>
+
+
+<div class="viewcode-block" id="LinearMask"><a class="viewcode-back" href="../../../cascada.linear.mask.html#cascada.linear.mask.LinearMask">[docs]</a><span class="k">class</span> <span class="nc">LinearMask</span><span class="p">(</span><span class="n">abstractproperty</span><span class="o">.</span><span class="n">property</span><span class="o">.</span><span class="n">Property</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent linear mask properties.</span>
+
+<span class="sd">    Given a function :math:`f`,  a `LinearMask` property pair</span>
+<span class="sd">    (also called a linear approximation) :math:`(\\alpha, \\beta)`</span>
+<span class="sd">    is a bit-vector `Property` :math:`(\\alpha, \\beta)` where the</span>
+<span class="sd">    propagation probability is the absolute correlation :math:`| C(\\alpha, \\beta) |`.</span>
+
+<span class="sd">    The absolute correlation of a linear approximation with input mask :math:`\\alpha`</span>
+<span class="sd">    and output mask :math:`\\beta` over a `Operation` :math:`f` is defined as</span>
+<span class="sd">    :math:`| C(\\alpha, \\beta) | = | 2 \\times \\left(</span>
+<span class="sd">    \# \{ x \ : \\langle \\alpha, x \\rangle = \\langle \\beta, f(x) \\rangle \}</span>
+<span class="sd">    / 2^n \\right) \ \ - \ \  1  |`,</span>
+<span class="sd">    where :math:`n` is the bit-width of the input :math:`x`.</span>
+<span class="sd">    Other related notions are the bias of an approximation (its correlation</span>
+<span class="sd">    divided by two) or the linear probability or potential</span>
+<span class="sd">    (the square of its correlation).</span>
+
+<span class="sd">    The inner product</span>
+<span class="sd">    :math:`\\langle a, b \\rangle` is defined as</span>
+<span class="sd">    :math:`(a_0 \wedge b_0) \oplus</span>
+<span class="sd">    (a_1 \wedge b_1) \oplus \dots \oplus (a_{n-1} \wedge b_{n-1})`.</span>
+
+<span class="sd">    Internally, `LinearMask` is a subclass of `Property` (as `XorDiff`).</span>
+<span class="sd">    The `LinearMask` methods inherited from `Property` requiring</span>
+<span class="sd">    arguments of type `Property` should be called instead with arguments</span>
+<span class="sd">    of type `LinearMask`.</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">        &gt;&gt;&gt; alpha = LinearMask(Constant(0b001, 3))</span>
+<span class="sd">        &gt;&gt;&gt; alpha</span>
+<span class="sd">        LinearMask(0b001)</span>
+<span class="sd">        &gt;&gt;&gt; alpha.apply(Constant(0b011, 3))</span>
+<span class="sd">        0b1</span>
+<span class="sd">        &gt;&gt;&gt; LinearMask(Variable(&quot;alpha&quot;, 3))</span>
+<span class="sd">        LinearMask(alpha)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="LinearMask.apply"><a class="viewcode-back" href="../../../cascada.linear.mask.html#cascada.linear.mask.LinearMask.apply">[docs]</a>    <span class="k">def</span> <span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the inner product of the mask and x.&quot;&quot;&quot;</span>
+        <span class="c1"># assert isinstance(self.val, core.Constant)</span>
+        <span class="c1"># assert isinstance(x, core.Constant)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Term</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">x</span><span class="o">.</span><span class="n">width</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">width</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">width</span><span class="p">):</span>
+            <span class="n">result</span> <span class="o">^=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">val</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="LinearMask.propagate"><a class="viewcode-back" href="../../../cascada.linear.mask.html#cascada.linear.mask.LinearMask.propagate">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">propagate</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">input_mask</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Propagate the given input `LinearMask` through the given operation.</span>
+
+<span class="sd">        For any linear (over the binary finite field)</span>
+<span class="sd">        operation ``op`` and any input mask ``input_mask``,</span>
+<span class="sd">        the output mask ``output_mask`` is uniquely determined and its</span>
+<span class="sd">        bit-vector value satisfies ``input_mask.val == M(output_mask.val)``,</span>
+<span class="sd">        where :math:`M` is the transpose of the binary matrix representing</span>
+<span class="sd">        ``op``.</span>
+
+<span class="sd">        See `Property.propagate` for more information.</span>
+
+<span class="sd">        User-defined or new `Operation` ``op`` can store its associated</span>
+<span class="sd">        linear `linear.opmodel.OpModel` in ``op.linear_model``, as this method</span>
+<span class="sd">        first checks whether ``op`` has its associated `linear.opmodel.OpModel`</span>
+<span class="sd">        stored in the class attribute ``linear_model``.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Variable, Constant</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.operation import BvXor, RotateLeft, BvIdentity</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.operation import make_partial_operation</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">            &gt;&gt;&gt; d1, d2 = LinearMask(Variable(&quot;d1&quot;, 8)), LinearMask(Variable(&quot;d2&quot;, 8))</span>
+<span class="sd">            &gt;&gt;&gt; LinearMask.propagate(BvXor, [d1, d2])</span>
+<span class="sd">            LinearModelBvXor([LinearMask(d1), LinearMask(d2)])</span>
+<span class="sd">            &gt;&gt;&gt; Xor1 = make_partial_operation(BvXor, tuple([None, Constant(1, 8)]))</span>
+<span class="sd">            &gt;&gt;&gt; LinearMask.propagate(Xor1, d1)</span>
+<span class="sd">            LinearMask(d1)</span>
+<span class="sd">            &gt;&gt;&gt; Rotate1 = make_partial_operation(RotateLeft, tuple([None, 1]))</span>
+<span class="sd">            &gt;&gt;&gt; LinearMask.propagate(Rotate1, d1)</span>
+<span class="sd">            LinearMask(d1 &lt;&lt;&lt; 1)</span>
+<span class="sd">            &gt;&gt;&gt; LinearMask.propagate(BvIdentity, d1)</span>
+<span class="sd">            LinearModelId(LinearMask(d1))</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">input_mask</span> <span class="o">=</span> <span class="n">abstractproperty</span><span class="o">.</span><span class="n">property</span><span class="o">.</span><span class="n">_tuplify</span><span class="p">(</span><span class="n">input_mask</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_mask</span><span class="p">)</span> <span class="o">==</span> <span class="nb">sum</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">arity</span><span class="p">)</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;invalid arguments: op=</span><span class="si">{}</span><span class="s2">, input_mask=</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">op</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+            <span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">vrepr</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Term</span><span class="p">)</span> <span class="k">else</span> <span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">input_mask</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span> <span class="k">for</span> <span class="n">mask</span> <span class="ow">in</span> <span class="n">input_mask</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="s2">&quot;_trivial_propagation&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">op</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">val</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">input_mask</span><span class="p">]))</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="s2">&quot;linear_model&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">op</span><span class="o">.</span><span class="n">linear_model</span><span class="p">(</span><span class="n">input_mask</span><span class="p">)</span>
+
+        <span class="c1"># if f(x) = M(x) + ct is an affine operation then</span>
+        <span class="c1"># (alpha, beta) = (a, b) is a linear approx. with Cr. +-1 if a = M^t · b</span>
+        <span class="c1"># (ct does not affect the input/output mask, only the correlation sign)</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvNot</span><span class="p">:</span>
+            <span class="c1"># ~x = x ^ 11111 (similar as BvXor with a ct)</span>
+            <span class="k">return</span> <span class="n">input_mask</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvXor</span><span class="p">:</span>
+            <span class="c1"># M = [I, I], (a0, a1) = [I I]^T b = (b, b)</span>
+            <span class="c1"># (need to add extra assertion a0 == a1)</span>
+            <span class="k">if</span> <span class="n">input_mask</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">input_mask</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="k">return</span> <span class="n">input_mask</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="kn">from</span> <span class="nn">cascada.linear</span> <span class="kn">import</span> <span class="n">opmodel</span>
+            <span class="k">return</span> <span class="n">opmodel</span><span class="o">.</span><span class="n">LinearModelBvXor</span><span class="p">(</span><span class="n">input_mask</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvAnd</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">cascada.linear</span> <span class="kn">import</span> <span class="n">opmodel</span>
+            <span class="k">return</span> <span class="n">opmodel</span><span class="o">.</span><span class="n">LinearModelBvAnd</span><span class="p">(</span><span class="n">input_mask</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvOr</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">cascada.linear</span> <span class="kn">import</span> <span class="n">opmodel</span>
+            <span class="k">return</span> <span class="n">opmodel</span><span class="o">.</span><span class="n">LinearModelBvOr</span><span class="p">(</span><span class="n">input_mask</span><span class="p">)</span>
+
+        <span class="c1"># RotateLeft, ..., BvLshr only allowed for constant offsets (see below)</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvAdd</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">cascada.linear</span> <span class="kn">import</span> <span class="n">opmodel</span>
+            <span class="k">return</span> <span class="n">opmodel</span><span class="o">.</span><span class="n">LinearModelBvAdd</span><span class="p">(</span><span class="n">input_mask</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvSub</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">cascada.linear</span> <span class="kn">import</span> <span class="n">opmodel</span>
+            <span class="k">return</span> <span class="n">opmodel</span><span class="o">.</span><span class="n">LinearModelBvSub</span><span class="p">(</span><span class="n">input_mask</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">Concat</span><span class="p">:</span>
+            <span class="c1"># M = [[I, 0], [0, I]] (identity matrix)</span>
+            <span class="c1"># (a0, a1) = M^T b = (b0, b1)</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">op</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">val</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">input_mask</span><span class="p">]))</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="n">cascada_ssa</span><span class="o">.</span><span class="n">SSAReturn</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_mask</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">):</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;constant propagation of output mask in &quot;</span>
+                              <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.propagate(op=</span><span class="si">{</span><span class="n">op</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">, &quot;</span>
+                              <span class="sa">f</span><span class="s2">&quot;input_mask=</span><span class="si">{</span><span class="n">input_mask</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="kn">from</span> <span class="nn">cascada.linear</span> <span class="kn">import</span> <span class="n">opmodel</span>
+            <span class="k">return</span> <span class="n">opmodel</span><span class="o">.</span><span class="n">LinearModelId</span><span class="p">(</span><span class="n">input_mask</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvIdentity</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_mask</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">input_mask</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="kn">from</span> <span class="nn">cascada.linear</span> <span class="kn">import</span> <span class="n">opmodel</span>
+                <span class="k">return</span> <span class="n">opmodel</span><span class="o">.</span><span class="n">LinearModelId</span><span class="p">(</span><span class="n">input_mask</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">operation</span><span class="o">.</span><span class="n">PartialOperation</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">base_op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvXor</span><span class="p">:</span>
+                <span class="c1"># M = [I], (a0) = [I]^T b0 = b0</span>
+                <span class="c1"># XOR by a constant only changes the sign of the correlation</span>
+                <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_mask</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+                <span class="n">m1</span> <span class="o">=</span> <span class="n">input_mask</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">return</span> <span class="n">m1</span>
+
+            <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">base_op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvAnd</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_mask</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+                <span class="n">m</span> <span class="o">=</span> <span class="n">input_mask</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">ct</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">ct</span> <span class="o">==</span> <span class="o">~</span><span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">ct</span><span class="o">.</span><span class="n">width</span><span class="p">):</span>  <span class="c1"># x &amp; 1111 = x</span>
+                    <span class="k">return</span> <span class="n">m</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="kn">from</span> <span class="nn">cascada.linear</span> <span class="kn">import</span> <span class="n">opmodel</span>
+                    <span class="k">return</span> <span class="n">opmodel</span><span class="o">.</span><span class="n">make_partial_op_model</span><span class="p">(</span><span class="n">opmodel</span><span class="o">.</span><span class="n">LinearModelBvAndCt</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">)(</span><span class="n">m</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">base_op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvOr</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_mask</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+                <span class="n">m</span> <span class="o">=</span> <span class="n">input_mask</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">ct</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">ct</span> <span class="o">==</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">ct</span><span class="o">.</span><span class="n">width</span><span class="p">):</span>  <span class="c1"># x | 0000 = x</span>
+                    <span class="k">return</span> <span class="n">m</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="kn">from</span> <span class="nn">cascada.linear</span> <span class="kn">import</span> <span class="n">opmodel</span>
+                    <span class="k">return</span> <span class="n">opmodel</span><span class="o">.</span><span class="n">make_partial_op_model</span><span class="p">(</span><span class="n">opmodel</span><span class="o">.</span><span class="n">LinearModelBvOrCt</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">)(</span><span class="n">m</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">base_op</span> <span class="ow">in</span> <span class="p">[</span><span class="n">operation</span><span class="o">.</span><span class="n">RotateLeft</span><span class="p">,</span> <span class="n">operation</span><span class="o">.</span><span class="n">RotateRight</span><span class="p">]:</span>
+                <span class="c1"># RotateLeft and RotateRight matrices are permutation matrices (square binary matrix</span>
+                <span class="c1"># that has exactly one entry of 1 in each row and each column and 0s elsewhere)</span>
+                <span class="c1"># Examples:</span>
+                <span class="c1">#   3-bit, RotateLeft by 1,</span>
+                <span class="c1">#   RotateLeft1(0bx2x1x0) = 0bx1x0x2, thus RotateLeft1([x0, x1, x2]) = [x2, x0, x1]</span>
+                <span class="c1">#   M = [0 0 1],</span>
+                <span class="c1">#       [1 0 0],</span>
+                <span class="c1">#       [0 1 0]</span>
+                <span class="c1">#   3-bit, RotateLeft by 2,</span>
+                <span class="c1">#   RotateLeft2(0bx2x1x0) = 0bx0x2x1, thus RotateLeft2([x0, x1, x2]) = [x1, x2, x0]</span>
+                <span class="c1">#   M = [0 1 0],</span>
+                <span class="c1">#       [0 0 1],</span>
+                <span class="c1">#       [1 0 0]</span>
+                <span class="c1"># Permutation matrices are orthogonal matrices, thus M^T = M^{-1}</span>
+                <span class="c1"># (a0) = M^T b0, then, M^(a0) = b0</span>
+                <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_mask</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+                    <span class="n">m</span> <span class="o">=</span> <span class="n">input_mask</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">base_op</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">base_op</span> <span class="ow">in</span> <span class="p">[</span><span class="n">operation</span><span class="o">.</span><span class="n">BvShl</span><span class="p">,</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvLshr</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_mask</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+                    <span class="n">m</span> <span class="o">=</span> <span class="n">input_mask</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># x &lt;&lt; 0 = x</span>
+                        <span class="k">return</span> <span class="n">m</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="kn">from</span> <span class="nn">cascada.linear</span> <span class="kn">import</span> <span class="n">opmodel</span>
+                        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">base_op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvShl</span><span class="p">:</span>
+                            <span class="n">partial_opmodel</span> <span class="o">=</span> <span class="n">opmodel</span><span class="o">.</span><span class="n">LinearModelBvShlCt</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">assert</span> <span class="n">op</span><span class="o">.</span><span class="n">base_op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvLshr</span>
+                            <span class="n">partial_opmodel</span> <span class="o">=</span> <span class="n">opmodel</span><span class="o">.</span><span class="n">LinearModelBvLshrCt</span>
+                        <span class="k">return</span> <span class="n">opmodel</span><span class="o">.</span><span class="n">make_partial_op_model</span><span class="p">(</span><span class="n">partial_opmodel</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">)(</span><span class="n">m</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">base_op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">Extract</span><span class="p">:</span>
+                <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">i</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">j</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_mask</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+                    <span class="n">m</span> <span class="o">=</span> <span class="n">input_mask</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">m</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">width</span> <span class="o">-</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">j</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="n">m</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="kn">from</span> <span class="nn">cascada.linear</span> <span class="kn">import</span> <span class="n">opmodel</span>
+                        <span class="k">return</span> <span class="n">opmodel</span><span class="o">.</span><span class="n">make_partial_op_model</span><span class="p">(</span><span class="n">opmodel</span><span class="o">.</span><span class="n">LinearModelExtractCt</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">)(</span><span class="n">m</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Linear PartialOpModel of </span><span class="si">{</span><span class="n">op</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> is not implemented&quot;</span><span class="p">)</span>
+
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Adrián Ranea.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

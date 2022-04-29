@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cascada.algebraic.opmodel &mdash; CASCADA 1.0.rc0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> CASCADA
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">CASCADA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../primitives_implemented.html">Primitives implemented</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cascada.html">API reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">CASCADA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>cascada.algebraic.opmodel</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cascada.algebraic.opmodel</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Manipulate algebraic models of bit-vector operations.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">decimal</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+
+<span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">core</span>
+<span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">operation</span>
+<span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">context</span>
+
+<span class="kn">from</span> <span class="nn">cascada</span> <span class="kn">import</span> <span class="n">abstractproperty</span>
+
+<span class="kn">from</span> <span class="nn">cascada.algebraic</span> <span class="kn">import</span> <span class="n">value</span>
+
+
+<span class="nb">zip</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="nb">zip</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">make_partial_op_model</span> <span class="o">=</span> <span class="n">abstractproperty</span><span class="o">.</span><span class="n">opmodel</span><span class="o">.</span><span class="n">make_partial_op_model</span>
+
+
+<div class="viewcode-block" id="OpModel"><a class="viewcode-back" href="../../../cascada.algebraic.opmodel.html#cascada.algebraic.opmodel.OpModel">[docs]</a><span class="k">class</span> <span class="nc">OpModel</span><span class="p">(</span><span class="n">abstractproperty</span><span class="o">.</span><span class="n">opmodel</span><span class="o">.</span><span class="n">OpModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent algebraic models of bit-vector operations.</span>
+
+<span class="sd">    A (bit-vector) algebraic model of a bit-vector `Operation` :math:`f`</span>
+<span class="sd">    is a set of bit-vector constraints that models the propagation</span>
+<span class="sd">    probability of value properties of :math:`f`. See `Value`.</span>
+
+<span class="sd">    An algebraic model is defined for a type of `Value`,</span>
+<span class="sd">    such as `BitValue` or `WordValue`.</span>
+
+<span class="sd">    This class is not meant to be instantiated but to provide a base</span>
+<span class="sd">    class for creating algebraic models.</span>
+
+<span class="sd">    .. note::</span>
+
+<span class="sd">        For all algebraic models, the ``pr_one_constraint`` method is</span>
+<span class="sd">        equivalent  to the ``validity_constraint`` method, and the weight of</span>
+<span class="sd">        a valid propagation is always ``Constant(0, 1)``.</span>
+<span class="sd">        This class implements the methods ``pr_one_constraint, bv_weight,</span>
+<span class="sd">        max_weight, weight_width, decimal_weight, num_frac_bits`` and ``error``,</span>
+<span class="sd">        and subclasses only need to implement ``validity_constraint``.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        val_type: the type of `Value` (alias of</span>
+<span class="sd">            `abstractproperty.opmodel.OpModel.prop_type`).</span>
+<span class="sd">        input_val: a list containing the `Value` of each bit-vector</span>
+<span class="sd">            operand (alias of `abstractproperty.opmodel.OpModel.input_prop`).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">val_type</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">input_val</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_prop</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">prop_type</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">val_type</span>
+
+<div class="viewcode-block" id="OpModel.pr_one_constraint"><a class="viewcode-back" href="../../../cascada.algebraic.opmodel.html#cascada.algebraic.opmodel.OpModel.pr_one_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">pr_one_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_val</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">validity_constraint</span><span class="p">(</span><span class="n">output_val</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OpModel.bv_weight"><a class="viewcode-back" href="../../../cascada.algebraic.opmodel.html#cascada.algebraic.opmodel.OpModel.bv_weight">[docs]</a>    <span class="k">def</span> <span class="nf">bv_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_val</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OpModel.max_weight"><a class="viewcode-back" href="../../../cascada.algebraic.opmodel.html#cascada.algebraic.opmodel.OpModel.max_weight">[docs]</a>    <span class="k">def</span> <span class="nf">max_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="OpModel.weight_width"><a class="viewcode-back" href="../../../cascada.algebraic.opmodel.html#cascada.algebraic.opmodel.OpModel.weight_width">[docs]</a>    <span class="k">def</span> <span class="nf">weight_width</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="OpModel.decimal_weight"><a class="viewcode-back" href="../../../cascada.algebraic.opmodel.html#cascada.algebraic.opmodel.OpModel.decimal_weight">[docs]</a>    <span class="k">def</span> <span class="nf">decimal_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_val</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_assert_preconditions_decimal_weight</span><span class="p">(</span><span class="n">output_val</span><span class="p">)</span>
+        <span class="n">dw</span> <span class="o">=</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bv_weight</span><span class="p">(</span><span class="n">output_val</span><span class="p">)))</span>  <span class="c1"># num_frac_bits = 0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_assert_postconditions_decimal_weight</span><span class="p">(</span><span class="n">output_val</span><span class="p">,</span> <span class="n">dw</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">dw</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="n">dw</span></div>
+
+<div class="viewcode-block" id="OpModel.num_frac_bits"><a class="viewcode-back" href="../../../cascada.algebraic.opmodel.html#cascada.algebraic.opmodel.OpModel.num_frac_bits">[docs]</a>    <span class="k">def</span> <span class="nf">num_frac_bits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="OpModel.error"><a class="viewcode-back" href="../../../cascada.algebraic.opmodel.html#cascada.algebraic.opmodel.OpModel.error">[docs]</a>    <span class="k">def</span> <span class="nf">error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">0</span></div></div>
+
+
+<div class="viewcode-block" id="BitModelId"><a class="viewcode-back" href="../../../cascada.algebraic.opmodel.html#cascada.algebraic.opmodel.BitModelId">[docs]</a><span class="k">class</span> <span class="nc">BitModelId</span><span class="p">(</span><span class="n">abstractproperty</span><span class="o">.</span><span class="n">opmodel</span><span class="o">.</span><span class="n">ModelIdentity</span><span class="p">,</span> <span class="n">OpModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent the `BitValue` `algebraic.opmodel.OpModel` of `BvIdentity`.</span>
+
+<span class="sd">    See also `ModelIdentity`.</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.algebraic.value import BitValue</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.algebraic.opmodel import BitModelId</span>
+<span class="sd">        &gt;&gt;&gt; alpha, beta = BitValue(Variable(&quot;a&quot;, 4)), BitValue(Variable(&quot;b&quot;, 4))</span>
+<span class="sd">        &gt;&gt;&gt; f = BitModelId(alpha)</span>
+<span class="sd">        &gt;&gt;&gt; print(f.vrepr())</span>
+<span class="sd">        BitModelId(BitValue(Variable(&#39;a&#39;, width=4)))</span>
+<span class="sd">        &gt;&gt;&gt; f.validity_constraint(beta)</span>
+<span class="sd">        ((a[0]) == (b[0])) &amp; ((a[1]) == (b[1])) &amp; ((a[2]) == (b[2])) &amp; ((a[3]) == (b[3]))</span>
+<span class="sd">        &gt;&gt;&gt; f.max_weight(), f.weight_width(), f.error(), f.num_frac_bits()</span>
+<span class="sd">        (0, 1, 0, 0)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">val_type</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">BitValue</span>
+
+<div class="viewcode-block" id="BitModelId.validity_constraint"><a class="viewcode-back" href="../../../cascada.algebraic.opmodel.html#cascada.algebraic.opmodel.BitModelId.validity_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">validity_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_val</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">width</span> <span class="o">==</span> <span class="n">output_val</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">width</span>
+        <span class="k">return</span> <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span>
+            <span class="n">operation</span><span class="o">.</span><span class="n">BvAnd</span><span class="p">,</span>
+            <span class="p">[</span><span class="n">operation</span><span class="o">.</span><span class="n">BvComp</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">input_val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_value</span><span class="p">(),</span> <span class="n">output_val</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+            <span class="p">)]</span>
+        <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="WordModelId"><a class="viewcode-back" href="../../../cascada.algebraic.opmodel.html#cascada.algebraic.opmodel.WordModelId">[docs]</a><span class="k">class</span> <span class="nc">WordModelId</span><span class="p">(</span><span class="n">abstractproperty</span><span class="o">.</span><span class="n">opmodel</span><span class="o">.</span><span class="n">ModelIdentity</span><span class="p">,</span> <span class="n">OpModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent the `WordValue` `algebraic.opmodel.OpModel` of `BvIdentity`.</span>
+
+<span class="sd">    See also `ModelIdentity`.</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.algebraic.value import WordValue</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.algebraic.opmodel import WordModelId</span>
+<span class="sd">        &gt;&gt;&gt; alpha, beta = WordValue(Variable(&quot;a&quot;, 4)), WordValue(Variable(&quot;b&quot;, 4))</span>
+<span class="sd">        &gt;&gt;&gt; f = WordModelId(alpha)</span>
+<span class="sd">        &gt;&gt;&gt; print(f.vrepr())</span>
+<span class="sd">        WordModelId(WordValue(Variable(&#39;a&#39;, width=4)))</span>
+<span class="sd">        &gt;&gt;&gt; f.validity_constraint(beta)</span>
+<span class="sd">        a == b</span>
+<span class="sd">        &gt;&gt;&gt; f.max_weight(), f.weight_width(), f.error(), f.num_frac_bits()</span>
+<span class="sd">        (0, 1, 0, 0)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">val_type</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">WordValue</span></div>
+
+
+<div class="viewcode-block" id="BitModelBvAdd"><a class="viewcode-back" href="../../../cascada.algebraic.opmodel.html#cascada.algebraic.opmodel.BitModelBvAdd">[docs]</a><span class="k">class</span> <span class="nc">BitModelBvAdd</span><span class="p">(</span><span class="n">OpModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent the `BitValue` `algebraic.opmodel.OpModel` of `BvAdd`.</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.algebraic.value import BitValue</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.algebraic.opmodel import BitModelBvAdd</span>
+<span class="sd">        &gt;&gt;&gt; alpha = BitValue(Variable(&quot;a&quot;, 4)), BitValue(Variable(&quot;b&quot;, 4))</span>
+<span class="sd">        &gt;&gt;&gt; f = BitModelBvAdd(alpha)</span>
+<span class="sd">        &gt;&gt;&gt; print(f.vrepr())</span>
+<span class="sd">        BitModelBvAdd([BitValue(Variable(&#39;a&#39;, width=4)), BitValue(Variable(&#39;b&#39;, width=4))])</span>
+<span class="sd">        &gt;&gt;&gt; f.max_weight(), f.weight_width(), f.error(), f.num_frac_bits()</span>
+<span class="sd">        (0, 1, 0, 0)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">val_type</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">BitValue</span>
+    <span class="n">op</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvAdd</span>
+
+<div class="viewcode-block" id="BitModelBvAdd.validity_constraint"><a class="viewcode-back" href="../../../cascada.algebraic.opmodel.html#cascada.algebraic.opmodel.BitModelBvAdd.validity_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">validity_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_val</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the validity constraint for a given `BitValue` output.</span>
+
+<span class="sd">        This model is based on the fact that the :math:`n`-bit modular addition</span>
+<span class="sd">        :math:`x \\boxplus y = z` has the following implicit function</span>
+<span class="sd">        :math:`x \oplus y \oplus z \oplus Q(x \oplus z, y \oplus z)`</span>
+<span class="sd">        where :math:`Q(x, y) = (0, x_0 \wedge y_0,</span>
+<span class="sd">        (x_0 \wedge y_0) \oplus (x_1 \wedge y_1), \dots,</span>
+<span class="sd">        (x_0 \wedge y_0) \oplus (x_1 \wedge y_1) \oplus \dots \oplus</span>
+<span class="sd">        (x_{n-2} \wedge y_{n-2}))`</span>
+
+<span class="sd">        Source: *Implicit White-Box Implementations: White-Boxing ARX Ciphers*.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.algebraic.value import BitValue</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.algebraic.opmodel import BitModelBvAdd</span>
+<span class="sd">            &gt;&gt;&gt; alpha = BitValue(Constant(0, 3)), BitValue(Constant(0, 3))</span>
+<span class="sd">            &gt;&gt;&gt; f = BitModelBvAdd(alpha)</span>
+<span class="sd">            &gt;&gt;&gt; beta = BitValue(Constant(0, 3))</span>
+<span class="sd">            &gt;&gt;&gt; f.validity_constraint(beta)</span>
+<span class="sd">            0b1</span>
+<span class="sd">            &gt;&gt;&gt; a0, a1, b = Variable(&quot;a0&quot;, 3), Variable(&quot;a1&quot;, 3), Variable(&quot;b&quot;, 3)</span>
+<span class="sd">            &gt;&gt;&gt; alpha = BitValue(a0), BitValue(a1)</span>
+<span class="sd">            &gt;&gt;&gt; f = BitModelBvAdd(alpha)</span>
+<span class="sd">            &gt;&gt;&gt; beta = BitValue(b)</span>
+<span class="sd">            &gt;&gt;&gt; result = f.validity_constraint(beta)</span>
+<span class="sd">            &gt;&gt;&gt; result  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">            (0b0 == ((a0[0]) ^ (a1[0]) ^ (b[0]))) &amp;</span>
+<span class="sd">            (0b0 == ((a0[1]) ^ (a1[1]) ^ (b[1]) ^ (((a0[0]) ^ (b[0])) &amp; ((a1[0]) ^ (b[0]))))) &amp;</span>
+<span class="sd">            (0b0 == ((a0[2]) ^ (a1[2]) ^ (b[2]) ^ (((a0[0]) ^ (b[0])) &amp; ((a1[0]) ^ (b[0]))) ^ (((a0[1]) ^ (b[1])) &amp; ((a1[1]) ^ (b[1])))))</span>
+<span class="sd">            &gt;&gt;&gt; result.xreplace({a0: Constant(0, 3), a1: Constant(0, 3), b: Constant(0, 3)})</span>
+<span class="sd">            0b1</span>
+<span class="sd">            &gt;&gt;&gt; a1 = Constant(0, 3)</span>
+<span class="sd">            &gt;&gt;&gt; alpha = BitValue(a0), BitValue(a1)</span>
+<span class="sd">            &gt;&gt;&gt; f = BitModelBvAdd(alpha)</span>
+<span class="sd">            &gt;&gt;&gt; beta = BitValue(b)</span>
+<span class="sd">            &gt;&gt;&gt; result = f.validity_constraint(beta)</span>
+<span class="sd">            &gt;&gt;&gt; result  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">            (0b0 == ((a0[0]) ^ (b[0]))) &amp;</span>
+<span class="sd">            (0b0 == ((a0[1]) ^ (b[1]) ^ (((a0[0]) ^ (b[0])) &amp; (b[0])))) &amp;</span>
+<span class="sd">            (0b0 == ((a0[2]) ^ (b[2]) ^ (((a0[0]) ^ (b[0])) &amp; (b[0])) ^ (((a0[1]) ^ (b[1])) &amp; (b[1]))))</span>
+
+<span class="sd">        See `OpModel.validity_constraint` for more information.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_value</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_val</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">output_val</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="n">zero_bit</span> <span class="o">=</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">q</span><span class="p">(</span><span class="n">my_x</span><span class="p">,</span> <span class="n">my_y</span><span class="p">):</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span>
+            <span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">zero_bit</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+                <span class="n">res</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">^</span> <span class="p">(</span><span class="n">my_x</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">&amp;</span> <span class="n">my_y</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">res</span>
+
+        <span class="k">def</span> <span class="nf">xor_tuples</span><span class="p">(</span><span class="n">my_tuple</span><span class="p">,</span> <span class="n">my_other_tuple</span><span class="p">):</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">my_tuple</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">my_other_tuple</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">x_i</span> <span class="o">^</span> <span class="n">y_i</span> <span class="k">for</span> <span class="n">x_i</span><span class="p">,</span> <span class="n">y_i</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">my_tuple</span><span class="p">,</span> <span class="n">my_other_tuple</span><span class="p">))</span>
+
+        <span class="k">with</span> <span class="n">context</span><span class="o">.</span><span class="n">Simplification</span><span class="p">(</span><span class="kc">False</span><span class="p">),</span> <span class="n">context</span><span class="o">.</span><span class="n">Validation</span><span class="p">(</span><span class="kc">False</span><span class="p">):</span>
+            <span class="n">q_x_z_y_z</span> <span class="o">=</span> <span class="n">q</span><span class="p">(</span><span class="n">xor_tuples</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="p">),</span> <span class="n">xor_tuples</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">))</span>
+
+            <span class="n">implicit_function</span> <span class="o">=</span> <span class="n">xor_tuples</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+            <span class="n">implicit_function</span> <span class="o">=</span> <span class="n">xor_tuples</span><span class="p">(</span><span class="n">implicit_function</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+            <span class="n">implicit_function</span> <span class="o">=</span> <span class="n">xor_tuples</span><span class="p">(</span><span class="n">implicit_function</span><span class="p">,</span> <span class="n">q_x_z_y_z</span><span class="p">)</span>
+
+            <span class="c1"># true if implicit_function == 0...0</span>
+            <span class="k">return</span> <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span>
+                <span class="n">operation</span><span class="o">.</span><span class="n">BvAnd</span><span class="p">,</span>
+                <span class="p">[</span><span class="n">operation</span><span class="o">.</span><span class="n">BvComp</span><span class="p">(</span><span class="n">zero_bit</span><span class="p">,</span> <span class="n">implicit_function</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)])</span></div></div>
+
+
+<div class="viewcode-block" id="BitModelBvSub"><a class="viewcode-back" href="../../../cascada.algebraic.opmodel.html#cascada.algebraic.opmodel.BitModelBvSub">[docs]</a><span class="k">class</span> <span class="nc">BitModelBvSub</span><span class="p">(</span><span class="n">OpModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent the `BitValue` `algebraic.opmodel.OpModel` of `BvSub`.</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.algebraic.value import BitValue</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.algebraic.opmodel import BitModelBvSub</span>
+<span class="sd">        &gt;&gt;&gt; alpha = BitValue(Variable(&quot;a&quot;, 4)), BitValue(Variable(&quot;b&quot;, 4))</span>
+<span class="sd">        &gt;&gt;&gt; f = BitModelBvSub(alpha)</span>
+<span class="sd">        &gt;&gt;&gt; print(f.vrepr())</span>
+<span class="sd">        BitModelBvSub([BitValue(Variable(&#39;a&#39;, width=4)), BitValue(Variable(&#39;b&#39;, width=4))])</span>
+<span class="sd">        &gt;&gt;&gt; f.max_weight(), f.weight_width(), f.error(), f.num_frac_bits()</span>
+<span class="sd">        (0, 1, 0, 0)</span>
+
+<span class="sd">    The algebraic model of the modular substraction is based on `BitModelBvAdd`</span>
+<span class="sd">    since ``~(x - y) == ~x + y``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">val_type</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">BitValue</span>
+    <span class="n">op</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvSub</span>
+
+<div class="viewcode-block" id="BitModelBvSub.validity_constraint"><a class="viewcode-back" href="../../../cascada.algebraic.opmodel.html#cascada.algebraic.opmodel.BitModelBvSub.validity_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">validity_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_val</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the validity constraint for a given `BitValue` output.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.algebraic.value import BitValue</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.algebraic.opmodel import BitModelBvSub</span>
+<span class="sd">            &gt;&gt;&gt; alpha = BitValue(Constant(0, 3)), BitValue(Constant(0, 3))</span>
+<span class="sd">            &gt;&gt;&gt; f = BitModelBvSub(alpha)</span>
+<span class="sd">            &gt;&gt;&gt; beta = BitValue(Constant(0, 3))</span>
+<span class="sd">            &gt;&gt;&gt; f.validity_constraint(beta)</span>
+<span class="sd">            0b1</span>
+<span class="sd">            &gt;&gt;&gt; a0, a1, b = Variable(&quot;a0&quot;, 3), Variable(&quot;a1&quot;, 3), Variable(&quot;b&quot;, 3)</span>
+<span class="sd">            &gt;&gt;&gt; alpha = BitValue(a0), BitValue(a1)</span>
+<span class="sd">            &gt;&gt;&gt; f = BitModelBvSub(alpha)</span>
+<span class="sd">            &gt;&gt;&gt; beta = BitValue(b)</span>
+<span class="sd">            &gt;&gt;&gt; result = f.validity_constraint(beta)</span>
+<span class="sd">            &gt;&gt;&gt; result  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">            (0b0 == (~(a0[0]) ^ (a1[0]) ^ ~(b[0]))) &amp;</span>
+<span class="sd">            (0b0 == (~(a0[1]) ^ (a1[1]) ^ ~(b[1]) ^ ((~(a0[0]) ^ ~(b[0])) &amp; ((a1[0]) ^ ~(b[0]))))) &amp;</span>
+<span class="sd">            (0b0 == (~(a0[2]) ^ (a1[2]) ^ ~(b[2]) ^ ((~(a0[0]) ^ ~(b[0])) &amp; ((a1[0]) ^ ~(b[0]))) ^ ((~(a0[1]) ^ ~(b[1])) &amp; ((a1[1]) ^ ~(b[1])))))</span>
+<span class="sd">            &gt;&gt;&gt; result.xreplace({a0: Constant(0, 3), a1: Constant(0, 3), b: Constant(0, 3)})</span>
+<span class="sd">            0b1</span>
+<span class="sd">            &gt;&gt;&gt; a1 = Constant(0, 3)</span>
+<span class="sd">            &gt;&gt;&gt; alpha = BitValue(a0), BitValue(a1)</span>
+<span class="sd">            &gt;&gt;&gt; f = BitModelBvSub(alpha)</span>
+<span class="sd">            &gt;&gt;&gt; beta = BitValue(b)</span>
+<span class="sd">            &gt;&gt;&gt; result = f.validity_constraint(beta)</span>
+<span class="sd">            &gt;&gt;&gt; result  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">            (0b0 == (~(a0[0]) ^ ~(b[0]))) &amp;</span>
+<span class="sd">            (0b0 == (~(a0[1]) ^ ~(b[1]) ^ ((~(a0[0]) ^ ~(b[0])) &amp; ~(b[0])))) &amp;</span>
+<span class="sd">            (0b0 == (~(a0[2]) ^ ~(b[2]) ^ ((~(a0[0]) ^ ~(b[0])) &amp; ~(b[0])) ^ ((~(a0[1]) ^ ~(b[1])) &amp; ~(b[1]))))</span>
+
+<span class="sd">        See `OpModel.validity_constraint` for more information.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># ~(x - y) == ~x + y</span>
+        <span class="n">new_input_val</span> <span class="o">=</span> <span class="p">[</span><span class="n">value</span><span class="o">.</span><span class="n">BitValue</span><span class="o">.</span><span class="n">propagate</span><span class="p">(</span><span class="n">operation</span><span class="o">.</span><span class="n">BvNot</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_val</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_val</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="n">new_op_model</span> <span class="o">=</span> <span class="n">BitModelBvAdd</span><span class="p">(</span><span class="n">new_input_val</span><span class="p">)</span>
+        <span class="n">new_output_val</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">BitValue</span><span class="o">.</span><span class="n">propagate</span><span class="p">(</span><span class="n">operation</span><span class="o">.</span><span class="n">BvNot</span><span class="p">,</span> <span class="n">output_val</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">new_op_model</span><span class="o">.</span><span class="n">validity_constraint</span><span class="p">(</span><span class="n">new_output_val</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Adrián Ranea.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

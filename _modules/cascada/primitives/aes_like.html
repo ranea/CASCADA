@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cascada.primitives.aes_like &mdash; CASCADA 1.0.rc0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> CASCADA
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">CASCADA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../primitives_implemented.html">Primitives implemented</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cascada.html">API reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">CASCADA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>cascada.primitives.aes_like</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cascada.primitives.aes_like</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;AES-like functions.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">enum</span>
+
+<span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span><span class="p">,</span> <span class="n">Term</span>
+<span class="kn">from</span> <span class="nn">cascada.bitvector.operation</span> <span class="kn">import</span> <span class="n">BvComp</span><span class="p">,</span> <span class="n">BvNot</span>
+<span class="kn">from</span> <span class="nn">cascada.bitvector.context</span> <span class="kn">import</span> <span class="n">Memoization</span>
+<span class="kn">from</span> <span class="nn">cascada.abstractproperty.property</span> <span class="kn">import</span> <span class="n">make_partial_propextract</span>
+
+<span class="kn">from</span> <span class="nn">cascada.bitvector.ssa</span> <span class="kn">import</span> <span class="n">RoundBasedFunction</span>
+
+
+<div class="viewcode-block" id="LoggingMode"><a class="viewcode-back" href="../../../cascada.primitives.aes_like.html#cascada.primitives.aes_like.LoggingMode">[docs]</a><span class="k">class</span> <span class="nc">LoggingMode</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent the options available for the information to log.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        Silent: nothing is logged</span>
+<span class="sd">        RoundOutputs: the plaintext and the output of each round is logged</span>
+<span class="sd">        StepOutputs: the plaintext and the output of each step is logged</span>
+<span class="sd">        Debug: similar as `StepOutputs`, but also logs debugging information</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Silent</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+    <span class="n">RoundOutputs</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+    <span class="n">StepOutputs</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+    <span class="n">Debug</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="AESLikeFunction"><a class="viewcode-back" href="../../../cascada.primitives.aes_like.html#cascada.primitives.aes_like.AESLikeFunction">[docs]</a><span class="k">class</span> <span class="nc">AESLikeFunction</span><span class="p">(</span><span class="n">RoundBasedFunction</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base class to implemented AES-like functions.</span>
+
+<span class="sd">    Subclasses need to set the integer attributes</span>
+<span class="sd">    ``num_rounds``, ``num_rows``, ``num_columns`` and ``cell_width``.</span>
+
+<span class="sd">    Subclasses also need to set ``sbox`` (resp. ``mix_columns_bit_matrix``)</span>
+<span class="sd">    to use ``sub_cells`` (resp. ``mix_columns``).</span>
+<span class="sd">    See `AESEncryption` for an example.</span>
+
+<span class="sd">    Optionally, subclasses can set the attributes ``logging_mode``</span>
+<span class="sd">    and ``name*`` to customize the information to log</span>
+<span class="sd">    (see `LoggingMode`, `BvFunction.get_formatted_logged_msgs` and</span>
+<span class="sd">    `Characteristic.get_formatted_logged_msgs`).</span>
+
+<span class="sd">    By default input/output bit-vector tuples are loaded column-wise.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># num_rounds</span>
+    <span class="c1"># num_rows, num_columns</span>
+    <span class="c1"># cell_width</span>
+    <span class="c1"># # num_extra_cells</span>
+
+    <span class="c1"># sbox, mix_columns_bit_matrix</span>
+
+    <span class="c1"># name_add_round_constants, name_sub_cells, name_shift_rows, name_mix_columns</span>
+    <span class="n">logging_mode</span> <span class="o">=</span> <span class="n">LoggingMode</span><span class="o">.</span><span class="n">Silent</span>
+
+    <span class="c1"># - RoundBasedFunction attributes/methods</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">input_widths</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">cell_width</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_rows</span><span class="o">*</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_columns</span><span class="p">)]</span>  <span class="c1"># cls.num_extra_cells</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">output_widths</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">cell_width</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_rows</span><span class="o">*</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_columns</span><span class="p">)]</span>
+
+<div class="viewcode-block" id="AESLikeFunction.set_num_rounds"><a class="viewcode-back" href="../../../cascada.primitives.aes_like.html#cascada.primitives.aes_like.AESLikeFunction.set_num_rounds">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">set_num_rounds</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">new_num_rounds</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span> <span class="o">=</span> <span class="n">new_num_rounds</span></div>
+
+    <span class="c1"># - steps of AES-like functions</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">add_round_constant</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">my_matrix_state</span><span class="p">,</span> <span class="n">my_matrix_constant</span><span class="p">):</span>
+        <span class="n">new_matrix_state</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span><span class="p">[:]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">my_matrix_state</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">my_matrix_constant</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">my_matrix_constant</span><span class="p">[</span><span class="n">row</span><span class="p">])):</span>
+                <span class="n">new_matrix_state</span><span class="p">[</span><span class="n">row</span><span class="p">][</span><span class="n">column</span><span class="p">]</span> <span class="o">^=</span> <span class="n">my_matrix_constant</span><span class="p">[</span><span class="n">row</span><span class="p">][</span><span class="n">column</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">logging_mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">LoggingMode</span><span class="o">.</span><span class="n">Silent</span><span class="p">,</span> <span class="n">LoggingMode</span><span class="o">.</span><span class="n">RoundOutputs</span><span class="p">]:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">log_msg</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;output of </span><span class="si">{</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s1">&#39;name_add_round_constants&#39;</span><span class="p">,</span> <span class="s1">&#39;AddRoundConstant&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">log_activity_matrix_state</span><span class="p">(</span><span class="n">new_matrix_state</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">new_matrix_state</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">sub_cells</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">my_matrix_state</span><span class="p">):</span>
+        <span class="n">new_matrix_state</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span><span class="p">[:]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">my_matrix_state</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_rows</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_columns</span><span class="p">):</span>
+                <span class="n">new_matrix_state</span><span class="p">[</span><span class="n">row</span><span class="p">][</span><span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">sbox</span><span class="p">(</span><span class="n">my_matrix_state</span><span class="p">[</span><span class="n">row</span><span class="p">][</span><span class="n">column</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">logging_mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">LoggingMode</span><span class="o">.</span><span class="n">Silent</span><span class="p">,</span> <span class="n">LoggingMode</span><span class="o">.</span><span class="n">RoundOutputs</span><span class="p">]:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">log_msg</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;output of </span><span class="si">{</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s1">&#39;name_sub_cells&#39;</span><span class="p">,</span> <span class="s1">&#39;SubCells&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">log_activity_matrix_state</span><span class="p">(</span><span class="n">new_matrix_state</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">new_matrix_state</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">shift_rows</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">my_matrix_state</span><span class="p">):</span>
+        <span class="n">new_matrix_state</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span><span class="p">[:]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">my_matrix_state</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_rows</span><span class="p">):</span>
+            <span class="n">offset</span> <span class="o">=</span> <span class="n">r</span>  <span class="c1"># shift offset (0 for r=0, 1 for r=1, ...)</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_columns</span><span class="p">):</span>
+                <span class="n">new_matrix_state</span><span class="p">[</span><span class="n">r</span><span class="p">][</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">my_matrix_state</span><span class="p">[</span><span class="n">r</span><span class="p">][(</span><span class="n">c</span> <span class="o">+</span> <span class="n">offset</span><span class="p">)</span> <span class="o">%</span> <span class="bp">cls</span><span class="o">.</span><span class="n">num_columns</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">logging_mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">LoggingMode</span><span class="o">.</span><span class="n">Silent</span><span class="p">,</span> <span class="n">LoggingMode</span><span class="o">.</span><span class="n">RoundOutputs</span><span class="p">]:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">log_msg</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;output of </span><span class="si">{</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s1">&#39;name_shift_rows&#39;</span><span class="p">,</span> <span class="s1">&#39;ShiftRows&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">log_activity_matrix_state</span><span class="p">(</span><span class="n">new_matrix_state</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">new_matrix_state</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">mix_columns</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">my_matrix_state</span><span class="p">):</span>
+        <span class="n">new_matrix_state</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span><span class="p">[:]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">my_matrix_state</span><span class="p">]</span>
+
+        <span class="n">num_rows</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">mix_columns_bit_matrix</span><span class="o">.</span><span class="n">arity</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="bp">cls</span><span class="o">.</span><span class="n">num_rows</span> <span class="o">&gt;=</span> <span class="n">num_rows</span>
+
+        <span class="n">cw</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">cell_width</span>
+        <span class="n">extract_cell</span> <span class="o">=</span> <span class="p">[</span><span class="n">make_partial_propextract</span><span class="p">((</span><span class="n">r</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">cw</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">r</span><span class="o">*</span><span class="n">cw</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_rows</span><span class="p">)]</span>
+
+        <span class="k">for</span> <span class="n">index_column</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_columns</span><span class="p">):</span>
+            <span class="n">input_column</span> <span class="o">=</span> <span class="p">[</span><span class="n">my_matrix_state</span><span class="p">[</span><span class="n">r</span><span class="p">][</span><span class="n">index_column</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_rows</span><span class="p">)]</span>
+            <span class="n">output_column</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">mix_columns_bit_matrix</span><span class="p">(</span><span class="o">*</span><span class="n">input_column</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_rows</span><span class="p">):</span>
+                <span class="n">new_matrix_state</span><span class="p">[</span><span class="n">r</span><span class="p">][</span><span class="n">index_column</span><span class="p">]</span> <span class="o">=</span> <span class="n">extract_cell</span><span class="p">[</span><span class="n">r</span><span class="p">](</span><span class="n">output_column</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">logging_mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">LoggingMode</span><span class="o">.</span><span class="n">Silent</span><span class="p">,</span> <span class="n">LoggingMode</span><span class="o">.</span><span class="n">RoundOutputs</span><span class="p">]:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">log_msg</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;output of </span><span class="si">{</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s1">&#39;name_mix_columns&#39;</span><span class="p">,</span> <span class="s1">&#39;MixColumns&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">log_activity_matrix_state</span><span class="p">(</span><span class="n">new_matrix_state</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">new_matrix_state</span>
+
+    <span class="c1"># - auxiliary functions</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">list2matrix</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">my_list</span><span class="p">,</span> <span class="n">num_rows</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">num_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">column_order</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>  <span class="c1"># , ignore_num_extra_cells=False):</span>
+        <span class="k">if</span> <span class="n">num_rows</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">num_rows</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">num_rows</span>
+        <span class="k">if</span> <span class="n">num_columns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">num_columns</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">num_columns</span>
+        <span class="n">my_matrix</span> <span class="o">=</span> <span class="p">[[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_columns</span><span class="p">)]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_rows</span><span class="p">)]</span>
+        <span class="n">position</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">column_order</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_columns</span><span class="p">):</span>  <span class="c1"># assuming my_list ordered by columns</span>
+                <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_rows</span><span class="p">):</span>
+                    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">my_list</span><span class="p">[</span><span class="n">position</span><span class="p">],</span> <span class="n">Term</span><span class="p">)</span> <span class="ow">and</span> <span class="n">my_list</span><span class="p">[</span><span class="n">position</span><span class="p">]</span><span class="o">.</span><span class="n">width</span> <span class="o">==</span> <span class="bp">cls</span><span class="o">.</span><span class="n">cell_width</span>
+                    <span class="n">my_matrix</span><span class="p">[</span><span class="n">row</span><span class="p">][</span><span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">my_list</span><span class="p">[</span><span class="n">position</span><span class="p">]</span>
+                    <span class="n">position</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_rows</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_columns</span><span class="p">):</span>  <span class="c1"># assuming my_list ordered by columns</span>
+                    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">my_list</span><span class="p">[</span><span class="n">position</span><span class="p">],</span> <span class="n">Term</span><span class="p">)</span> <span class="ow">and</span> <span class="n">my_list</span><span class="p">[</span><span class="n">position</span><span class="p">]</span><span class="o">.</span><span class="n">width</span> <span class="o">==</span> <span class="bp">cls</span><span class="o">.</span><span class="n">cell_width</span>
+                    <span class="n">my_matrix</span><span class="p">[</span><span class="n">row</span><span class="p">][</span><span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">my_list</span><span class="p">[</span><span class="n">position</span><span class="p">]</span>
+                    <span class="n">position</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="c1"># if cls.num_extra_cells and ignore_num_extra_cells is not True:</span>
+        <span class="c1">#     my_matrix.append([None for _ in range(cls.num_extra_cells)])</span>
+        <span class="c1">#     for cell in range(cls.num_extra_cells):</span>
+        <span class="c1">#         assert isinstance(my_list[position], Term) and my_list[position].width == cls.cell_width</span>
+        <span class="c1">#         my_matrix[-1][cell] = my_list[position]</span>
+        <span class="c1">#         position += 1</span>
+        <span class="k">assert</span> <span class="n">position</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">my_list</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">my_matrix</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">matrix2list</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">my_matrix</span><span class="p">,</span> <span class="n">num_rows</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">num_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">column_order</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>  <span class="c1"># , ignore_num_extra_cells=False):</span>
+        <span class="k">if</span> <span class="n">num_rows</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">num_rows</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">num_rows</span>
+        <span class="k">if</span> <span class="n">num_columns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">num_columns</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">num_columns</span>
+        <span class="n">my_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">column_order</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_columns</span><span class="p">):</span>  <span class="c1"># sorting my_list by columns</span>
+                <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_rows</span><span class="p">):</span>
+                    <span class="n">my_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">my_matrix</span><span class="p">[</span><span class="n">row</span><span class="p">][</span><span class="n">column</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_rows</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_columns</span><span class="p">):</span>
+                    <span class="n">my_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">my_matrix</span><span class="p">[</span><span class="n">row</span><span class="p">][</span><span class="n">column</span><span class="p">])</span>
+        <span class="c1"># if cls.num_extra_cells and ignore_num_extra_cells is not True:</span>
+        <span class="c1">#     my_list.extend(my_matrix[-1])</span>
+        <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">Term</span><span class="p">)</span> <span class="ow">and</span> <span class="n">x</span><span class="o">.</span><span class="n">width</span> <span class="o">==</span> <span class="bp">cls</span><span class="o">.</span><span class="n">cell_width</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">my_list</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">my_list</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">log_activity_matrix_state</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">my_matrix_state</span><span class="p">,</span> <span class="n">return_format</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">activity</span><span class="p">(</span><span class="n">my_bv</span><span class="p">):</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">my_bv</span><span class="p">,</span> <span class="n">Term</span><span class="p">)</span> <span class="ow">and</span> <span class="n">my_bv</span><span class="o">.</span><span class="n">width</span> <span class="o">==</span> <span class="bp">cls</span><span class="o">.</span><span class="n">cell_width</span>
+            <span class="k">with</span> <span class="n">Memoization</span><span class="p">(</span><span class="kc">None</span><span class="p">):</span>
+                <span class="n">my_bv</span> <span class="o">=</span> <span class="n">BvNot</span><span class="p">(</span><span class="n">BvComp</span><span class="p">(</span><span class="n">my_bv</span><span class="p">,</span> <span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">my_bv</span><span class="o">.</span><span class="n">width</span><span class="p">)))</span>
+            <span class="k">return</span> <span class="n">my_bv</span>
+
+        <span class="c1"># assert len(my_matrix_state) == cls.num_rows + (1 if cls.num_extra_cells else 0)</span>
+
+        <span class="n">format_string</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">format_field_objects</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_rows</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">logging_mode</span> <span class="o">==</span> <span class="n">LoggingMode</span><span class="o">.</span><span class="n">Debug</span><span class="p">:</span>
+                <span class="n">format_string</span> <span class="o">+=</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">]</span><span class="o">*</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_columns</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)</span><span class="se">\t</span><span class="s2">&quot;</span>
+                <span class="n">format_field_objects</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">my_matrix_state</span><span class="p">[</span><span class="n">row</span><span class="p">])</span>
+            <span class="n">format_string</span> <span class="o">+=</span> <span class="s2">&quot;(&quot;</span> <span class="o">+</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">]</span><span class="o">*</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_columns</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="n">format_field_objects</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">activity</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">my_matrix_state</span><span class="p">[</span><span class="n">row</span><span class="p">])</span>
+
+        <span class="c1"># if cls.num_extra_cells:</span>
+        <span class="c1">#     assert len(my_matrix_state[-1]) == cls.num_extra_cells</span>
+        <span class="c1">#     if cls.logging_mode == LoggingMode.Debug:</span>
+        <span class="c1">#         format_string += &quot;[&quot; + &#39;,&#39;.join([&quot;{}&quot;]*cls.num_extra_cells) + &quot;]\t&quot;</span>
+        <span class="c1">#         format_field_objects.extend(my_matrix_state[-1])</span>
+        <span class="c1">#     format_string += &quot;[&quot; + &#39;,&#39;.join([&quot;{}&quot;]*cls.num_extra_cells) + &quot;]\n&quot;</span>
+        <span class="c1">#     format_field_objects.extend(activity(x) for x in my_matrix_state[-1])</span>
+
+        <span class="n">format_string</span> <span class="o">=</span> <span class="n">format_string</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># remove last &quot;\n&quot;</span>
+
+        <span class="k">if</span> <span class="n">return_format</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">format_string</span><span class="p">,</span> <span class="n">format_field_objects</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">log_msg</span><span class="p">(</span><span class="n">format_string</span><span class="p">,</span> <span class="n">format_field_objects</span><span class="o">=</span><span class="n">format_field_objects</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Adrián Ranea.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

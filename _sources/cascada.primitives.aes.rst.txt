@@ -1,0 +1,6 @@
+cascada.primitives.aes module
+=============================
+
+.. automodule:: cascada.primitives.aes
+   :members:
+   :show-inheritance:

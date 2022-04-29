@@ -1,0 +1,14 @@
+cascada.differential module
+===========================
+
+.. automodule:: cascada.differential
+   :members:
+   :show-inheritance:
+
+.. toctree::
+   :maxdepth: 4
+
+   cascada.differential.difference
+   cascada.differential.opmodel
+   cascada.differential.chmodel
+   cascada.differential.characteristic

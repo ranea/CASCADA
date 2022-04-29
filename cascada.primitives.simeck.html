@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cascada.primitives.simeck module &mdash; CASCADA 1.0.rc0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="cascada.primitives.simon module" href="cascada.primitives.simon.html" />
+    <link rel="prev" title="cascada.primitives.shacal2 module" href="cascada.primitives.shacal2.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> CASCADA
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">CASCADA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="primitives_implemented.html">Primitives implemented</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="cascada.html">API reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="cascada.bitvector.html">cascada.bitvector module</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="cascada.primitives.html">cascada.primitives module</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="cascada.primitives.blockcipher.html">cascada.primitives.blockcipher module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.primitives.aes.html">cascada.primitives.aes module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.primitives.aes_like.html">cascada.primitives.aes_like module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.primitives.aes_masked.html">cascada.primitives.aes_masked module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.primitives.cham.html">cascada.primitives.cham module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.primitives.chaskey.html">cascada.primitives.chaskey module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.primitives.feal.html">cascada.primitives.feal module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.primitives.hight.html">cascada.primitives.hight module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.primitives.lea.html">cascada.primitives.lea module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.primitives.multi2.html">cascada.primitives.multi2 module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.primitives.picipher.html">cascada.primitives.picipher module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.primitives.shacal1.html">cascada.primitives.shacal1 module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.primitives.shacal2.html">cascada.primitives.shacal2 module</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">cascada.primitives.simeck module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.primitives.simon.html">cascada.primitives.simon module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.primitives.simon_rf.html">cascada.primitives.simon_rf module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.primitives.speck.html">cascada.primitives.speck module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.primitives.skinny64.html">cascada.primitives.skinny64 module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.primitives.skinny128.html">cascada.primitives.skinny128 module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.primitives.tea.html">cascada.primitives.tea module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.primitives.xtea.html">cascada.primitives.xtea module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.abstractproperty.html">cascada.abstractproperty module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.differential.html">cascada.differential module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.linear.html">cascada.linear module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.algebraic.html">cascada.algebraic module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.smt.html">cascada.smt module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">CASCADA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="cascada.html">API reference</a> &raquo;</li>
+          <li><a href="cascada.primitives.html">cascada.primitives module</a> &raquo;</li>
+      <li>cascada.primitives.simeck module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/cascada.primitives.simeck.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-cascada.primitives.simeck">
+<span id="cascada-primitives-simeck-module"></span><h1>cascada.primitives.simeck module<a class="headerlink" href="#module-cascada.primitives.simeck" title="Permalink to this headline"></a></h1>
+<p>Simeck family of block ciphers.</p>
+<p>This implementation is based on <a class="reference internal" href="cascada.primitives.simon.html#module-cascada.primitives.simon" title="cascada.primitives.simon"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">simon</span></code></a> and <a class="reference internal" href="cascada.primitives.simon_rf.html#module-cascada.primitives.simon_rf" title="cascada.primitives.simon_rf"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">simon_rf</span></code></a>.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.primitives.simeck.SimeckRF">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.primitives.simeck.</span></span><span class="sig-name descname"><span class="pre">SimeckRF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/primitives/simeck.html#SimeckRF"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.primitives.simeck.SimeckRF" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="cascada.primitives.simon_rf.html#cascada.primitives.simon_rf.SimonRF" title="cascada.primitives.simon_rf.SimonRF"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.primitives.simon_rf.SimonRF</span></code></a></p>
+<p>The non-linear part of the round function of Simon.</p>
+<p>This corresponds to <code class="docutils literal notranslate"><span class="pre">f(x)</span> <span class="pre">=</span> <span class="pre">((x</span> <span class="pre">&lt;&lt;&lt;</span> <span class="pre">a)</span> <span class="pre">&amp;</span> <span class="pre">(x</span> <span class="pre">&lt;&lt;&lt;</span> <span class="pre">b))</span> <span class="pre">^</span> <span class="pre">(x</span> <span class="pre">&lt;&lt;&lt;</span> <span class="pre">c)</span></code>,
+where <code class="docutils literal notranslate"><span class="pre">(a,</span> <span class="pre">b,</span> <span class="pre">c)</span> <span class="pre">=</span> <span class="pre">(5,</span> <span class="pre">0,</span> <span class="pre">4)</span></code>.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.primitives.simeck.SimeckRF.rx_model">
+<span class="sig-name descname"><span class="pre">rx_model</span></span><a class="headerlink" href="#cascada.primitives.simeck.SimeckRF.rx_model" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="#cascada.primitives.simeck.RXModelSimeckRF" title="cascada.primitives.simeck.RXModelSimeckRF"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.primitives.simeck.RXModelSimeckRF</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.primitives.simeck.SimeckRF.xor_model">
+<span class="sig-name descname"><span class="pre">xor_model</span></span><a class="headerlink" href="#cascada.primitives.simeck.SimeckRF.xor_model" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="#cascada.primitives.simeck.XorModelSimeckRF" title="cascada.primitives.simeck.XorModelSimeckRF"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.primitives.simeck.XorModelSimeckRF</span></code></a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.primitives.simeck.XorModelSimeckRF">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.primitives.simeck.</span></span><span class="sig-name descname"><span class="pre">XorModelSimeckRF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_prop</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/primitives/simeck.html#XorModelSimeckRF"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.primitives.simeck.XorModelSimeckRF" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="cascada.primitives.simon_rf.html#cascada.primitives.simon_rf.XorModelSimonRF" title="cascada.primitives.simon_rf.XorModelSimonRF"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.primitives.simon_rf.XorModelSimonRF</span></code></a></p>
+<p>Represent the <a class="reference internal" href="cascada.differential.difference.html#cascada.differential.difference.XorDiff" title="cascada.differential.difference.XorDiff"><code class="xref any py py-class docutils literal notranslate"><span class="pre">XorDiff</span></code></a> <a class="reference internal" href="cascada.differential.opmodel.html#cascada.differential.opmodel.OpModel" title="cascada.differential.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">differential.opmodel.OpModel</span></code></a> of <a class="reference internal" href="#cascada.primitives.simeck.SimeckRF" title="cascada.primitives.simeck.SimeckRF"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SimeckRF</span></code></a>.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.primitives.simeck.XorModelSimeckRF.op">
+<span class="sig-name descname"><span class="pre">op</span></span><a class="headerlink" href="#cascada.primitives.simeck.XorModelSimeckRF.op" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="#cascada.primitives.simeck.SimeckRF" title="cascada.primitives.simeck.SimeckRF"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.primitives.simeck.SimeckRF</span></code></a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.primitives.simeck.RXModelSimeckRF">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.primitives.simeck.</span></span><span class="sig-name descname"><span class="pre">RXModelSimeckRF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_prop</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/primitives/simeck.html#RXModelSimeckRF"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.primitives.simeck.RXModelSimeckRF" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="cascada.primitives.simon_rf.html#cascada.primitives.simon_rf.RXModelSimonRF" title="cascada.primitives.simon_rf.RXModelSimonRF"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.primitives.simon_rf.RXModelSimonRF</span></code></a></p>
+<p>Represent the <a class="reference internal" href="cascada.differential.difference.html#cascada.differential.difference.RXDiff" title="cascada.differential.difference.RXDiff"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RXDiff</span></code></a> <a class="reference internal" href="cascada.differential.opmodel.html#cascada.differential.opmodel.OpModel" title="cascada.differential.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">differential.opmodel.OpModel</span></code></a> of <a class="reference internal" href="#cascada.primitives.simeck.SimeckRF" title="cascada.primitives.simeck.SimeckRF"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SimeckRF</span></code></a>.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.primitives.simeck.RXModelSimeckRF.op">
+<span class="sig-name descname"><span class="pre">op</span></span><a class="headerlink" href="#cascada.primitives.simeck.RXModelSimeckRF.op" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="#cascada.primitives.simeck.SimeckRF" title="cascada.primitives.simeck.SimeckRF"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.primitives.simeck.SimeckRF</span></code></a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.primitives.simeck.SimeckInstance">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.primitives.simeck.</span></span><span class="sig-name descname"><span class="pre">SimeckInstance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/primitives/simeck.html#SimeckInstance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.primitives.simeck.SimeckInstance" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
+<p>Represent the available instances of Simeck.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.primitives.simeck.SimeckInstance.simeck_32_64">
+<span class="sig-name descname"><span class="pre">simeck_32_64</span></span><a class="headerlink" href="#cascada.primitives.simeck.SimeckInstance.simeck_32_64" title="Permalink to this definition"></a></dt>
+<dd><p>Simeck32/64</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.primitives.simeck.SimeckInstance.simeck_48_96">
+<span class="sig-name descname"><span class="pre">simeck_48_96</span></span><a class="headerlink" href="#cascada.primitives.simeck.SimeckInstance.simeck_48_96" title="Permalink to this definition"></a></dt>
+<dd><p>Simeck48/96</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.primitives.simeck.SimeckInstance.simeck_64_128">
+<span class="sig-name descname"><span class="pre">simeck_64_128</span></span><a class="headerlink" href="#cascada.primitives.simeck.SimeckInstance.simeck_64_128" title="Permalink to this definition"></a></dt>
+<dd><p>Simeck64/128</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cascada.primitives.simeck.get_Simeck_instance">
+<span class="sig-prename descclassname"><span class="pre">cascada.primitives.simeck.</span></span><span class="sig-name descname"><span class="pre">get_Simeck_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">simeck_instance</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/primitives/simeck.html#get_Simeck_instance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.primitives.simeck.get_Simeck_instance" title="Permalink to this definition"></a></dt>
+<dd><p>Return an instance of the Simeck family as a <a class="reference internal" href="cascada.primitives.blockcipher.html#cascada.primitives.blockcipher.Cipher" title="cascada.primitives.blockcipher.Cipher"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Cipher</span></code></a>.</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cascada.primitives.shacal2.html" class="btn btn-neutral float-left" title="cascada.primitives.shacal2 module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cascada.primitives.simon.html" class="btn btn-neutral float-right" title="cascada.primitives.simon module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Adrián Ranea.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cascada.linear.mask module &mdash; CASCADA 1.0.rc0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="cascada.linear.opmodel module" href="cascada.linear.opmodel.html" />
+    <link rel="prev" title="cascada.linear module" href="cascada.linear.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> CASCADA
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">CASCADA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="primitives_implemented.html">Primitives implemented</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="cascada.html">API reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="cascada.bitvector.html">cascada.bitvector module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.primitives.html">cascada.primitives module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.abstractproperty.html">cascada.abstractproperty module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.differential.html">cascada.differential module</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="cascada.linear.html">cascada.linear module</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">cascada.linear.mask module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.linear.opmodel.html">cascada.linear.opmodel module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.linear.chmodel.html">cascada.linear.chmodel module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.linear.characteristic.html">cascada.linear.characteristic module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.algebraic.html">cascada.algebraic module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.smt.html">cascada.smt module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">CASCADA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="cascada.html">API reference</a> &raquo;</li>
+          <li><a href="cascada.linear.html">cascada.linear module</a> &raquo;</li>
+      <li>cascada.linear.mask module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/cascada.linear.mask.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-cascada.linear.mask">
+<span id="cascada-linear-mask-module"></span><h1>cascada.linear.mask module<a class="headerlink" href="#module-cascada.linear.mask" title="Permalink to this headline"></a></h1>
+<p>Represent linear mask properties in the context of linear cryptanalysis.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.linear.mask.LinearMask">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.linear.mask.</span></span><span class="sig-name descname"><span class="pre">LinearMask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/linear/mask.html#LinearMask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.linear.mask.LinearMask" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.abstractproperty.property.Property</span></code></a></p>
+<p>Represent linear mask properties.</p>
+<p>Given a function <span class="math notranslate nohighlight">\(f\)</span>,  a <a class="reference internal" href="#cascada.linear.mask.LinearMask" title="cascada.linear.mask.LinearMask"><code class="xref any py py-class docutils literal notranslate"><span class="pre">LinearMask</span></code></a> property pair
+(also called a linear approximation) <span class="math notranslate nohighlight">\((\alpha, \beta)\)</span>
+is a bit-vector <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> <span class="math notranslate nohighlight">\((\alpha, \beta)\)</span> where the
+propagation probability is the absolute correlation <span class="math notranslate nohighlight">\(| C(\alpha, \beta) |\)</span>.</p>
+<p>The absolute correlation of a linear approximation with input mask <span class="math notranslate nohighlight">\(\alpha\)</span>
+and output mask <span class="math notranslate nohighlight">\(\beta\)</span> over a <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.Operation" title="cascada.bitvector.operation.Operation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Operation</span></code></a> <span class="math notranslate nohighlight">\(f\)</span> is defined as
+<span class="math notranslate nohighlight">\(| C(\alpha, \beta) | = | 2 \times \left(
+\# \{ x \ : \langle \alpha, x \rangle = \langle \beta, f(x) \rangle \}
+/ 2^n \right) \ \ - \ \  1  |\)</span>,
+where <span class="math notranslate nohighlight">\(n\)</span> is the bit-width of the input <span class="math notranslate nohighlight">\(x\)</span>.
+Other related notions are the bias of an approximation (its correlation
+divided by two) or the linear probability or potential
+(the square of its correlation).</p>
+<p>The inner product
+<span class="math notranslate nohighlight">\(\langle a, b \rangle\)</span> is defined as
+<span class="math notranslate nohighlight">\((a_0 \wedge b_0) \oplus
+(a_1 \wedge b_1) \oplus \dots \oplus (a_{n-1} \wedge b_{n-1})\)</span>.</p>
+<p>Internally, <a class="reference internal" href="#cascada.linear.mask.LinearMask" title="cascada.linear.mask.LinearMask"><code class="xref any py py-class docutils literal notranslate"><span class="pre">LinearMask</span></code></a> is a subclass of <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> (as <a class="reference internal" href="cascada.differential.difference.html#cascada.differential.difference.XorDiff" title="cascada.differential.difference.XorDiff"><code class="xref any py py-class docutils literal notranslate"><span class="pre">XorDiff</span></code></a>).
+The <a class="reference internal" href="#cascada.linear.mask.LinearMask" title="cascada.linear.mask.LinearMask"><code class="xref any py py-class docutils literal notranslate"><span class="pre">LinearMask</span></code></a> methods inherited from <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> requiring
+arguments of type <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> should be called instead with arguments
+of type <a class="reference internal" href="#cascada.linear.mask.LinearMask" title="cascada.linear.mask.LinearMask"><code class="xref any py py-class docutils literal notranslate"><span class="pre">LinearMask</span></code></a>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span><span class="p">,</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.linear.mask</span> <span class="kn">import</span> <span class="n">LinearMask</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">alpha</span> <span class="o">=</span> <span class="n">LinearMask</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="mb">0b001</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">alpha</span>
+<span class="go">LinearMask(0b001)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">alpha</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="mb">0b011</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="go">0b1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">LinearMask</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;alpha&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="go">LinearMask(alpha)</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.linear.mask.LinearMask.apply">
+<span class="sig-name descname"><span class="pre">apply</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/linear/mask.html#LinearMask.apply"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.linear.mask.LinearMask.apply" title="Permalink to this definition"></a></dt>
+<dd><p>Return the inner product of the mask and x.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.linear.mask.LinearMask.propagate">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">propagate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_mask</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/linear/mask.html#LinearMask.propagate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.linear.mask.LinearMask.propagate" title="Permalink to this definition"></a></dt>
+<dd><p>Propagate the given input <a class="reference internal" href="#cascada.linear.mask.LinearMask" title="cascada.linear.mask.LinearMask"><code class="xref any py py-class docutils literal notranslate"><span class="pre">LinearMask</span></code></a> through the given operation.</p>
+<p>For any linear (over the binary finite field)
+operation <code class="docutils literal notranslate"><span class="pre">op</span></code> and any input mask <code class="docutils literal notranslate"><span class="pre">input_mask</span></code>,
+the output mask <code class="docutils literal notranslate"><span class="pre">output_mask</span></code> is uniquely determined and its
+bit-vector value satisfies <code class="docutils literal notranslate"><span class="pre">input_mask.val</span> <span class="pre">==</span> <span class="pre">M(output_mask.val)</span></code>,
+where <span class="math notranslate nohighlight">\(M\)</span> is the transpose of the binary matrix representing
+<code class="docutils literal notranslate"><span class="pre">op</span></code>.</p>
+<p>See <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property.propagate" title="cascada.abstractproperty.property.Property.propagate"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">Property.propagate</span></code></a> for more information.</p>
+<p>User-defined or new <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.Operation" title="cascada.bitvector.operation.Operation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Operation</span></code></a> <code class="docutils literal notranslate"><span class="pre">op</span></code> can store its associated
+linear <a class="reference internal" href="cascada.linear.opmodel.html#cascada.linear.opmodel.OpModel" title="cascada.linear.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">linear.opmodel.OpModel</span></code></a> in <code class="docutils literal notranslate"><span class="pre">op.linear_model</span></code>, as this method
+first checks whether <code class="docutils literal notranslate"><span class="pre">op</span></code> has its associated <a class="reference internal" href="cascada.linear.opmodel.html#cascada.linear.opmodel.OpModel" title="cascada.linear.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">linear.opmodel.OpModel</span></code></a>
+stored in the class attribute <code class="docutils literal notranslate"><span class="pre">linear_model</span></code>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Variable</span><span class="p">,</span> <span class="n">Constant</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.operation</span> <span class="kn">import</span> <span class="n">BvXor</span><span class="p">,</span> <span class="n">RotateLeft</span><span class="p">,</span> <span class="n">BvIdentity</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.operation</span> <span class="kn">import</span> <span class="n">make_partial_operation</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.linear.mask</span> <span class="kn">import</span> <span class="n">LinearMask</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d1</span><span class="p">,</span> <span class="n">d2</span> <span class="o">=</span> <span class="n">LinearMask</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;d1&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">)),</span> <span class="n">LinearMask</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;d2&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">LinearMask</span><span class="o">.</span><span class="n">propagate</span><span class="p">(</span><span class="n">BvXor</span><span class="p">,</span> <span class="p">[</span><span class="n">d1</span><span class="p">,</span> <span class="n">d2</span><span class="p">])</span>
+<span class="go">LinearModelBvXor([LinearMask(d1), LinearMask(d2)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Xor1</span> <span class="o">=</span> <span class="n">make_partial_operation</span><span class="p">(</span><span class="n">BvXor</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">([</span><span class="kc">None</span><span class="p">,</span> <span class="n">Constant</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">8</span><span class="p">)]))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">LinearMask</span><span class="o">.</span><span class="n">propagate</span><span class="p">(</span><span class="n">Xor1</span><span class="p">,</span> <span class="n">d1</span><span class="p">)</span>
+<span class="go">LinearMask(d1)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Rotate1</span> <span class="o">=</span> <span class="n">make_partial_operation</span><span class="p">(</span><span class="n">RotateLeft</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">([</span><span class="kc">None</span><span class="p">,</span> <span class="mi">1</span><span class="p">]))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">LinearMask</span><span class="o">.</span><span class="n">propagate</span><span class="p">(</span><span class="n">Rotate1</span><span class="p">,</span> <span class="n">d1</span><span class="p">)</span>
+<span class="go">LinearMask(d1 &lt;&lt;&lt; 1)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">LinearMask</span><span class="o">.</span><span class="n">propagate</span><span class="p">(</span><span class="n">BvIdentity</span><span class="p">,</span> <span class="n">d1</span><span class="p">)</span>
+<span class="go">LinearModelId(LinearMask(d1))</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cascada.linear.html" class="btn btn-neutral float-left" title="cascada.linear module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cascada.linear.opmodel.html" class="btn btn-neutral float-right" title="cascada.linear.opmodel module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Adrián Ranea.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

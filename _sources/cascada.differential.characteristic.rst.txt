@@ -1,0 +1,6 @@
+cascada.differential.characteristic module
+==========================================
+
+.. automodule:: cascada.differential.characteristic
+   :members:
+   :show-inheritance:

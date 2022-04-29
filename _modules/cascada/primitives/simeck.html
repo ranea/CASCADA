@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cascada.primitives.simeck &mdash; CASCADA 1.0.rc0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> CASCADA
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">CASCADA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../primitives_implemented.html">Primitives implemented</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cascada.html">API reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">CASCADA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>cascada.primitives.simeck</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cascada.primitives.simeck</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Simeck family of block ciphers.</span>
+
+<span class="sd">This implementation is based on `simon` and `simon_rf`.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">enum</span>
+
+<span class="kn">from</span> <span class="nn">cascada.bitvector.ssa</span> <span class="kn">import</span> <span class="n">RoundBasedFunction</span>
+<span class="kn">from</span> <span class="nn">cascada.primitives.blockcipher</span> <span class="kn">import</span> <span class="n">Encryption</span><span class="p">,</span> <span class="n">Cipher</span>
+
+<span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">simon_rf</span>
+
+
+<div class="viewcode-block" id="SimeckRF"><a class="viewcode-back" href="../../../cascada.primitives.simeck.html#cascada.primitives.simeck.SimeckRF">[docs]</a><span class="k">class</span> <span class="nc">SimeckRF</span><span class="p">(</span><span class="n">simon_rf</span><span class="o">.</span><span class="n">SimonRF</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The non-linear part of the round function of Simon.</span>
+
+<span class="sd">    This corresponds to ``f(x) = ((x &lt;&lt;&lt; a) &amp; (x &lt;&lt;&lt; b)) ^ (x &lt;&lt;&lt; c)``,</span>
+<span class="sd">    where ``(a, b, c) = (5, 0, 4)``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="mi">1</span></div>
+
+
+<div class="viewcode-block" id="XorModelSimeckRF"><a class="viewcode-back" href="../../../cascada.primitives.simeck.html#cascada.primitives.simeck.XorModelSimeckRF">[docs]</a><span class="k">class</span> <span class="nc">XorModelSimeckRF</span><span class="p">(</span><span class="n">simon_rf</span><span class="o">.</span><span class="n">XorModelSimonRF</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent the `XorDiff` `differential.opmodel.OpModel` of `SimeckRF`.&quot;&quot;&quot;</span>
+    <span class="n">op</span> <span class="o">=</span> <span class="n">SimeckRF</span></div>
+
+
+<div class="viewcode-block" id="RXModelSimeckRF"><a class="viewcode-back" href="../../../cascada.primitives.simeck.html#cascada.primitives.simeck.RXModelSimeckRF">[docs]</a><span class="k">class</span> <span class="nc">RXModelSimeckRF</span><span class="p">(</span><span class="n">simon_rf</span><span class="o">.</span><span class="n">RXModelSimonRF</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent the `RXDiff` `differential.opmodel.OpModel` of `SimeckRF`.&quot;&quot;&quot;</span>
+    <span class="n">op</span> <span class="o">=</span> <span class="n">SimeckRF</span></div>
+
+
+<span class="n">SimeckRF</span><span class="o">.</span><span class="n">xor_model</span> <span class="o">=</span> <span class="n">XorModelSimeckRF</span>
+<span class="n">SimeckRF</span><span class="o">.</span><span class="n">rx_model</span> <span class="o">=</span> <span class="n">RXModelSimeckRF</span>
+
+
+<span class="c1">#</span>
+
+
+<div class="viewcode-block" id="SimeckInstance"><a class="viewcode-back" href="../../../cascada.primitives.simeck.html#cascada.primitives.simeck.SimeckInstance">[docs]</a><span class="k">class</span> <span class="nc">SimeckInstance</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent the available instances of Simeck.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        simeck_32_64: Simeck32/64</span>
+<span class="sd">        simeck_48_96: Simeck48/96</span>
+<span class="sd">        simeck_64_128: Simeck64/128</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">simeck_32_64</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+    <span class="n">simeck_48_96</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+    <span class="n">simeck_64_128</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="get_Simeck_instance"><a class="viewcode-back" href="../../../cascada.primitives.simeck.html#cascada.primitives.simeck.get_Simeck_instance">[docs]</a><span class="k">def</span> <span class="nf">get_Simeck_instance</span><span class="p">(</span><span class="n">simeck_instance</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return an instance of the Simeck family as a `Cipher`.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">simeck_instance</span> <span class="o">==</span> <span class="n">SimeckInstance</span><span class="o">.</span><span class="n">simeck_32_64</span><span class="p">:</span>
+        <span class="n">default_rounds</span> <span class="o">=</span> <span class="mi">32</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="mi">16</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="mi">4</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="nb">bin</span><span class="p">(</span><span class="mh">0x9A42BB1F</span><span class="p">)[</span><span class="mi">2</span><span class="p">:]))</span>
+    <span class="k">elif</span> <span class="n">simeck_instance</span> <span class="o">==</span> <span class="n">SimeckInstance</span><span class="o">.</span><span class="n">simeck_48_96</span><span class="p">:</span>
+        <span class="n">default_rounds</span> <span class="o">=</span> <span class="mi">36</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="mi">24</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="mi">4</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="nb">bin</span><span class="p">(</span><span class="mh">0x9A42BB1F</span><span class="p">)[</span><span class="mi">2</span><span class="p">:]))</span>
+    <span class="k">elif</span> <span class="n">simeck_instance</span> <span class="o">==</span> <span class="n">SimeckInstance</span><span class="o">.</span><span class="n">simeck_64_128</span><span class="p">:</span>
+        <span class="n">default_rounds</span> <span class="o">=</span> <span class="mi">44</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="mi">32</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="mi">4</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="nb">bin</span><span class="p">(</span><span class="mh">0x938BCA3083F</span><span class="p">)[</span><span class="mi">2</span><span class="p">:]))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;invalid instance of Simeck&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">rf</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The round function of Simeck32/64.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">y</span> <span class="o">^</span> <span class="n">SimeckRF</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">^</span> <span class="n">k</span><span class="p">,</span> <span class="n">x</span>
+
+    <span class="k">class</span> <span class="nc">SimeckKeySchedule</span><span class="p">(</span><span class="n">RoundBasedFunction</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Key schedule function.&quot;&quot;&quot;</span>
+
+        <span class="n">num_rounds</span> <span class="o">=</span> <span class="n">default_rounds</span>
+        <span class="n">input_widths</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="p">)]</span>
+        <span class="n">output_widths</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">default_rounds</span><span class="p">)]</span>
+
+        <span class="nd">@classmethod</span>
+        <span class="k">def</span> <span class="nf">set_num_rounds</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">new_num_rounds</span><span class="p">):</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span> <span class="o">=</span> <span class="n">new_num_rounds</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">output_widths</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">new_num_rounds</span><span class="p">)]</span>
+
+        <span class="nd">@classmethod</span>
+        <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">master_key</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span> <span class="o">&lt;=</span> <span class="n">m</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">master_key</span><span class="p">))[:</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span><span class="p">]</span>
+
+            <span class="n">k</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span><span class="p">)]</span>
+            <span class="n">k</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">master_key</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">master_key</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">C</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="n">n</span> <span class="o">-</span> <span class="mi">4</span><span class="p">)</span> <span class="o">^</span> <span class="nb">int</span><span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">z</span><span class="p">)])</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">rf</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="mi">4</span><span class="p">],</span> <span class="n">k</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">C</span><span class="p">)</span>
+                <span class="n">t</span><span class="p">[(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">3</span><span class="p">)</span> <span class="o">%</span> <span class="mi">4</span><span class="p">],</span> <span class="n">k</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span>
+
+            <span class="k">return</span> <span class="n">k</span>
+
+    <span class="k">class</span> <span class="nc">SimeckEncryption</span><span class="p">(</span><span class="n">Encryption</span><span class="p">,</span> <span class="n">RoundBasedFunction</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Encryption function.&quot;&quot;&quot;</span>
+
+        <span class="n">num_rounds</span> <span class="o">=</span> <span class="n">default_rounds</span>
+        <span class="n">input_widths</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">]</span>
+        <span class="n">output_widths</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">]</span>
+        <span class="n">round_keys</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="nd">@classmethod</span>
+        <span class="k">def</span> <span class="nf">set_num_rounds</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">new_num_rounds</span><span class="p">):</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span> <span class="o">=</span> <span class="n">new_num_rounds</span>
+
+        <span class="nd">@classmethod</span>
+        <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span><span class="p">):</span>
+                <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">rf</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">round_keys</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">add_round_outputs</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span>
+
+    <span class="k">class</span> <span class="nc">SimeckCipher</span><span class="p">(</span><span class="n">Cipher</span><span class="p">):</span>
+        <span class="n">key_schedule</span> <span class="o">=</span> <span class="n">SimeckKeySchedule</span>
+        <span class="n">encryption</span> <span class="o">=</span> <span class="n">SimeckEncryption</span>
+        <span class="n">_simeck_instance</span> <span class="o">=</span> <span class="n">simeck_instance</span>
+
+        <span class="nd">@classmethod</span>
+        <span class="k">def</span> <span class="nf">set_num_rounds</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">new_num_rounds</span><span class="p">):</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">key_schedule</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="n">new_num_rounds</span><span class="p">)</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">encryption</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="n">new_num_rounds</span><span class="p">)</span>
+
+        <span class="nd">@classmethod</span>
+        <span class="k">def</span> <span class="nf">test</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+            <span class="n">old_num_rounds</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="n">default_rounds</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_simeck_instance</span> <span class="o">==</span> <span class="n">SimeckInstance</span><span class="o">.</span><span class="n">simeck_32_64</span><span class="p">:</span>
+                <span class="n">plaintext</span> <span class="o">=</span> <span class="p">(</span><span class="mh">0x6565</span><span class="p">,</span> <span class="mh">0x6877</span><span class="p">)</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="mh">0x1918</span><span class="p">,</span> <span class="mh">0x1110</span><span class="p">,</span> <span class="mh">0x0908</span><span class="p">,</span> <span class="mh">0x0100</span><span class="p">)</span>
+                <span class="k">assert</span> <span class="bp">cls</span><span class="p">(</span><span class="n">plaintext</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span> <span class="o">==</span> <span class="p">(</span><span class="mh">0x770d</span><span class="p">,</span> <span class="mh">0x2c76</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_simeck_instance</span> <span class="o">==</span> <span class="n">SimeckInstance</span><span class="o">.</span><span class="n">simeck_48_96</span><span class="p">:</span>
+                <span class="n">plaintext</span> <span class="o">=</span> <span class="p">(</span><span class="mh">0x726963</span><span class="p">,</span> <span class="mh">0x20646e</span><span class="p">)</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="mh">0x1a1918</span><span class="p">,</span> <span class="mh">0x121110</span><span class="p">,</span> <span class="mh">0x0a0908</span><span class="p">,</span> <span class="mh">0x020100</span><span class="p">)</span>
+                <span class="k">assert</span> <span class="bp">cls</span><span class="p">(</span><span class="n">plaintext</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span> <span class="o">==</span> <span class="p">(</span><span class="mh">0xf3cf25</span><span class="p">,</span> <span class="mh">0xe33b36</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_simeck_instance</span> <span class="o">==</span> <span class="n">SimeckInstance</span><span class="o">.</span><span class="n">simeck_64_128</span><span class="p">:</span>
+                <span class="n">plaintext</span> <span class="o">=</span> <span class="p">(</span><span class="mh">0x656b696c</span><span class="p">,</span> <span class="mh">0x20646e75</span><span class="p">)</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="mh">0x1b1a1918</span><span class="p">,</span> <span class="mh">0x13121110</span><span class="p">,</span> <span class="mh">0x0b0a0908</span><span class="p">,</span> <span class="mh">0x03020100</span><span class="p">)</span>
+                <span class="k">assert</span> <span class="bp">cls</span><span class="p">(</span><span class="n">plaintext</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span> <span class="o">==</span> <span class="p">(</span><span class="mh">0x45ce6902</span><span class="p">,</span> <span class="mh">0x5f7ab7ed</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;invalid instance of Simeck&quot;</span><span class="p">)</span>
+
+            <span class="bp">cls</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="n">old_num_rounds</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">SimeckCipher</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Adrián Ranea.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

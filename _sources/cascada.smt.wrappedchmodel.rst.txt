@@ -1,0 +1,6 @@
+cascada.smt.wrappedchmodel module
+=================================
+
+.. automodule:: cascada.smt.wrappedchmodel
+   :members:
+   :show-inheritance:

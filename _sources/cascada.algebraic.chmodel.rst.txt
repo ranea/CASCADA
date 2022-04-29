@@ -1,0 +1,6 @@
+cascada.algebraic.chmodel module
+================================
+
+.. automodule:: cascada.algebraic.chmodel
+   :members:
+   :show-inheritance:

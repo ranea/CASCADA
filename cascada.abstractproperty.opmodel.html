@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cascada.abstractproperty.opmodel module &mdash; CASCADA 1.0.rc0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="cascada.abstractproperty.tests.test_opmodel module" href="cascada.abstractproperty.tests.test_opmodel.html" />
+    <link rel="prev" title="cascada.abstractproperty.property module" href="cascada.abstractproperty.property.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> CASCADA
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">CASCADA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="primitives_implemented.html">Primitives implemented</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="cascada.html">API reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="cascada.bitvector.html">cascada.bitvector module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.primitives.html">cascada.primitives module</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="cascada.abstractproperty.html">cascada.abstractproperty module</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="cascada.abstractproperty.property.html">cascada.abstractproperty.property module</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">cascada.abstractproperty.opmodel module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.abstractproperty.tests.test_opmodel.html">cascada.abstractproperty.tests.test_opmodel module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.abstractproperty.chmodel.html">cascada.abstractproperty.chmodel module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.abstractproperty.characteristic.html">cascada.abstractproperty.characteristic module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.differential.html">cascada.differential module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.linear.html">cascada.linear module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.algebraic.html">cascada.algebraic module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.smt.html">cascada.smt module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">CASCADA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="cascada.html">API reference</a> &raquo;</li>
+          <li><a href="cascada.abstractproperty.html">cascada.abstractproperty module</a> &raquo;</li>
+      <li>cascada.abstractproperty.opmodel module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/cascada.abstractproperty.opmodel.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-cascada.abstractproperty.opmodel">
+<span id="cascada-abstractproperty-opmodel-module"></span><h1>cascada.abstractproperty.opmodel module<a class="headerlink" href="#module-cascada.abstractproperty.opmodel" title="Permalink to this headline"></a></h1>
+<p>Manipulate property models of bit-vector operations (w.r.t an abstract property).</p>
+<dl class="py exception">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.InvalidOpModelError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.abstractproperty.opmodel.</span></span><span class="sig-name descname"><span class="pre">InvalidOpModelError</span></span><a class="reference internal" href="_modules/cascada/abstractproperty/opmodel.html#InvalidOpModelError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.opmodel.InvalidOpModelError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>Raised when the OpModel is not valid and a valid one was expected.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.OpModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.abstractproperty.opmodel.</span></span><span class="sig-name descname"><span class="pre">OpModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_prop</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/opmodel.html#OpModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.opmodel.OpModel" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Represent property models of bit-vector operations.</p>
+<p>A (bit-vector) property model of a bit-vector <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.Operation" title="cascada.bitvector.operation.Operation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Operation</span></code></a> <span class="math notranslate nohighlight">\(f\)</span> for
+a particular <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> is a set of bit-vector constraints that
+models the propagation probability of <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> over <span class="math notranslate nohighlight">\(f\)</span>.
+See <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For the <a class="reference internal" href="cascada.algebraic.value.html#cascada.algebraic.value.Value" title="cascada.algebraic.value.Value"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Value</span></code></a> and <a class="reference internal" href="cascada.differential.difference.html#cascada.differential.difference.Difference" title="cascada.differential.difference.Difference"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Difference</span></code></a> <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> types,
+the propagation probability satisfies that for any
+fixed <span class="math notranslate nohighlight">\(\alpha\)</span>, the sum of the probabilities of <span class="math notranslate nohighlight">\(\alpha\)</span>
+propagating to <span class="math notranslate nohighlight">\(\beta\)</span> (for all <span class="math notranslate nohighlight">\(\beta\)</span>) is equal to 1.
+In particular, if the propagation probability of
+<span class="math notranslate nohighlight">\((\alpha, \beta)\)</span> is 1, then <span class="math notranslate nohighlight">\(\alpha\)</span>
+uniquely propagates to <span class="math notranslate nohighlight">\(\beta\)</span>.</p>
+<p>For the <a class="reference internal" href="cascada.linear.mask.html#cascada.linear.mask.LinearMask" title="cascada.linear.mask.LinearMask"><code class="xref any py py-class docutils literal notranslate"><span class="pre">LinearMask</span></code></a> property this is different
+(see <a class="reference internal" href="cascada.linear.opmodel.html#cascada.linear.opmodel.OpModel" title="cascada.linear.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">linear.opmodel.OpModel</span></code></a>).</p>
+</div>
+<p>A model of <span class="math notranslate nohighlight">\(f\)</span> is mainly given by three bit-vector formulas or
+constraints: the <a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel.validity_constraint" title="cascada.abstractproperty.opmodel.OpModel.validity_constraint"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">validity_constraint</span></code></a> constraint, the <a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel.weight_constraint" title="cascada.abstractproperty.opmodel.OpModel.weight_constraint"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">weight_constraint</span></code></a>
+and the <a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel.pr_one_constraint" title="cascada.abstractproperty.opmodel.OpModel.pr_one_constraint"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">pr_one_constraint</span></code></a>:</p>
+<ul class="simple">
+<li><p>The validity constraint (with inputs <span class="math notranslate nohighlight">\((\alpha, \beta)\)</span>) is True
+if and only if the propagation probability of <span class="math notranslate nohighlight">\((\alpha, \beta)\)</span>
+is non-zero, that is, <span class="math notranslate nohighlight">\(P(\alpha, \beta) \neq 0\)</span>.</p></li>
+<li><p>The weight constraint (with inputs <span class="math notranslate nohighlight">\((w, \alpha, \beta)\)</span> is True
+if and only if the bit-vector <span class="math notranslate nohighlight">\(w\)</span> is equals to the negative binary
+logarithm (weight) of the propagation probability of <span class="math notranslate nohighlight">\((\alpha, \beta)\)</span>,
+that is, <span class="math notranslate nohighlight">\(w = -log_2(P(\alpha, \beta)))\)</span>.</p></li>
+<li><p>The probability-one constraint  (with inputs <span class="math notranslate nohighlight">\((\alpha, \beta)\)</span>)
+is True if and only if the propagation probability of
+<span class="math notranslate nohighlight">\((\alpha, \beta)\)</span> is 1.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The weight constraint is only defined for inputs <span class="math notranslate nohighlight">\((w, \alpha, \beta)\)</span>
+where the propagation probability of <span class="math notranslate nohighlight">\((\alpha, \beta)\)</span> is non-zero.</p>
+<p>By default, the <span class="math notranslate nohighlight">\(n_w\)</span>-bit input <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Variable" title="cascada.bitvector.core.Variable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Variable</span></code></a> <span class="math notranslate nohighlight">\(w\)</span>
+of the weight constraint is interpreted as the non-negative integer
+<span class="math notranslate nohighlight">\(w[0] + 2 w[1] + \dots + 2^{n_w−1} w[n_w − 1]\)</span>.
+However, since the propagation weight can be a non-integer value
+for some properties and functions, <span class="math notranslate nohighlight">\(w\)</span> can also be interpreted
+as the rational value <span class="math notranslate nohighlight">\(2^{−l}(w[0] + 2w[1] + \dots + 2^{n_w−1} w[n_w − 1]\)</span>
+for a given fixed number <span class="math notranslate nohighlight">\(l\)</span> (<a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel.num_frac_bits" title="cascada.abstractproperty.opmodel.OpModel.num_frac_bits"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">num_frac_bits</span></code></a>) of fractional bits.</p>
+<p>Moreover, weight constraints can also be True if
+<span class="math notranslate nohighlight">\(w\)</span> is equals to weight of the propagation probability up to
+some error bounded by <a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel.error" title="cascada.abstractproperty.opmodel.OpModel.error"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">error</span></code></a>.</p>
+</div>
+<p>An <a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel" title="cascada.abstractproperty.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">OpModel</span></code></a> is defined for a type of <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> and a bit-vector
+<a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.Operation" title="cascada.bitvector.operation.Operation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Operation</span></code></a> <span class="math notranslate nohighlight">\(f\)</span> . The input property <span class="math notranslate nohighlight">\(\alpha\)</span> is used
+when initializing the <a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel" title="cascada.abstractproperty.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">OpModel</span></code></a> object, and the output property
+<span class="math notranslate nohighlight">\(\beta\)</span> is given in the arguments of the methods
+<a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel.validity_constraint" title="cascada.abstractproperty.opmodel.OpModel.validity_constraint"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">OpModel.validity_constraint</span></code></a>, <a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel.weight_constraint" title="cascada.abstractproperty.opmodel.OpModel.weight_constraint"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">OpModel.weight_constraint</span></code></a>
+and <a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel.pr_one_constraint" title="cascada.abstractproperty.opmodel.OpModel.pr_one_constraint"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">OpModel.pr_one_constraint</span></code></a> (among others).</p>
+<p>In some cases, the validity, weight or probability-one constraints
+use auxiliary external (different from the input and output
+properties) variables in the bit-vector expression.
+These external variables can be obtained from
+<a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel.external_vars_validity_constraint" title="cascada.abstractproperty.opmodel.OpModel.external_vars_validity_constraint"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">external_vars_validity_constraint</span></code></a>,
+<a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel.external_vars_weight_constraint" title="cascada.abstractproperty.opmodel.OpModel.external_vars_weight_constraint"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">external_vars_weight_constraint</span></code></a> and
+<a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel.external_vars_pr_one_constraint" title="cascada.abstractproperty.opmodel.OpModel.external_vars_pr_one_constraint"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">external_vars_pr_one_constraint</span></code></a> respectively.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel" title="cascada.abstractproperty.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">OpModel</span></code></a> of functions with scalar operands are not supported.</p>
+</div>
+<p>This class is not meant to be instantiated but to provide a base
+class for creating models of some operation w.r.t some property,
+(see <a class="reference internal" href="cascada.differential.opmodel.html#cascada.differential.opmodel.XorModelBvAdd" title="cascada.differential.opmodel.XorModelBvAdd"><code class="xref any py py-class docutils literal notranslate"><span class="pre">XorModelBvAdd</span></code></a>, <a class="reference internal" href="cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelBvAdd" title="cascada.linear.opmodel.LinearModelBvAdd"><code class="xref any py py-class docutils literal notranslate"><span class="pre">LinearModelBvAdd</span></code></a> or <a class="reference internal" href="cascada.algebraic.opmodel.html#cascada.algebraic.opmodel.BitModelBvAdd" title="cascada.algebraic.opmodel.BitModelBvAdd"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BitModelBvAdd</span></code></a>
+for some examples).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>It is highly recommended that new models of bit-vector operations
+are tested with <a class="reference internal" href="cascada.abstractproperty.tests.test_opmodel.html#cascada.abstractproperty.tests.test_opmodel.TestOpModelGeneric" title="cascada.abstractproperty.tests.test_opmodel.TestOpModelGeneric"><code class="xref any py py-class docutils literal notranslate"><span class="pre">TestOpModelGeneric</span></code></a>
+(see <code class="docutils literal notranslate"><span class="pre">differential/tests/test_opmodel.py</span></code> or
+<code class="docutils literal notranslate"><span class="pre">linear/tests/test_opmodel.py</span></code> for some examples).</p>
+</div>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.OpModel.prop_type">
+<span class="sig-name descname"><span class="pre">prop_type</span></span><a class="headerlink" href="#cascada.abstractproperty.opmodel.OpModel.prop_type" title="Permalink to this definition"></a></dt>
+<dd><p>the particular <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> type</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.OpModel.op">
+<span class="sig-name descname"><span class="pre">op</span></span><a class="headerlink" href="#cascada.abstractproperty.opmodel.OpModel.op" title="Permalink to this definition"></a></dt>
+<dd><p>the bit-vector <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.Operation" title="cascada.bitvector.operation.Operation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Operation</span></code></a> <span class="math notranslate nohighlight">\(f\)</span></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.OpModel.input_prop">
+<span class="sig-name descname"><span class="pre">input_prop</span></span><a class="headerlink" href="#cascada.abstractproperty.opmodel.OpModel.input_prop" title="Permalink to this definition"></a></dt>
+<dd><p>a list containing the <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> associated to
+each bit-vector operand.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.OpModel.vrepr">
+<span class="sig-name descname"><span class="pre">vrepr</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/opmodel.html#OpModel.vrepr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.opmodel.OpModel.vrepr" title="Permalink to this definition"></a></dt>
+<dd><p>Return an executable string representation.</p>
+<p>This method returns a string so that <code class="docutils literal notranslate"><span class="pre">eval(self.vrepr())</span></code>
+and <code class="docutils literal notranslate"><span class="pre">self</span></code> have the same content.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.OpModel.validity_constraint">
+<span class="sig-name descname"><span class="pre">validity_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_prop</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/opmodel.html#OpModel.validity_constraint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.opmodel.OpModel.validity_constraint" title="Permalink to this definition"></a></dt>
+<dd><p>Return the validity constraint for a given output <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a>.</p>
+<p>The validity constraint is a bit-vector expression that depends on
+the input property <a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel.input_prop" title="cascada.abstractproperty.opmodel.OpModel.input_prop"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">OpModel.input_prop</span></code></a> and the output property
+<code class="docutils literal notranslate"><span class="pre">output_prop</span></code> and it is True if and only if the input property
+propagates to the output property with non-zero probability.</p>
+<p>If both the input and output properties are constant values,
+this method returns the <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Constant" title="cascada.bitvector.core.Constant"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a> <code class="docutils literal notranslate"><span class="pre">0b1</span></code> or <code class="docutils literal notranslate"><span class="pre">0b0</span></code> depending on
+whether the corresponding propagation has non-zero probability.
+Otherwise, this method returns a bit-vector <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term" title="cascada.bitvector.core.Term"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Term</span></code></a>
+containing the input and output properties as <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Variable" title="cascada.bitvector.core.Variable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Variable</span></code></a> objects.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.OpModel.pr_one_constraint">
+<span class="sig-name descname"><span class="pre">pr_one_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_prop</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/opmodel.html#OpModel.pr_one_constraint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.opmodel.OpModel.pr_one_constraint" title="Permalink to this definition"></a></dt>
+<dd><p>Return the probability-one constraint for a given output <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a>.</p>
+<p>Return the constraint that evaluates to True if the input <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a>
+propagates to the given output <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> with probability one.</p>
+<p>This method returns a bit-vector expression that depends on
+the input property <a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel.input_prop" title="cascada.abstractproperty.opmodel.OpModel.input_prop"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">OpModel.input_prop</span></code></a> and the output property
+<code class="docutils literal notranslate"><span class="pre">output_prop</span></code> and it is True if and only if the input property
+propagates to the output property with probability 1.</p>
+<p>If both the input and output properties are constant values,
+this method returns the <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Constant" title="cascada.bitvector.core.Constant"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a> <code class="docutils literal notranslate"><span class="pre">0b1</span></code> or <code class="docutils literal notranslate"><span class="pre">0b0</span></code> depending on
+whether the corresponding propagation has probability 1.
+Otherwise, this method returns a bit-vector <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term" title="cascada.bitvector.core.Term"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Term</span></code></a>
+containing the input and output properties as <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Variable" title="cascada.bitvector.core.Variable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Variable</span></code></a> objects.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.OpModel.weight_constraint">
+<span class="sig-name descname"><span class="pre">weight_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_prop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/opmodel.html#OpModel.weight_constraint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.opmodel.OpModel.weight_constraint" title="Permalink to this definition"></a></dt>
+<dd><p>Return the weight constraint for a given output <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> and weight <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Variable" title="cascada.bitvector.core.Variable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Variable</span></code></a>.</p>
+<p>The weight constraint is a bit-vector expression that depends on
+the input property <a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel.input_prop" title="cascada.abstractproperty.opmodel.OpModel.input_prop"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">OpModel.input_prop</span></code></a>, the output property
+<code class="docutils literal notranslate"><span class="pre">output_prop</span></code> and the weight variable <code class="docutils literal notranslate"><span class="pre">weight_variable</span></code>.
+This expression is True if and only if the weight
+(negative binary logarithm of the probability) of the input property
+propagating to the output property is equals to <code class="docutils literal notranslate"><span class="pre">weight_variable</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>It is assumed that the corresponding propagation has non-zero probability.</p>
+</div>
+<p>If the input and output properties and the weight variable are constant values,
+this method returns the <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Constant" title="cascada.bitvector.core.Constant"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a> <code class="docutils literal notranslate"><span class="pre">0b1</span></code> or <code class="docutils literal notranslate"><span class="pre">0b0</span></code> depending on
+whether the corresponding propagation has the given weight.
+Otherwise, this method returns a bit-vector <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term" title="cascada.bitvector.core.Term"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Term</span></code></a>
+containing the input and output properties and the weight as <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Variable" title="cascada.bitvector.core.Variable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Variable</span></code></a> objects.</p>
+<p>Subclasses can either reimplement this method or implement the method <code class="docutils literal notranslate"><span class="pre">bv_weight</span></code>.
+In the last case, the weight constraint is defined as
+<code class="docutils literal notranslate"><span class="pre">BvComp(weight_variable,</span> <span class="pre">self.bv_weight(output_prop))</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.OpModel.bv_weight">
+<span class="sig-name descname"><span class="pre">bv_weight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_prop</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/opmodel.html#OpModel.bv_weight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.opmodel.OpModel.bv_weight" title="Permalink to this definition"></a></dt>
+<dd><p>Return the bit-vector weight for a given output <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a>.</p>
+<p>The bit-vector weight is a bit-vector expression that depends on
+the input property <a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel.input_prop" title="cascada.abstractproperty.opmodel.OpModel.input_prop"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">OpModel.input_prop</span></code></a> and the output property
+<code class="docutils literal notranslate"><span class="pre">output_prop</span></code>. This bit-vector function represents an approximation
+of the negative binary logarithm (weight) of the probability of
+the input property propagating to the output property.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This method is optional and subclasses of <a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel" title="cascada.abstractproperty.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">OpModel</span></code></a> don’t need to implement it
+(as opposed to <a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel.weight_constraint" title="cascada.abstractproperty.opmodel.OpModel.weight_constraint"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">OpModel.weight_constraint</span></code></a>).</p>
+<p>It is assumed that the corresponding propagation has non-zero probability.</p>
+</div>
+<p>If the input and output properties are constant values,
+this method returns a <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Constant" title="cascada.bitvector.core.Constant"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a> of bit-size <a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel.weight_width" title="cascada.abstractproperty.opmodel.OpModel.weight_width"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">weight_width</span></code></a>
+denoting the weight of the valid propagation.
+Otherwise, this method returns a bit-vector <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term" title="cascada.bitvector.core.Term"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Term</span></code></a>
+containing the input and output properties as <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Variable" title="cascada.bitvector.core.Variable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Variable</span></code></a> objects.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.OpModel.max_weight">
+<span class="sig-name descname"><span class="pre">max_weight</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/opmodel.html#OpModel.max_weight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.opmodel.OpModel.max_weight" title="Permalink to this definition"></a></dt>
+<dd><p>Return the maximum value the weight variable can achieve in <a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel.weight_constraint" title="cascada.abstractproperty.opmodel.OpModel.weight_constraint"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">OpModel.weight_constraint</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.OpModel.weight_width">
+<span class="sig-name descname"><span class="pre">weight_width</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/opmodel.html#OpModel.weight_width"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.opmodel.OpModel.weight_width" title="Permalink to this definition"></a></dt>
+<dd><p>Return the width of the weight variable used <a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel.weight_constraint" title="cascada.abstractproperty.opmodel.OpModel.weight_constraint"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">OpModel.weight_constraint</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.OpModel.decimal_weight">
+<span class="sig-name descname"><span class="pre">decimal_weight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_prop</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/opmodel.html#OpModel.decimal_weight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.opmodel.OpModel.decimal_weight" title="Permalink to this definition"></a></dt>
+<dd><p>Return the <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">decimal.Decimal</span></code></a> weight for a given constant output <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a>.</p>
+<p>This method returns, as a decimal number, the weight (negative binary logarithm)
+of the probability of the input property propagating to the output property.</p>
+<p>This method only works when the input property and the output property are
+constant values, but provides a better approximation than the bit-vector weight
+from <a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel.weight_constraint" title="cascada.abstractproperty.opmodel.OpModel.weight_constraint"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">OpModel.weight_constraint</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.OpModel.num_frac_bits">
+<span class="sig-name descname"><span class="pre">num_frac_bits</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/opmodel.html#OpModel.num_frac_bits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.opmodel.OpModel.num_frac_bits" title="Permalink to this definition"></a></dt>
+<dd><p>Return the number of fractional bits used in the weight variable of <a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel.weight_constraint" title="cascada.abstractproperty.opmodel.OpModel.weight_constraint"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">OpModel.weight_constraint</span></code></a>.</p>
+<p>If the number of fractional bits is <code class="docutils literal notranslate"><span class="pre">k</span></code>, then the bit-vector weight variable
+<code class="docutils literal notranslate"><span class="pre">w</span></code> of <a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel.weight_constraint" title="cascada.abstractproperty.opmodel.OpModel.weight_constraint"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">OpModel.weight_constraint</span></code></a> represents the number <code class="docutils literal notranslate"><span class="pre">2^{-k}</span> <span class="pre">*</span> <span class="pre">bv2int(w)</span></code>.
+In particular, if <code class="docutils literal notranslate"><span class="pre">k</span> <span class="pre">==</span> <span class="pre">0</span></code>, then <code class="docutils literal notranslate"><span class="pre">w</span></code> represents an integer number.
+Otherwise, the <code class="docutils literal notranslate"><span class="pre">k</span></code> least significant bits of <code class="docutils literal notranslate"><span class="pre">w</span></code> denote the
+fractional part of the number represented by <code class="docutils literal notranslate"><span class="pre">w</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.OpModel.error">
+<span class="sig-name descname"><span class="pre">error</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/opmodel.html#OpModel.error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.opmodel.OpModel.error" title="Permalink to this definition"></a></dt>
+<dd><p>Return the maximum difference between <a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel.weight_constraint" title="cascada.abstractproperty.opmodel.OpModel.weight_constraint"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">OpModel.weight_constraint</span></code></a> and the exact weight.</p>
+<p>The exact weight is exact value (without error) of the negative binary
+logarithm (weight) of the propagation probability of <span class="math notranslate nohighlight">\((\alpha, \beta)\)</span>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The exact weight can be computed in <a class="reference internal" href="cascada.abstractproperty.tests.test_opmodel.html#cascada.abstractproperty.tests.test_opmodel.TestOpModelGeneric.get_empirical_weight_slow" title="cascada.abstractproperty.tests.test_opmodel.TestOpModelGeneric.get_empirical_weight_slow"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">TestOpModelGeneric.get_empirical_weight_slow</span></code></a>.</p>
+</div>
+<p>This method returns an upper bound (in absolute value) of the maximum difference
+(over all input and output properties) between the bit-vector weight
+from <a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel.weight_constraint" title="cascada.abstractproperty.opmodel.OpModel.weight_constraint"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">OpModel.weight_constraint</span></code></a> and the exact weight.</p>
+<p>Note that the exact weight might still differ from <a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel.decimal_weight" title="cascada.abstractproperty.opmodel.OpModel.decimal_weight"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">decimal_weight</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.OpModel.external_vars_validity_constraint">
+<span class="sig-name descname"><span class="pre">external_vars_validity_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_prop</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/opmodel.html#OpModel.external_vars_validity_constraint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.opmodel.OpModel.external_vars_validity_constraint" title="Permalink to this definition"></a></dt>
+<dd><p>Return the list of external variables of <a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel.validity_constraint" title="cascada.abstractproperty.opmodel.OpModel.validity_constraint"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">validity_constraint</span></code></a>
+for a given output <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> (an empty list by default).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.OpModel.external_vars_pr_one_constraint">
+<span class="sig-name descname"><span class="pre">external_vars_pr_one_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_prop</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/opmodel.html#OpModel.external_vars_pr_one_constraint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.opmodel.OpModel.external_vars_pr_one_constraint" title="Permalink to this definition"></a></dt>
+<dd><p>Return the list of external variables of <a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel.pr_one_constraint" title="cascada.abstractproperty.opmodel.OpModel.pr_one_constraint"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">pr_one_constraint</span></code></a>
+for a given output <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> (an empty list by default).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.OpModel.external_vars_weight_constraint">
+<span class="sig-name descname"><span class="pre">external_vars_weight_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_prop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/opmodel.html#OpModel.external_vars_weight_constraint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.opmodel.OpModel.external_vars_weight_constraint" title="Permalink to this definition"></a></dt>
+<dd><p>Return the list of external variables of <a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel.weight_constraint" title="cascada.abstractproperty.opmodel.OpModel.weight_constraint"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">weight_constraint</span></code></a>
+for a given output <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> and weight <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Variable" title="cascada.bitvector.core.Variable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Variable</span></code></a> (an empty list by default).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.PartialOpModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.abstractproperty.opmodel.</span></span><span class="sig-name descname"><span class="pre">PartialOpModel</span></span><a class="reference internal" href="_modules/cascada/abstractproperty/opmodel.html#PartialOpModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.opmodel.PartialOpModel" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Represent property models of operations with fixed operands.</p>
+<p>This class is not meant to be instantiated but to provide a base
+class for property models of operations with fixed operands generated
+through <a class="reference internal" href="#cascada.abstractproperty.opmodel.make_partial_op_model" title="cascada.abstractproperty.opmodel.make_partial_op_model"><code class="xref any py py-func docutils literal notranslate"><span class="pre">make_partial_op_model</span></code></a>.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.PartialOpModel.base_op">
+<span class="sig-name descname"><span class="pre">base_op</span></span><a class="headerlink" href="#cascada.abstractproperty.opmodel.PartialOpModel.base_op" title="Permalink to this definition"></a></dt>
+<dd><p>a subclass of <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.Operation" title="cascada.bitvector.operation.Operation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Operation</span></code></a> denoting the base operator.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.PartialOpModel.vrepr">
+<span class="sig-name descname"><span class="pre">vrepr</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/opmodel.html#PartialOpModel.vrepr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.opmodel.PartialOpModel.vrepr" title="Permalink to this definition"></a></dt>
+<dd><p>Return an executable string representation.</p>
+<p>This method returns a string so that <code class="docutils literal notranslate"><span class="pre">eval(self.vrepr())</span></code>
+and <code class="docutils literal notranslate"><span class="pre">self</span></code> have the same content.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.make_partial_op_model">
+<span class="sig-prename descclassname"><span class="pre">cascada.abstractproperty.opmodel.</span></span><span class="sig-name descname"><span class="pre">make_partial_op_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">abstract_partial_op_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/opmodel.html#make_partial_op_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.opmodel.make_partial_op_model" title="Permalink to this definition"></a></dt>
+<dd><p>Return the partial property model of the given bit-vector partial operation.</p>
+<p>The argument <code class="docutils literal notranslate"><span class="pre">abstract_partial_op_model</span></code> is an (abstract) subclass of
+<a class="reference internal" href="#cascada.abstractproperty.opmodel.PartialOpModel" title="cascada.abstractproperty.opmodel.PartialOpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">PartialOpModel</span></code></a> containing the base operator.</p>
+<p>The argument <code class="docutils literal notranslate"><span class="pre">fixed_args</span></code> is a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">tuple</span></code></a>, with the same length as
+the number of operands of the base operator, containing <code class="docutils literal notranslate"><span class="pre">None</span></code>,
+scalar or <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Constant" title="cascada.bitvector.core.Constant"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a> elements. If <code class="docutils literal notranslate"><span class="pre">fixed_args[i]</span></code> is <code class="docutils literal notranslate"><span class="pre">None</span></code>,
+the i-th operand is not fixed; otherwise, the i-th operand is
+replaced with <code class="docutils literal notranslate"><span class="pre">fixed_args[i]</span></code>. See also <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.make_partial_operation" title="cascada.bitvector.operation.make_partial_operation"><code class="xref any py py-func docutils literal notranslate"><span class="pre">make_partial_operation</span></code></a>.</p>
+<p>The resulting class is a subclass of <code class="docutils literal notranslate"><span class="pre">abstract_partial_op_model</span></code>.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.ModelIdentity">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.abstractproperty.opmodel.</span></span><span class="sig-name descname"><span class="pre">ModelIdentity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_prop</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/opmodel.html#ModelIdentity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.opmodel.ModelIdentity" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel" title="cascada.abstractproperty.opmodel.OpModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.abstractproperty.opmodel.OpModel</span></code></a></p>
+<p>Represent the (trivial) property model of the identity function.</p>
+<p>This model is used to rename a complex intermediate property with a new name.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.ModelIdentity.op">
+<span class="sig-name descname"><span class="pre">op</span></span><a class="headerlink" href="#cascada.abstractproperty.opmodel.ModelIdentity.op" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.BvIdentity" title="cascada.bitvector.operation.BvIdentity"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.bitvector.operation.BvIdentity</span></code></a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.ModelIdentity.validity_constraint">
+<span class="sig-name descname"><span class="pre">validity_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_prop</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/opmodel.html#ModelIdentity.validity_constraint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.opmodel.ModelIdentity.validity_constraint" title="Permalink to this definition"></a></dt>
+<dd><p>Return the validity constraint for a given output <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a>.</p>
+<p>The validity constraint is a bit-vector expression that depends on
+the input property <a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel.input_prop" title="cascada.abstractproperty.opmodel.OpModel.input_prop"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">OpModel.input_prop</span></code></a> and the output property
+<code class="docutils literal notranslate"><span class="pre">output_prop</span></code> and it is True if and only if the input property
+propagates to the output property with non-zero probability.</p>
+<p>If both the input and output properties are constant values,
+this method returns the <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Constant" title="cascada.bitvector.core.Constant"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a> <code class="docutils literal notranslate"><span class="pre">0b1</span></code> or <code class="docutils literal notranslate"><span class="pre">0b0</span></code> depending on
+whether the corresponding propagation has non-zero probability.
+Otherwise, this method returns a bit-vector <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term" title="cascada.bitvector.core.Term"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Term</span></code></a>
+containing the input and output properties as <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Variable" title="cascada.bitvector.core.Variable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Variable</span></code></a> objects.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.ModelIdentity.pr_one_constraint">
+<span class="sig-name descname"><span class="pre">pr_one_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_prop</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/opmodel.html#ModelIdentity.pr_one_constraint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.opmodel.ModelIdentity.pr_one_constraint" title="Permalink to this definition"></a></dt>
+<dd><p>Return the probability-one constraint for a given output <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a>.</p>
+<p>Return the constraint that evaluates to True if the input <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a>
+propagates to the given output <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> with probability one.</p>
+<p>This method returns a bit-vector expression that depends on
+the input property <a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel.input_prop" title="cascada.abstractproperty.opmodel.OpModel.input_prop"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">OpModel.input_prop</span></code></a> and the output property
+<code class="docutils literal notranslate"><span class="pre">output_prop</span></code> and it is True if and only if the input property
+propagates to the output property with probability 1.</p>
+<p>If both the input and output properties are constant values,
+this method returns the <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Constant" title="cascada.bitvector.core.Constant"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a> <code class="docutils literal notranslate"><span class="pre">0b1</span></code> or <code class="docutils literal notranslate"><span class="pre">0b0</span></code> depending on
+whether the corresponding propagation has probability 1.
+Otherwise, this method returns a bit-vector <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term" title="cascada.bitvector.core.Term"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Term</span></code></a>
+containing the input and output properties as <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Variable" title="cascada.bitvector.core.Variable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Variable</span></code></a> objects.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.ModelIdentity.bv_weight">
+<span class="sig-name descname"><span class="pre">bv_weight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_prop</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/opmodel.html#ModelIdentity.bv_weight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.opmodel.ModelIdentity.bv_weight" title="Permalink to this definition"></a></dt>
+<dd><p>Return the bit-vector weight for a given output <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a>.</p>
+<p>The bit-vector weight is a bit-vector expression that depends on
+the input property <a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel.input_prop" title="cascada.abstractproperty.opmodel.OpModel.input_prop"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">OpModel.input_prop</span></code></a> and the output property
+<code class="docutils literal notranslate"><span class="pre">output_prop</span></code>. This bit-vector function represents an approximation
+of the negative binary logarithm (weight) of the probability of
+the input property propagating to the output property.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This method is optional and subclasses of <a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel" title="cascada.abstractproperty.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">OpModel</span></code></a> don’t need to implement it
+(as opposed to <a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel.weight_constraint" title="cascada.abstractproperty.opmodel.OpModel.weight_constraint"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">OpModel.weight_constraint</span></code></a>).</p>
+<p>It is assumed that the corresponding propagation has non-zero probability.</p>
+</div>
+<p>If the input and output properties are constant values,
+this method returns a <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Constant" title="cascada.bitvector.core.Constant"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a> of bit-size <a class="reference internal" href="#cascada.abstractproperty.opmodel.ModelIdentity.weight_width" title="cascada.abstractproperty.opmodel.ModelIdentity.weight_width"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">weight_width</span></code></a>
+denoting the weight of the valid propagation.
+Otherwise, this method returns a bit-vector <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term" title="cascada.bitvector.core.Term"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Term</span></code></a>
+containing the input and output properties as <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Variable" title="cascada.bitvector.core.Variable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Variable</span></code></a> objects.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.ModelIdentity.max_weight">
+<span class="sig-name descname"><span class="pre">max_weight</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/opmodel.html#ModelIdentity.max_weight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.opmodel.ModelIdentity.max_weight" title="Permalink to this definition"></a></dt>
+<dd><p>Return the maximum value the weight variable can achieve in <a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel.weight_constraint" title="cascada.abstractproperty.opmodel.OpModel.weight_constraint"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">OpModel.weight_constraint</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.ModelIdentity.weight_width">
+<span class="sig-name descname"><span class="pre">weight_width</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/opmodel.html#ModelIdentity.weight_width"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.opmodel.ModelIdentity.weight_width" title="Permalink to this definition"></a></dt>
+<dd><p>Return the width of the weight variable used <a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel.weight_constraint" title="cascada.abstractproperty.opmodel.OpModel.weight_constraint"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">OpModel.weight_constraint</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.ModelIdentity.decimal_weight">
+<span class="sig-name descname"><span class="pre">decimal_weight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_prop</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/opmodel.html#ModelIdentity.decimal_weight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.opmodel.ModelIdentity.decimal_weight" title="Permalink to this definition"></a></dt>
+<dd><p>Return the <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">decimal.Decimal</span></code></a> weight for a given constant output <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a>.</p>
+<p>This method returns, as a decimal number, the weight (negative binary logarithm)
+of the probability of the input property propagating to the output property.</p>
+<p>This method only works when the input property and the output property are
+constant values, but provides a better approximation than the bit-vector weight
+from <a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel.weight_constraint" title="cascada.abstractproperty.opmodel.OpModel.weight_constraint"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">OpModel.weight_constraint</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.ModelIdentity.num_frac_bits">
+<span class="sig-name descname"><span class="pre">num_frac_bits</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/opmodel.html#ModelIdentity.num_frac_bits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.opmodel.ModelIdentity.num_frac_bits" title="Permalink to this definition"></a></dt>
+<dd><p>Return the number of fractional bits used in the weight variable of <a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel.weight_constraint" title="cascada.abstractproperty.opmodel.OpModel.weight_constraint"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">OpModel.weight_constraint</span></code></a>.</p>
+<p>If the number of fractional bits is <code class="docutils literal notranslate"><span class="pre">k</span></code>, then the bit-vector weight variable
+<code class="docutils literal notranslate"><span class="pre">w</span></code> of <a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel.weight_constraint" title="cascada.abstractproperty.opmodel.OpModel.weight_constraint"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">OpModel.weight_constraint</span></code></a> represents the number <code class="docutils literal notranslate"><span class="pre">2^{-k}</span> <span class="pre">*</span> <span class="pre">bv2int(w)</span></code>.
+In particular, if <code class="docutils literal notranslate"><span class="pre">k</span> <span class="pre">==</span> <span class="pre">0</span></code>, then <code class="docutils literal notranslate"><span class="pre">w</span></code> represents an integer number.
+Otherwise, the <code class="docutils literal notranslate"><span class="pre">k</span></code> least significant bits of <code class="docutils literal notranslate"><span class="pre">w</span></code> denote the
+fractional part of the number represented by <code class="docutils literal notranslate"><span class="pre">w</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.ModelIdentity.error">
+<span class="sig-name descname"><span class="pre">error</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/opmodel.html#ModelIdentity.error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.opmodel.ModelIdentity.error" title="Permalink to this definition"></a></dt>
+<dd><p>Return the maximum difference between <a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel.weight_constraint" title="cascada.abstractproperty.opmodel.OpModel.weight_constraint"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">OpModel.weight_constraint</span></code></a> and the exact weight.</p>
+<p>The exact weight is exact value (without error) of the negative binary
+logarithm (weight) of the propagation probability of <span class="math notranslate nohighlight">\((\alpha, \beta)\)</span>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The exact weight can be computed in <a class="reference internal" href="cascada.abstractproperty.tests.test_opmodel.html#cascada.abstractproperty.tests.test_opmodel.TestOpModelGeneric.get_empirical_weight_slow" title="cascada.abstractproperty.tests.test_opmodel.TestOpModelGeneric.get_empirical_weight_slow"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">TestOpModelGeneric.get_empirical_weight_slow</span></code></a>.</p>
+</div>
+<p>This method returns an upper bound (in absolute value) of the maximum difference
+(over all input and output properties) between the bit-vector weight
+from <a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel.weight_constraint" title="cascada.abstractproperty.opmodel.OpModel.weight_constraint"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">OpModel.weight_constraint</span></code></a> and the exact weight.</p>
+<p>Note that the exact weight might still differ from <a class="reference internal" href="#cascada.abstractproperty.opmodel.ModelIdentity.decimal_weight" title="cascada.abstractproperty.opmodel.ModelIdentity.decimal_weight"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">decimal_weight</span></code></a>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.WeakModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.abstractproperty.opmodel.</span></span><span class="sig-name descname"><span class="pre">WeakModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_prop</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/opmodel.html#WeakModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.opmodel.WeakModel" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Represent <em>weak models</em> of bit-vector operations w.r.t some property.</p>
+<p>A <em>weak model</em> is an <a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel" title="cascada.abstractproperty.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">OpModel</span></code></a> where the propagation weight of a
+<a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> pair <span class="math notranslate nohighlight">\((\alpha, \beta)\)</span> is one of the following cases:</p>
+<ul class="simple">
+<li><p>If <span class="math notranslate nohighlight">\(\alpha = 0 = \beta\)</span>, the weight is <a class="reference internal" href="#cascada.abstractproperty.opmodel.WeakModel.zero2zero_weight" title="cascada.abstractproperty.opmodel.WeakModel.zero2zero_weight"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">zero2zero_weight</span></code></a>.</p></li>
+<li><p>If <span class="math notranslate nohighlight">\(\alpha \neq 0 \neq \beta\)</span>, the weight is <a class="reference internal" href="#cascada.abstractproperty.opmodel.WeakModel.nonzero2nonzero_weight" title="cascada.abstractproperty.opmodel.WeakModel.nonzero2nonzero_weight"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">nonzero2nonzero_weight</span></code></a>.</p></li>
+<li><p>If <span class="math notranslate nohighlight">\(\alpha = 0 \neq \beta\)</span>, the weight is <a class="reference internal" href="#cascada.abstractproperty.opmodel.WeakModel.zero2nonzero_weight" title="cascada.abstractproperty.opmodel.WeakModel.zero2nonzero_weight"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">zero2nonzero_weight</span></code></a>.</p></li>
+<li><p>If <span class="math notranslate nohighlight">\(\alpha \neq 0 = \beta\)</span>, the weight is <a class="reference internal" href="#cascada.abstractproperty.opmodel.WeakModel.nonzero2zero_weight" title="cascada.abstractproperty.opmodel.WeakModel.nonzero2zero_weight"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">nonzero2zero_weight</span></code></a>.</p></li>
+</ul>
+<p>If any of weights <a class="reference internal" href="#cascada.abstractproperty.opmodel.WeakModel.zero2zero_weight" title="cascada.abstractproperty.opmodel.WeakModel.zero2zero_weight"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">zero2zero_weight</span></code></a>, <a class="reference internal" href="#cascada.abstractproperty.opmodel.WeakModel.nonzero2nonzero_weight" title="cascada.abstractproperty.opmodel.WeakModel.nonzero2nonzero_weight"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">nonzero2nonzero_weight</span></code></a>,
+<a class="reference internal" href="#cascada.abstractproperty.opmodel.WeakModel.zero2nonzero_weight" title="cascada.abstractproperty.opmodel.WeakModel.zero2nonzero_weight"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">zero2nonzero_weight</span></code></a> or <a class="reference internal" href="#cascada.abstractproperty.opmodel.WeakModel.nonzero2zero_weight" title="cascada.abstractproperty.opmodel.WeakModel.nonzero2zero_weight"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">nonzero2zero_weight</span></code></a> is <code class="docutils literal notranslate"><span class="pre">math.inf</span></code>,
+the propagation probability of the corresponding case is assumed to be 0.</p>
+<p>This class is not meant to be instantiated but to provide a base
+class for weak models of operations (generated for example
+through <a class="reference internal" href="cascada.differential.opmodel.html#cascada.differential.opmodel.get_weak_model" title="cascada.differential.opmodel.get_weak_model"><code class="xref any py py-func docutils literal notranslate"><span class="pre">differential.opmodel.get_weak_model</span></code></a> or
+<a class="reference internal" href="cascada.linear.opmodel.html#cascada.linear.opmodel.get_weak_model" title="cascada.linear.opmodel.get_weak_model"><code class="xref any py py-func docutils literal notranslate"><span class="pre">linear.opmodel.get_weak_model</span></code></a>).</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.WeakModel.zero2zero_weight">
+<span class="sig-name descname"><span class="pre">zero2zero_weight</span></span><a class="headerlink" href="#cascada.abstractproperty.opmodel.WeakModel.zero2zero_weight" title="Permalink to this definition"></a></dt>
+<dd><p>a <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">decimal.Decimal</span></code></a> denoting the weight
+of the zero to zero transitions (<code class="docutils literal notranslate"><span class="pre">math.inf</span></code> if these
+transitions are invalid)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.WeakModel.nonzero2nonzero_weight">
+<span class="sig-name descname"><span class="pre">nonzero2nonzero_weight</span></span><a class="headerlink" href="#cascada.abstractproperty.opmodel.WeakModel.nonzero2nonzero_weight" title="Permalink to this definition"></a></dt>
+<dd><p>a <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">decimal.Decimal</span></code></a> denoting the weight
+of the non-zero to non-zero transitions (<code class="docutils literal notranslate"><span class="pre">math.inf</span></code> if these
+transitions are invalid)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.WeakModel.zero2nonzero_weight">
+<span class="sig-name descname"><span class="pre">zero2nonzero_weight</span></span><a class="headerlink" href="#cascada.abstractproperty.opmodel.WeakModel.zero2nonzero_weight" title="Permalink to this definition"></a></dt>
+<dd><p>a <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">decimal.Decimal</span></code></a> denoting the weight
+of the zero to non-zero transitions (<code class="docutils literal notranslate"><span class="pre">math.inf</span></code> if these
+transitions are invalid)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.WeakModel.nonzero2zero_weight">
+<span class="sig-name descname"><span class="pre">nonzero2zero_weight</span></span><a class="headerlink" href="#cascada.abstractproperty.opmodel.WeakModel.nonzero2zero_weight" title="Permalink to this definition"></a></dt>
+<dd><p>a <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">decimal.Decimal</span></code></a> denoting the weight
+of the non-zero to zero transitions (<code class="docutils literal notranslate"><span class="pre">math.inf</span></code> if these
+transitions are invalid)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.WeakModel.precision">
+<span class="sig-name descname"><span class="pre">precision</span></span><a class="headerlink" href="#cascada.abstractproperty.opmodel.WeakModel.precision" title="Permalink to this definition"></a></dt>
+<dd><p>the number of fraction bits used in the bit-vector weight
+(0 if all non-<code class="docutils literal notranslate"><span class="pre">math.inf</span></code> attributes <code class="docutils literal notranslate"><span class="pre">*_weight</span></code> are integer values)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.BranchNumberModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.abstractproperty.opmodel.</span></span><span class="sig-name descname"><span class="pre">BranchNumberModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_prop</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/opmodel.html#BranchNumberModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.opmodel.BranchNumberModel" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cascada.abstractproperty.opmodel.WeakModel" title="cascada.abstractproperty.opmodel.WeakModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.abstractproperty.opmodel.WeakModel</span></code></a></p>
+<p>Represent property models of bit-vector operations based on the branch number.</p>
+<p>Let <span class="math notranslate nohighlight">\((y_0, y_1, \dots, y_m) = f(x_1, x_2, \dots, x_n)\)</span> be a bit-vector
+function with input words <span class="math notranslate nohighlight">\(x_i\)</span> and output words <span class="math notranslate nohighlight">\(y_j\)</span>.
+Given a property pair
+<span class="math notranslate nohighlight">\(((P_{x_1}, \dots, P_{x_n}), (P_{y_1}, \dots, P_{y_n}))\)</span>
+over <span class="math notranslate nohighlight">\(f\)</span>, we say that the property
+<span class="math notranslate nohighlight">\(P_{x_i}\)</span> over <span class="math notranslate nohighlight">\(x_i\)</span> is <em>active</em> if <span class="math notranslate nohighlight">\(P_{x_i} \neq 0\)</span>
+(similar for <span class="math notranslate nohighlight">\(P_{y_j}\)</span>).</p>
+<p>A <a class="reference internal" href="#cascada.abstractproperty.opmodel.BranchNumberModel" title="cascada.abstractproperty.opmodel.BranchNumberModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BranchNumberModel</span></code></a> of an <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.Operation" title="cascada.bitvector.operation.Operation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Operation</span></code></a> <span class="math notranslate nohighlight">\(f\)</span> is an <a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel" title="cascada.abstractproperty.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">OpModel</span></code></a>
+where the propagation weight of a <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> pair <span class="math notranslate nohighlight">\((\alpha, \beta)\)</span>
+is one of the four cases of <a class="reference internal" href="#cascada.abstractproperty.opmodel.WeakModel" title="cascada.abstractproperty.opmodel.WeakModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">WeakModel</span></code></a> but with the additional
+constraint that if <span class="math notranslate nohighlight">\((\alpha, \beta)\)</span> is non-zero and its
+number of active words is strictly less than <span class="math notranslate nohighlight">\(B\)</span> then it is invalid.</p>
+<p>The number <span class="math notranslate nohighlight">\(B\)</span> is usually the <em>branch number</em> of <span class="math notranslate nohighlight">\(f\)</span>, that is,
+the minimum number of active words (at the input and at the output)
+among all non-zero property pairs.
+Nevertheless, any <span class="math notranslate nohighlight">\(2 \le B \le n + m\)</span> can be used.</p>
+<p>Since an <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.Operation" title="cascada.bitvector.operation.Operation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Operation</span></code></a> outputs a single bit-vector, the
+class attribute <a class="reference internal" href="#cascada.abstractproperty.opmodel.BranchNumberModel.output_widths" title="cascada.abstractproperty.opmodel.BranchNumberModel.output_widths"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">output_widths</span></code></a> of <a class="reference internal" href="#cascada.abstractproperty.opmodel.BranchNumberModel" title="cascada.abstractproperty.opmodel.BranchNumberModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BranchNumberModel</span></code></a> delimits
+the output words of <span class="math notranslate nohighlight">\(f\)</span>
+(for the counting of active output words).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To extract the output words from an <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.Operation" title="cascada.bitvector.operation.Operation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Operation</span></code></a> with a
+<a class="reference internal" href="#cascada.abstractproperty.opmodel.BranchNumberModel" title="cascada.abstractproperty.opmodel.BranchNumberModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BranchNumberModel</span></code></a>, use <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.PropExtract" title="cascada.abstractproperty.property.PropExtract"><code class="xref any py py-class docutils literal notranslate"><span class="pre">PropExtract</span></code></a> instead of <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.Extract" title="cascada.bitvector.operation.Extract"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Extract</span></code></a>.</p>
+</div>
+<p>This class is not meant to be instantiated but to provide a base
+class for branch-number-based models of operations (generated for example
+through <a class="reference internal" href="cascada.differential.opmodel.html#cascada.differential.opmodel.get_branch_number_model" title="cascada.differential.opmodel.get_branch_number_model"><code class="xref any py py-func docutils literal notranslate"><span class="pre">differential.opmodel.get_branch_number_model</span></code></a> or
+<a class="reference internal" href="cascada.linear.opmodel.html#cascada.linear.opmodel.get_branch_number_model" title="cascada.linear.opmodel.get_branch_number_model"><code class="xref any py py-func docutils literal notranslate"><span class="pre">linear.opmodel.get_branch_number_model</span></code></a>).</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.BranchNumberModel.output_widths">
+<span class="sig-name descname"><span class="pre">output_widths</span></span><a class="headerlink" href="#cascada.abstractproperty.opmodel.BranchNumberModel.output_widths" title="Permalink to this definition"></a></dt>
+<dd><p>a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">tuple</span></code></a> containing the widths of the output words</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.BranchNumberModel.branch_number">
+<span class="sig-name descname"><span class="pre">branch_number</span></span><a class="headerlink" href="#cascada.abstractproperty.opmodel.BranchNumberModel.branch_number" title="Permalink to this definition"></a></dt>
+<dd><p>the branch number <span class="math notranslate nohighlight">\(B\)</span></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.BranchNumberModel.zero2zero_weight">
+<span class="sig-name descname"><span class="pre">zero2zero_weight</span></span><a class="headerlink" href="#cascada.abstractproperty.opmodel.BranchNumberModel.zero2zero_weight" title="Permalink to this definition"></a></dt>
+<dd><p>a <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">decimal.Decimal</span></code></a> denoting the weight
+of the zero to zero transitions (<code class="docutils literal notranslate"><span class="pre">math.inf</span></code> if all these
+transitions are invalid)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.BranchNumberModel.nonzero2nonzero_weight">
+<span class="sig-name descname"><span class="pre">nonzero2nonzero_weight</span></span><a class="headerlink" href="#cascada.abstractproperty.opmodel.BranchNumberModel.nonzero2nonzero_weight" title="Permalink to this definition"></a></dt>
+<dd><p>a <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">decimal.Decimal</span></code></a> denoting the weight
+of the non-zero to non-zero transitions (<code class="docutils literal notranslate"><span class="pre">math.inf</span></code> if all these
+transitions are invalid)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.BranchNumberModel.zero2nonzero_weight">
+<span class="sig-name descname"><span class="pre">zero2nonzero_weight</span></span><a class="headerlink" href="#cascada.abstractproperty.opmodel.BranchNumberModel.zero2nonzero_weight" title="Permalink to this definition"></a></dt>
+<dd><p>a <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">decimal.Decimal</span></code></a> denoting the weight
+of the zero to non-zero transitions (<code class="docutils literal notranslate"><span class="pre">math.inf</span></code> if all these
+transitions are invalid)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.BranchNumberModel.nonzero2zero_weight">
+<span class="sig-name descname"><span class="pre">nonzero2zero_weight</span></span><a class="headerlink" href="#cascada.abstractproperty.opmodel.BranchNumberModel.nonzero2zero_weight" title="Permalink to this definition"></a></dt>
+<dd><p>a <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">decimal.Decimal</span></code></a> denoting the weight
+of the non-zero to zero transitions (<code class="docutils literal notranslate"><span class="pre">math.inf</span></code> if all these
+transitions are invalid)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.BranchNumberModel.precision">
+<span class="sig-name descname"><span class="pre">precision</span></span><a class="headerlink" href="#cascada.abstractproperty.opmodel.BranchNumberModel.precision" title="Permalink to this definition"></a></dt>
+<dd><p>the number of fraction bits used in the bit-vector weight
+(0 if all non-<code class="docutils literal notranslate"><span class="pre">math.inf</span></code> attributes <code class="docutils literal notranslate"><span class="pre">*_weight</span></code> are integer values)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.WDTModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.abstractproperty.opmodel.</span></span><span class="sig-name descname"><span class="pre">WDTModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_prop</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/opmodel.html#WDTModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.opmodel.WDTModel" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Represent WDT-based models of bit-vector operations w.r.t some property.</p>
+<p>A model based on a Weight Distribution Table (WDT) is an <a class="reference internal" href="#cascada.abstractproperty.opmodel.OpModel" title="cascada.abstractproperty.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">OpModel</span></code></a>
+where the propagation weight is obtained from a 2-dimensional
+table <code class="docutils literal notranslate"><span class="pre">WDT</span></code> such that <code class="docutils literal notranslate"><span class="pre">WDT[a][b]</span></code> contains the propagation
+weight of the input-output <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> pair <span class="math notranslate nohighlight">\((a, b)\)</span>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For the <a class="reference internal" href="cascada.differential.difference.html#cascada.differential.difference.Difference" title="cascada.differential.difference.Difference"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Difference</span></code></a> (resp. <a class="reference internal" href="cascada.linear.mask.html#cascada.linear.mask.LinearMask" title="cascada.linear.mask.LinearMask"><code class="xref any py py-class docutils literal notranslate"><span class="pre">LinearMask</span></code></a>) property,
+the WDT is also known as the Difference Distribution Table or DDT
+(resp. Linear Approximation Table or LAT).</p>
+</div>
+<p>This class is not meant to be instantiated but to provide a base
+class for WDT-based models of operations (generated for example
+through <a class="reference internal" href="cascada.differential.opmodel.html#cascada.differential.opmodel.get_wdt_model" title="cascada.differential.opmodel.get_wdt_model"><code class="xref any py py-func docutils literal notranslate"><span class="pre">differential.opmodel.get_wdt_model</span></code></a> or
+<a class="reference internal" href="cascada.linear.opmodel.html#cascada.linear.opmodel.get_wdt_model" title="cascada.linear.opmodel.get_wdt_model"><code class="xref any py py-func docutils literal notranslate"><span class="pre">linear.opmodel.get_wdt_model</span></code></a>).</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.WDTModel.weight_distribution_table">
+<span class="sig-name descname"><span class="pre">weight_distribution_table</span></span><a class="headerlink" href="#cascada.abstractproperty.opmodel.WDTModel.weight_distribution_table" title="Permalink to this definition"></a></dt>
+<dd><p>a 2-dimensional <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">tuple</span></code></a> containing
+the distribution of the propagations weights,
+where <a class="reference external" href="https://docs.python.org/3/library/math.html#math.inf" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">math.inf</span></code></a> entries correspond to invalid transitions</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.WDTModel.loop_rows_then_columns">
+<span class="sig-name descname"><span class="pre">loop_rows_then_columns</span></span><a class="headerlink" href="#cascada.abstractproperty.opmodel.WDTModel.loop_rows_then_columns" title="Permalink to this definition"></a></dt>
+<dd><p>whether to extract the constraints from
+<a class="reference internal" href="#cascada.abstractproperty.opmodel.WDTModel.weight_distribution_table" title="cascada.abstractproperty.opmodel.WDTModel.weight_distribution_table"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">weight_distribution_table</span></code></a> by looping first over the rows
+(input properties) and then over the columns (output properties)
+or vice-versa</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.abstractproperty.opmodel.WDTModel.precision">
+<span class="sig-name descname"><span class="pre">precision</span></span><a class="headerlink" href="#cascada.abstractproperty.opmodel.WDTModel.precision" title="Permalink to this definition"></a></dt>
+<dd><p>the number of fraction bits used in the bit-vector weight
+(0 if all the weights in <a class="reference internal" href="#cascada.abstractproperty.opmodel.WDTModel.weight_distribution_table" title="cascada.abstractproperty.opmodel.WDTModel.weight_distribution_table"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">weight_distribution_table</span></code></a> are integer values)</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cascada.abstractproperty.property.html" class="btn btn-neutral float-left" title="cascada.abstractproperty.property module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cascada.abstractproperty.tests.test_opmodel.html" class="btn btn-neutral float-right" title="cascada.abstractproperty.tests.test_opmodel module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Adrián Ranea.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

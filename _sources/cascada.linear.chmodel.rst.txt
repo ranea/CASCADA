@@ -1,0 +1,6 @@
+cascada.linear.chmodel module
+=============================
+
+.. automodule:: cascada.linear.chmodel
+   :members:
+   :show-inheritance:

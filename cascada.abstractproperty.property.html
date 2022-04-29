@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cascada.abstractproperty.property module &mdash; CASCADA 1.0.rc0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="cascada.abstractproperty.opmodel module" href="cascada.abstractproperty.opmodel.html" />
+    <link rel="prev" title="cascada.abstractproperty module" href="cascada.abstractproperty.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> CASCADA
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">CASCADA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="primitives_implemented.html">Primitives implemented</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="cascada.html">API reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="cascada.bitvector.html">cascada.bitvector module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.primitives.html">cascada.primitives module</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="cascada.abstractproperty.html">cascada.abstractproperty module</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">cascada.abstractproperty.property module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.abstractproperty.opmodel.html">cascada.abstractproperty.opmodel module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.abstractproperty.tests.test_opmodel.html">cascada.abstractproperty.tests.test_opmodel module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.abstractproperty.chmodel.html">cascada.abstractproperty.chmodel module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.abstractproperty.characteristic.html">cascada.abstractproperty.characteristic module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.differential.html">cascada.differential module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.linear.html">cascada.linear module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.algebraic.html">cascada.algebraic module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.smt.html">cascada.smt module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">CASCADA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="cascada.html">API reference</a> &raquo;</li>
+          <li><a href="cascada.abstractproperty.html">cascada.abstractproperty module</a> &raquo;</li>
+      <li>cascada.abstractproperty.property module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/cascada.abstractproperty.property.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-cascada.abstractproperty.property">
+<span id="cascada-abstractproperty-property-module"></span><h1>cascada.abstractproperty.property module<a class="headerlink" href="#module-cascada.abstractproperty.property" title="Permalink to this headline"></a></h1>
+<p>Provide a base class for properties like <a class="reference internal" href="cascada.differential.difference.html#cascada.differential.difference.Difference" title="cascada.differential.difference.Difference"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Difference</span></code></a>, <a class="reference internal" href="cascada.linear.mask.html#cascada.linear.mask.LinearMask" title="cascada.linear.mask.LinearMask"><code class="xref any py py-class docutils literal notranslate"><span class="pre">LinearMask</span></code></a> or <a class="reference internal" href="cascada.algebraic.value.html#cascada.algebraic.value.Value" title="cascada.algebraic.value.Value"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Value</span></code></a>.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.abstractproperty.property.Property">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.abstractproperty.property.</span></span><span class="sig-name descname"><span class="pre">Property</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/property.html#Property"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.property.Property" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Represent bit-vector properties.</p>
+<p>A (bit-vector) property pair, or simply a property, over a function <span class="math notranslate nohighlight">\(f\)</span>
+is a pair of bit-vectors <span class="math notranslate nohighlight">\((\alpha, \beta)\)</span> with
+an associated propagation probability <span class="math notranslate nohighlight">\(PP_f(\alpha, \beta)\)</span>.
+In this case, we also say that the input property <span class="math notranslate nohighlight">\(\alpha\)</span> propagates
+to the output property <span class="math notranslate nohighlight">\(\beta\)</span> with probability
+<span class="math notranslate nohighlight">\(PP_f(\alpha, \beta)\)</span>.</p>
+<p>Each instance of this class represents an input or output property;
+the underlying bit-vector value of the input or output property is stored
+in the attribute <a class="reference internal" href="#cascada.abstractproperty.property.Property.val" title="cascada.abstractproperty.property.Property.val"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">val</span></code></a>, but the associated function <span class="math notranslate nohighlight">\(f\)</span>
+is not stored within the <a class="reference internal" href="#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> object.</p>
+<p>Note that arithmetic with properties is not supported.
+For example, two <a class="reference internal" href="#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> objects <code class="docutils literal notranslate"><span class="pre">d1</span></code> and <code class="docutils literal notranslate"><span class="pre">d2</span></code>
+cannot be XORed, i.e., <code class="docutils literal notranslate"><span class="pre">d1</span> <span class="pre">^</span> <span class="pre">d2</span></code>.
+This can be done instead by performing the arithmetic with
+the property values and converting the resulting
+<a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term" title="cascada.bitvector.core.Term"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Term</span></code></a> to a property, that is, <code class="docutils literal notranslate"><span class="pre">Property(d1.val</span> <span class="pre">^</span> <span class="pre">d2.val)</span></code></p>
+<p>This class is not meant to be instantiated but to provide a base
+class to define bit-vector properties
+such as <a class="reference internal" href="cascada.differential.difference.html#cascada.differential.difference.Difference" title="cascada.differential.difference.Difference"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Difference</span></code></a>, <a class="reference internal" href="cascada.linear.mask.html#cascada.linear.mask.LinearMask" title="cascada.linear.mask.LinearMask"><code class="xref any py py-class docutils literal notranslate"><span class="pre">LinearMask</span></code></a> or <a class="reference internal" href="cascada.algebraic.value.html#cascada.algebraic.value.Value" title="cascada.algebraic.value.Value"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Value</span></code></a>.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.abstractproperty.property.Property.val">
+<span class="sig-name descname"><span class="pre">val</span></span><a class="headerlink" href="#cascada.abstractproperty.property.Property.val" title="Permalink to this definition"></a></dt>
+<dd><p>a <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term" title="cascada.bitvector.core.Term"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Term</span></code></a> representing the underlying value of the property.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.abstractproperty.property.Property.xreplace">
+<span class="sig-name descname"><span class="pre">xreplace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rule</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/property.html#Property.xreplace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.property.Property.xreplace" title="Permalink to this definition"></a></dt>
+<dd><p>Replace occurrences of properties within the expression.</p>
+<p>The argument <code class="docutils literal notranslate"><span class="pre">rule</span></code> is a dict-like object representing
+the replacement rule.</p>
+<p>This method is similar to SymPy <a class="reference external" href="https://docs.sympy.org/latest/modules/core.html?highlight=xreplace#sympy.core.basic.Basic.xreplace">xreplace</a> but with the restriction that
+only <a class="reference internal" href="#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> objects are allowed in <code class="docutils literal notranslate"><span class="pre">rule</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.abstractproperty.property.Property.vrepr">
+<span class="sig-name descname"><span class="pre">vrepr</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/property.html#Property.vrepr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.property.Property.vrepr" title="Permalink to this definition"></a></dt>
+<dd><p>Return an executable string representation.</p>
+<p>This method returns a string so that the relation
+<code class="docutils literal notranslate"><span class="pre">eval(self.vrepr())</span> <span class="pre">==</span> <span class="pre">self</span></code> holds.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.abstractproperty.property.Property.propagate">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">propagate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_prop</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/property.html#Property.propagate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.property.Property.propagate" title="Permalink to this definition"></a></dt>
+<dd><p>Propagate the given input property through the given operation.</p>
+<p>Given a function <span class="math notranslate nohighlight">\(y = f(x)\)</span>,
+an input property <span class="math notranslate nohighlight">\(p_x\)</span> propagates (over <span class="math notranslate nohighlight">\(f\)</span>) to
+an output property <span class="math notranslate nohighlight">\(p_y\)</span> if the propagation probability
+<span class="math notranslate nohighlight">\(PP_f(\alpha, \beta)\)</span> is not zero.</p>
+<p>Note that if <span class="math notranslate nohighlight">\(f\)</span> has <span class="math notranslate nohighlight">\(t\)</span> operands,
+the input property is actually a list of <span class="math notranslate nohighlight">\(t\)</span> properties, that is,
+<span class="math notranslate nohighlight">\(p_x = (p_{x_0}, p_{x_1}, \dots, p_{x_{t-1}})\)</span>,
+and similar for <span class="math notranslate nohighlight">\(p_y\)</span>.</p>
+<p>For some functions, any input property propagates to a unique
+output property with probability 1, and the output property
+can be easily computed from the input property.</p>
+<p>Examples of probability-one propagations are the following:</p>
+<ul class="simple">
+<li><p>For the <a class="reference internal" href="cascada.algebraic.value.html#cascada.algebraic.value.Value" title="cascada.algebraic.value.Value"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Value</span></code></a> property type, for any operation <span class="math notranslate nohighlight">\(f\)</span> and any
+input property <span class="math notranslate nohighlight">\(p_x\)</span>, the output property <span class="math notranslate nohighlight">\(p_y\)</span>
+is uniquely determined and its bit-vector value is <code class="docutils literal notranslate"><span class="pre">f(p_x.val)</span></code>.</p></li>
+<li><p>For the <a class="reference internal" href="cascada.differential.difference.html#cascada.differential.difference.Difference" title="cascada.differential.difference.Difference"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Difference</span></code></a> property type with difference operation <span class="math notranslate nohighlight">\(-\)</span>
+(e.g., XOR),  for any linear (over <span class="math notranslate nohighlight">\(-\)</span>) operation <span class="math notranslate nohighlight">\(f\)</span> and any
+input property <span class="math notranslate nohighlight">\(p_x\)</span>, the output property <span class="math notranslate nohighlight">\(p_y\)</span>
+is uniquely determined and its bit-vector value is <code class="docutils literal notranslate"><span class="pre">f(p_x.val)</span></code>.</p></li>
+<li><p>For the <a class="reference internal" href="cascada.linear.mask.html#cascada.linear.mask.LinearMask" title="cascada.linear.mask.LinearMask"><code class="xref any py py-class docutils literal notranslate"><span class="pre">LinearMask</span></code></a> property, for any XOR-linear operation <span class="math notranslate nohighlight">\(f\)</span>
+and any input property <span class="math notranslate nohighlight">\(p_x\)</span>,
+the output property <span class="math notranslate nohighlight">\(p_y\)</span> is uniquely determined and its
+bit-vector value satisfies <code class="docutils literal notranslate"><span class="pre">p_x.val</span> <span class="pre">==</span> <span class="pre">M(p_y.val)</span></code>, where <span class="math notranslate nohighlight">\(M\)</span>
+is the transpose of the binary matrix representing <span class="math notranslate nohighlight">\(f\)</span>.</p></li>
+</ul>
+<p>If for the given <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.Operation" title="cascada.bitvector.operation.Operation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Operation</span></code></a> <code class="docutils literal notranslate"><span class="pre">op</span></code> any input property propagates
+to a unique output property with probability 1 and the output property
+can be easily computed from the input property, this method
+returns the corresponding output property (for the given
+input property <code class="docutils literal notranslate"><span class="pre">input_prop</span></code>) as a <a class="reference internal" href="#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> object.
+Otherwise, this method returns the
+<a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel" title="cascada.abstractproperty.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.opmodel.OpModel</span></code></a> of the operation <code class="docutils literal notranslate"><span class="pre">op</span></code>
+with the given input property <code class="docutils literal notranslate"><span class="pre">input_prop</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Operations <code class="docutils literal notranslate"><span class="pre">op</span></code> with scalar operands are not supported,
+but these operands can be removed with <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.make_partial_operation" title="cascada.bitvector.operation.make_partial_operation"><code class="xref any py py-func docutils literal notranslate"><span class="pre">make_partial_operation</span></code></a>
+and partial operations are supported by this method.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>op</strong> – the bit-vector operator <span class="math notranslate nohighlight">\(f\)</span> as an <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.Operation" title="cascada.bitvector.operation.Operation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Operation</span></code></a> subclass</p></li>
+<li><p><strong>input_prop</strong> – a list containing the input <a class="reference internal" href="#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> for each operand of
+<code class="docutils literal notranslate"><span class="pre">op</span></code> (or simply the <a class="reference internal" href="#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> object if there is only
+one operand)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.abstractproperty.property.PropConcat">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.abstractproperty.property.</span></span><span class="sig-name descname"><span class="pre">PropConcat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/property.html#PropConcat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.property.PropConcat" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.Concat" title="cascada.bitvector.operation.Concat"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.bitvector.operation.Concat</span></code></a></p>
+<p>Subclass of <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.Concat" title="cascada.bitvector.operation.Concat"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Concat</span></code></a> that propagates properties naturally.</p>
+<p>The only difference between <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.Concat" title="cascada.bitvector.operation.Concat"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Concat</span></code></a> and <a class="reference internal" href="#cascada.abstractproperty.property.PropConcat" title="cascada.abstractproperty.property.PropConcat"><code class="xref any py py-class docutils literal notranslate"><span class="pre">PropConcat</span></code></a>
+is that the latter one propagates (see <a class="reference internal" href="#cascada.abstractproperty.property.Property.propagate" title="cascada.abstractproperty.property.Property.propagate"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">Property.propagate</span></code></a>)
+an input <a class="reference internal" href="#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> list <code class="docutils literal notranslate"><span class="pre">p0,</span> <span class="pre">p1</span></code> as <code class="docutils literal notranslate"><span class="pre">Property(Concat(p0.val,</span> <span class="pre">p1.val))</span></code>.</p>
+<blockquote>
+<div></div></blockquote>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.abstractproperty.property.PropExtract">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.abstractproperty.property.</span></span><span class="sig-name descname"><span class="pre">PropExtract</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/property.html#PropExtract"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.property.PropExtract" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.Extract" title="cascada.bitvector.operation.Extract"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.bitvector.operation.Extract</span></code></a></p>
+<p>Subclass of <code class="docutils literal notranslate"><span class="pre">Extract</span></code> that propagates properties naturally.</p>
+<p>The only difference between <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.Extract" title="cascada.bitvector.operation.Extract"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Extract</span></code></a> and <a class="reference internal" href="#cascada.abstractproperty.property.PropExtract" title="cascada.abstractproperty.property.PropExtract"><code class="xref any py py-class docutils literal notranslate"><span class="pre">PropExtract</span></code></a>
+is that the latter one (with fixed operands) propagates
+(see <a class="reference internal" href="#cascada.abstractproperty.property.Property.propagate" title="cascada.abstractproperty.property.Property.propagate"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">Property.propagate</span></code></a>) an input <a class="reference internal" href="#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> <code class="docutils literal notranslate"><span class="pre">p</span></code> as
+<code class="docutils literal notranslate"><span class="pre">Property(Extract_{·,</span> <span class="pre">i,</span> <span class="pre">j}(p0.val))</span></code>,
+where <code class="docutils literal notranslate"><span class="pre">i,</span> <span class="pre">j</span></code> are the fixed operands.</p>
+<blockquote>
+<div></div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cascada.abstractproperty.property.make_partial_propextract">
+<span class="sig-prename descclassname"><span class="pre">cascada.abstractproperty.property.</span></span><span class="sig-name descname"><span class="pre">make_partial_propextract</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">j</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/property.html#make_partial_propextract"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.property.make_partial_propextract" title="Permalink to this definition"></a></dt>
+<dd><p>Return a <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.PartialOperation" title="cascada.bitvector.operation.PartialOperation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">PartialOperation</span></code></a> of <a class="reference internal" href="#cascada.abstractproperty.property.PropExtract" title="cascada.abstractproperty.property.PropExtract"><code class="xref any py py-class docutils literal notranslate"><span class="pre">PropExtract</span></code></a> that propagates properties naturally.</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cascada.abstractproperty.html" class="btn btn-neutral float-left" title="cascada.abstractproperty module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cascada.abstractproperty.opmodel.html" class="btn btn-neutral float-right" title="cascada.abstractproperty.opmodel module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Adrián Ranea.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

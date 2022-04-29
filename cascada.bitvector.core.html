@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cascada.bitvector.core module &mdash; CASCADA 1.0.rc0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="cascada.bitvector.secondaryop module" href="cascada.bitvector.secondaryop.html" />
+    <link rel="prev" title="cascada.bitvector.context module" href="cascada.bitvector.context.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> CASCADA
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">CASCADA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="primitives_implemented.html">Primitives implemented</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="cascada.html">API reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="cascada.bitvector.html">cascada.bitvector module</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="cascada.bitvector.context.html">cascada.bitvector.context module</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">cascada.bitvector.core module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.bitvector.secondaryop.html">cascada.bitvector.secondaryop module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.bitvector.operation.html">cascada.bitvector.operation module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.bitvector.printing.html">cascada.bitvector.printing module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.bitvector.ssa.html">cascada.bitvector.ssa module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.primitives.html">cascada.primitives module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.abstractproperty.html">cascada.abstractproperty module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.differential.html">cascada.differential module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.linear.html">cascada.linear module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.algebraic.html">cascada.algebraic module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.smt.html">cascada.smt module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">CASCADA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="cascada.html">API reference</a> &raquo;</li>
+          <li><a href="cascada.bitvector.html">cascada.bitvector module</a> &raquo;</li>
+      <li>cascada.bitvector.core module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/cascada.bitvector.core.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-cascada.bitvector.core">
+<span id="cascada-bitvector-core-module"></span><h1>cascada.bitvector.core module<a class="headerlink" href="#module-cascada.bitvector.core" title="Permalink to this headline"></a></h1>
+<p>Provide the basic bit-vector types.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.bitvector.core.Term">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.bitvector.core.</span></span><span class="sig-name descname"><span class="pre">Term</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/core.html#Term"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.core.Term" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.sympy.org/latest/modules/core.html#sympy.core.basic.Basic" title="(in SymPy v1.10.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">sympy.core.basic.Basic</span></code></a></p>
+<p>Represent bit-vector terms.</p>
+<p>Bit-vector terms are constants, variables and operations applied to terms.</p>
+<p>Bit-vector terms support many operations with the standard
+operators symbols (&lt;=, +, ^, etc.). See <a class="reference internal" href="cascada.bitvector.operation.html#module-cascada.bitvector.operation" title="cascada.bitvector.operation"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">operation</span></code></a>
+for more information.</p>
+<p>This class is not meant to be instantiated but to provide a base
+class for the different types of terms.</p>
+<p>Note that Term inherits the methods of the SymPy class <a class="reference external" href="http://docs.sympy.org/latest/modules/core.html#module-sympy.core.basic">Basic</a>;
+many of these methods work with bit-vector terms out of the box.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="cascada.bitvector.core.Term.width">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">width</span></span><a class="headerlink" href="#cascada.bitvector.core.Term.width" title="Permalink to this definition"></a></dt>
+<dd><p>The bit-width of the term.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.core.Term.formula_size">
+<span class="sig-name descname"><span class="pre">formula_size</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/core.html#Term.formula_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.core.Term.formula_size" title="Permalink to this definition"></a></dt>
+<dd><p>Return the formula size of the bit-vector term.</p>
+<p>As defined in <a class="reference external" href="https://doi.org/10.1007/s00224-015-9653-1">Complexity of Fixed-Size Bit-Vector Logics</a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.core.Term.vrepr">
+<span class="sig-name descname"><span class="pre">vrepr</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/core.html#Term.vrepr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.core.Term.vrepr" title="Permalink to this definition"></a></dt>
+<dd><p>Return an executable string representation.</p>
+<p>This method returns a string so that the relation
+<code class="docutils literal notranslate"><span class="pre">eval(expr.vrepr()))</span> <span class="pre">==</span> <span class="pre">expr</span></code> holds when <code class="docutils literal notranslate"><span class="pre">expr</span></code> is a <a class="reference internal" href="#cascada.bitvector.core.Term" title="cascada.bitvector.core.Term"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Term</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.core.Term.srepr">
+<span class="sig-name descname"><span class="pre">srepr</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/core.html#Term.srepr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.core.Term.srepr" title="Permalink to this definition"></a></dt>
+<dd><p>Return a short string representation.</p>
+<p>This method returns a short string describing
+the bit-vector term, as opposed to <a class="reference internal" href="#cascada.bitvector.core.Term.vrepr" title="cascada.bitvector.core.Term.vrepr"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">vrepr</span></code></a> which
+returns a long and executable string representation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.core.Term.crepr">
+<span class="sig-name descname"><span class="pre">crepr</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/core.html#Term.crepr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.core.Term.crepr" title="Permalink to this definition"></a></dt>
+<dd><p>Return a C code representation.</p>
+<p>This method returns a string with an expression in the
+C programming language that evaluates to <code class="docutils literal notranslate"><span class="pre">self</span></code>.</p>
+<p>Bit-vector widths larger than 128 are not supported.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span><span class="p">,</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span> <span class="o">*</span> <span class="n">Constant</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span><span class="o">.</span><span class="n">crepr</span><span class="p">()</span>
+<span class="go">&#39;(a * 0x2U) &amp; 0xfU&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">Constant</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span><span class="o">.</span><span class="n">crepr</span><span class="p">()</span>
+<span class="go">&#39;(_Bool)((a &lt; 0x1U) &amp; 0x1U)&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Variable</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">8</span><span class="p">)[</span><span class="mi">2</span><span class="p">:</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">crepr</span><span class="p">()</span>
+<span class="go">&#39;(a &gt;&gt; 0x1U) &amp; 0x3U&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Constant</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">96</span><span class="p">)</span><span class="o">.</span><span class="n">crepr</span><span class="p">()</span>
+<span class="go">&#39;((__uint128)(0x1ULL)) &amp; (((__uint128)(0xffffffffULL) &lt;&lt; 64) | ((__uint128)(0xffffffffffffffffULL)))&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.core.Term.doit">
+<span class="sig-name descname"><span class="pre">doit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eval_sec_ops</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_symmetric_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/core.html#Term.doit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.core.Term.doit" title="Permalink to this definition"></a></dt>
+<dd><p>Evaluate the term.</p>
+<p>Similar to Sympy’s <a class="reference external" href="https://docs.sympy.org/latest/modules/core.html#sympy.core.basic.Basic.doit">doit</a>
+method, this method evaluate the term in case it was not evaluated
+by default (like <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.SecondaryOperation" title="cascada.bitvector.operation.SecondaryOperation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SecondaryOperation</span></code></a> objects).</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">eval_sec_ops</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>, the evaluation is done
+with the context <a class="reference internal" href="cascada.bitvector.context.html#cascada.bitvector.context.SecondaryOperationEvaluation" title="cascada.bitvector.context.SecondaryOperationEvaluation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SecondaryOperationEvaluation</span></code></a> enabled.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">sort_symmetric_args</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>, arguments of
+symmetric <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.Operation" title="cascada.bitvector.operation.Operation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Operation</span></code></a> objects are sorted.</p>
+<p>See also <a class="reference internal" href="cascada.bitvector.context.html#cascada.bitvector.context.PrimaryOperationEvaluation" title="cascada.bitvector.context.PrimaryOperationEvaluation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">PrimaryOperationEvaluation</span></code></a> and <a class="reference internal" href="cascada.bitvector.context.html#cascada.bitvector.context.SecondaryOperationEvaluation" title="cascada.bitvector.context.SecondaryOperationEvaluation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SecondaryOperationEvaluation</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.core.Term.class_key">
+<span class="sig-name descname"><span class="pre">class_key</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/core.html#Term.class_key"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.core.Term.class_key" title="Permalink to this definition"></a></dt>
+<dd><p>Return the key (identifier) of the class for sorting.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.core.Term.atoms">
+<span class="sig-name descname"><span class="pre">atoms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">types</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/core.html#Term.atoms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.core.Term.atoms" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the <em>atoms</em> that form the current object.</p>
+<p>This can be used to get all the bit-vectors of type <a class="reference internal" href="#cascada.bitvector.core.Constant" title="cascada.bitvector.core.Constant"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a> or
+the bit-vectors of type <a class="reference internal" href="#cascada.bitvector.core.Variable" title="cascada.bitvector.core.Variable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Variable</span></code></a> from a bit-vector expression.</p>
+<p>For more information see
+<a class="reference external" href="https://docs.sympy.org/latest/modules/core.html#sympy.core.basic.Basic.atoms">SymPy’s atoms method</a>.
+This method is similar to the SymPy variant but this method
+doesn’t throw an exception when one of the arguments is of type ‘int’.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span><span class="p">,</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">expr</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span> <span class="o">+</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">expr</span><span class="o">.</span><span class="n">atoms</span><span class="p">(</span><span class="n">Constant</span><span class="p">)</span>
+<span class="go">{0x1}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">expr</span><span class="o">.</span><span class="n">atoms</span><span class="p">(</span><span class="n">Variable</span><span class="p">)</span>
+<span class="go">{a}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.bitvector.core.Constant">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.bitvector.core.</span></span><span class="sig-name descname"><span class="pre">Constant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/core.html#Constant"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.core.Constant" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.sympy.org/latest/modules/core.html#sympy.core.basic.Atom" title="(in SymPy v1.10.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">sympy.core.basic.Atom</span></code></a>, <a class="reference internal" href="#cascada.bitvector.core.Term" title="cascada.bitvector.core.Term"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.bitvector.core.Term</span></code></a></p>
+<p>Represent bit-vector constants.</p>
+<p>Bit-vector constants are interpreted as unsigned integers in base 2,
+that is, a bit-vector <span class="math notranslate nohighlight">\((x_{n-1}, \dots, x_1, x_0)\)</span>,
+where <span class="math notranslate nohighlight">\(x_0\)</span> or <code class="docutils literal notranslate"><span class="pre">x[0]</span></code> denotes the LSB located at position 0,
+represents the non-negative integer <span class="math notranslate nohighlight">\(x_0 + 2 x_1 + \dots + 2^{n-1} x_{n-1}\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>val</strong> – the integer value.</p></li>
+<li><p><strong>width</strong> – the bit-width.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Constant</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
+<span class="go">0x003</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Constant</span><span class="p">(</span><span class="mb">0b11</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
+<span class="go">0x003</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Constant</span><span class="p">(</span><span class="mh">0x003</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
+<span class="go">0x003</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Constant</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span><span class="o">.</span><span class="n">vrepr</span><span class="p">()</span>
+<span class="go">&#39;Constant(0x003, width=12)&#39;</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.core.Constant.class_key">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">class_key</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/core.html#Constant.class_key"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.core.Constant.class_key" title="Permalink to this definition"></a></dt>
+<dd><p>Return the key (identifier) of the class for sorting.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="cascada.bitvector.core.Constant.val">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">val</span></span><a class="headerlink" href="#cascada.bitvector.core.Constant.val" title="Permalink to this definition"></a></dt>
+<dd><p>The integer represented by the bit-vector constant.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.core.Constant.formula_size">
+<span class="sig-name descname"><span class="pre">formula_size</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/core.html#Constant.formula_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.core.Constant.formula_size" title="Permalink to this definition"></a></dt>
+<dd><p>The formula size of the constant.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.core.Constant.bin">
+<span class="sig-name descname"><span class="pre">bin</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/core.html#Constant.bin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.core.Constant.bin" title="Permalink to this definition"></a></dt>
+<dd><p>Return the python-like binary representation.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">bin</span><span class="p">())</span>
+<span class="go">0b0011</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">bin</span><span class="p">())</span>
+<span class="go">0b000100</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.core.Constant.hex">
+<span class="sig-name descname"><span class="pre">hex</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/core.html#Constant.hex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.core.Constant.hex" title="Permalink to this definition"></a></dt>
+<dd><p>Return the python-like hexadecimal representation.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">hex</span><span class="p">())</span>
+<span class="go">0x3</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.core.Constant.oct">
+<span class="sig-name descname"><span class="pre">oct</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/core.html#Constant.oct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.core.Constant.oct" title="Permalink to this definition"></a></dt>
+<dd><p>Return the python-like octal representation.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">oct</span><span class="p">())</span>
+<span class="go">0o04</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.bitvector.core.Variable">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.bitvector.core.</span></span><span class="sig-name descname"><span class="pre">Variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/core.html#Variable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.core.Variable" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.sympy.org/latest/modules/core.html#sympy.core.basic.Atom" title="(in SymPy v1.10.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">sympy.core.basic.Atom</span></code></a>, <a class="reference internal" href="#cascada.bitvector.core.Term" title="cascada.bitvector.core.Term"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.bitvector.core.Term</span></code></a></p>
+<p>Represent bit-vector variables.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – the name of the variable.</p></li>
+<li><p><strong>width</strong> – the bit-width.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
+<span class="go">x</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span><span class="o">.</span><span class="n">vrepr</span><span class="p">()</span>
+<span class="go">&quot;Variable(&#39;x&#39;, width=12)&quot;</span>
+</pre></div>
+</div>
+<dl class="py property">
+<dt class="sig sig-object py" id="cascada.bitvector.core.Variable.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#cascada.bitvector.core.Variable.name" title="Permalink to this definition"></a></dt>
+<dd><p>The name of the variable.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.core.Variable.formula_size">
+<span class="sig-name descname"><span class="pre">formula_size</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/core.html#Variable.formula_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.core.Variable.formula_size" title="Permalink to this definition"></a></dt>
+<dd><p>The formula size of the variable.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cascada.bitvector.core.bitvectify">
+<span class="sig-prename descclassname"><span class="pre">cascada.bitvector.core.</span></span><span class="sig-name descname"><span class="pre">bitvectify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/core.html#bitvectify"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.core.bitvectify" title="Permalink to this definition"></a></dt>
+<dd><p>Convert the argument <em>t</em> to a bit-vector <a class="reference internal" href="#cascada.bitvector.core.Term" title="cascada.bitvector.core.Term"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Term</span></code></a> of bit-width <em>width</em>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">bitvectify</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">bitvectify</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span><span class="o">.</span><span class="n">vrepr</span><span class="p">())</span>
+<span class="go">Constant(0b00000000, width=8)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">bitvectify</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span><span class="o">.</span><span class="n">vrepr</span><span class="p">())</span>
+<span class="go">Variable(&#39;x&#39;, width=8)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cascada.bitvector.context.html" class="btn btn-neutral float-left" title="cascada.bitvector.context module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cascada.bitvector.secondaryop.html" class="btn btn-neutral float-right" title="cascada.bitvector.secondaryop module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Adrián Ranea.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

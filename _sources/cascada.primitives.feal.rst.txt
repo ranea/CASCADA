@@ -1,0 +1,6 @@
+cascada.primitives.feal module
+==============================
+
+.. automodule:: cascada.primitives.feal
+   :members:
+   :show-inheritance:

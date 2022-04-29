@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cascada.differential.difference module &mdash; CASCADA 1.0.rc0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="cascada.differential.opmodel module" href="cascada.differential.opmodel.html" />
+    <link rel="prev" title="cascada.differential module" href="cascada.differential.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> CASCADA
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">CASCADA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="primitives_implemented.html">Primitives implemented</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="cascada.html">API reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="cascada.bitvector.html">cascada.bitvector module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.primitives.html">cascada.primitives module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.abstractproperty.html">cascada.abstractproperty module</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="cascada.differential.html">cascada.differential module</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">cascada.differential.difference module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.differential.opmodel.html">cascada.differential.opmodel module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.differential.chmodel.html">cascada.differential.chmodel module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.differential.characteristic.html">cascada.differential.characteristic module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.linear.html">cascada.linear module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.algebraic.html">cascada.algebraic module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.smt.html">cascada.smt module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">CASCADA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="cascada.html">API reference</a> &raquo;</li>
+          <li><a href="cascada.differential.html">cascada.differential module</a> &raquo;</li>
+      <li>cascada.differential.difference module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/cascada.differential.difference.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-cascada.differential.difference">
+<span id="cascada-differential-difference-module"></span><h1>cascada.differential.difference module<a class="headerlink" href="#module-cascada.differential.difference" title="Permalink to this headline"></a></h1>
+<p>Represent types of difference properties in the context of differential cryptanalysis.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.differential.difference.Difference">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.differential.difference.</span></span><span class="sig-name descname"><span class="pre">Difference</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/differential/difference.html#Difference"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.differential.difference.Difference" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.abstractproperty.property.Property</span></code></a></p>
+<p>Represent difference properties.</p>
+<p>The <em>difference</em> between two <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term" title="cascada.bitvector.core.Term"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Term</span></code></a> objects <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(y\)</span>
+is defined as <span class="math notranslate nohighlight">\(\alpha = y - x\)</span>
+for some <em>difference operation</em> <span class="math notranslate nohighlight">\(-\)</span> (a bit-vector <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.Operation" title="cascada.bitvector.operation.Operation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Operation</span></code></a>).
+In other words, the pair <span class="math notranslate nohighlight">\((x, x + \alpha)\)</span> has difference
+<span class="math notranslate nohighlight">\(\alpha\)</span>, where <span class="math notranslate nohighlight">\(+\)</span> is the “inverse” of the difference operation.</p>
+<p>Given a function <span class="math notranslate nohighlight">\(f\)</span>,  a <a class="reference internal" href="#cascada.differential.difference.Difference" title="cascada.differential.difference.Difference"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Difference</span></code></a> property pair
+(also called a differential) <span class="math notranslate nohighlight">\((\alpha, \beta)\)</span>
+is a bit-vector <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> <span class="math notranslate nohighlight">\((\alpha, \beta)\)</span> where the
+propagation probability (also called the differential probability)
+is defined as
+<span class="math notranslate nohighlight">\(DP(\alpha, \beta) =
+\# \{ x \ : \ f(x + \alpha) - f(x)  = \beta \} / 2^{n}\)</span>,
+that is, the fraction of input pairs with input difference
+<span class="math notranslate nohighlight">\(\alpha\)</span> that lead to output pairs with difference <span class="math notranslate nohighlight">\(\beta\)</span>.</p>
+<p>The most common difference used in differential cryptanalysis
+is the XOR difference <a class="reference internal" href="#cascada.differential.difference.XorDiff" title="cascada.differential.difference.XorDiff"><code class="xref any py py-class docutils literal notranslate"><span class="pre">XorDiff</span></code></a> (where the difference operation
+is <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.BvXor" title="cascada.bitvector.operation.BvXor"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvXor</span></code></a>). Other examples are the additive difference
+(where the difference operation is <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.BvSub" title="cascada.bitvector.operation.BvSub"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvSub</span></code></a>) or the rotational-XOR
+difference <a class="reference internal" href="#cascada.differential.difference.RXDiff" title="cascada.differential.difference.RXDiff"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RXDiff</span></code></a>.</p>
+<p>This class is not meant to be instantiated but to provide a base
+class to represent types of differences.</p>
+<p>Internally, <a class="reference internal" href="#cascada.differential.difference.Difference" title="cascada.differential.difference.Difference"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Difference</span></code></a> is a subclass of <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> (as <a class="reference internal" href="cascada.linear.mask.html#cascada.linear.mask.LinearMask" title="cascada.linear.mask.LinearMask"><code class="xref any py py-class docutils literal notranslate"><span class="pre">LinearMask</span></code></a>).
+The <a class="reference internal" href="#cascada.differential.difference.Difference" title="cascada.differential.difference.Difference"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Difference</span></code></a> methods inherited from <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> requiring
+arguments of type <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> should be called instead with arguments
+of type <a class="reference internal" href="#cascada.differential.difference.Difference" title="cascada.differential.difference.Difference"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Difference</span></code></a>.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.differential.difference.Difference.diff_op">
+<span class="sig-name descname"><span class="pre">diff_op</span></span><a class="headerlink" href="#cascada.differential.difference.Difference.diff_op" title="Permalink to this definition"></a></dt>
+<dd><p>the difference <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.Operation" title="cascada.bitvector.operation.Operation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Operation</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.differential.difference.Difference.inv_diff_op">
+<span class="sig-name descname"><span class="pre">inv_diff_op</span></span><a class="headerlink" href="#cascada.differential.difference.Difference.inv_diff_op" title="Permalink to this definition"></a></dt>
+<dd><p>the inverse of the difference operation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.differential.difference.Difference.get_pair_element">
+<span class="sig-name descname"><span class="pre">get_pair_element</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/differential/difference.html#Difference.get_pair_element"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.differential.difference.Difference.get_pair_element" title="Permalink to this definition"></a></dt>
+<dd><p>Return the <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term" title="cascada.bitvector.core.Term"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Term</span></code></a> <span class="math notranslate nohighlight">\(y\)</span> such that <span class="math notranslate nohighlight">\(y = \alpha + x\)</span>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.differential.difference.Difference.from_pair">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_pair</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/differential/difference.html#Difference.from_pair"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.differential.difference.Difference.from_pair" title="Permalink to this definition"></a></dt>
+<dd><p>Return the <a class="reference internal" href="#cascada.differential.difference.Difference" title="cascada.differential.difference.Difference"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Difference</span></code></a> <span class="math notranslate nohighlight">\(\alpha = y - x\)</span> given two <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term" title="cascada.bitvector.core.Term"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Term</span></code></a>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.differential.difference.XorDiff">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.differential.difference.</span></span><span class="sig-name descname"><span class="pre">XorDiff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/differential/difference.html#XorDiff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.differential.difference.XorDiff" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cascada.differential.difference.Difference" title="cascada.differential.difference.Difference"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.differential.difference.Difference</span></code></a></p>
+<p>Represent XOR difference properties.</p>
+<p>The XOR difference of two <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term" title="cascada.bitvector.core.Term"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Term</span></code></a> is given by the XOR
+of the terms. In other words, the <em>difference operation</em>
+of <a class="reference internal" href="#cascada.differential.difference.XorDiff" title="cascada.differential.difference.XorDiff"><code class="xref any py py-class docutils literal notranslate"><span class="pre">XorDiff</span></code></a> is the <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.BvXor" title="cascada.bitvector.operation.BvXor"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvXor</span></code></a> (see <a class="reference internal" href="#cascada.differential.difference.Difference" title="cascada.differential.difference.Difference"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Difference</span></code></a>).</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span><span class="p">,</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.difference</span> <span class="kn">import</span> <span class="n">XorDiff</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="mb">0b000</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">Constant</span><span class="p">(</span><span class="mb">0b000</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">alpha</span> <span class="o">=</span> <span class="n">XorDiff</span><span class="o">.</span><span class="n">from_pair</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">alpha</span>
+<span class="go">XorDiff(0b000)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">alpha</span><span class="o">.</span><span class="n">get_pair_element</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="go">0b000</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="mb">0b010</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">Constant</span><span class="p">(</span><span class="mb">0b101</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">alpha</span> <span class="o">=</span> <span class="n">XorDiff</span><span class="o">.</span><span class="n">from_pair</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">alpha</span>
+<span class="go">XorDiff(0b111)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">alpha</span><span class="o">.</span><span class="n">get_pair_element</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="go">0b101</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">k</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">alpha</span> <span class="o">=</span> <span class="n">XorDiff</span><span class="o">.</span><span class="n">from_pair</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">alpha</span>
+<span class="go">XorDiff(0x00)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">alpha</span><span class="o">.</span><span class="n">get_pair_element</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+<span class="go">k</span>
+</pre></div>
+</div>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.differential.difference.XorDiff.diff_op">
+<span class="sig-name descname"><span class="pre">diff_op</span></span><a class="headerlink" href="#cascada.differential.difference.XorDiff.diff_op" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.BvXor" title="cascada.bitvector.operation.BvXor"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.bitvector.operation.BvXor</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.differential.difference.XorDiff.inv_diff_op">
+<span class="sig-name descname"><span class="pre">inv_diff_op</span></span><a class="headerlink" href="#cascada.differential.difference.XorDiff.inv_diff_op" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.BvXor" title="cascada.bitvector.operation.BvXor"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.bitvector.operation.BvXor</span></code></a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.differential.difference.XorDiff.propagate">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">propagate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_diff</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/differential/difference.html#XorDiff.propagate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.differential.difference.XorDiff.propagate" title="Permalink to this definition"></a></dt>
+<dd><p>Propagate the given input difference of type <a class="reference internal" href="#cascada.differential.difference.XorDiff" title="cascada.differential.difference.XorDiff"><code class="xref any py py-class docutils literal notranslate"><span class="pre">XorDiff</span></code></a> through the given operation.</p>
+<p>For any operation <code class="docutils literal notranslate"><span class="pre">op</span></code> linear with respect to <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.BvXor" title="cascada.bitvector.operation.BvXor"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvXor</span></code></a> and any
+input difference <code class="docutils literal notranslate"><span class="pre">input_diff</span></code>, the output difference
+is uniquely determined and its bit-vector value is <code class="docutils literal notranslate"><span class="pre">f(input_diff.val)</span></code>.</p>
+<p>See <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property.propagate" title="cascada.abstractproperty.property.Property.propagate"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">Property.propagate</span></code></a> for more information.</p>
+<p>User-defined or new <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.Operation" title="cascada.bitvector.operation.Operation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Operation</span></code></a> <code class="docutils literal notranslate"><span class="pre">op</span></code> can store its associated
+<a class="reference internal" href="#cascada.differential.difference.XorDiff" title="cascada.differential.difference.XorDiff"><code class="xref any py py-class docutils literal notranslate"><span class="pre">XorDiff</span></code></a> <a class="reference internal" href="cascada.differential.opmodel.html#cascada.differential.opmodel.OpModel" title="cascada.differential.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">differential.opmodel.OpModel</span></code></a> in <code class="docutils literal notranslate"><span class="pre">op.xor_model</span></code>,
+as this method first checks whether <code class="docutils literal notranslate"><span class="pre">op</span></code> has its associated
+<a class="reference internal" href="cascada.differential.opmodel.html#cascada.differential.opmodel.OpModel" title="cascada.differential.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">differential.opmodel.OpModel</span></code></a> stored in the class attribute <code class="docutils literal notranslate"><span class="pre">xor_model</span></code>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Variable</span><span class="p">,</span> <span class="n">Constant</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.operation</span> <span class="kn">import</span> <span class="n">BvXor</span><span class="p">,</span> <span class="n">BvAdd</span><span class="p">,</span> <span class="n">BvIdentity</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.operation</span> <span class="kn">import</span> <span class="n">make_partial_operation</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.difference</span> <span class="kn">import</span> <span class="n">XorDiff</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d1</span><span class="p">,</span> <span class="n">d2</span> <span class="o">=</span> <span class="n">XorDiff</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;d1&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">)),</span> <span class="n">XorDiff</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;d2&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">XorDiff</span><span class="o">.</span><span class="n">propagate</span><span class="p">(</span><span class="n">BvXor</span><span class="p">,</span> <span class="p">[</span><span class="n">d1</span><span class="p">,</span> <span class="n">d2</span><span class="p">])</span>
+<span class="go">XorDiff(d1 ^ d2)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Xor1</span> <span class="o">=</span> <span class="n">make_partial_operation</span><span class="p">(</span><span class="n">BvXor</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">([</span><span class="kc">None</span><span class="p">,</span> <span class="n">Constant</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">8</span><span class="p">)]))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">XorDiff</span><span class="o">.</span><span class="n">propagate</span><span class="p">(</span><span class="n">Xor1</span><span class="p">,</span> <span class="n">d1</span><span class="p">)</span>
+<span class="go">XorDiff(d1)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">XorDiff</span><span class="o">.</span><span class="n">propagate</span><span class="p">(</span><span class="n">BvAdd</span><span class="p">,</span> <span class="p">[</span><span class="n">d1</span><span class="p">,</span> <span class="n">d2</span><span class="p">])</span>
+<span class="go">XorModelBvAdd([XorDiff(d1), XorDiff(d2)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Add1</span> <span class="o">=</span> <span class="n">make_partial_operation</span><span class="p">(</span><span class="n">BvAdd</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">([</span><span class="kc">None</span><span class="p">,</span> <span class="n">Constant</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">8</span><span class="p">)]))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">XorDiff</span><span class="o">.</span><span class="n">propagate</span><span class="p">(</span><span class="n">Add1</span><span class="p">,</span> <span class="n">d1</span><span class="p">)</span>
+<span class="go">XorModelBvAddCt_{·, 0x01}(XorDiff(d1))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">XorDiff</span><span class="o">.</span><span class="n">propagate</span><span class="p">(</span><span class="n">BvIdentity</span><span class="p">,</span> <span class="n">d1</span><span class="p">)</span>
+<span class="go">XorModelId(XorDiff(d1))</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.differential.difference.RXOp">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.differential.difference.</span></span><span class="sig-name descname"><span class="pre">RXOp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/differential/difference.html#RXOp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.differential.difference.RXOp" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.SecondaryOperation" title="cascada.bitvector.operation.SecondaryOperation"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.bitvector.operation.SecondaryOperation</span></code></a></p>
+<p>The difference operation of <a class="reference internal" href="#cascada.differential.difference.RXDiff" title="cascada.differential.difference.RXDiff"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RXDiff</span></code></a> given by <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y)</span> <span class="pre">|--&gt;</span> <span class="pre">(x</span> <span class="pre">&lt;&lt;&lt;</span> <span class="pre">1)</span> <span class="pre">^</span> <span class="pre">y.</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.differential.difference.RXOp.condition">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">condition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/differential/difference.html#RXOp.condition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.differential.difference.RXOp.condition" title="Permalink to this definition"></a></dt>
+<dd><p>Check if the operands verify the restrictions of the operator.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.differential.difference.RXOp.output_width">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">output_width</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/differential/difference.html#RXOp.output_width"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.differential.difference.RXOp.output_width" title="Permalink to this definition"></a></dt>
+<dd><p>Return the bit-width of the resulting bit-vector.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.differential.difference.RXOp.eval">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">eval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/differential/difference.html#RXOp.eval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.differential.difference.RXOp.eval" title="Permalink to this definition"></a></dt>
+<dd><p>Evaluate the operator with given operands.</p>
+<p>This is an internal method that assumes the list <code class="docutils literal notranslate"><span class="pre">args</span></code> has been parsed.
+To evaluate a bit-vector operation, instantiate a new object with
+the operands as the object arguments (i.e., use the Python operator <code class="docutils literal notranslate"><span class="pre">()</span></code>).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.differential.difference.RXInvOp">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.differential.difference.</span></span><span class="sig-name descname"><span class="pre">RXInvOp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/differential/difference.html#RXInvOp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.differential.difference.RXInvOp" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.SecondaryOperation" title="cascada.bitvector.operation.SecondaryOperation"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.bitvector.operation.SecondaryOperation</span></code></a></p>
+<p>The inverse of the difference operation of <a class="reference internal" href="#cascada.differential.difference.RXDiff" title="cascada.differential.difference.RXDiff"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RXDiff</span></code></a> given by <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">d)</span> <span class="pre">|--&gt;</span> <span class="pre">(x</span> <span class="pre">&lt;&lt;&lt;</span> <span class="pre">1)</span> <span class="pre">^</span> <span class="pre">d.</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.differential.difference.RXInvOp.condition">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">condition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/differential/difference.html#RXInvOp.condition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.differential.difference.RXInvOp.condition" title="Permalink to this definition"></a></dt>
+<dd><p>Check if the operands verify the restrictions of the operator.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.differential.difference.RXInvOp.output_width">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">output_width</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/differential/difference.html#RXInvOp.output_width"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.differential.difference.RXInvOp.output_width" title="Permalink to this definition"></a></dt>
+<dd><p>Return the bit-width of the resulting bit-vector.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.differential.difference.RXInvOp.eval">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">eval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/differential/difference.html#RXInvOp.eval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.differential.difference.RXInvOp.eval" title="Permalink to this definition"></a></dt>
+<dd><p>Evaluate the operator with given operands.</p>
+<p>This is an internal method that assumes the list <code class="docutils literal notranslate"><span class="pre">args</span></code> has been parsed.
+To evaluate a bit-vector operation, instantiate a new object with
+the operands as the object arguments (i.e., use the Python operator <code class="docutils literal notranslate"><span class="pre">()</span></code>).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.differential.difference.RXDiff">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.differential.difference.</span></span><span class="sig-name descname"><span class="pre">RXDiff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/differential/difference.html#RXDiff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.differential.difference.RXDiff" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cascada.differential.difference.Difference" title="cascada.differential.difference.Difference"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.differential.difference.Difference</span></code></a></p>
+<p>Represent rotational-XOR (RX) difference properties.</p>
+<p>The pair <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">(x</span> <span class="pre">&lt;&lt;&lt;</span> <span class="pre">1)</span> <span class="pre">^</span> <span class="pre">d)</span></code> has RX difference <code class="docutils literal notranslate"><span class="pre">d</span></code>.
+In other words,  the RX difference of two <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term" title="cascada.bitvector.core.Term"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Term</span></code></a> <code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code>
+is defined as <code class="docutils literal notranslate"><span class="pre">(x</span> <span class="pre">&lt;&lt;&lt;</span> <span class="pre">1)</span> <span class="pre">^</span> <span class="pre">y</span></code>.</p>
+<p>This definition of rotational-XOR difference is equivalent but
+slightly different to the definitions presented in
+<a class="reference external" href="https://doi.org/10.13154/tosc.v2016.i1.57-70">Rotational Cryptanalysis in the Presence of Constants</a>
+and <a class="reference external" href="https://doi.org/10.13154/tosc.v2017.i3.24-36">Rotational-XOR Cryptanalysis of Reduced-round SPECK</a>.</p>
+<p>See <a class="reference internal" href="#cascada.differential.difference.Difference" title="cascada.differential.difference.Difference"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Difference</span></code></a> for more information.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span><span class="p">,</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.operation</span> <span class="kn">import</span> <span class="n">RotateLeft</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.difference</span> <span class="kn">import</span> <span class="n">RXDiff</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="mb">0b000</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">Constant</span><span class="p">(</span><span class="mb">0b000</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">alpha</span> <span class="o">=</span> <span class="n">RXDiff</span><span class="o">.</span><span class="n">from_pair</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">alpha</span>
+<span class="go">RXDiff(0b000)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">alpha</span><span class="o">.</span><span class="n">get_pair_element</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="go">0b000</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="mb">0b000</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">Constant</span><span class="p">(</span><span class="mb">0b001</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">alpha</span> <span class="o">=</span> <span class="n">RXDiff</span><span class="o">.</span><span class="n">from_pair</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">alpha</span>
+<span class="go">RXDiff(0b001)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">alpha</span><span class="o">.</span><span class="n">get_pair_element</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="go">0b001</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>  <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">RXDiff</span><span class="o">.</span><span class="n">from_pair</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">doit</span><span class="p">()</span>  <span class="c1"># RXOp is a SecondaryOperation</span>
+<span class="go">(x &lt;&lt;&lt; 1) ^ y</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">RXDiff</span><span class="o">.</span><span class="n">from_pair</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">RotateLeft</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">^</span> <span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">doit</span><span class="p">()</span>
+<span class="go">d</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">RXDiff</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">get_pair_element</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">doit</span><span class="p">()</span>
+<span class="go">(x &lt;&lt;&lt; 1) ^ d</span>
+</pre></div>
+</div>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.differential.difference.RXDiff.diff_op">
+<span class="sig-name descname"><span class="pre">diff_op</span></span><a class="headerlink" href="#cascada.differential.difference.RXDiff.diff_op" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="#cascada.differential.difference.RXOp" title="cascada.differential.difference.RXOp"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.differential.difference.RXOp</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.differential.difference.RXDiff.inv_diff_op">
+<span class="sig-name descname"><span class="pre">inv_diff_op</span></span><a class="headerlink" href="#cascada.differential.difference.RXDiff.inv_diff_op" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="#cascada.differential.difference.RXInvOp" title="cascada.differential.difference.RXInvOp"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.differential.difference.RXInvOp</span></code></a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.differential.difference.RXDiff.propagate">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">propagate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_diff</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/differential/difference.html#RXDiff.propagate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.differential.difference.RXDiff.propagate" title="Permalink to this definition"></a></dt>
+<dd><p>Propagate the given input difference of type <a class="reference internal" href="#cascada.differential.difference.RXDiff" title="cascada.differential.difference.RXDiff"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RXDiff</span></code></a> through the given operation.</p>
+<p>For any operation <code class="docutils literal notranslate"><span class="pre">op</span></code> linear with respect to <a class="reference internal" href="#cascada.differential.difference.RXOp" title="cascada.differential.difference.RXOp"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RXOp</span></code></a> and any
+input difference <code class="docutils literal notranslate"><span class="pre">input_diff</span></code>, the output difference
+is uniquely determined and its bit-vector value is <code class="docutils literal notranslate"><span class="pre">f(input_diff.val)</span></code>.</p>
+<p>See <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property.propagate" title="cascada.abstractproperty.property.Property.propagate"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">Property.propagate</span></code></a> for more information.</p>
+<p>User-defined or new <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.Operation" title="cascada.bitvector.operation.Operation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Operation</span></code></a> <code class="docutils literal notranslate"><span class="pre">op</span></code> can store its associated <a class="reference internal" href="#cascada.differential.difference.RXDiff" title="cascada.differential.difference.RXDiff"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RXDiff</span></code></a>
+<a class="reference internal" href="cascada.differential.opmodel.html#cascada.differential.opmodel.OpModel" title="cascada.differential.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">differential.opmodel.OpModel</span></code></a> in <code class="docutils literal notranslate"><span class="pre">op.rx_model</span></code>, as this method first
+checks whether <code class="docutils literal notranslate"><span class="pre">op</span></code> has its associated <a class="reference internal" href="cascada.differential.opmodel.html#cascada.differential.opmodel.OpModel" title="cascada.differential.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">differential.opmodel.OpModel</span></code></a>
+stored in the class attribute <code class="docutils literal notranslate"><span class="pre">rx_model</span></code>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Variable</span><span class="p">,</span> <span class="n">Constant</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.operation</span> <span class="kn">import</span> <span class="n">BvAdd</span><span class="p">,</span> <span class="n">BvXor</span><span class="p">,</span> <span class="n">BvShl</span><span class="p">,</span> <span class="n">BvIdentity</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.operation</span> <span class="kn">import</span> <span class="n">make_partial_operation</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.difference</span> <span class="kn">import</span> <span class="n">RXDiff</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d1</span><span class="p">,</span> <span class="n">d2</span> <span class="o">=</span> <span class="n">RXDiff</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;d1&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">)),</span> <span class="n">RXDiff</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;d2&quot;</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">RXDiff</span><span class="o">.</span><span class="n">propagate</span><span class="p">(</span><span class="n">BvXor</span><span class="p">,</span> <span class="p">[</span><span class="n">d1</span><span class="p">,</span> <span class="n">d2</span><span class="p">])</span>
+<span class="go">RXDiff(d1 ^ d2)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Xor1</span> <span class="o">=</span> <span class="n">make_partial_operation</span><span class="p">(</span><span class="n">BvXor</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">([</span><span class="kc">None</span><span class="p">,</span> <span class="n">Constant</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">8</span><span class="p">)]))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">RXDiff</span><span class="o">.</span><span class="n">propagate</span><span class="p">(</span><span class="n">Xor1</span><span class="p">,</span> <span class="n">d1</span><span class="p">)</span>
+<span class="go">RXDiff(d1 ^ 0x03)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">RXDiff</span><span class="o">.</span><span class="n">propagate</span><span class="p">(</span><span class="n">BvAdd</span><span class="p">,</span> <span class="p">[</span><span class="n">d1</span><span class="p">,</span> <span class="n">d2</span><span class="p">])</span>
+<span class="go">RXModelBvAdd([RXDiff(d1), RXDiff(d2)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Shl1</span> <span class="o">=</span> <span class="n">make_partial_operation</span><span class="p">(</span><span class="n">BvShl</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">([</span><span class="kc">None</span><span class="p">,</span> <span class="n">Constant</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">8</span><span class="p">)]))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">RXDiff</span><span class="o">.</span><span class="n">propagate</span><span class="p">(</span><span class="n">Shl1</span><span class="p">,</span> <span class="n">d1</span><span class="p">)</span>
+<span class="go">RXModelBvShlCt_{·, 0x01}(RXDiff(d1))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">RXDiff</span><span class="o">.</span><span class="n">propagate</span><span class="p">(</span><span class="n">BvIdentity</span><span class="p">,</span> <span class="n">d1</span><span class="p">)</span>
+<span class="go">RXModelId(RXDiff(d1))</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cascada.differential.html" class="btn btn-neutral float-left" title="cascada.differential module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cascada.differential.opmodel.html" class="btn btn-neutral float-right" title="cascada.differential.opmodel module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Adrián Ranea.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

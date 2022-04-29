@@ -1,0 +1,6 @@
+cascada.differential.opmodel module
+===================================
+
+.. automodule:: cascada.differential.opmodel
+   :members:
+   :show-inheritance:

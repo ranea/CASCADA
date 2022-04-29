@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cascada.differential.characteristic &mdash; CASCADA 1.0.rc0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> CASCADA
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">CASCADA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../primitives_implemented.html">Primitives implemented</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cascada.html">API reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">CASCADA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>cascada.differential.characteristic</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cascada.differential.characteristic</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Manipulate non-symbolic differential characteristics.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">decimal</span>
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">multiprocessing</span>
+<span class="kn">import</span> <span class="nn">random</span>
+
+<span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">core</span>
+<span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">context</span>
+<span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">ssa</span> <span class="k">as</span> <span class="n">cascada_ssa</span>
+<span class="kn">from</span> <span class="nn">cascada.differential</span> <span class="kn">import</span> <span class="n">difference</span>
+<span class="kn">from</span> <span class="nn">cascada.differential</span> <span class="kn">import</span> <span class="n">chmodel</span> <span class="k">as</span> <span class="n">cascada_chmodel</span>
+<span class="kn">from</span> <span class="nn">cascada.differential</span> <span class="kn">import</span> <span class="n">opmodel</span> <span class="k">as</span> <span class="n">cascada_opmodel</span>
+
+<span class="kn">from</span> <span class="nn">cascada</span> <span class="kn">import</span> <span class="n">abstractproperty</span>
+
+
+<span class="nb">zip</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="nb">zip</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">EmpiricalWeightData</span> <span class="o">=</span> <span class="n">abstractproperty</span><span class="o">.</span><span class="n">characteristic</span><span class="o">.</span><span class="n">EmpiricalWeightData</span>
+
+
+<div class="viewcode-block" id="Characteristic"><a class="viewcode-back" href="../../../cascada.differential.characteristic.html#cascada.differential.characteristic.Characteristic">[docs]</a><span class="k">class</span> <span class="nc">Characteristic</span><span class="p">(</span><span class="n">abstractproperty</span><span class="o">.</span><span class="n">characteristic</span><span class="o">.</span><span class="n">Characteristic</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent differential characteristics over bit-vector functions.</span>
+
+<span class="sd">    Internally, this class is a subclass of</span>
+<span class="sd">    `abstractproperty.characteristic.Characteristic`,</span>
+<span class="sd">    where the `Property` is a `Difference` type.</span>
+
+<span class="sd">    As mentioned in `abstractproperty.characteristic.Characteristic`,</span>
+<span class="sd">    the characteristic probability is defined as the product of the propagation</span>
+<span class="sd">    probability (differential probability) of the `Difference` pairs (differentials)</span>
+<span class="sd">    :math:`(\Delta_{x_{i}} \mapsto \Delta_{x_{i+1}})` over :math:`f_i`.</span>
+<span class="sd">    If :math:`f` has external variables, the characteristic probability</span>
+<span class="sd">    approximates the differential probability of the input-output difference pair</span>
+<span class="sd">    of the characteristic averaged over the set of all values of the external variables.</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Constant</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.operation import RotateLeft</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.differential.difference import XorDiff, RXDiff</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.differential.chmodel import ChModel</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.differential.characteristic import Characteristic</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">        &gt;&gt;&gt; Speck32_KS = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64).key_schedule</span>
+<span class="sd">        &gt;&gt;&gt; Speck32_KS.set_num_rounds(2)</span>
+<span class="sd">        &gt;&gt;&gt; xor_ch_model = ChModel(Speck32_KS, XorDiff, [&quot;dmk0&quot;, &quot;dmk1&quot;, &quot;dmk2&quot;])</span>
+<span class="sd">        &gt;&gt;&gt; zd = core.Constant(0, width=16)</span>
+<span class="sd">        &gt;&gt;&gt; mk0 = RotateLeft(Constant(1, width=16), 5)  # mk0 &gt;&gt;&gt; 7 == 0b010···0</span>
+<span class="sd">        &gt;&gt;&gt; rr2 = RotateLeft(Constant(1, width=16), 14)  # rr2 == 0b010···0 == d5 == d11 (see ch_model)</span>
+<span class="sd">        &gt;&gt;&gt; xor_ch = Characteristic([mk0, zd, zd], [zd, zd, rr2], [zd, rr2, zd, zd, rr2], xor_ch_model)</span>
+<span class="sd">        &gt;&gt;&gt; xor_ch  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        Characteristic(ch_weight=1, assignment_weights=[0, 1, 0, 0, 0],</span>
+<span class="sd">            input_diff=[0x0020, 0x0000, 0x0000], output_diff=[0x0000, 0x0000, 0x4000],</span>
+<span class="sd">            assign_outdiff_list=[0x0000, 0x4000, 0x0000, 0x0000, 0x4000])</span>
+<span class="sd">        &gt;&gt;&gt; list(zip(xor_ch.assignment_weights, xor_ch.tuple_assign_outdiff2op_model))  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        [(Decimal(&#39;0&#39;), (XorDiff(0x0000), XorModelBvAdd([XorDiff(0x0000), XorDiff(0x0000)]))),</span>
+<span class="sd">        (Decimal(&#39;1&#39;), (XorDiff(0x4000), XorModelBvAdd([XorDiff(0x4000), XorDiff(0x0000)]))),</span>
+<span class="sd">        (Decimal(&#39;0&#39;), (XorDiff(0x0000), XorModelId(XorDiff(0x0000)))),</span>
+<span class="sd">        (Decimal(&#39;0&#39;), (XorDiff(0x0000), XorModelId(XorDiff(0x0000)))),</span>
+<span class="sd">        (Decimal(&#39;0&#39;), (XorDiff(0x4000), XorModelId(XorDiff(0x4000))))]</span>
+<span class="sd">        &gt;&gt;&gt; rx_ch_model = ChModel(Speck32_KS, RXDiff, [&quot;dmk0&quot;, &quot;dmk1&quot;, &quot;dmk2&quot;])</span>
+<span class="sd">        &gt;&gt;&gt; zd = RXDiff(core.Constant(0, width=16))</span>
+<span class="sd">        &gt;&gt;&gt; td = RXDiff(core.Constant(3, width=16))</span>
+<span class="sd">        &gt;&gt;&gt; rx_ch = Characteristic([zd, zd, zd], [zd, zd, td], [zd, zd, zd, zd, td], rx_ch_model)</span>
+<span class="sd">        &gt;&gt;&gt; rx_ch  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        Characteristic(ch_weight=2.829986944784033003657233894,</span>
+<span class="sd">            assignment_weights=[1.414993472392016501828616947, 1.414993472392016501828616947, 0, 0, 0],</span>
+<span class="sd">            input_diff=[0x0000, 0x0000, 0x0000], output_diff=[0x0000, 0x0000, 0x0003],</span>
+<span class="sd">            assign_outdiff_list=[0x0000, 0x0000, 0x0000, 0x0000, 0x0003])</span>
+<span class="sd">        &gt;&gt;&gt; list(zip(rx_ch.assignment_weights, rx_ch.tuple_assign_outdiff2op_model))  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        [(Decimal(&#39;1.414993472392016501828616947&#39;), (RXDiff(0x0000), RXModelBvAdd([RXDiff(0x0000), RXDiff(0x0000)]))),</span>
+<span class="sd">        (Decimal(&#39;1.414993472392016501828616947&#39;), (RXDiff(0x0000), RXModelBvAdd([RXDiff(0x0000), RXDiff(0x0000)]))),</span>
+<span class="sd">        (Decimal(&#39;0&#39;), (RXDiff(0x0000), RXModelId(RXDiff(0x0000)))),</span>
+<span class="sd">        (Decimal(&#39;0&#39;), (RXDiff(0x0000), RXModelId(RXDiff(0x0000)))),</span>
+<span class="sd">        (Decimal(&#39;0&#39;), (RXDiff(0x0003), RXModelId(RXDiff(0x0003))))]</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        input_diff: a list of `Difference` objects containing</span>
+<span class="sd">            the (constant) input difference (alias of</span>
+<span class="sd">            `abstractproperty.characteristic.Characteristic.input_prop`).</span>
+<span class="sd">        output_diff: a list of `Difference` objects containing</span>
+<span class="sd">            the (constant) output difference (alias of</span>
+<span class="sd">            `abstractproperty.characteristic.Characteristic.output_prop`).</span>
+<span class="sd">        external_diffs: a list containing the (constant) `Difference` of</span>
+<span class="sd">            the external variables of the function (alias of</span>
+<span class="sd">            `abstractproperty.characteristic.Characteristic.external_props`).</span>
+<span class="sd">        tuple_assign_outdiff2op_model:  a tuple where each element is a pair</span>
+<span class="sd">            containing: (1) the output (constant) `Difference` :math:`\Delta_{x_{i+1}}`</span>
+<span class="sd">            of the non-trivial assignment  :math:`x_{i+1} \leftarrow f_i(x_i)`</span>
+<span class="sd">            and (2) the `differential.opmodel.OpModel` of this assignment with</span>
+<span class="sd">            a (constant) input `Difference` :math:`\Delta_{x_{i}}` (alias of</span>
+<span class="sd">            `abstractproperty.characteristic.Characteristic.tuple_assign_outprop2op_model`).</span>
+<span class="sd">        free_diffs: a list of (symbolic) `Difference` objects of</span>
+<span class="sd">            the `Characteristic.ch_model`, whose values do not affect the</span>
+<span class="sd">            characteristic, and were replaced by constant differences in `input_diff`,</span>
+<span class="sd">            `output_diff`, `external_diffs` or `tuple_assign_outdiff2op_model`</span>
+<span class="sd">            (alias of `abstractproperty.characteristic.Characteristic.free_props`).</span>
+<span class="sd">        var_diff2ct_diff: a `collections.OrderedDict` mapping each</span>
+<span class="sd">            symbolic `Difference` in the trail to its constant difference (alias of</span>
+<span class="sd">            `abstractproperty.characteristic.Characteristic.var_prop2ct_prop`).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_prop_label</span> <span class="o">=</span> <span class="s2">&quot;diff&quot;</span>  <span class="c1"># for str and vrepr</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">input_diff</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_prop</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">output_diff</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_prop</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">external_diffs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">external_props</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">tuple_assign_outdiff2op_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tuple_assign_outprop2op_model</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">free_diffs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">free_props</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">var_diff2ct_diff</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_prop2ct_prop</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_diff</span><span class="p">,</span> <span class="n">output_diff</span><span class="p">,</span> <span class="n">assign_outdiff_list</span><span class="p">,</span>
+                 <span class="n">ch_model</span><span class="p">,</span> <span class="n">external_diffs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">free_diffs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">empirical_ch_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">empirical_data_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">is_valid</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">input_prop</span><span class="o">=</span><span class="n">input_diff</span><span class="p">,</span> <span class="n">output_prop</span><span class="o">=</span><span class="n">output_diff</span><span class="p">,</span> <span class="n">assign_outprop_list</span><span class="o">=</span><span class="n">assign_outdiff_list</span><span class="p">,</span>
+            <span class="n">ch_model</span><span class="o">=</span><span class="n">ch_model</span><span class="p">,</span> <span class="n">external_props</span><span class="o">=</span><span class="n">external_diffs</span><span class="p">,</span> <span class="n">free_props</span><span class="o">=</span><span class="n">free_diffs</span><span class="p">,</span>
+            <span class="n">empirical_ch_weight</span><span class="o">=</span><span class="n">empirical_ch_weight</span><span class="p">,</span> <span class="n">empirical_data_list</span><span class="o">=</span><span class="n">empirical_data_list</span><span class="p">,</span> <span class="n">is_valid</span><span class="o">=</span><span class="n">is_valid</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="Characteristic.vrepr"><a class="viewcode-back" href="../../../cascada.differential.characteristic.html#cascada.differential.characteristic.Characteristic.vrepr">[docs]</a>    <span class="k">def</span> <span class="nf">vrepr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ignore_external_diffs</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return an executable string representation.</span>
+
+<span class="sd">        See also `abstractproperty.characteristic.Characteristic.vrepr`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Constant</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.operation import RotateLeft</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.difference import XorDiff</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.chmodel import ChModel</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64).key_schedule</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS.set_num_rounds(2)</span>
+<span class="sd">            &gt;&gt;&gt; xor_ch_model = ChModel(Speck32_KS, XorDiff, [&quot;dmk0&quot;, &quot;dmk1&quot;, &quot;dmk2&quot;])</span>
+<span class="sd">            &gt;&gt;&gt; zd = core.Constant(0, width=16)</span>
+<span class="sd">            &gt;&gt;&gt; mk0 = RotateLeft(Constant(1, width=16), 5)</span>
+<span class="sd">            &gt;&gt;&gt; aux = RotateLeft(Constant(1, width=16), 14)</span>
+<span class="sd">            &gt;&gt;&gt; xor_ch = Characteristic([mk0, zd, zd], [zd, zd, aux], [zd, aux, zd, zd, aux], xor_ch_model)</span>
+<span class="sd">            &gt;&gt;&gt; xor_ch.vrepr()  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">            &quot;Characteristic(input_diff=[Constant(0x0020, width=16), Constant(0x0000, width=16), Constant(0x0000, width=16)],</span>
+<span class="sd">                output_diff=[Constant(0x0000, width=16), Constant(0x0000, width=16), Constant(0x4000, width=16)],</span>
+<span class="sd">                assign_outdiff_list=[Constant(0x0000, width=16), Constant(0x4000, width=16),</span>
+<span class="sd">                    Constant(0x0000, width=16), Constant(0x0000, width=16), Constant(0x4000, width=16)],</span>
+<span class="sd">                ch_model=ChModel(func=SpeckKeySchedule.set_num_rounds_and_return(2), diff_type=XorDiff,</span>
+<span class="sd">                    input_diff_names=[&#39;dmk0&#39;, &#39;dmk1&#39;, &#39;dmk2&#39;], prefix=&#39;dx&#39;))&quot;</span>
+<span class="sd">            &gt;&gt;&gt; xor_ch.srepr()</span>
+<span class="sd">            &#39;Ch(w=1, id=0020 0000 0000, od=0000 0000 4000)&#39;</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># ignore ignore_external_diffs=ignore_external_diffs (parent class might be abstract)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">vrepr</span><span class="p">(</span><span class="n">ignore_external_diffs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Characteristic.split"><a class="viewcode-back" href="../../../cascada.differential.characteristic.html#cascada.differential.characteristic.Characteristic.split">[docs]</a>    <span class="k">def</span> <span class="nf">split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">diff_separators</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Split into multiple `Characteristic` objects given the list of difference separators.</span>
+
+<span class="sd">        See also `abstractproperty.characteristic.Characteristic.split`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.operation import RotateLeft</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.difference import XorDiff</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.chmodel import ChModel</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.characteristic import Characteristic</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64).key_schedule</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS.set_num_rounds(2)</span>
+<span class="sd">            &gt;&gt;&gt; xor_ch_model = ChModel(Speck32_KS, XorDiff, [&quot;dmk0&quot;, &quot;dmk1&quot;, &quot;dmk2&quot;])</span>
+<span class="sd">            &gt;&gt;&gt; tuple(xor_ch_model.ssa.assignments.items())  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">            ((dx0, dmk1 &gt;&gt;&gt; 7), (dx1, dx0 + dmk2), (dx2, dmk2 &lt;&lt;&lt; 2), (dx3, dx2 ^ dx1),</span>
+<span class="sd">            (dx4, dmk0 &gt;&gt;&gt; 7), (dx5, dx4 + dx3), (dx6, dx5 ^ 0x0001), (dx7, dx3 &lt;&lt;&lt; 2), (dx8, dx7 ^ dx6),</span>
+<span class="sd">            (dmk2_out, Id(dmk2)), (dx3_out, Id(dx3)), (dx8_out, Id(dx8)))</span>
+<span class="sd">            &gt;&gt;&gt; diff_separators = [ (XorDiff(Variable(&quot;dx2&quot;, width=16)), XorDiff(Variable(&quot;dx3&quot;, width=16))), ]</span>
+<span class="sd">            &gt;&gt;&gt; zd = core.Constant(0, width=16)</span>
+<span class="sd">            &gt;&gt;&gt; mk0 = RotateLeft(Constant(1, width=16), 5)  # mk0 &gt;&gt;&gt; 7 == 0b010···0</span>
+<span class="sd">            &gt;&gt;&gt; rr2 = RotateLeft(Constant(1, width=16), 14)  # rr2 == 0b010···0 == d5 == d11 (see ch_model)</span>
+<span class="sd">            &gt;&gt;&gt; xor_ch = Characteristic([mk0, zd, zd], [zd, zd, rr2], [zd, rr2, zd, zd, rr2], xor_ch_model)</span>
+<span class="sd">            &gt;&gt;&gt; for ch in xor_ch.split(diff_separators): print(ch)  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">            Characteristic(ch_weight=0, assignment_weights=[0, 0, 0, 0],</span>
+<span class="sd">                input_diff=[0x0020, 0x0000, 0x0000], output_diff=[0x0020, 0x0000, 0x0000],</span>
+<span class="sd">                assign_outdiff_list=[0x0000, 0x0020, 0x0000, 0x0000])</span>
+<span class="sd">            Characteristic(ch_weight=1, assignment_weights=[1, 0, 0, 0],</span>
+<span class="sd">                input_diff=[0x0020, 0x0000, 0x0000], output_diff=[0x0000, 0x0000, 0x4000],</span>
+<span class="sd">                assign_outdiff_list=[0x4000, 0x0000, 0x0000, 0x4000])</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">diff_separators</span><span class="p">)</span></div>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_num_right_inputs2weight</span><span class="p">(</span><span class="n">num_right_inputs</span><span class="p">,</span> <span class="n">num_input_samples</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">num_right_inputs</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">inf</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">pr</span> <span class="o">=</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="n">num_right_inputs</span><span class="p">)</span> <span class="o">/</span> <span class="n">num_input_samples</span>
+            <span class="n">weight</span> <span class="o">=</span> <span class="o">-</span> <span class="n">cascada_opmodel</span><span class="o">.</span><span class="n">log2_decimal</span><span class="p">(</span><span class="n">pr</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="n">weight</span> <span class="o">&gt;=</span> <span class="mi">0</span>
+            <span class="k">return</span> <span class="n">weight</span>
+
+    <span class="k">def</span> <span class="nf">_get_empirical_ch_weights_C</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_input_samples</span><span class="p">,</span> <span class="n">num_external_samples</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">num_parallel_processes</span><span class="p">,</span>
+                                    <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">get_sampled_inputs</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a list of empirical weights (one for each ``num_external_samples``)</span>
+<span class="sd">        by compiling and executing C code.</span>
+
+<span class="sd">            .. Implementation details:</span>
+<span class="sd">                Calling the C function get_num_right_inputs() returns the EW for one</span>
+<span class="sd">                external sample, which is randomly sampled at the beginning</span>
+<span class="sd">                get_num_right_inputs(). Thus, calling num_external_samples-times</span>
+<span class="sd">                get_num_right_inputs() produces the list of empirical weights.</span>
+<span class="sd">                This avoids returning a list in the C code.</span>
+
+<span class="sd">                The only argument of get_num_right_inputs is the seed.</span>
+<span class="sd">                The differences are hardcoded, and the input samples</span>
+<span class="sd">                are randomly sampled using the hardcoded differences.</span>
+
+<span class="sd">                PRNG used: http://www.math.sci.hiroshima-u.ac.jp/m-mat/MT/VERSIONS/C-LANG/mt19937-64.c</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">uuid</span>
+        <span class="kn">from</span> <span class="nn">cascada.bitvector.printing</span> <span class="kn">import</span> <span class="n">BvCCodePrinter</span>
+
+        <span class="k">assert</span> <span class="ow">not</span> <span class="p">(</span><span class="n">verbose</span> <span class="ow">and</span> <span class="n">get_sampled_inputs</span><span class="p">)</span>
+
+        <span class="k">assert</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="n">num_input_samples</span> <span class="o">&lt;=</span> <span class="mi">2</span> <span class="o">**</span> <span class="nb">sum</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">width</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_diff</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">external_diffs</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="n">num_external_samples</span> <span class="o">&lt;=</span> <span class="mi">2</span> <span class="o">**</span> <span class="nb">sum</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">width</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">external_diffs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">num_external_samples</span> <span class="o">==</span> <span class="mi">0</span>
+
+        <span class="k">if</span> <span class="n">num_input_samples</span><span class="o">.</span><span class="n">bit_length</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">64</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;max num_input_samples supported is 2**64 - 1&quot;</span><span class="p">)</span>
+
+        <span class="n">width2C_type</span> <span class="o">=</span> <span class="n">BvCCodePrinter</span><span class="o">.</span><span class="n">_width2C_type</span>
+        <span class="n">get_and_mask_C_code</span> <span class="o">=</span> <span class="n">BvCCodePrinter</span><span class="o">.</span><span class="n">_get_and_mask_C_code</span>
+
+        <span class="n">ctype_num_right_inputs</span> <span class="o">=</span> <span class="n">width2C_type</span><span class="p">(</span><span class="n">num_input_samples</span><span class="o">.</span><span class="n">bit_length</span><span class="p">())</span>
+
+        <span class="c1"># 1 - Build the C code</span>
+
+        <span class="n">header</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ctype_num_right_inputs</span><span class="si">}</span><span class="s2"> get_num_right_inputs(uint64_t seed);&quot;</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ch_model</span><span class="p">,</span> <span class="s2">&quot;_unwrapped_ch_model&quot;</span><span class="p">):</span>
+            <span class="c1"># avoid gcc error due to huge line statements</span>
+            <span class="n">ssa</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">_unwrapped_ch_model</span><span class="o">.</span><span class="n">ssa</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ssa</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">ssa</span>
+        <span class="n">eval_ssa_code_function_name</span> <span class="o">=</span> <span class="s2">&quot;eval_ssa&quot;</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">eval_ssa_code_body</span> <span class="o">=</span> <span class="n">ssa</span><span class="o">.</span><span class="n">get_C_code</span><span class="p">(</span><span class="n">eval_ssa_code_function_name</span><span class="p">)</span>  <span class="c1"># ignore header</span>
+
+        <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+        <span class="n">mt19937_filename</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;mt19937.c&quot;</span>
+
+        <span class="k">def</span> <span class="nf">rand</span><span class="p">(</span><span class="n">my_width</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">my_width</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">rand_str</span> <span class="o">=</span> <span class="s2">&quot;genrand64_int1&quot;</span>
+            <span class="k">elif</span> <span class="n">my_width</span> <span class="o">&lt;=</span> <span class="mi">8</span><span class="p">:</span>
+                <span class="n">rand_str</span> <span class="o">=</span> <span class="s2">&quot;genrand64_int8&quot;</span>
+            <span class="k">elif</span> <span class="n">my_width</span> <span class="o">&lt;=</span> <span class="mi">16</span><span class="p">:</span>
+                <span class="n">rand_str</span> <span class="o">=</span> <span class="s2">&quot;genrand64_int16&quot;</span>
+            <span class="k">elif</span> <span class="n">my_width</span> <span class="o">&lt;=</span> <span class="mi">32</span><span class="p">:</span>
+                <span class="n">rand_str</span> <span class="o">=</span> <span class="s2">&quot;genrand64_int32&quot;</span>
+            <span class="k">elif</span> <span class="n">my_width</span> <span class="o">&lt;=</span> <span class="mi">64</span><span class="p">:</span>
+                <span class="n">rand_str</span> <span class="o">=</span> <span class="s2">&quot;genrand64_int64&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;random bit-vectors with more than 64 bits are not supported&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">rand_str</span><span class="si">}</span><span class="s2">()</span><span class="si">{</span><span class="n">get_and_mask_C_code</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">width</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="c1"># stdint already in eval_ssa and in mt19937</span>
+        <span class="n">body</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;#include &quot;</span><span class="si">{</span><span class="n">mt19937_filename</span><span class="si">}</span><span class="s1">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="n">eval_ssa_code_body</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="n">body</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="n">ctype_num_right_inputs</span><span class="si">}</span><span class="s2"> get_num_right_inputs(uint64_t seed)</span><span class="se">{{</span><span class="s2">&quot;</span>
+
+        <span class="n">to_sample_all_iv</span> <span class="o">=</span> <span class="n">num_input_samples</span> <span class="o">==</span> <span class="mi">2</span> <span class="o">**</span> <span class="nb">sum</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">width</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_diff</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">external_diffs</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">to_sample_all_iv</span><span class="p">:</span>
+            <span class="n">body</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n\t</span><span class="s2">init_genrand64(seed);&quot;</span>
+
+        <span class="n">body</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n\t</span><span class="si">{</span><span class="n">ctype_num_right_inputs</span><span class="si">}</span><span class="s2"> num_right_inputs = 0U;&quot;</span>
+
+        <span class="c1"># to_sample_all_ev cannot be used since get_num_right_inputs only returns 1 EW</span>
+        <span class="k">if</span> <span class="n">ssa</span><span class="o">.</span><span class="n">external_vars</span><span class="p">:</span>
+            <span class="n">ev_other_names</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">v</span><span class="o">.</span><span class="n">crepr</span><span class="p">()</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">ssa</span><span class="o">.</span><span class="n">external_vars</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ssa</span><span class="o">.</span><span class="n">external_vars</span><span class="p">)):</span>
+                <span class="n">var</span> <span class="o">=</span> <span class="n">ssa</span><span class="o">.</span><span class="n">external_vars</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">body</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n\t</span><span class="si">{</span><span class="n">width2C_type</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">width</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">var</span><span class="o">.</span><span class="n">crepr</span><span class="p">()</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">rand</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">width</span><span class="p">)</span><span class="si">}</span><span class="s2">;&quot;</span>
+                <span class="n">other_var</span> <span class="o">=</span> <span class="n">core</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">ev_other_names</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">var</span><span class="o">.</span><span class="n">width</span><span class="p">)</span>
+                <span class="n">other_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">external_diffs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">get_pair_element</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+                <span class="n">body</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n\t</span><span class="si">{</span><span class="n">width2C_type</span><span class="p">(</span><span class="n">other_var</span><span class="o">.</span><span class="n">width</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">other_var</span><span class="o">.</span><span class="n">crepr</span><span class="p">()</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">other_val</span><span class="o">.</span><span class="n">crepr</span><span class="p">()</span><span class="si">}</span><span class="s2">;&quot;</span>
+                <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                    <span class="n">body</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1">printf(&quot;</span><span class="se">\\</span><span class="s1">nexternal_vars[%u] = (%x, %x)&quot;, </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">U, </span><span class="si">{</span><span class="n">var</span><span class="o">.</span><span class="n">crepr</span><span class="p">()</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">other_var</span><span class="o">.</span><span class="n">crepr</span><span class="p">()</span><span class="si">}</span><span class="s1">);&#39;</span>
+            <span class="n">ev_args</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">v</span><span class="o">.</span><span class="n">crepr</span><span class="p">()</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">ssa</span><span class="o">.</span><span class="n">external_vars</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span>
+            <span class="n">ev_other_args</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ev_other_names</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ev_args</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">ev_other_args</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="c1"># start for</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">to_sample_all_iv</span><span class="p">:</span>
+            <span class="n">body</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n\t</span><span class="s2">for (</span><span class="si">{</span><span class="n">ctype_num_right_inputs</span><span class="si">}</span><span class="s2"> i = 0U; i &lt; </span><span class="si">{</span><span class="n">num_input_samples</span><span class="si">}</span><span class="s2">U; ++i) </span><span class="se">{{</span><span class="s2">&quot;</span>
+
+        <span class="n">iv_other_names</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">v</span><span class="o">.</span><span class="n">crepr</span><span class="p">()</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">ssa</span><span class="o">.</span><span class="n">input_vars</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ssa</span><span class="o">.</span><span class="n">input_vars</span><span class="p">)):</span>
+            <span class="n">var</span> <span class="o">=</span> <span class="n">ssa</span><span class="o">.</span><span class="n">input_vars</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">to_sample_all_iv</span><span class="p">:</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="n">var</span><span class="o">.</span><span class="n">crepr</span><span class="p">()</span>
+                <span class="n">body</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n\t\t</span><span class="s2">for (</span><span class="si">{</span><span class="n">width2C_type</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">width</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2"> = 0U; </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2"> &lt; </span><span class="si">{</span><span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">width</span><span class="p">)</span><span class="si">}</span><span class="s2">U; ++</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">) </span><span class="se">{{</span><span class="s2">&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">body</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n\t\t</span><span class="si">{</span><span class="n">width2C_type</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">width</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">var</span><span class="o">.</span><span class="n">crepr</span><span class="p">()</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">rand</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">width</span><span class="p">)</span><span class="si">}</span><span class="s2">;&quot;</span>
+            <span class="n">other_var</span> <span class="o">=</span> <span class="n">core</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">iv_other_names</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">var</span><span class="o">.</span><span class="n">width</span><span class="p">)</span>
+            <span class="n">other_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_diff</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">get_pair_element</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+            <span class="n">body</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n\t\t</span><span class="si">{</span><span class="n">width2C_type</span><span class="p">(</span><span class="n">other_var</span><span class="o">.</span><span class="n">width</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">other_var</span><span class="o">.</span><span class="n">crepr</span><span class="p">()</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">other_val</span><span class="o">.</span><span class="n">crepr</span><span class="p">()</span><span class="si">}</span><span class="s2">;&quot;</span>
+            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                <span class="n">body</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n\t\t</span><span class="s1">printf(&quot;</span><span class="se">\\</span><span class="s1">ninput sample i=%u | input_vars[%u] = (%x, %x)&quot;, &#39;</span> \
+                        <span class="sa">f</span><span class="s1">&#39;i, </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">U, </span><span class="si">{</span><span class="n">var</span><span class="o">.</span><span class="n">crepr</span><span class="p">()</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">other_var</span><span class="o">.</span><span class="n">crepr</span><span class="p">()</span><span class="si">}</span><span class="s1">);&#39;</span>
+        <span class="k">if</span> <span class="n">get_sampled_inputs</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ssa</span><span class="o">.</span><span class="n">input_vars</span><span class="p">)):</span>
+                <span class="n">aux_prefix</span> <span class="o">=</span> <span class="s2">&quot;[&quot;</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+                <span class="n">aux_suffix</span> <span class="o">=</span> <span class="s2">&quot;],&quot;</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">ssa</span><span class="o">.</span><span class="n">input_vars</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+                <span class="n">body</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n\t\t</span><span class="s1">printf(&quot;</span><span class="si">{</span><span class="n">aux_prefix</span><span class="si">}</span><span class="s1">0x%x,</span><span class="si">{</span><span class="n">aux_suffix</span><span class="si">}</span><span class="s1">&quot;, </span><span class="si">{</span><span class="n">ssa</span><span class="o">.</span><span class="n">input_vars</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">crepr</span><span class="p">()</span><span class="si">}</span><span class="s1">);&#39;</span>
+        <span class="n">iv_args</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">v</span><span class="o">.</span><span class="n">crepr</span><span class="p">()</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">ssa</span><span class="o">.</span><span class="n">input_vars</span><span class="p">])</span>
+        <span class="n">iv_other_args</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">iv_other_names</span><span class="p">)</span>
+
+        <span class="n">ov_other_names</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">v</span><span class="o">.</span><span class="n">crepr</span><span class="p">()</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">ssa</span><span class="o">.</span><span class="n">output_vars</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ssa</span><span class="o">.</span><span class="n">output_vars</span><span class="p">)):</span>
+            <span class="n">var</span> <span class="o">=</span> <span class="n">ssa</span><span class="o">.</span><span class="n">output_vars</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">other_var</span> <span class="o">=</span> <span class="n">core</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">ov_other_names</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">var</span><span class="o">.</span><span class="n">width</span><span class="p">)</span>
+            <span class="c1"># var passed by reference later (no need to declare them as pointers)</span>
+            <span class="n">body</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n\t\t</span><span class="si">{</span><span class="n">width2C_type</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">width</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">var</span><span class="o">.</span><span class="n">crepr</span><span class="p">()</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">other_var</span><span class="o">.</span><span class="n">crepr</span><span class="p">()</span><span class="si">}</span><span class="s2">;&quot;</span>
+        <span class="n">ov_args</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;&amp;&quot;</span> <span class="o">+</span> <span class="n">v</span><span class="o">.</span><span class="n">crepr</span><span class="p">()</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">ssa</span><span class="o">.</span><span class="n">output_vars</span><span class="p">])</span>
+        <span class="n">ov_other_args</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;&amp;&quot;</span> <span class="o">+</span> <span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">ov_other_names</span><span class="p">])</span>
+
+        <span class="n">body</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n\t\t</span><span class="si">{</span><span class="n">eval_ssa_code_function_name</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="n">iv_args</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">ev_args</span><span class="si">}{</span><span class="n">ov_args</span><span class="si">}</span><span class="s2">);&quot;</span>
+        <span class="n">body</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n\t\t</span><span class="si">{</span><span class="n">eval_ssa_code_function_name</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="n">iv_other_args</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">ev_other_args</span><span class="si">}{</span><span class="n">ov_other_args</span><span class="si">}</span><span class="s2">);&quot;</span>
+
+        <span class="n">if_conditions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ssa</span><span class="o">.</span><span class="n">output_vars</span><span class="p">)):</span>
+            <span class="n">var</span> <span class="o">=</span> <span class="n">ssa</span><span class="o">.</span><span class="n">output_vars</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">other_var</span> <span class="o">=</span> <span class="n">core</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">ov_other_names</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">var</span><span class="o">.</span><span class="n">width</span><span class="p">)</span>
+            <span class="n">current_d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">diff_type</span><span class="o">.</span><span class="n">from_pair</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">other_var</span><span class="p">)</span><span class="o">.</span><span class="n">val</span>
+            <span class="n">expected_d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_diff</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">val</span>
+            <span class="c1"># casting current_d is necessary for the comparison</span>
+            <span class="n">if_conditions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;( (</span><span class="si">{</span><span class="n">width2C_type</span><span class="p">(</span><span class="n">current_d</span><span class="o">.</span><span class="n">width</span><span class="p">)</span><span class="si">}</span><span class="s2">)(</span><span class="si">{</span><span class="n">current_d</span><span class="o">.</span><span class="n">crepr</span><span class="p">()</span><span class="si">}</span><span class="s2">) == </span><span class="si">{</span><span class="n">expected_d</span><span class="o">.</span><span class="n">crepr</span><span class="p">()</span><span class="si">}</span><span class="s2"> )&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                <span class="n">body</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n\t\t</span><span class="s1">printf(&quot;</span><span class="se">\\</span><span class="s1">n                 | output_vars[%u] = (%x, %x)&quot;, &#39;</span> \
+                        <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">U, </span><span class="si">{</span><span class="n">var</span><span class="o">.</span><span class="n">crepr</span><span class="p">()</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">other_var</span><span class="o">.</span><span class="n">crepr</span><span class="p">()</span><span class="si">}</span><span class="s1">);&#39;</span>
+                <span class="n">body</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n\t\t</span><span class="s1">printf(&quot;</span><span class="se">\\</span><span class="s1">n                 | current_expected[%u] = (%x, %x)&quot;, &#39;</span> \
+                        <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">U, </span><span class="si">{</span><span class="n">current_d</span><span class="o">.</span><span class="n">crepr</span><span class="p">()</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">expected_d</span><span class="o">.</span><span class="n">crepr</span><span class="p">()</span><span class="si">}</span><span class="s1">);&#39;</span>
+        <span class="n">body</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n\t\t</span><span class="s2">if ( </span><span class="si">{</span><span class="s1">&#39; &amp;&amp; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">if_conditions</span><span class="p">)</span><span class="si">}</span><span class="s2"> )</span><span class="se">{{</span><span class="s2">&quot;</span>
+        <span class="n">body</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n\t\t\t</span><span class="s2">num_right_inputs += 1U;&quot;</span>
+        <span class="n">body</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n\t\t</span><span class="s2">}&quot;</span>
+
+        <span class="k">if</span> <span class="n">to_sample_all_iv</span><span class="p">:</span>
+            <span class="n">body</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n\t\t</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;}&quot;</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">ssa</span><span class="o">.</span><span class="n">input_vars</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">body</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n\t</span><span class="s2">}&quot;</span>
+
+        <span class="c1"># end for</span>
+
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="n">body</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1">printf(&quot;</span><span class="se">\\</span><span class="s1">nnum_right_inputs = %u</span><span class="se">\\</span><span class="s1">n&quot;, num_right_inputs);&#39;</span>
+
+        <span class="n">body</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n\t</span><span class="s2">return num_right_inputs;</span><span class="se">\n</span><span class="s2">}&quot;</span>
+
+        <span class="c1"># 2 - Run the C code</span>
+
+        <span class="k">if</span> <span class="n">num_parallel_processes</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">num_external_samples</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">pymod</span><span class="p">,</span> <span class="n">tmpdir</span> <span class="o">=</span> <span class="n">cascada_ssa</span><span class="o">.</span><span class="n">_compile_C_code</span><span class="p">(</span><span class="n">header</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+
+            <span class="n">PRNG</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
+            <span class="n">PRNG</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+
+            <span class="n">aux_empirical_weights</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_external_samples</span><span class="p">)):</span>  <span class="c1"># num_external_samples can be 0</span>
+                <span class="n">num_right_inputs</span> <span class="o">=</span> <span class="n">pymod</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">get_num_right_inputs</span><span class="p">(</span><span class="n">PRNG</span><span class="o">.</span><span class="n">randrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">**</span><span class="mi">64</span><span class="p">))</span>
+                <span class="n">aux_empirical_weights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_num_right_inputs2weight</span><span class="p">(</span><span class="n">num_right_inputs</span><span class="p">,</span> <span class="n">num_input_samples</span><span class="p">)</span>
+                <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">lib_path</span><span class="p">,</span> <span class="n">module_name</span><span class="p">,</span> <span class="n">tmpdir</span> <span class="o">=</span> <span class="n">cascada_ssa</span><span class="o">.</span><span class="n">_compile_C_code</span><span class="p">(</span><span class="n">header</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">return_unloaded</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+
+            <span class="n">num_parallel_processes</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">num_parallel_processes</span><span class="p">,</span> <span class="n">num_external_samples</span><span class="p">)</span>
+
+            <span class="n">PRNG</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
+            <span class="n">PRNG</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+            <span class="n">external_seeds</span> <span class="o">=</span> <span class="p">[</span><span class="n">PRNG</span><span class="o">.</span><span class="n">randrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">**</span><span class="mi">64</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_external_samples</span><span class="p">)]</span>
+
+            <span class="n">chunk</span> <span class="o">=</span> <span class="n">num_external_samples</span> <span class="o">//</span> <span class="n">num_parallel_processes</span>
+            <span class="k">if</span> <span class="n">num_external_samples</span> <span class="o">%</span> <span class="n">num_parallel_processes</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">extra_chunk</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">extra_chunk</span> <span class="o">=</span> <span class="n">num_external_samples</span> <span class="o">%</span> <span class="n">num_parallel_processes</span>
+            <span class="k">assert</span> <span class="n">chunk</span><span class="o">*</span><span class="p">(</span><span class="n">num_parallel_processes</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">chunk</span> <span class="o">+</span> <span class="n">extra_chunk</span> <span class="o">==</span> <span class="n">num_external_samples</span>
+
+            <span class="n">aux_empirical_weights</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">with</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="n">num_parallel_processes</span><span class="p">)</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
+                <span class="n">async_results</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_parallel_processes</span><span class="p">)]</span>
+                <span class="k">for</span> <span class="n">ar_index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">async_results</span><span class="p">)):</span>
+                    <span class="n">async_results</span><span class="p">[</span><span class="n">ar_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">apply_async</span><span class="p">(</span>
+                        <span class="n">_run_C_code_get_num_right_inputs</span><span class="p">,</span>
+                        <span class="p">(</span>
+                            <span class="n">external_seeds</span><span class="p">[</span><span class="n">ar_index</span><span class="o">*</span><span class="n">chunk</span><span class="p">],</span>
+                            <span class="n">module_name</span><span class="p">,</span>
+                            <span class="n">lib_path</span><span class="p">,</span>
+                            <span class="n">chunk</span><span class="o">+</span><span class="n">extra_chunk</span> <span class="k">if</span> <span class="n">ar_index</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">async_results</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">chunk</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="n">pool</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="n">pool</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>  <span class="c1"># blocking call</span>
+                <span class="k">for</span> <span class="n">ar_index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">async_results</span><span class="p">)):</span>
+                    <span class="c1"># type(process_list[process_index]) == AsyncResult</span>
+                    <span class="c1"># and AsyncResult.get() blocks until result obtained</span>
+                    <span class="n">list_num_right_inputs</span> <span class="o">=</span> <span class="n">async_results</span><span class="p">[</span><span class="n">ar_index</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+                    <span class="n">aux_empirical_weights</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                        <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_num_right_inputs2weight</span><span class="p">(</span><span class="n">nri</span><span class="p">,</span> <span class="n">num_input_samples</span><span class="p">)</span> <span class="k">for</span> <span class="n">nri</span> <span class="ow">in</span> <span class="n">list_num_right_inputs</span><span class="p">]</span>
+                    <span class="p">)</span>
+
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">aux_empirical_weights</span><span class="p">)</span> <span class="o">==</span> <span class="n">num_external_samples</span>
+
+        <span class="n">tmpdir</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">aux_empirical_weights</span>
+
+    <span class="k">def</span> <span class="nf">_get_empirical_ch_weights_Python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_input_samples</span><span class="p">,</span> <span class="n">num_external_samples</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">list_input_samples</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a list of empirical weights (one for each ``num_external_samples``).&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="n">num_input_samples</span> <span class="o">&lt;=</span> <span class="mi">2</span> <span class="o">**</span> <span class="nb">sum</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">width</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_diff</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">external_diffs</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="n">num_external_samples</span> <span class="o">&lt;=</span> <span class="mi">2</span> <span class="o">**</span> <span class="nb">sum</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">width</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">external_diffs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">num_external_samples</span> <span class="o">==</span> <span class="mi">0</span>
+
+        <span class="n">PRNG</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">()</span>
+        <span class="n">PRNG</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">get_random_bv</span><span class="p">(</span><span class="n">width</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="n">PRNG</span><span class="o">.</span><span class="n">randrange</span><span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="n">width</span><span class="p">),</span> <span class="n">width</span><span class="p">)</span>
+
+        <span class="n">aux_empirical_weights</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">with</span> <span class="n">context</span><span class="o">.</span><span class="n">Simplification</span><span class="p">(</span><span class="kc">False</span><span class="p">),</span> <span class="n">context</span><span class="o">.</span><span class="n">Cache</span><span class="p">(</span><span class="kc">False</span><span class="p">):</span>
+            <span class="n">input_widths</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">width</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_diff</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">list_input_samples</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">list_input_samples</span><span class="p">)</span> <span class="o">==</span> <span class="n">num_input_samples</span>
+                <span class="k">def</span> <span class="nf">get_next_input_pair</span><span class="p">():</span>
+                    <span class="k">for</span> <span class="n">pt</span> <span class="ow">in</span> <span class="n">list_input_samples</span><span class="p">:</span>
+                        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_diff</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">pt</span><span class="p">)</span>
+                        <span class="n">other_pt</span> <span class="o">=</span> <span class="p">[]</span>
+                        <span class="k">for</span> <span class="n">aux_i</span><span class="p">,</span> <span class="n">diff</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_diff</span><span class="p">):</span>
+                            <span class="n">pt</span><span class="p">[</span><span class="n">aux_i</span><span class="p">]</span> <span class="o">=</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="n">pt</span><span class="p">[</span><span class="n">aux_i</span><span class="p">],</span> <span class="n">diff</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">width</span><span class="p">)</span>
+                            <span class="n">other_pt</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">diff</span><span class="o">.</span><span class="n">get_pair_element</span><span class="p">(</span><span class="n">pt</span><span class="p">[</span><span class="n">aux_i</span><span class="p">]))</span>
+                        <span class="k">yield</span> <span class="n">pt</span><span class="p">,</span> <span class="n">other_pt</span>
+            <span class="k">elif</span> <span class="n">num_input_samples</span> <span class="o">==</span> <span class="mi">2</span> <span class="o">**</span> <span class="nb">sum</span><span class="p">(</span><span class="n">input_widths</span><span class="p">):</span>
+                <span class="c1"># input_samples == whole input space</span>
+                <span class="k">def</span> <span class="nf">get_next_input_pair</span><span class="p">():</span>
+                    <span class="k">for</span> <span class="n">input_sample</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="n">w</span><span class="p">)</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">input_widths</span><span class="p">]):</span>
+                        <span class="n">pt</span> <span class="o">=</span> <span class="p">[</span><span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="n">p_i</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span> <span class="k">for</span> <span class="n">p_i</span><span class="p">,</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">input_sample</span><span class="p">,</span> <span class="n">input_widths</span><span class="p">)]</span>
+                        <span class="n">other_pt</span> <span class="o">=</span> <span class="p">[</span><span class="n">diff</span><span class="o">.</span><span class="n">get_pair_element</span><span class="p">(</span><span class="n">pt</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">diff</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_diff</span><span class="p">)]</span>
+                        <span class="k">yield</span> <span class="n">pt</span><span class="p">,</span> <span class="n">other_pt</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">def</span> <span class="nf">get_next_input_pair</span><span class="p">():</span>
+                    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_input_samples</span><span class="p">):</span>
+                        <span class="n">pt</span> <span class="o">=</span> <span class="p">[]</span>
+                        <span class="n">other_pt</span> <span class="o">=</span> <span class="p">[]</span>
+                        <span class="k">for</span> <span class="n">diff</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_diff</span><span class="p">:</span>
+                            <span class="n">random_bv</span> <span class="o">=</span> <span class="n">get_random_bv</span><span class="p">(</span><span class="n">diff</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">width</span><span class="p">)</span>
+                            <span class="n">pt</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">random_bv</span><span class="p">)</span>
+                            <span class="n">other_pt</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">diff</span><span class="o">.</span><span class="n">get_pair_element</span><span class="p">(</span><span class="n">random_bv</span><span class="p">))</span>
+                        <span class="k">yield</span> <span class="n">pt</span><span class="p">,</span> <span class="n">other_pt</span>
+
+            <span class="n">found_external_vars</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">external_diffs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+            <span class="k">if</span> <span class="n">found_external_vars</span><span class="p">:</span>
+                <span class="n">external_widths</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">width</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">external_diffs</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">num_external_samples</span> <span class="o">==</span> <span class="mi">2</span> <span class="o">**</span> <span class="nb">sum</span><span class="p">(</span><span class="n">external_widths</span><span class="p">):</span>
+                    <span class="c1"># external_samples == whole external space</span>
+                    <span class="n">external_space</span> <span class="o">=</span> <span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="n">w</span><span class="p">)</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">external_widths</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">external_space</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_external_samples</span><span class="p">)</span>  <span class="c1"># num_external_samples &gt; 0</span>
+
+                <span class="k">def</span> <span class="nf">get_next_ssa_pair_external_fixed</span><span class="p">():</span>
+                    <span class="k">for</span> <span class="n">external_sample</span> <span class="ow">in</span> <span class="n">external_space</span><span class="p">:</span>
+                        <span class="n">ssa</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">ssa</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                        <span class="n">v2c</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">()</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">external_sample</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">ssa</span><span class="o">.</span><span class="n">external_vars</span><span class="p">:</span>
+                                <span class="n">v2c</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_random_bv</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">width</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">for</span> <span class="n">i_v</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ssa</span><span class="o">.</span><span class="n">external_vars</span><span class="p">):</span>
+                                <span class="n">v2c</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="n">external_sample</span><span class="p">[</span><span class="n">i_v</span><span class="p">],</span> <span class="n">external_widths</span><span class="p">[</span><span class="n">i_v</span><span class="p">])</span>
+                        <span class="k">for</span> <span class="n">outvar</span> <span class="ow">in</span> <span class="n">ssa</span><span class="o">.</span><span class="n">assignments</span><span class="p">:</span>
+                            <span class="n">ssa</span><span class="o">.</span><span class="n">assignments</span><span class="p">[</span><span class="n">outvar</span><span class="p">]</span> <span class="o">=</span> <span class="n">ssa</span><span class="o">.</span><span class="n">assignments</span><span class="p">[</span><span class="n">outvar</span><span class="p">]</span><span class="o">.</span><span class="n">xreplace</span><span class="p">(</span><span class="n">v2c</span><span class="p">)</span>
+                        <span class="n">ssa</span><span class="o">.</span><span class="n">external_vars</span> <span class="o">=</span> <span class="p">[]</span>
+                        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">val</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">external_diffs</span><span class="p">)</span> <span class="ow">and</span> \
+                                <span class="bp">self</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">diff_type</span> <span class="o">==</span> <span class="n">difference</span><span class="o">.</span><span class="n">XorDiff</span><span class="p">:</span>
+                            <span class="n">other_ssa</span> <span class="o">=</span> <span class="n">ssa</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="c1"># RXDiff 0-difference does not mean ssa == other_ssa</span>
+                            <span class="n">other_ssa</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">ssa</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                            <span class="n">other_v2c</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">()</span>
+                            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">v2c</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+                                <span class="n">other_v2c</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">external_diffs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">get_pair_element</span><span class="p">(</span><span class="n">v2c</span><span class="p">[</span><span class="n">v</span><span class="p">])</span>
+                            <span class="k">for</span> <span class="n">outvar</span> <span class="ow">in</span> <span class="n">other_ssa</span><span class="o">.</span><span class="n">assignments</span><span class="p">:</span>
+                                <span class="n">other_ssa</span><span class="o">.</span><span class="n">assignments</span><span class="p">[</span><span class="n">outvar</span><span class="p">]</span> <span class="o">=</span> <span class="n">other_ssa</span><span class="o">.</span><span class="n">assignments</span><span class="p">[</span><span class="n">outvar</span><span class="p">]</span><span class="o">.</span><span class="n">xreplace</span><span class="p">(</span><span class="n">other_v2c</span><span class="p">)</span>
+                            <span class="n">other_ssa</span><span class="o">.</span><span class="n">external_vars</span> <span class="o">=</span> <span class="p">[]</span>
+                        <span class="c1"># print(&quot;# new external samples&quot;)</span>
+                        <span class="c1"># print(&quot;v2c:&quot;, v2c)</span>
+                        <span class="c1"># print(&quot;other_v2c:&quot;, other_v2c)  # might throw error</span>
+                        <span class="c1"># print(&quot;external_diffs:&quot;, self.external_diffs)</span>
+                        <span class="c1"># print(&quot;base ssa:&quot;, self.ch_model.ssa)</span>
+                        <span class="c1"># print(&quot;ssa:&quot;, ssa)</span>
+                        <span class="c1"># print(&quot;other_ssa:&quot;, other_ssa)  # might throw error</span>
+                        <span class="k">yield</span> <span class="n">ssa</span><span class="p">,</span> <span class="n">other_ssa</span>
+
+                <span class="n">gen_next_ssa_pair_external_fixed</span> <span class="o">=</span> <span class="n">get_next_ssa_pair_external_fixed</span><span class="p">()</span>
+
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_external_samples</span><span class="p">)):</span>  <span class="c1">#  num_external_samples can be 0</span>
+                <span class="n">num_right_inputs</span> <span class="o">=</span> <span class="mi">0</span>
+
+                <span class="k">if</span> <span class="n">found_external_vars</span><span class="p">:</span>
+                    <span class="n">ssa</span><span class="p">,</span> <span class="n">other_ssa</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">gen_next_ssa_pair_external_fixed</span><span class="p">)</span>
+                    <span class="c1"># print(&quot;&gt; ssa:&quot;, ssa)</span>
+                    <span class="c1"># print(&quot;&gt; other_ssa:&quot;, other_ssa)</span>
+
+                <span class="k">for</span> <span class="n">pt</span><span class="p">,</span> <span class="n">other_pt</span> <span class="ow">in</span> <span class="n">get_next_input_pair</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">found_external_vars</span><span class="p">:</span>  <span class="c1"># func() faster than SSA.eval()</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">ct</span><span class="p">,</span> <span class="n">other_ct</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">pt</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">other_pt</span><span class="p">)</span>
+                        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;expected a tuple of Constant values returned&quot;</span><span class="p">):</span>
+                                <span class="c1"># func might return redundant symbolic outputs (e.g., k ^ k = 0)</span>
+                                <span class="n">ct</span><span class="p">,</span> <span class="n">other_ct</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">ssa</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">pt</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">ssa</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">other_pt</span><span class="p">)</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="k">raise</span> <span class="n">e</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">ct</span><span class="p">,</span> <span class="n">other_ct</span> <span class="o">=</span> <span class="n">ssa</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">pt</span><span class="p">),</span> <span class="n">other_ssa</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">other_pt</span><span class="p">)</span>
+
+                    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="p">(</span><span class="n">ct</span><span class="p">,</span> <span class="n">other_ct</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">):</span>
+                            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;found symbolic output in ct=</span><span class="si">{</span><span class="n">ct</span><span class="si">}</span><span class="s2"> or other_ct=</span><span class="si">{</span><span class="n">other_ct</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                    <span class="c1"># print(&quot;pt, other_pt:&quot;, pt, &quot;\t&quot;, other_pt)</span>
+                    <span class="c1"># print(&quot;ct, other_ct:&quot;, ct, &quot;\t&quot;, other_ct)</span>
+                    <span class="c1"># print(&quot;expect diff:&quot;, self.output_diff)</span>
+                    <span class="c1"># print(&quot;diff found :&quot;, [self.ch_model.diff_type.from_pair(ct[i], other_ct[i]) for i in range(len(ct))])</span>
+                    <span class="c1"># print()</span>
+
+                    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">diff</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_diff</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">diff_type</span><span class="o">.</span><span class="n">from_pair</span><span class="p">(</span><span class="n">ct</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">other_ct</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">!=</span> <span class="n">diff</span><span class="p">:</span>
+                            <span class="k">break</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">num_right_inputs</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                <span class="n">aux_empirical_weights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_num_right_inputs2weight</span><span class="p">(</span><span class="n">num_right_inputs</span><span class="p">,</span> <span class="n">num_input_samples</span><span class="p">)</span>
+                <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">aux_empirical_weights</span>
+
+    <span class="k">def</span> <span class="nf">_get_empirical_data_complexity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_input_samples</span><span class="p">,</span> <span class="n">num_external_samples</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">num_input_samples</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># data complexity = small_ct * p^(-1), p == ch. probability</span>
+            <span class="c1"># w = -log2(p) = log2(p^(-1)) ==&gt; 2**w = p^(-1)</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ch_weight</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">error</span><span class="p">())</span>
+            <span class="c1"># small_ct == number of input bits</span>
+            <span class="n">small_ct</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">width</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">input_diff</span><span class="p">)</span>
+            <span class="n">num_input_samples</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">small_ct</span> <span class="o">*</span> <span class="n">p</span><span class="p">))</span>
+        <span class="n">num_input_samples</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+            <span class="mi">1</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">num_input_samples</span><span class="p">,</span> <span class="mi">2</span><span class="o">**</span><span class="nb">sum</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">width</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">input_diff</span><span class="p">)))</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">external_diffs</span><span class="p">:</span>
+            <span class="n">num_external_samples</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">num_external_samples</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># an external sample for each external bit</span>
+                <span class="n">num_external_samples</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">d</span><span class="o">.</span><span class="n">width</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">external_var2diff</span><span class="p">])</span>
+            <span class="n">num_external_samples</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+                <span class="mi">1</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">num_external_samples</span><span class="p">,</span> <span class="mi">2</span> <span class="o">**</span> <span class="nb">sum</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">width</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">external_var2diff</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">num_input_samples</span><span class="p">,</span> <span class="n">num_external_samples</span>
+
+<div class="viewcode-block" id="Characteristic.compute_empirical_ch_weight"><a class="viewcode-back" href="../../../cascada.differential.characteristic.html#cascada.differential.characteristic.Characteristic.compute_empirical_ch_weight">[docs]</a>    <span class="k">def</span> <span class="nf">compute_empirical_ch_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_input_samples</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">num_external_samples</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                    <span class="n">split_by_max_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">split_by_rounds</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                    <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">C_code</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">num_parallel_processes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compute and store the empirical weight.</span>
+
+<span class="sd">        The main description of this method can be read from</span>
+<span class="sd">        `abstractproperty.characteristic.Characteristic.compute_empirical_ch_weight`,</span>
+<span class="sd">        simply by replacing `Property` by `Difference` and</span>
+<span class="sd">        input-output pair by differential.</span>
+
+<span class="sd">        The basic subroutine in this case consists of computing the</span>
+<span class="sd">        fraction of right pairs for ``num_input_samples`` sampled input pairs.</span>
+<span class="sd">        An input pair with difference `input_diff` is a right pair</span>
+<span class="sd">        if `output_diff` is the difference of the output pair obtained</span>
+<span class="sd">        from evaluating the input pair through the underlying bit-vector function.</span>
+
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Constant</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.operation import RotateLeft</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.difference import RXDiff</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.chmodel import ChModel</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.characteristic import Characteristic</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64).key_schedule</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS.set_num_rounds(2)</span>
+<span class="sd">            &gt;&gt;&gt; rx_ch_model = ChModel(Speck32_KS, RXDiff, [&quot;dmk0&quot;, &quot;dmk1&quot;, &quot;dmk2&quot;])</span>
+<span class="sd">            &gt;&gt;&gt; zd = RXDiff(core.Constant(0, width=16))</span>
+<span class="sd">            &gt;&gt;&gt; td = RXDiff(core.Constant(3, width=16))</span>
+<span class="sd">            &gt;&gt;&gt; rx_ch = Characteristic([zd, zd, zd], [zd, zd, td], [zd, zd, zd, zd, td], rx_ch_model)</span>
+<span class="sd">            &gt;&gt;&gt; rx_ch.compute_empirical_ch_weight(seed=0)</span>
+<span class="sd">            &gt;&gt;&gt; rx_ch.empirical_ch_weight</span>
+<span class="sd">            Decimal(&#39;3.033853610869555448012695123&#39;)</span>
+<span class="sd">            &gt;&gt;&gt; for data in rx_ch.empirical_data_list: print(data)  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">            EmpiricalWeightData(weight_avg_aux_prs=3.033853610869555448012695123,</span>
+<span class="sd">                num_aux_weights=1, num_inf_aux_weights=0, num_input_samples=1466, seed=0, C_code=False)</span>
+<span class="sd">            &gt;&gt;&gt; rx_ch.compute_empirical_ch_weight(seed=0, C_code=True)</span>
+<span class="sd">            &gt;&gt;&gt; rx_ch.empirical_ch_weight</span>
+<span class="sd">            Decimal(&#39;2.947813779802864030440499920&#39;)</span>
+<span class="sd">            &gt;&gt;&gt; rx_ch.compute_empirical_ch_weight(split_by_max_weight=1.5, seed=0)</span>
+<span class="sd">            &gt;&gt;&gt; rx_ch.empirical_ch_weight</span>
+<span class="sd">            Decimal(&#39;2.682204698298087862793386808&#39;)</span>
+<span class="sd">            &gt;&gt;&gt; for data in rx_ch.empirical_data_list: print(data)  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">            EmpiricalWeightData(weight_avg_aux_prs=1.327361980937990421954710722,</span>
+<span class="sd">                num_aux_weights=1, num_inf_aux_weights=0, num_input_samples=266, seed=0, C_code=False)</span>
+<span class="sd">            EmpiricalWeightData(weight_avg_aux_prs=1.354842717360097440838676086,</span>
+<span class="sd">                num_aux_weights=1, num_inf_aux_weights=0, num_input_samples=266, seed=0, C_code=False)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">compute_empirical_ch_weight</span><span class="p">(</span>
+            <span class="n">num_input_samples</span><span class="o">=</span><span class="n">num_input_samples</span><span class="p">,</span> <span class="n">num_external_samples</span><span class="o">=</span><span class="n">num_external_samples</span><span class="p">,</span>
+            <span class="n">split_by_max_weight</span><span class="o">=</span><span class="n">split_by_max_weight</span><span class="p">,</span> <span class="n">split_by_rounds</span><span class="o">=</span><span class="n">split_by_rounds</span><span class="p">,</span>
+            <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span> <span class="n">C_code</span><span class="o">=</span><span class="n">C_code</span><span class="p">,</span> <span class="n">num_parallel_processes</span><span class="o">=</span><span class="n">num_parallel_processes</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Characteristic.random"><a class="viewcode-back" href="../../../cascada.differential.characteristic.html#cascada.differential.characteristic.Characteristic.random">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">random</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">ch_model</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">external_diffs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a random `Characteristic` with given `differential.chmodel.ChModel`.</span>
+
+<span class="sd">        See also `abstractproperty.characteristic.Characteristic.random`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.difference import XorDiff</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.chmodel import ChModel</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.characteristic import Characteristic</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64).key_schedule</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS.set_num_rounds(2)</span>
+<span class="sd">            &gt;&gt;&gt; xor_ch_model = ChModel(Speck32_KS, XorDiff, [&quot;dmk0&quot;, &quot;dmk1&quot;, &quot;dmk2&quot;])</span>
+<span class="sd">            &gt;&gt;&gt; Characteristic.random(xor_ch_model, 0)  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">            Characteristic(ch_weight=25, assignment_weights=[13, 12, 0, 0, 0],</span>
+<span class="sd">                input_diff=[0xc53e, 0xd755, 0x14ba], output_diff=[0x14ba, 0xa6ec, 0x2ce0],</span>
+<span class="sd">                assign_outdiff_list=[0xf404, 0xb752, 0x14ba, 0xa6ec, 0x2ce0])</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ch_model</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">external_diffs</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="EncryptionCharacteristic"><a class="viewcode-back" href="../../../cascada.differential.characteristic.html#cascada.differential.characteristic.EncryptionCharacteristic">[docs]</a><span class="k">class</span> <span class="nc">EncryptionCharacteristic</span><span class="p">(</span><span class="n">abstractproperty</span><span class="o">.</span><span class="n">characteristic</span><span class="o">.</span><span class="n">EncryptionCharacteristic</span><span class="p">,</span> <span class="n">Characteristic</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent differential characteristics over encryption functions.</span>
+
+<span class="sd">    Given a `Cipher`, an `EncryptionCharacteristic` is an XOR</span>
+<span class="sd">    differential characteristic  (see `Characteristic`) over</span>
+<span class="sd">    the `Cipher.encryption` in the single-key setting</span>
+<span class="sd">    (where the `Cipher.key_schedule` is ignored and round key differences</span>
+<span class="sd">    are set to zero).</span>
+
+<span class="sd">    .. note::</span>
+
+<span class="sd">        `EncryptionCharacteristic` only supports `XorDiff`</span>
+<span class="sd">        (see `differential.chmodel.EncryptionChModel`).</span>
+
+<span class="sd">    The propagation probability of an `EncryptionCharacteristic` is also</span>
+<span class="sd">    called in the literature the expected differential probability (EDP)</span>
+<span class="sd">    of a characteristic (see https://eprint.iacr.org/2005/212).</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Constant</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.operation import RotateRight, RotateLeft</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.differential.difference import XorDiff</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.differential.chmodel import EncryptionChModel</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.differential.characteristic import EncryptionCharacteristic</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">        &gt;&gt;&gt; Speck32 = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64)</span>
+<span class="sd">        &gt;&gt;&gt; Speck32.set_num_rounds(2)</span>
+<span class="sd">        &gt;&gt;&gt; ch_model = EncryptionChModel(Speck32, XorDiff)</span>
+<span class="sd">        &gt;&gt;&gt; zd = core.Constant(0, width=16)</span>
+<span class="sd">        &gt;&gt;&gt; rr1 = RotateRight(Constant(1, width=16), 1)  # rr1 == 0b100···0</span>
+<span class="sd">        &gt;&gt;&gt; rr2 = RotateRight(Constant(1, width=16), 2)  # rr2 == 0b010···0</span>
+<span class="sd">        &gt;&gt;&gt; dp0 = RotateLeft(rr1, 7)  # dp0 &gt;&gt;&gt; 7 == rr1</span>
+<span class="sd">        &gt;&gt;&gt; dp1 = rr1</span>
+<span class="sd">        &gt;&gt;&gt; dx6 = Constant(0x0002, width=16)</span>
+<span class="sd">        &gt;&gt;&gt; dx11 = Constant(0x000a, width=16)</span>
+<span class="sd">        &gt;&gt;&gt; ch = EncryptionCharacteristic([dp0, dp1], [dx6, dx11], [zd, dx6, dx6, dx11], ch_model)</span>
+<span class="sd">        &gt;&gt;&gt; ch  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        EncryptionCharacteristic(ch_weight=1, assignment_weights=[0, 1, 0, 0],</span>
+<span class="sd">            input_diff=[0x0040, 0x8000], output_diff=[0x0002, 0x000a], external_diffs=[0x0000, 0x0000],</span>
+<span class="sd">            assign_outdiff_list=[0x0000, 0x0002, 0x0002, 0x000a])</span>
+<span class="sd">        &gt;&gt;&gt; list(zip(ch.assignment_weights, ch.tuple_assign_outdiff2op_model))  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        [(Decimal(&#39;0&#39;), (XorDiff(0x0000), XorModelBvAdd([XorDiff(0x8000), XorDiff(0x8000)]))),</span>
+<span class="sd">        (Decimal(&#39;1&#39;), (XorDiff(0x0002), XorModelBvAdd([XorDiff(0x0000), XorDiff(0x0002)]))),</span>
+<span class="sd">        (Decimal(&#39;0&#39;), (XorDiff(0x0002), XorModelId(XorDiff(0x0002)))),</span>
+<span class="sd">        (Decimal(&#39;0&#39;), (XorDiff(0x000a), XorModelId(XorDiff(0x000a))))]</span>
+
+
+<span class="sd">    .. Implementation details:</span>
+
+<span class="sd">        __init__ contains the argument ``external_diffs`` to match the signature</span>
+<span class="sd">        of `abstractproperty.characteristic.EncryptionCharacteristic`, but</span>
+<span class="sd">        the round key differences are always set to zero.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_diff</span><span class="p">,</span> <span class="n">output_diff</span><span class="p">,</span> <span class="n">assign_outdiff_list</span><span class="p">,</span> <span class="n">ch_model</span><span class="p">,</span> <span class="n">external_diffs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">free_diffs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">empirical_ch_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">empirical_data_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">is_valid</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ch_model</span><span class="p">,</span> <span class="n">cascada_chmodel</span><span class="o">.</span><span class="n">EncryptionChModel</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">val</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">ch_model</span><span class="o">.</span><span class="n">external_var2diff</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="k">assert</span> <span class="n">ch_model</span><span class="o">.</span><span class="n">diff_type</span> <span class="o">==</span> <span class="n">difference</span><span class="o">.</span><span class="n">XorDiff</span>
+        <span class="k">assert</span> <span class="n">external_diffs</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> \
+               <span class="p">(</span><span class="nb">all</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">val</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">external_diffs</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="nb">len</span><span class="p">(</span><span class="n">external_diffs</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">ch_model</span><span class="o">.</span><span class="n">external_var2diff</span><span class="p">))</span>
+        <span class="n">external_diffs</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">ch_model</span><span class="o">.</span><span class="n">external_var2diff</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">input_diff</span><span class="p">,</span> <span class="n">output_diff</span><span class="p">,</span> <span class="n">assign_outdiff_list</span><span class="p">,</span> <span class="n">ch_model</span><span class="p">,</span> <span class="n">external_props</span><span class="o">=</span><span class="n">external_diffs</span><span class="p">,</span> <span class="n">free_props</span><span class="o">=</span><span class="n">free_diffs</span><span class="p">,</span>
+            <span class="n">empirical_ch_weight</span><span class="o">=</span><span class="n">empirical_ch_weight</span><span class="p">,</span> <span class="n">empirical_data_list</span><span class="o">=</span><span class="n">empirical_data_list</span><span class="p">,</span> <span class="n">is_valid</span><span class="o">=</span><span class="n">is_valid</span><span class="p">)</span>
+
+<div class="viewcode-block" id="EncryptionCharacteristic.random"><a class="viewcode-back" href="../../../cascada.differential.characteristic.html#cascada.differential.characteristic.EncryptionCharacteristic.random">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">random</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">ch_model</span><span class="p">,</span> <span class="n">seed</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a random `EncryptionCharacteristic` with given `differential.chmodel.EncryptionChModel`.</span>
+
+<span class="sd">        The round key differences are set to zero.</span>
+
+<span class="sd">        See also `abstractproperty.characteristic.EncryptionCharacteristic.random`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.difference import XorDiff</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.chmodel import EncryptionChModel</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.characteristic import EncryptionCharacteristic</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">            &gt;&gt;&gt; Speck32 = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64)</span>
+<span class="sd">            &gt;&gt;&gt; Speck32.set_num_rounds(2)</span>
+<span class="sd">            &gt;&gt;&gt; ch_model = EncryptionChModel(Speck32, XorDiff)</span>
+<span class="sd">            &gt;&gt;&gt; EncryptionCharacteristic.random(ch_model, 0)  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">            EncryptionCharacteristic(ch_weight=24, assignment_weights=[13, 11, 0, 0],</span>
+<span class="sd">                input_diff=[0xc53e, 0xd755], output_diff=[0xf43a, 0xc051], external_diffs=[0x0000, 0x0000],</span>
+<span class="sd">                assign_outdiff_list=[0x904d, 0xf43a, 0xf43a, 0xc051])</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">ch_model</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="CipherCharacteristic"><a class="viewcode-back" href="../../../cascada.differential.characteristic.html#cascada.differential.characteristic.CipherCharacteristic">[docs]</a><span class="k">class</span> <span class="nc">CipherCharacteristic</span><span class="p">(</span><span class="n">abstractproperty</span><span class="o">.</span><span class="n">characteristic</span><span class="o">.</span><span class="n">CipherCharacteristic</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent related-key differential characteristics over ciphers.</span>
+
+<span class="sd">    A `CipherCharacteristic` is a related-key differential characteristic of a</span>
+<span class="sd">    block cipher, given by one `Characteristic` over the `Cipher.key_schedule`</span>
+<span class="sd">    and another `Characteristic` over the `Cipher.encryption`.</span>
+
+<span class="sd">    The related-key setting means that the round key differences in the encryption</span>
+<span class="sd">    characteristic (the differences of the external variables of the encryption `SSA`)</span>
+<span class="sd">    are set to the output differences of the key-schedule characteristic.</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Constant</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.operation import RotateRight, RotateLeft</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.differential.difference import XorDiff, RXDiff</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.differential.chmodel import CipherChModel</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.differential.characteristic import CipherCharacteristic</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">        &gt;&gt;&gt; Speck32 = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64)</span>
+<span class="sd">        &gt;&gt;&gt; Speck32.set_num_rounds(2)</span>
+<span class="sd">        &gt;&gt;&gt; xor_ch_model = CipherChModel(Speck32, XorDiff)</span>
+<span class="sd">        &gt;&gt;&gt; zd = core.Constant(0, width=16)</span>
+<span class="sd">        &gt;&gt;&gt; rr1 = RotateRight(Constant(1, width=16), 1)  # rr1 == 0b100···0</span>
+<span class="sd">        &gt;&gt;&gt; rr2 = RotateRight(Constant(1, width=16), 2)  # rr2 == 0b010···0</span>
+<span class="sd">        &gt;&gt;&gt; mk0 = RotateLeft(Constant(1, width=16), 5)  # mk0 &gt;&gt;&gt; 7 == 0b010···0</span>
+<span class="sd">        &gt;&gt;&gt; dp0 = RotateLeft(rr1, 7)  # dp0 &gt;&gt;&gt; 7 == rr1</span>
+<span class="sd">        &gt;&gt;&gt; dp1 = rr1</span>
+<span class="sd">        &gt;&gt;&gt; dx6 = Constant(0x0002, width=16)</span>
+<span class="sd">        &gt;&gt;&gt; dx11 = Constant(0x000a, width=16)</span>
+<span class="sd">        &gt;&gt;&gt; ch = CipherCharacteristic(</span>
+<span class="sd">        ...     [mk0, zd], [zd, rr2], [rr2, zd, rr2],</span>
+<span class="sd">        ...     [dp0, dp1], [dx6^rr2, dx11^rr2], [zd, dx6, dx6^rr2, dx11^rr2], xor_ch_model)</span>
+<span class="sd">        &gt;&gt;&gt; ch  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        CipherCharacteristic(ks_characteristic=Characteristic(ch_weight=1,</span>
+<span class="sd">            assignment_weights=[1, 0, 0],</span>
+<span class="sd">            input_diff=[0x0020, 0x0000], output_diff=[0x0000, 0x4000],</span>
+<span class="sd">            assign_outdiff_list=[0x4000, 0x0000, 0x4000]),</span>
+<span class="sd">        enc_characteristic=Characteristic(ch_weight=1,</span>
+<span class="sd">            assignment_weights=[0, 1, 0, 0],</span>
+<span class="sd">            input_diff=[0x0040, 0x8000], output_diff=[0x4002, 0x400a], external_diffs=[0x0000, 0x4000],</span>
+<span class="sd">            assign_outdiff_list=[0x0000, 0x0002, 0x4002, 0x400a]))</span>
+<span class="sd">        &gt;&gt;&gt; ks_ch, enc_ch = ch.ks_characteristic, ch.enc_characteristic</span>
+<span class="sd">        &gt;&gt;&gt; list(zip(ks_ch.assignment_weights, ks_ch.tuple_assign_outdiff2op_model))  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        [(Decimal(&#39;1&#39;), (XorDiff(0x4000), XorModelBvAdd([XorDiff(0x4000), XorDiff(0x0000)]))),</span>
+<span class="sd">        (Decimal(&#39;0&#39;), (XorDiff(0x0000), XorModelId(XorDiff(0x0000)))),</span>
+<span class="sd">        (Decimal(&#39;0&#39;), (XorDiff(0x4000), XorModelId(XorDiff(0x4000))))]</span>
+<span class="sd">        &gt;&gt;&gt; list(zip(enc_ch.assignment_weights, enc_ch.tuple_assign_outdiff2op_model))  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        [(Decimal(&#39;0&#39;), (XorDiff(0x0000), XorModelBvAdd([XorDiff(0x8000), XorDiff(0x8000)]))),</span>
+<span class="sd">        (Decimal(&#39;1&#39;), (XorDiff(0x0002), XorModelBvAdd([XorDiff(0x0000), XorDiff(0x0002)]))),</span>
+<span class="sd">        (Decimal(&#39;0&#39;), (XorDiff(0x4002), XorModelId(XorDiff(0x4002)))),</span>
+<span class="sd">        (Decimal(&#39;0&#39;), (XorDiff(0x400a), XorModelId(XorDiff(0x400a))))]</span>
+<span class="sd">        &gt;&gt;&gt; cipher_ch_model = CipherChModel(Speck32, RXDiff)</span>
+<span class="sd">        &gt;&gt;&gt; zd = RXDiff(core.Constant(0, width=16))</span>
+<span class="sd">        &gt;&gt;&gt; ch = CipherCharacteristic(</span>
+<span class="sd">        ...     [zd, zd], [zd, zd], [zd, zd, zd],</span>
+<span class="sd">        ...     [zd, zd], [zd, zd], [zd, zd, zd, zd], cipher_ch_model)</span>
+<span class="sd">        &gt;&gt;&gt; ch  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        CipherCharacteristic(ks_characteristic=Characteristic(ch_weight=1.414993472392016501828616947,</span>
+<span class="sd">            assignment_weights=[1.414993472392016501828616947, 0, 0],</span>
+<span class="sd">            input_diff=[0x0000, 0x0000], output_diff=[0x0000, 0x0000],</span>
+<span class="sd">            assign_outdiff_list=[0x0000, 0x0000, 0x0000]),</span>
+<span class="sd">        enc_characteristic=Characteristic(ch_weight=2.829986944784033003657233894,</span>
+<span class="sd">            assignment_weights=[1.414993472392016501828616947, 1.414993472392016501828616947, 0, 0],</span>
+<span class="sd">            input_diff=[0x0000, 0x0000], output_diff=[0x0000, 0x0000], external_diffs=[0x0000, 0x0000],</span>
+<span class="sd">            assign_outdiff_list=[0x0000, 0x0000, 0x0000, 0x0000]))</span>
+<span class="sd">        &gt;&gt;&gt; ch.srepr()  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        &#39;Ch(ks_ch=Ch(w=1.415, id=0000 0000, od=0000 0000), enc_ch=Ch(w=2.830, id=0000 0000, od=0000 0000))&#39;</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_Characteristic_cls</span> <span class="o">=</span> <span class="n">Characteristic</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">ks_input_diff</span><span class="p">,</span> <span class="n">ks_output_diff</span><span class="p">,</span> <span class="n">ks_assign_outdiff_list</span><span class="p">,</span>
+            <span class="n">enc_input_diff</span><span class="p">,</span> <span class="n">enc_output_diff</span><span class="p">,</span> <span class="n">enc_assign_outdiff_list</span><span class="p">,</span>
+            <span class="n">cipher_ch_model</span><span class="p">,</span> <span class="n">ks_free_diffs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">enc_free_diffs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">ks_empirical_ch_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ks_empirical_data_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">enc_empirical_ch_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">enc_empirical_data_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">ks_is_valid</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">enc_is_valid</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">):</span>
+        <span class="c1"># avoid *_props=*_props (super might not abstract)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">ks_input_diff</span><span class="p">,</span> <span class="n">ks_output_diff</span><span class="p">,</span> <span class="n">ks_assign_outdiff_list</span><span class="p">,</span>
+            <span class="n">enc_input_diff</span><span class="p">,</span> <span class="n">enc_output_diff</span><span class="p">,</span> <span class="n">enc_assign_outdiff_list</span><span class="p">,</span>
+            <span class="n">cipher_ch_model</span><span class="p">,</span> <span class="n">ks_free_diffs</span><span class="p">,</span> <span class="n">enc_free_diffs</span><span class="p">,</span>
+            <span class="n">ks_empirical_ch_weight</span><span class="o">=</span><span class="n">ks_empirical_ch_weight</span><span class="p">,</span> <span class="n">ks_empirical_data_list</span><span class="o">=</span><span class="n">ks_empirical_data_list</span><span class="p">,</span>
+            <span class="n">enc_empirical_ch_weight</span><span class="o">=</span><span class="n">enc_empirical_ch_weight</span><span class="p">,</span> <span class="n">enc_empirical_data_list</span><span class="o">=</span><span class="n">enc_empirical_data_list</span><span class="p">,</span>
+            <span class="n">ks_is_valid</span><span class="o">=</span><span class="n">ks_is_valid</span><span class="p">,</span> <span class="n">enc_is_valid</span><span class="o">=</span><span class="n">enc_is_valid</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="CipherCharacteristic.vrepr"><a class="viewcode-back" href="../../../cascada.differential.characteristic.html#cascada.differential.characteristic.CipherCharacteristic.vrepr">[docs]</a>    <span class="k">def</span> <span class="nf">vrepr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return an executable string representation.</span>
+
+<span class="sd">        See also `abstractproperty.characteristic.CipherCharacteristic.vrepr`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Constant</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.operation import RotateRight, RotateLeft</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.difference import XorDiff</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.chmodel import CipherChModel</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.characteristic import CipherCharacteristic</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">            &gt;&gt;&gt; Speck32 = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64)</span>
+<span class="sd">            &gt;&gt;&gt; Speck32.set_num_rounds(2)</span>
+<span class="sd">            &gt;&gt;&gt; xor_ch_model = CipherChModel(Speck32, XorDiff)</span>
+<span class="sd">            &gt;&gt;&gt; zd = core.Constant(0, width=16)</span>
+<span class="sd">            &gt;&gt;&gt; rr1 = RotateRight(Constant(1, width=16), 1)  # rr1 == 0b100···0</span>
+<span class="sd">            &gt;&gt;&gt; rr2 = RotateRight(Constant(1, width=16), 2)  # rr2 == 0b010···0</span>
+<span class="sd">            &gt;&gt;&gt; mk0 = RotateLeft(Constant(1, width=16), 5)  # mk0 &gt;&gt;&gt; 7 == 0b010···0</span>
+<span class="sd">            &gt;&gt;&gt; dp0 = RotateLeft(rr1, 7)  # dp0 &gt;&gt;&gt; 7 == rr1</span>
+<span class="sd">            &gt;&gt;&gt; dp1 = rr1</span>
+<span class="sd">            &gt;&gt;&gt; dx6 = Constant(0x0002, width=16)</span>
+<span class="sd">            &gt;&gt;&gt; dx11 = Constant(0x000a, width=16)</span>
+<span class="sd">            &gt;&gt;&gt; ch = CipherCharacteristic(</span>
+<span class="sd">            ...     [mk0, zd], [zd, rr2], [rr2, zd, rr2],</span>
+<span class="sd">            ...     [dp0, dp1], [dx6^rr2, dx11^rr2], [zd, dx6, dx6^rr2, dx11^rr2], xor_ch_model)</span>
+<span class="sd">            &gt;&gt;&gt; ch.vrepr()  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">            &#39;CipherCharacteristic(ks_input_diff=[Constant(0x0020, width=16), Constant(0x0000, width=16)],</span>
+<span class="sd">                ks_output_diff=[Constant(0x0000, width=16), Constant(0x4000, width=16)],</span>
+<span class="sd">                ks_assign_outdiff_list=[Constant(0x4000, width=16), Constant(0x0000, width=16), Constant(0x4000, width=16)],</span>
+<span class="sd">                enc_input_diff=[Constant(0x0040, width=16), Constant(0x8000, width=16)],</span>
+<span class="sd">                enc_output_diff=[Constant(0x4002, width=16), Constant(0x400a, width=16)],</span>
+<span class="sd">                enc_assign_outdiff_list=[Constant(0x0000, width=16), Constant(0x0002, width=16),</span>
+<span class="sd">                    Constant(0x4002, width=16), Constant(0x400a, width=16)],</span>
+<span class="sd">                cipher_ch_model=CipherChModel(cipher=SpeckCipher.set_num_rounds_and_return(2), diff_type=XorDiff))&#39;</span>
+<span class="sd">            &gt;&gt;&gt; ch.srepr()</span>
+<span class="sd">            &#39;Ch(ks_ch=Ch(w=1, id=0020 0000, od=0000 4000), enc_ch=Ch(w=1, id=0040 8000, od=4002 400a))&#39;</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">vrepr</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CipherCharacteristic.random"><a class="viewcode-back" href="../../../cascada.differential.characteristic.html#cascada.differential.characteristic.CipherCharacteristic.random">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">random</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cipher_ch_model</span><span class="p">,</span> <span class="n">seed</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a random `CipherCharacteristic` with given `differential.chmodel.CipherChModel`.</span>
+
+<span class="sd">        See also `abstractproperty.characteristic.CipherCharacteristic.random`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.difference import XorDiff</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.chmodel import CipherChModel</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.characteristic import CipherCharacteristic</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">            &gt;&gt;&gt; Speck32 = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64)</span>
+<span class="sd">            &gt;&gt;&gt; Speck32.set_num_rounds(2)</span>
+<span class="sd">            &gt;&gt;&gt; xor_ch_model = CipherChModel(Speck32, XorDiff)</span>
+<span class="sd">            &gt;&gt;&gt; CipherCharacteristic.random(xor_ch_model, 0)  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">            CipherCharacteristic(ks_characteristic=Characteristic(ch_weight=13,</span>
+<span class="sd">                assignment_weights=[13, 0, 0],</span>
+<span class="sd">                input_diff=[0xc53e, 0xd755], output_diff=[0xd755, 0xcd1a],</span>
+<span class="sd">                assign_outdiff_list=[0x904d, 0xd755, 0xcd1a]),</span>
+<span class="sd">            enc_characteristic=Characteristic(ch_weight=24,</span>
+<span class="sd">                assignment_weights=[11, 13, 0, 0],</span>
+<span class="sd">                input_diff=[0xfff4, 0xaa87],</span>
+<span class="sd">                output_diff=[0x4523, 0xb896],</span>
+<span class="sd">                external_diffs=[0xd755, 0xcd1a],</span>
+<span class="sd">                 assign_outdiff_list=[0x0226, 0x8839, 0x4523, 0xb896]))</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">cipher_ch_model</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span></div></div>
+
+
+<span class="k">def</span> <span class="nf">_run_C_code_get_num_right_inputs</span><span class="p">(</span><span class="n">my_seed</span><span class="p">,</span> <span class="n">my_module_name</span><span class="p">,</span> <span class="n">my_lib_path</span><span class="p">,</span> <span class="n">my_num_external_samples</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">importlib</span> <span class="kn">import</span> <span class="n">util</span> <span class="k">as</span> <span class="n">my_importlib_util</span>
+    <span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">Random</span> <span class="k">as</span> <span class="n">my_Random</span>
+
+    <span class="n">my_spec</span> <span class="o">=</span> <span class="n">my_importlib_util</span><span class="o">.</span><span class="n">spec_from_file_location</span><span class="p">(</span><span class="n">my_module_name</span><span class="p">,</span> <span class="n">my_lib_path</span><span class="p">)</span>
+    <span class="n">my_pymod</span> <span class="o">=</span> <span class="n">my_importlib_util</span><span class="o">.</span><span class="n">module_from_spec</span><span class="p">(</span><span class="n">my_spec</span><span class="p">)</span>
+    <span class="n">my_spec</span><span class="o">.</span><span class="n">loader</span><span class="o">.</span><span class="n">exec_module</span><span class="p">(</span><span class="n">my_pymod</span><span class="p">)</span>
+
+    <span class="n">my_PRNG</span> <span class="o">=</span> <span class="n">my_Random</span><span class="p">()</span>
+    <span class="n">my_PRNG</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">my_seed</span><span class="p">)</span>
+
+    <span class="n">list_my_num_right_inputs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">my_num_external_samples</span><span class="p">):</span>
+        <span class="c1"># get_num_right_inputs hardcoded</span>
+        <span class="n">my_num_right_inputs</span> <span class="o">=</span> <span class="n">my_pymod</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">get_num_right_inputs</span><span class="p">(</span><span class="n">my_PRNG</span><span class="o">.</span><span class="n">randrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span> <span class="o">**</span> <span class="mi">64</span><span class="p">))</span>
+        <span class="n">list_my_num_right_inputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">my_num_right_inputs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">list_my_num_right_inputs</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Adrián Ranea.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

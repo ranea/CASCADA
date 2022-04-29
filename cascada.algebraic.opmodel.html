@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cascada.algebraic.opmodel module &mdash; CASCADA 1.0.rc0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="cascada.algebraic.chmodel module" href="cascada.algebraic.chmodel.html" />
+    <link rel="prev" title="cascada.algebraic.value module" href="cascada.algebraic.value.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> CASCADA
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">CASCADA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="primitives_implemented.html">Primitives implemented</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="cascada.html">API reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="cascada.bitvector.html">cascada.bitvector module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.primitives.html">cascada.primitives module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.abstractproperty.html">cascada.abstractproperty module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.differential.html">cascada.differential module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.linear.html">cascada.linear module</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="cascada.algebraic.html">cascada.algebraic module</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="cascada.algebraic.value.html">cascada.algebraic.value module</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">cascada.algebraic.opmodel module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.algebraic.chmodel.html">cascada.algebraic.chmodel module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.algebraic.characteristic.html">cascada.algebraic.characteristic module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.smt.html">cascada.smt module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">CASCADA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="cascada.html">API reference</a> &raquo;</li>
+          <li><a href="cascada.algebraic.html">cascada.algebraic module</a> &raquo;</li>
+      <li>cascada.algebraic.opmodel module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/cascada.algebraic.opmodel.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-cascada.algebraic.opmodel">
+<span id="cascada-algebraic-opmodel-module"></span><h1>cascada.algebraic.opmodel module<a class="headerlink" href="#module-cascada.algebraic.opmodel" title="Permalink to this headline"></a></h1>
+<p>Manipulate algebraic models of bit-vector operations.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.algebraic.opmodel.OpModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.algebraic.opmodel.</span></span><span class="sig-name descname"><span class="pre">OpModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_prop</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/algebraic/opmodel.html#OpModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.algebraic.opmodel.OpModel" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel" title="cascada.abstractproperty.opmodel.OpModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.abstractproperty.opmodel.OpModel</span></code></a></p>
+<p>Represent algebraic models of bit-vector operations.</p>
+<p>A (bit-vector) algebraic model of a bit-vector <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.Operation" title="cascada.bitvector.operation.Operation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Operation</span></code></a> <span class="math notranslate nohighlight">\(f\)</span>
+is a set of bit-vector constraints that models the propagation
+probability of value properties of <span class="math notranslate nohighlight">\(f\)</span>. See <a class="reference internal" href="cascada.algebraic.value.html#cascada.algebraic.value.Value" title="cascada.algebraic.value.Value"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Value</span></code></a>.</p>
+<p>An algebraic model is defined for a type of <a class="reference internal" href="cascada.algebraic.value.html#cascada.algebraic.value.Value" title="cascada.algebraic.value.Value"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Value</span></code></a>,
+such as <a class="reference internal" href="cascada.algebraic.value.html#cascada.algebraic.value.BitValue" title="cascada.algebraic.value.BitValue"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BitValue</span></code></a> or <a class="reference internal" href="cascada.algebraic.value.html#cascada.algebraic.value.WordValue" title="cascada.algebraic.value.WordValue"><code class="xref any py py-class docutils literal notranslate"><span class="pre">WordValue</span></code></a>.</p>
+<p>This class is not meant to be instantiated but to provide a base
+class for creating algebraic models.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For all algebraic models, the <code class="docutils literal notranslate"><span class="pre">pr_one_constraint</span></code> method is
+equivalent  to the <code class="docutils literal notranslate"><span class="pre">validity_constraint</span></code> method, and the weight of
+a valid propagation is always <code class="docutils literal notranslate"><span class="pre">Constant(0,</span> <span class="pre">1)</span></code>.
+This class implements the methods <code class="docutils literal notranslate"><span class="pre">pr_one_constraint,</span> <span class="pre">bv_weight,</span>
+<span class="pre">max_weight,</span> <span class="pre">weight_width,</span> <span class="pre">decimal_weight,</span> <span class="pre">num_frac_bits</span></code> and <code class="docutils literal notranslate"><span class="pre">error</span></code>,
+and subclasses only need to implement <code class="docutils literal notranslate"><span class="pre">validity_constraint</span></code>.</p>
+</div>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.algebraic.opmodel.OpModel.val_type">
+<span class="sig-name descname"><span class="pre">val_type</span></span><a class="headerlink" href="#cascada.algebraic.opmodel.OpModel.val_type" title="Permalink to this definition"></a></dt>
+<dd><p>the type of <a class="reference internal" href="cascada.algebraic.value.html#cascada.algebraic.value.Value" title="cascada.algebraic.value.Value"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Value</span></code></a> (alias of
+<a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel.prop_type" title="cascada.abstractproperty.opmodel.OpModel.prop_type"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">abstractproperty.opmodel.OpModel.prop_type</span></code></a>).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.algebraic.opmodel.OpModel.input_val">
+<span class="sig-name descname"><span class="pre">input_val</span></span><a class="headerlink" href="#cascada.algebraic.opmodel.OpModel.input_val" title="Permalink to this definition"></a></dt>
+<dd><p>a list containing the <a class="reference internal" href="cascada.algebraic.value.html#cascada.algebraic.value.Value" title="cascada.algebraic.value.Value"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Value</span></code></a> of each bit-vector
+operand (alias of <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel.input_prop" title="cascada.abstractproperty.opmodel.OpModel.input_prop"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">abstractproperty.opmodel.OpModel.input_prop</span></code></a>).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.algebraic.opmodel.OpModel.pr_one_constraint">
+<span class="sig-name descname"><span class="pre">pr_one_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_val</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/algebraic/opmodel.html#OpModel.pr_one_constraint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.algebraic.opmodel.OpModel.pr_one_constraint" title="Permalink to this definition"></a></dt>
+<dd><p>Return the probability-one constraint for a given output <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a>.</p>
+<p>Return the constraint that evaluates to True if the input <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a>
+propagates to the given output <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> with probability one.</p>
+<p>This method returns a bit-vector expression that depends on
+the input property <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel.input_prop" title="cascada.abstractproperty.opmodel.OpModel.input_prop"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">OpModel.input_prop</span></code></a> and the output property
+<code class="docutils literal notranslate"><span class="pre">output_prop</span></code> and it is True if and only if the input property
+propagates to the output property with probability 1.</p>
+<p>If both the input and output properties are constant values,
+this method returns the <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Constant" title="cascada.bitvector.core.Constant"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a> <code class="docutils literal notranslate"><span class="pre">0b1</span></code> or <code class="docutils literal notranslate"><span class="pre">0b0</span></code> depending on
+whether the corresponding propagation has probability 1.
+Otherwise, this method returns a bit-vector <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term" title="cascada.bitvector.core.Term"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Term</span></code></a>
+containing the input and output properties as <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Variable" title="cascada.bitvector.core.Variable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Variable</span></code></a> objects.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.algebraic.opmodel.OpModel.bv_weight">
+<span class="sig-name descname"><span class="pre">bv_weight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_val</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/algebraic/opmodel.html#OpModel.bv_weight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.algebraic.opmodel.OpModel.bv_weight" title="Permalink to this definition"></a></dt>
+<dd><p>Return the bit-vector weight for a given output <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a>.</p>
+<p>The bit-vector weight is a bit-vector expression that depends on
+the input property <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel.input_prop" title="cascada.abstractproperty.opmodel.OpModel.input_prop"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">OpModel.input_prop</span></code></a> and the output property
+<code class="docutils literal notranslate"><span class="pre">output_prop</span></code>. This bit-vector function represents an approximation
+of the negative binary logarithm (weight) of the probability of
+the input property propagating to the output property.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This method is optional and subclasses of <a class="reference internal" href="#cascada.algebraic.opmodel.OpModel" title="cascada.algebraic.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">OpModel</span></code></a> don’t need to implement it
+(as opposed to <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel.weight_constraint" title="cascada.abstractproperty.opmodel.OpModel.weight_constraint"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">OpModel.weight_constraint</span></code></a>).</p>
+<p>It is assumed that the corresponding propagation has non-zero probability.</p>
+</div>
+<p>If the input and output properties are constant values,
+this method returns a <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Constant" title="cascada.bitvector.core.Constant"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a> of bit-size <a class="reference internal" href="#cascada.algebraic.opmodel.OpModel.weight_width" title="cascada.algebraic.opmodel.OpModel.weight_width"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">weight_width</span></code></a>
+denoting the weight of the valid propagation.
+Otherwise, this method returns a bit-vector <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term" title="cascada.bitvector.core.Term"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Term</span></code></a>
+containing the input and output properties as <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Variable" title="cascada.bitvector.core.Variable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Variable</span></code></a> objects.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.algebraic.opmodel.OpModel.max_weight">
+<span class="sig-name descname"><span class="pre">max_weight</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/algebraic/opmodel.html#OpModel.max_weight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.algebraic.opmodel.OpModel.max_weight" title="Permalink to this definition"></a></dt>
+<dd><p>Return the maximum value the weight variable can achieve in <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel.weight_constraint" title="cascada.abstractproperty.opmodel.OpModel.weight_constraint"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">OpModel.weight_constraint</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.algebraic.opmodel.OpModel.weight_width">
+<span class="sig-name descname"><span class="pre">weight_width</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/algebraic/opmodel.html#OpModel.weight_width"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.algebraic.opmodel.OpModel.weight_width" title="Permalink to this definition"></a></dt>
+<dd><p>Return the width of the weight variable used <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel.weight_constraint" title="cascada.abstractproperty.opmodel.OpModel.weight_constraint"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">OpModel.weight_constraint</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.algebraic.opmodel.OpModel.decimal_weight">
+<span class="sig-name descname"><span class="pre">decimal_weight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_val</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/algebraic/opmodel.html#OpModel.decimal_weight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.algebraic.opmodel.OpModel.decimal_weight" title="Permalink to this definition"></a></dt>
+<dd><p>Return the <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">decimal.Decimal</span></code></a> weight for a given constant output <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a>.</p>
+<p>This method returns, as a decimal number, the weight (negative binary logarithm)
+of the probability of the input property propagating to the output property.</p>
+<p>This method only works when the input property and the output property are
+constant values, but provides a better approximation than the bit-vector weight
+from <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel.weight_constraint" title="cascada.abstractproperty.opmodel.OpModel.weight_constraint"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">OpModel.weight_constraint</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.algebraic.opmodel.OpModel.num_frac_bits">
+<span class="sig-name descname"><span class="pre">num_frac_bits</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/algebraic/opmodel.html#OpModel.num_frac_bits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.algebraic.opmodel.OpModel.num_frac_bits" title="Permalink to this definition"></a></dt>
+<dd><p>Return the number of fractional bits used in the weight variable of <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel.weight_constraint" title="cascada.abstractproperty.opmodel.OpModel.weight_constraint"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">OpModel.weight_constraint</span></code></a>.</p>
+<p>If the number of fractional bits is <code class="docutils literal notranslate"><span class="pre">k</span></code>, then the bit-vector weight variable
+<code class="docutils literal notranslate"><span class="pre">w</span></code> of <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel.weight_constraint" title="cascada.abstractproperty.opmodel.OpModel.weight_constraint"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">OpModel.weight_constraint</span></code></a> represents the number <code class="docutils literal notranslate"><span class="pre">2^{-k}</span> <span class="pre">*</span> <span class="pre">bv2int(w)</span></code>.
+In particular, if <code class="docutils literal notranslate"><span class="pre">k</span> <span class="pre">==</span> <span class="pre">0</span></code>, then <code class="docutils literal notranslate"><span class="pre">w</span></code> represents an integer number.
+Otherwise, the <code class="docutils literal notranslate"><span class="pre">k</span></code> least significant bits of <code class="docutils literal notranslate"><span class="pre">w</span></code> denote the
+fractional part of the number represented by <code class="docutils literal notranslate"><span class="pre">w</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.algebraic.opmodel.OpModel.error">
+<span class="sig-name descname"><span class="pre">error</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/algebraic/opmodel.html#OpModel.error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.algebraic.opmodel.OpModel.error" title="Permalink to this definition"></a></dt>
+<dd><p>Return the maximum difference between <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel.weight_constraint" title="cascada.abstractproperty.opmodel.OpModel.weight_constraint"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">OpModel.weight_constraint</span></code></a> and the exact weight.</p>
+<p>The exact weight is exact value (without error) of the negative binary
+logarithm (weight) of the propagation probability of <span class="math notranslate nohighlight">\((\alpha, \beta)\)</span>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The exact weight can be computed in <a class="reference internal" href="cascada.abstractproperty.tests.test_opmodel.html#cascada.abstractproperty.tests.test_opmodel.TestOpModelGeneric.get_empirical_weight_slow" title="cascada.abstractproperty.tests.test_opmodel.TestOpModelGeneric.get_empirical_weight_slow"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">TestOpModelGeneric.get_empirical_weight_slow</span></code></a>.</p>
+</div>
+<p>This method returns an upper bound (in absolute value) of the maximum difference
+(over all input and output properties) between the bit-vector weight
+from <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel.weight_constraint" title="cascada.abstractproperty.opmodel.OpModel.weight_constraint"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">OpModel.weight_constraint</span></code></a> and the exact weight.</p>
+<p>Note that the exact weight might still differ from <a class="reference internal" href="#cascada.algebraic.opmodel.OpModel.decimal_weight" title="cascada.algebraic.opmodel.OpModel.decimal_weight"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">decimal_weight</span></code></a>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.algebraic.opmodel.BitModelId">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.algebraic.opmodel.</span></span><span class="sig-name descname"><span class="pre">BitModelId</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_prop</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/algebraic/opmodel.html#BitModelId"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.algebraic.opmodel.BitModelId" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.ModelIdentity" title="cascada.abstractproperty.opmodel.ModelIdentity"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.abstractproperty.opmodel.ModelIdentity</span></code></a>, <a class="reference internal" href="#cascada.algebraic.opmodel.OpModel" title="cascada.algebraic.opmodel.OpModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.algebraic.opmodel.OpModel</span></code></a></p>
+<p>Represent the <a class="reference internal" href="cascada.algebraic.value.html#cascada.algebraic.value.BitValue" title="cascada.algebraic.value.BitValue"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BitValue</span></code></a> <a class="reference internal" href="#cascada.algebraic.opmodel.OpModel" title="cascada.algebraic.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">algebraic.opmodel.OpModel</span></code></a> of <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.BvIdentity" title="cascada.bitvector.operation.BvIdentity"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvIdentity</span></code></a>.</p>
+<p>See also <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.ModelIdentity" title="cascada.abstractproperty.opmodel.ModelIdentity"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ModelIdentity</span></code></a>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span><span class="p">,</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.algebraic.value</span> <span class="kn">import</span> <span class="n">BitValue</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.algebraic.opmodel</span> <span class="kn">import</span> <span class="n">BitModelId</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span> <span class="o">=</span> <span class="n">BitValue</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)),</span> <span class="n">BitValue</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">BitModelId</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">vrepr</span><span class="p">())</span>
+<span class="go">BitModelId(BitValue(Variable(&#39;a&#39;, width=4)))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">validity_constraint</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
+<span class="go">((a[0]) == (b[0])) &amp; ((a[1]) == (b[1])) &amp; ((a[2]) == (b[2])) &amp; ((a[3]) == (b[3]))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">max_weight</span><span class="p">(),</span> <span class="n">f</span><span class="o">.</span><span class="n">weight_width</span><span class="p">(),</span> <span class="n">f</span><span class="o">.</span><span class="n">error</span><span class="p">(),</span> <span class="n">f</span><span class="o">.</span><span class="n">num_frac_bits</span><span class="p">()</span>
+<span class="go">(0, 1, 0, 0)</span>
+</pre></div>
+</div>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.algebraic.opmodel.BitModelId.val_type">
+<span class="sig-name descname"><span class="pre">val_type</span></span><a class="headerlink" href="#cascada.algebraic.opmodel.BitModelId.val_type" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="cascada.algebraic.value.html#cascada.algebraic.value.BitValue" title="cascada.algebraic.value.BitValue"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.algebraic.value.BitValue</span></code></a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.algebraic.opmodel.BitModelId.validity_constraint">
+<span class="sig-name descname"><span class="pre">validity_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_val</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/algebraic/opmodel.html#BitModelId.validity_constraint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.algebraic.opmodel.BitModelId.validity_constraint" title="Permalink to this definition"></a></dt>
+<dd><p>Return the validity constraint for a given output <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a>.</p>
+<p>The validity constraint is a bit-vector expression that depends on
+the input property <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel.input_prop" title="cascada.abstractproperty.opmodel.OpModel.input_prop"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">OpModel.input_prop</span></code></a> and the output property
+<code class="docutils literal notranslate"><span class="pre">output_prop</span></code> and it is True if and only if the input property
+propagates to the output property with non-zero probability.</p>
+<p>If both the input and output properties are constant values,
+this method returns the <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Constant" title="cascada.bitvector.core.Constant"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a> <code class="docutils literal notranslate"><span class="pre">0b1</span></code> or <code class="docutils literal notranslate"><span class="pre">0b0</span></code> depending on
+whether the corresponding propagation has non-zero probability.
+Otherwise, this method returns a bit-vector <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term" title="cascada.bitvector.core.Term"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Term</span></code></a>
+containing the input and output properties as <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Variable" title="cascada.bitvector.core.Variable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Variable</span></code></a> objects.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.algebraic.opmodel.WordModelId">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.algebraic.opmodel.</span></span><span class="sig-name descname"><span class="pre">WordModelId</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_prop</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/algebraic/opmodel.html#WordModelId"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.algebraic.opmodel.WordModelId" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.ModelIdentity" title="cascada.abstractproperty.opmodel.ModelIdentity"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.abstractproperty.opmodel.ModelIdentity</span></code></a>, <a class="reference internal" href="#cascada.algebraic.opmodel.OpModel" title="cascada.algebraic.opmodel.OpModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.algebraic.opmodel.OpModel</span></code></a></p>
+<p>Represent the <a class="reference internal" href="cascada.algebraic.value.html#cascada.algebraic.value.WordValue" title="cascada.algebraic.value.WordValue"><code class="xref any py py-class docutils literal notranslate"><span class="pre">WordValue</span></code></a> <a class="reference internal" href="#cascada.algebraic.opmodel.OpModel" title="cascada.algebraic.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">algebraic.opmodel.OpModel</span></code></a> of <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.BvIdentity" title="cascada.bitvector.operation.BvIdentity"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvIdentity</span></code></a>.</p>
+<p>See also <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.ModelIdentity" title="cascada.abstractproperty.opmodel.ModelIdentity"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ModelIdentity</span></code></a>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span><span class="p">,</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.algebraic.value</span> <span class="kn">import</span> <span class="n">WordValue</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.algebraic.opmodel</span> <span class="kn">import</span> <span class="n">WordModelId</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span> <span class="o">=</span> <span class="n">WordValue</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)),</span> <span class="n">WordValue</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">WordModelId</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">vrepr</span><span class="p">())</span>
+<span class="go">WordModelId(WordValue(Variable(&#39;a&#39;, width=4)))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">validity_constraint</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
+<span class="go">a == b</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">max_weight</span><span class="p">(),</span> <span class="n">f</span><span class="o">.</span><span class="n">weight_width</span><span class="p">(),</span> <span class="n">f</span><span class="o">.</span><span class="n">error</span><span class="p">(),</span> <span class="n">f</span><span class="o">.</span><span class="n">num_frac_bits</span><span class="p">()</span>
+<span class="go">(0, 1, 0, 0)</span>
+</pre></div>
+</div>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.algebraic.opmodel.WordModelId.val_type">
+<span class="sig-name descname"><span class="pre">val_type</span></span><a class="headerlink" href="#cascada.algebraic.opmodel.WordModelId.val_type" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="cascada.algebraic.value.html#cascada.algebraic.value.WordValue" title="cascada.algebraic.value.WordValue"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.algebraic.value.WordValue</span></code></a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.algebraic.opmodel.BitModelBvAdd">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.algebraic.opmodel.</span></span><span class="sig-name descname"><span class="pre">BitModelBvAdd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_prop</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/algebraic/opmodel.html#BitModelBvAdd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.algebraic.opmodel.BitModelBvAdd" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cascada.algebraic.opmodel.OpModel" title="cascada.algebraic.opmodel.OpModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.algebraic.opmodel.OpModel</span></code></a></p>
+<p>Represent the <a class="reference internal" href="cascada.algebraic.value.html#cascada.algebraic.value.BitValue" title="cascada.algebraic.value.BitValue"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BitValue</span></code></a> <a class="reference internal" href="#cascada.algebraic.opmodel.OpModel" title="cascada.algebraic.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">algebraic.opmodel.OpModel</span></code></a> of <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.BvAdd" title="cascada.bitvector.operation.BvAdd"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvAdd</span></code></a>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span><span class="p">,</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.algebraic.value</span> <span class="kn">import</span> <span class="n">BitValue</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.algebraic.opmodel</span> <span class="kn">import</span> <span class="n">BitModelBvAdd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">alpha</span> <span class="o">=</span> <span class="n">BitValue</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)),</span> <span class="n">BitValue</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">BitModelBvAdd</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">vrepr</span><span class="p">())</span>
+<span class="go">BitModelBvAdd([BitValue(Variable(&#39;a&#39;, width=4)), BitValue(Variable(&#39;b&#39;, width=4))])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">max_weight</span><span class="p">(),</span> <span class="n">f</span><span class="o">.</span><span class="n">weight_width</span><span class="p">(),</span> <span class="n">f</span><span class="o">.</span><span class="n">error</span><span class="p">(),</span> <span class="n">f</span><span class="o">.</span><span class="n">num_frac_bits</span><span class="p">()</span>
+<span class="go">(0, 1, 0, 0)</span>
+</pre></div>
+</div>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.algebraic.opmodel.BitModelBvAdd.val_type">
+<span class="sig-name descname"><span class="pre">val_type</span></span><a class="headerlink" href="#cascada.algebraic.opmodel.BitModelBvAdd.val_type" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="cascada.algebraic.value.html#cascada.algebraic.value.BitValue" title="cascada.algebraic.value.BitValue"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.algebraic.value.BitValue</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.algebraic.opmodel.BitModelBvAdd.op">
+<span class="sig-name descname"><span class="pre">op</span></span><a class="headerlink" href="#cascada.algebraic.opmodel.BitModelBvAdd.op" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.BvAdd" title="cascada.bitvector.operation.BvAdd"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.bitvector.operation.BvAdd</span></code></a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.algebraic.opmodel.BitModelBvAdd.validity_constraint">
+<span class="sig-name descname"><span class="pre">validity_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_val</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/algebraic/opmodel.html#BitModelBvAdd.validity_constraint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.algebraic.opmodel.BitModelBvAdd.validity_constraint" title="Permalink to this definition"></a></dt>
+<dd><p>Return the validity constraint for a given <a class="reference internal" href="cascada.algebraic.value.html#cascada.algebraic.value.BitValue" title="cascada.algebraic.value.BitValue"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BitValue</span></code></a> output.</p>
+<p>This model is based on the fact that the <span class="math notranslate nohighlight">\(n\)</span>-bit modular addition
+<span class="math notranslate nohighlight">\(x \boxplus y = z\)</span> has the following implicit function
+<span class="math notranslate nohighlight">\(x \oplus y \oplus z \oplus Q(x \oplus z, y \oplus z)\)</span>
+where <span class="math notranslate nohighlight">\(Q(x, y) = (0, x_0 \wedge y_0,
+(x_0 \wedge y_0) \oplus (x_1 \wedge y_1), \dots,
+(x_0 \wedge y_0) \oplus (x_1 \wedge y_1) \oplus \dots \oplus
+(x_{n-2} \wedge y_{n-2}))\)</span></p>
+<p>Source: <em>Implicit White-Box Implementations: White-Boxing ARX Ciphers</em>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span><span class="p">,</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.algebraic.value</span> <span class="kn">import</span> <span class="n">BitValue</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.algebraic.opmodel</span> <span class="kn">import</span> <span class="n">BitModelBvAdd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">alpha</span> <span class="o">=</span> <span class="n">BitValue</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">)),</span> <span class="n">BitValue</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">BitModelBvAdd</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">beta</span> <span class="o">=</span> <span class="n">BitValue</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">validity_constraint</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
+<span class="go">0b1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a0</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;a0&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;a1&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">alpha</span> <span class="o">=</span> <span class="n">BitValue</span><span class="p">(</span><span class="n">a0</span><span class="p">),</span> <span class="n">BitValue</span><span class="p">(</span><span class="n">a1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">BitModelBvAdd</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">beta</span> <span class="o">=</span> <span class="n">BitValue</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">validity_constraint</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span>  
+<span class="go">(0b0 == ((a0[0]) ^ (a1[0]) ^ (b[0]))) &amp;</span>
+<span class="go">(0b0 == ((a0[1]) ^ (a1[1]) ^ (b[1]) ^ (((a0[0]) ^ (b[0])) &amp; ((a1[0]) ^ (b[0]))))) &amp;</span>
+<span class="go">(0b0 == ((a0[2]) ^ (a1[2]) ^ (b[2]) ^ (((a0[0]) ^ (b[0])) &amp; ((a1[0]) ^ (b[0]))) ^ (((a0[1]) ^ (b[1])) &amp; ((a1[1]) ^ (b[1])))))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span><span class="o">.</span><span class="n">xreplace</span><span class="p">({</span><span class="n">a0</span><span class="p">:</span> <span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">a1</span><span class="p">:</span> <span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">b</span><span class="p">:</span> <span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">)})</span>
+<span class="go">0b1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a1</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">alpha</span> <span class="o">=</span> <span class="n">BitValue</span><span class="p">(</span><span class="n">a0</span><span class="p">),</span> <span class="n">BitValue</span><span class="p">(</span><span class="n">a1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">BitModelBvAdd</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">beta</span> <span class="o">=</span> <span class="n">BitValue</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">validity_constraint</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span>  
+<span class="go">(0b0 == ((a0[0]) ^ (b[0]))) &amp;</span>
+<span class="go">(0b0 == ((a0[1]) ^ (b[1]) ^ (((a0[0]) ^ (b[0])) &amp; (b[0])))) &amp;</span>
+<span class="go">(0b0 == ((a0[2]) ^ (b[2]) ^ (((a0[0]) ^ (b[0])) &amp; (b[0])) ^ (((a0[1]) ^ (b[1])) &amp; (b[1]))))</span>
+</pre></div>
+</div>
+<p>See <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel.validity_constraint" title="cascada.abstractproperty.opmodel.OpModel.validity_constraint"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">OpModel.validity_constraint</span></code></a> for more information.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.algebraic.opmodel.BitModelBvSub">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.algebraic.opmodel.</span></span><span class="sig-name descname"><span class="pre">BitModelBvSub</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_prop</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/algebraic/opmodel.html#BitModelBvSub"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.algebraic.opmodel.BitModelBvSub" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cascada.algebraic.opmodel.OpModel" title="cascada.algebraic.opmodel.OpModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.algebraic.opmodel.OpModel</span></code></a></p>
+<p>Represent the <a class="reference internal" href="cascada.algebraic.value.html#cascada.algebraic.value.BitValue" title="cascada.algebraic.value.BitValue"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BitValue</span></code></a> <a class="reference internal" href="#cascada.algebraic.opmodel.OpModel" title="cascada.algebraic.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">algebraic.opmodel.OpModel</span></code></a> of <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.BvSub" title="cascada.bitvector.operation.BvSub"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvSub</span></code></a>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span><span class="p">,</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.algebraic.value</span> <span class="kn">import</span> <span class="n">BitValue</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.algebraic.opmodel</span> <span class="kn">import</span> <span class="n">BitModelBvSub</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">alpha</span> <span class="o">=</span> <span class="n">BitValue</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)),</span> <span class="n">BitValue</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">BitModelBvSub</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">vrepr</span><span class="p">())</span>
+<span class="go">BitModelBvSub([BitValue(Variable(&#39;a&#39;, width=4)), BitValue(Variable(&#39;b&#39;, width=4))])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">max_weight</span><span class="p">(),</span> <span class="n">f</span><span class="o">.</span><span class="n">weight_width</span><span class="p">(),</span> <span class="n">f</span><span class="o">.</span><span class="n">error</span><span class="p">(),</span> <span class="n">f</span><span class="o">.</span><span class="n">num_frac_bits</span><span class="p">()</span>
+<span class="go">(0, 1, 0, 0)</span>
+</pre></div>
+</div>
+<p>The algebraic model of the modular substraction is based on <a class="reference internal" href="#cascada.algebraic.opmodel.BitModelBvAdd" title="cascada.algebraic.opmodel.BitModelBvAdd"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BitModelBvAdd</span></code></a>
+since <code class="docutils literal notranslate"><span class="pre">~(x</span> <span class="pre">-</span> <span class="pre">y)</span> <span class="pre">==</span> <span class="pre">~x</span> <span class="pre">+</span> <span class="pre">y</span></code>.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.algebraic.opmodel.BitModelBvSub.val_type">
+<span class="sig-name descname"><span class="pre">val_type</span></span><a class="headerlink" href="#cascada.algebraic.opmodel.BitModelBvSub.val_type" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="cascada.algebraic.value.html#cascada.algebraic.value.BitValue" title="cascada.algebraic.value.BitValue"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.algebraic.value.BitValue</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.algebraic.opmodel.BitModelBvSub.op">
+<span class="sig-name descname"><span class="pre">op</span></span><a class="headerlink" href="#cascada.algebraic.opmodel.BitModelBvSub.op" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.BvSub" title="cascada.bitvector.operation.BvSub"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.bitvector.operation.BvSub</span></code></a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.algebraic.opmodel.BitModelBvSub.validity_constraint">
+<span class="sig-name descname"><span class="pre">validity_constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_val</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/algebraic/opmodel.html#BitModelBvSub.validity_constraint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.algebraic.opmodel.BitModelBvSub.validity_constraint" title="Permalink to this definition"></a></dt>
+<dd><p>Return the validity constraint for a given <a class="reference internal" href="cascada.algebraic.value.html#cascada.algebraic.value.BitValue" title="cascada.algebraic.value.BitValue"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BitValue</span></code></a> output.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span><span class="p">,</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.algebraic.value</span> <span class="kn">import</span> <span class="n">BitValue</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.algebraic.opmodel</span> <span class="kn">import</span> <span class="n">BitModelBvSub</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">alpha</span> <span class="o">=</span> <span class="n">BitValue</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">)),</span> <span class="n">BitValue</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">BitModelBvSub</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">beta</span> <span class="o">=</span> <span class="n">BitValue</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">validity_constraint</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
+<span class="go">0b1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a0</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;a0&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;a1&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">alpha</span> <span class="o">=</span> <span class="n">BitValue</span><span class="p">(</span><span class="n">a0</span><span class="p">),</span> <span class="n">BitValue</span><span class="p">(</span><span class="n">a1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">BitModelBvSub</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">beta</span> <span class="o">=</span> <span class="n">BitValue</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">validity_constraint</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span>  
+<span class="go">(0b0 == (~(a0[0]) ^ (a1[0]) ^ ~(b[0]))) &amp;</span>
+<span class="go">(0b0 == (~(a0[1]) ^ (a1[1]) ^ ~(b[1]) ^ ((~(a0[0]) ^ ~(b[0])) &amp; ((a1[0]) ^ ~(b[0]))))) &amp;</span>
+<span class="go">(0b0 == (~(a0[2]) ^ (a1[2]) ^ ~(b[2]) ^ ((~(a0[0]) ^ ~(b[0])) &amp; ((a1[0]) ^ ~(b[0]))) ^ ((~(a0[1]) ^ ~(b[1])) &amp; ((a1[1]) ^ ~(b[1])))))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span><span class="o">.</span><span class="n">xreplace</span><span class="p">({</span><span class="n">a0</span><span class="p">:</span> <span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">a1</span><span class="p">:</span> <span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">b</span><span class="p">:</span> <span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">)})</span>
+<span class="go">0b1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a1</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">alpha</span> <span class="o">=</span> <span class="n">BitValue</span><span class="p">(</span><span class="n">a0</span><span class="p">),</span> <span class="n">BitValue</span><span class="p">(</span><span class="n">a1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">BitModelBvSub</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">beta</span> <span class="o">=</span> <span class="n">BitValue</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">validity_constraint</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span>  
+<span class="go">(0b0 == (~(a0[0]) ^ ~(b[0]))) &amp;</span>
+<span class="go">(0b0 == (~(a0[1]) ^ ~(b[1]) ^ ((~(a0[0]) ^ ~(b[0])) &amp; ~(b[0])))) &amp;</span>
+<span class="go">(0b0 == (~(a0[2]) ^ ~(b[2]) ^ ((~(a0[0]) ^ ~(b[0])) &amp; ~(b[0])) ^ ((~(a0[1]) ^ ~(b[1])) &amp; ~(b[1]))))</span>
+</pre></div>
+</div>
+<p>See <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel.validity_constraint" title="cascada.abstractproperty.opmodel.OpModel.validity_constraint"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">OpModel.validity_constraint</span></code></a> for more information.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cascada.algebraic.value.html" class="btn btn-neutral float-left" title="cascada.algebraic.value module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cascada.algebraic.chmodel.html" class="btn btn-neutral float-right" title="cascada.algebraic.chmodel module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Adrián Ranea.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

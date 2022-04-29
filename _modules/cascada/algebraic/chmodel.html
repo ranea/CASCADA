@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cascada.algebraic.chmodel &mdash; CASCADA 1.0.rc0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> CASCADA
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">CASCADA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../primitives_implemented.html">Primitives implemented</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cascada.html">API reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">CASCADA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>cascada.algebraic.chmodel</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cascada.algebraic.chmodel</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Manage models of algebraic characteristics.&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">core</span>
+<span class="kn">from</span> <span class="nn">cascada.algebraic</span> <span class="kn">import</span> <span class="n">value</span>
+
+<span class="kn">from</span> <span class="nn">cascada</span> <span class="kn">import</span> <span class="n">abstractproperty</span>
+
+
+<span class="n">ChModelSigType</span> <span class="o">=</span> <span class="n">abstractproperty</span><span class="o">.</span><span class="n">chmodel</span><span class="o">.</span><span class="n">ChModelSigType</span>
+
+
+<div class="viewcode-block" id="ChModel"><a class="viewcode-back" href="../../../cascada.algebraic.chmodel.html#cascada.algebraic.chmodel.ChModel">[docs]</a><span class="k">class</span> <span class="nc">ChModel</span><span class="p">(</span><span class="n">abstractproperty</span><span class="o">.</span><span class="n">chmodel</span><span class="o">.</span><span class="n">ChModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent bit-vector models of algebraic characteristics over bit-vector functions.</span>
+
+<span class="sd">    Internally, this class is a subclass of `abstractproperty.chmodel.ChModel`,</span>
+<span class="sd">    where the `Property` is a `Value` type and the probability of the</span>
+<span class="sd">    characteristic is the product of the propagation probabilities</span>
+<span class="sd">    of the `Value` pairs :math:`(\Delta_{x_{i}} \mapsto \Delta_{x_{i+1}})`</span>
+<span class="sd">    composing the characteristic (see `algebraic.characteristic.Characteristic`).</span>
+
+<span class="sd">    If the `SSA` of the `BvFunction` contains external `Variable` objects</span>
+<span class="sd">    and their `Value` objects are not provided in the initialization</span>
+<span class="sd">    through ``external_var2val``, these free external variables</span>
+<span class="sd">    are wrapped in `Value` objects.</span>
+
+<span class="sd">    ::</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.algebraic.value import BitValue, WordValue</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.algebraic.chmodel import ChModel</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">        &gt;&gt;&gt; Speck32_KS = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64).key_schedule</span>
+<span class="sd">        &gt;&gt;&gt; Speck32_KS.set_num_rounds(2)</span>
+<span class="sd">        &gt;&gt;&gt; ch_model = ChModel(Speck32_KS, BitValue, [&quot;vmk0&quot;, &quot;vmk1&quot;, &quot;vmk2&quot;])</span>
+<span class="sd">        &gt;&gt;&gt; ch_model  # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS</span>
+<span class="sd">        ChModel(func=SpeckKeySchedule_2R,</span>
+<span class="sd">                input_val=[BitValue(vmk0), BitValue(vmk1), BitValue(vmk2)],</span>
+<span class="sd">                output_val=[BitValue(vmk2_out), BitValue(vx3_out), BitValue(vx8_out)],</span>
+<span class="sd">                assign_outval2op_model=[(BitValue(vx1), BitModelBvAdd([BitValue((vmk1[6:]) :: ...</span>
+<span class="sd">        &gt;&gt;&gt; ch_model.ssa  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        SSA(input_vars=[vmk0, vmk1, vmk2],</span>
+<span class="sd">            output_vars=[vmk2_out, vx3_out, vx8_out],</span>
+<span class="sd">            assignments=[(vx0, vmk1 &gt;&gt;&gt; 7), (vx1, vx0 + vmk2), (vx2, vmk2 &lt;&lt;&lt; 2), (vx3, vx2 ^ vx1),</span>
+<span class="sd">                         (vx4, vmk0 &gt;&gt;&gt; 7), (vx5, vx4 + vx3), (vx6, vx5 ^ 0x0001), (vx7, vx3 &lt;&lt;&lt; 2), (vx8, vx7 ^ vx6),</span>
+<span class="sd">                         (vmk2_out, Id(vmk2)), (vx3_out, Id(vx3)), (vx8_out, Id(vx8))])</span>
+<span class="sd">        &gt;&gt;&gt; ch_model = ChModel(Speck32_KS, WordValue, [&quot;vmk0&quot;, &quot;vmk1&quot;, &quot;vmk2&quot;])</span>
+<span class="sd">        &gt;&gt;&gt; ch_model  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        ChModel(func=SpeckKeySchedule_2R,</span>
+<span class="sd">                input_val=[WordValue(vmk0), WordValue(vmk1), WordValue(vmk2)],</span>
+<span class="sd">                output_val=[WordValue(vmk2_out), WordValue(vx3_out), WordValue(vx8_out)],</span>
+<span class="sd">                assign_outval2op_model=[(WordValue(vmk2_out), WordModelId(WordValue(vmk2))),</span>
+<span class="sd">                                        (WordValue(vx3_out), WordModelId(WordValue(vmk2 &lt;&lt;&lt; 2 ^ (vmk1 &gt;&gt;&gt; 7 + vmk2)))),</span>
+<span class="sd">                                        (WordValue(vx8_out), WordModelId(WordValue((vmk2 &lt;&lt;&lt; 2 ^ (vmk1 &gt;&gt;&gt; 7 + vmk2)) &lt;&lt;&lt; 2 ^</span>
+<span class="sd">                                            (vmk0 &gt;&gt;&gt; 7 + (vmk2 &lt;&lt;&lt; 2 ^ (vmk1 &gt;&gt;&gt; 7 + vmk2))) ^ 0x0001)))])</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        val_type: alias of</span>
+<span class="sd">            `abstractproperty.chmodel.ChModel.prop_type`.</span>
+<span class="sd">        input_val: alias of</span>
+<span class="sd">            `abstractproperty.chmodel.ChModel.input_prop`.</span>
+<span class="sd">        output_val: alias of</span>
+<span class="sd">            `abstractproperty.chmodel.ChModel.output_prop`.</span>
+<span class="sd">        external_var2val: alias of</span>
+<span class="sd">            `abstractproperty.chmodel.ChModel.external_var2prop`.</span>
+<span class="sd">        assign_outval2op_model: alias of</span>
+<span class="sd">            `abstractproperty.chmodel.ChModel.assign_outprop2op_model`.</span>
+<span class="sd">        var2val: alias of</span>
+<span class="sd">            `abstractproperty.chmodel.ChModel.var2prop`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_prop_label</span> <span class="o">=</span> <span class="s2">&quot;val&quot;</span>  <span class="c1"># for str and vrepr</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">val_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">prop_type</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">input_val</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_prop</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">output_val</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_prop</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">external_var2val</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">external_var2prop</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">assign_outval2op_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">assign_outprop2op_model</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">var2val</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">var2prop</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_input_val_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_input_prop_names</span>
+
+    <span class="k">def</span> <span class="nf">_get_property_missing_external_var</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val_type</span><span class="p">,</span> <span class="n">ext_var</span><span class="p">,</span> <span class="n">external_var2val</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">val_type</span><span class="p">(</span><span class="n">ext_var</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">val_type</span><span class="p">,</span> <span class="n">input_val_names</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;vx&quot;</span><span class="p">,</span>
+                 <span class="n">external_var2val</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">op_model_class2options</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">func</span><span class="p">,</span> <span class="n">prop_type</span><span class="o">=</span><span class="n">val_type</span><span class="p">,</span> <span class="n">input_prop_names</span><span class="o">=</span><span class="n">input_val_names</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
+            <span class="n">external_var2prop</span><span class="o">=</span><span class="n">external_var2val</span><span class="p">,</span> <span class="n">op_model_class2options</span><span class="o">=</span><span class="n">op_model_class2options</span>
+        <span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_get_Characteristic_cls</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">cascada.algebraic.characteristic</span> <span class="kn">import</span> <span class="n">Characteristic</span> <span class="k">as</span> <span class="n">Characteristic_cls</span>
+        <span class="k">return</span> <span class="n">Characteristic_cls</span>
+
+<div class="viewcode-block" id="ChModel.vrepr"><a class="viewcode-back" href="../../../cascada.algebraic.chmodel.html#cascada.algebraic.chmodel.ChModel.vrepr">[docs]</a>    <span class="k">def</span> <span class="nf">vrepr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return an executable string representation.</span>
+
+<span class="sd">        See also `abstractproperty.chmodel.ChModel.vrepr`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.algebraic.value import BitValue</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.algebraic.chmodel import ChModel</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64).key_schedule</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS.set_num_rounds(2)</span>
+<span class="sd">            &gt;&gt;&gt; ch_model = ChModel(Speck32_KS, BitValue, [&quot;vmk0&quot;, &quot;vmk1&quot;, &quot;vmk2&quot;])</span>
+<span class="sd">            &gt;&gt;&gt; ch_model.vrepr()  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">            &quot;ChModel(func=SpeckKeySchedule.set_num_rounds_and_return(2), val_type=BitValue,</span>
+<span class="sd">                     input_val_names=[&#39;vmk0&#39;, &#39;vmk1&#39;, &#39;vmk2&#39;], prefix=&#39;vx&#39;)&quot;</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">vrepr</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ChModel.validity_assertions"><a class="viewcode-back" href="../../../cascada.algebraic.chmodel.html#cascada.algebraic.chmodel.ChModel.validity_assertions">[docs]</a>    <span class="k">def</span> <span class="nf">validity_assertions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the validity constraint as a list of assertions.</span>
+
+<span class="sd">        See also `abstractproperty.chmodel.ChModel.validity_assertions`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from functools import reduce</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.operation import BvAnd</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.algebraic.value import BitValue</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.algebraic.chmodel import ChModel</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64).key_schedule</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS.set_num_rounds(2)</span>
+<span class="sd">            &gt;&gt;&gt; ch_model = ChModel(Speck32_KS, BitValue, [&quot;vmk0&quot;, &quot;vmk1&quot;, &quot;vmk2&quot;])</span>
+<span class="sd">            &gt;&gt;&gt; assertions = ch_model.validity_assertions()</span>
+<span class="sd">            &gt;&gt;&gt; for a in assertions: print(a)  # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS</span>
+<span class="sd">            (0b0 == ((vmk1[7]) ^ (vmk2[0]) ^ (vx1[0]))) &amp; ...</span>
+<span class="sd">            (0b0 == ((vmk0[7]) ^ (vmk2[14]) ^ (vx1[0]) ^ (vx5[0]))) &amp; ...</span>
+<span class="sd">            ((vmk2[0]) == (vmk2_out[0])) &amp; ((vmk2[1]) == (vmk2_out[1])) &amp; ...</span>
+<span class="sd">            (((vmk2[14]) ^ (vx1[0])) == (vx3_out[0])) &amp; (((vmk2[15]) ^ ...</span>
+<span class="sd">            (((vmk2[12]) ^ (vx1[14]) ^ ~(vx5[0])) == (vx8_out[0])) &amp; ...</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">validity_assertions</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ChModel.pr_one_assertions"><a class="viewcode-back" href="../../../cascada.algebraic.chmodel.html#cascada.algebraic.chmodel.ChModel.pr_one_assertions">[docs]</a>    <span class="k">def</span> <span class="nf">pr_one_assertions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the probability-one constraint as a list of assertions.</span>
+
+<span class="sd">        See also `abstractproperty.chmodel.ChModel.pr_one_assertions`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.algebraic.value import BitValue</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.algebraic.chmodel import ChModel</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64).key_schedule</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS.set_num_rounds(2)</span>
+<span class="sd">            &gt;&gt;&gt; ch_model = ChModel(Speck32_KS, BitValue, [&quot;vmk0&quot;, &quot;vmk1&quot;, &quot;vmk2&quot;])</span>
+<span class="sd">            &gt;&gt;&gt; for a in ch_model.pr_one_assertions(): print(a)  # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS</span>
+<span class="sd">            (0b0 == ((vmk1[7]) ^ (vmk2[0]) ^ (vx1[0]))) &amp; (0b0 == ((vmk1[8]) ^ (vmk2[1]) ^ (vx1[1]) ^ ...</span>
+<span class="sd">            (0b0 == ((vmk0[7]) ^ (vmk2[14]) ^ (vx1[0]) ^ (vx5[0]))) &amp; (0b0 == ((vmk0[8]) ^ (vmk2[15]) ^ ...</span>
+<span class="sd">            ((vmk2[0]) == (vmk2_out[0])) &amp; ((vmk2[1]) == (vmk2_out[1])) &amp; ((vmk2[2]) == (vmk2_out[2])) &amp; ...</span>
+<span class="sd">            (((vmk2[14]) ^ (vx1[0])) == (vx3_out[0])) &amp; (((vmk2[15]) ^ (vx1[1])) == (vx3_out[1])) &amp; ...</span>
+<span class="sd">            (((vmk2[12]) ^ (vx1[14]) ^ ~(vx5[0])) == (vx8_out[0])) &amp; (((vmk2[13]) ^ (vx1[15]) ^ ...</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">pr_one_assertions</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ChModel.weight_assertions"><a class="viewcode-back" href="../../../cascada.algebraic.chmodel.html#cascada.algebraic.chmodel.ChModel.weight_assertions">[docs]</a>    <span class="k">def</span> <span class="nf">weight_assertions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ch_weight_variable</span><span class="p">,</span> <span class="n">assign_weight_variables</span><span class="p">,</span> <span class="n">truncate</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the weight constraint as a list of assertions.</span>
+
+<span class="sd">        See also `abstractproperty.chmodel.ChModel.weight_assertions`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.operation import BvAnd</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.algebraic.value import BitValue, WordValue</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.algebraic.chmodel import ChModel</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64).key_schedule</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS.set_num_rounds(2)</span>
+<span class="sd">            &gt;&gt;&gt; cm = ChModel(Speck32_KS, BitValue, [&quot;vmk0&quot;, &quot;vmk1&quot;, &quot;vmk2&quot;])</span>
+<span class="sd">            &gt;&gt;&gt; cwv = Variable(&quot;w&quot;, cm.weight_width())</span>
+<span class="sd">            &gt;&gt;&gt; omvs = [Variable(f&quot;w{i}&quot;, om.weight_width()) for i, om in enumerate(cm.assign_outval2op_model.values())]</span>
+<span class="sd">            &gt;&gt;&gt; for a in cm.weight_assertions(cwv, omvs): print(a)  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">            w0 == 0b0</span>
+<span class="sd">            w1 == 0b0</span>
+<span class="sd">            w2 == 0b0</span>
+<span class="sd">            w3 == 0b0</span>
+<span class="sd">            w4 == 0b0</span>
+<span class="sd">            w == 0b0</span>
+<span class="sd">            &gt;&gt;&gt; cm = ChModel(Speck32_KS, WordValue, [&quot;vmk0&quot;, &quot;vmk1&quot;, &quot;vmk2&quot;])</span>
+<span class="sd">            &gt;&gt;&gt; cwv = Variable(&quot;w&quot;, cm.weight_width())</span>
+<span class="sd">            &gt;&gt;&gt; omvs = [Variable(f&quot;w{i}&quot;, om.weight_width()) for i, om in enumerate(cm.assign_outval2op_model.values())]</span>
+<span class="sd">            &gt;&gt;&gt; for a in cm.weight_assertions(cwv, omvs): print(a)  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">            w0 == 0b0</span>
+<span class="sd">            w1 == 0b0</span>
+<span class="sd">            w2 == 0b0</span>
+<span class="sd">            w == 0b0</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">weight_assertions</span><span class="p">(</span><span class="n">ch_weight_variable</span><span class="p">,</span> <span class="n">assign_weight_variables</span><span class="p">,</span> <span class="n">truncate</span><span class="o">=</span><span class="n">truncate</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ChModel.max_weight"><a class="viewcode-back" href="../../../cascada.algebraic.chmodel.html#cascada.algebraic.chmodel.ChModel.max_weight">[docs]</a>    <span class="k">def</span> <span class="nf">max_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">truncate</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the maximum value the ch. weight variable can achieve in `weight_assertions`.</span>
+
+<span class="sd">        See also `abstractproperty.chmodel.ChModel.max_weight`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.operation import BvAnd</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.algebraic.value import BitValue, WordValue</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.algebraic.chmodel import ChModel</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64).key_schedule</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS.set_num_rounds(2)</span>
+<span class="sd">            &gt;&gt;&gt; cm = ChModel(Speck32_KS, BitValue, [&quot;vmk0&quot;, &quot;vmk1&quot;, &quot;vmk2&quot;])</span>
+<span class="sd">            &gt;&gt;&gt; cm.max_weight(), cm.weight_width(), cm.num_frac_bits()</span>
+<span class="sd">            (0, 1, 0)</span>
+<span class="sd">            &gt;&gt;&gt; cm = ChModel(Speck32_KS, WordValue, [&quot;vmk0&quot;, &quot;vmk1&quot;, &quot;vmk2&quot;])</span>
+<span class="sd">            &gt;&gt;&gt; cm.num_frac_bits()</span>
+<span class="sd">            0</span>
+<span class="sd">            &gt;&gt;&gt; cm.max_weight(), cm.weight_width()</span>
+<span class="sd">            (0, 1)</span>
+<span class="sd">            &gt;&gt;&gt; cm.max_weight(truncate=False), cm.weight_width(truncate=False)</span>
+<span class="sd">            (0, 1)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">max_weight</span><span class="p">(</span><span class="n">truncate</span><span class="o">=</span><span class="n">truncate</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ChModel.error"><a class="viewcode-back" href="../../../cascada.algebraic.chmodel.html#cascada.algebraic.chmodel.ChModel.error">[docs]</a>    <span class="k">def</span> <span class="nf">error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the maximum difference between `weight_assertions` and the exact weight.</span>
+
+<span class="sd">        See also `abstractproperty.chmodel.ChModel.error`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.operation import BvAnd</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.algebraic.value import BitValue, WordValue</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.algebraic.chmodel import ChModel</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64).key_schedule</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS.set_num_rounds(2)</span>
+<span class="sd">            &gt;&gt;&gt; ChModel(Speck32_KS, BitValue, [&quot;vmk0&quot;, &quot;vmk1&quot;, &quot;vmk2&quot;]).error()</span>
+<span class="sd">            0</span>
+<span class="sd">            &gt;&gt;&gt; ChModel(Speck32_KS, WordValue, [&quot;vmk0&quot;, &quot;vmk1&quot;, &quot;vmk2&quot;]).error()</span>
+<span class="sd">            0</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ChModel.signature"><a class="viewcode-back" href="../../../cascada.algebraic.chmodel.html#cascada.algebraic.chmodel.ChModel.signature">[docs]</a>    <span class="k">def</span> <span class="nf">signature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sig_type</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the signature of the characteristic model.</span>
+
+<span class="sd">        See also `abstractproperty.chmodel.ChModel.signature`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.operation import BvAnd</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.algebraic.value import BitValue</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.algebraic.chmodel import ChModel</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64).key_schedule</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS.set_num_rounds(2)</span>
+<span class="sd">            &gt;&gt;&gt; ch_model = ChModel(Speck32_KS, BitValue, [&quot;vmk0&quot;, &quot;vmk1&quot;, &quot;vmk2&quot;])</span>
+<span class="sd">            &gt;&gt;&gt; ch_model.signature(ChModelSigType.Unique)</span>
+<span class="sd">            [vmk0, vmk1, vmk2]</span>
+<span class="sd">            &gt;&gt;&gt; ch_model.signature(ChModelSigType.InputOutput)</span>
+<span class="sd">            [vmk0, vmk1, vmk2, vmk2_out, vx3_out, vx8_out]</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">sig_type</span> <span class="o">==</span> <span class="n">ChModelSigType</span><span class="o">.</span><span class="n">Unique</span><span class="p">:</span>
+            <span class="c1"># only the input and external values are needed to fully propagate the characteristic</span>
+            <span class="n">sig_var</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">val</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_prop</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">val</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ssa</span><span class="o">.</span><span class="n">_input_vars_not_used</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">ext_var</span><span class="p">,</span> <span class="n">prop</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">external_var2prop</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prop</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">):</span>
+                    <span class="n">sig_var</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ext_var</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">sig_var</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">sig_type</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ChModel.split"><a class="viewcode-back" href="../../../cascada.algebraic.chmodel.html#cascada.algebraic.chmodel.ChModel.split">[docs]</a>    <span class="k">def</span> <span class="nf">split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val_separators</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Split into multiple `ChModel` objects given the list of value separators.</span>
+
+<span class="sd">        See also `abstractproperty.chmodel.ChModel.split`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.operation import BvAnd</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.algebraic.value import BitValue</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.algebraic.chmodel import ChModel</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64).key_schedule</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS.set_num_rounds(2)</span>
+<span class="sd">            &gt;&gt;&gt; ch_model = ChModel(Speck32_KS, BitValue, [&quot;vmk0&quot;, &quot;vmk1&quot;, &quot;vmk2&quot;])</span>
+<span class="sd">            &gt;&gt;&gt; tuple(ch_model.ssa.assignments.items())  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">            ((vx0, vmk1 &gt;&gt;&gt; 7), (vx1, vx0 + vmk2), (vx2, vmk2 &lt;&lt;&lt; 2), (vx3, vx2 ^ vx1),</span>
+<span class="sd">            (vx4, vmk0 &gt;&gt;&gt; 7), (vx5, vx4 + vx3), (vx6, vx5 ^ 0x0001), (vx7, vx3 &lt;&lt;&lt; 2), (vx8, vx7 ^ vx6),</span>
+<span class="sd">            (vmk2_out, Id(vmk2)), (vx3_out, Id(vx3)), (vx8_out, Id(vx8)))</span>
+<span class="sd">            &gt;&gt;&gt; val_separators = [ (BitValue(Variable(&quot;vx2&quot;, width=16)), BitValue(Variable(&quot;vx3&quot;, width=16))), ]</span>
+<span class="sd">            &gt;&gt;&gt; for cm in ch_model.split(val_separators): print(cm)  # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS</span>
+<span class="sd">            ChModel(func=SpeckKeySchedule_2R_0S,</span>
+<span class="sd">                    input_val=[BitValue(vmk0), BitValue(vmk1), BitValue(vmk2)],</span>
+<span class="sd">                    output_val=[BitValue(vmk0_out), BitValue(vx3_out), BitValue(vmk2_out)],</span>
+<span class="sd">                    assign_outval2op_model=[(BitValue(vx1), BitModelBvAdd([BitValue((vmk1[6:]) :: ...</span>
+<span class="sd">            ChModel(func=SpeckKeySchedule_2R_1S,</span>
+<span class="sd">                    input_val=[BitValue(vmk0), BitValue(vx3), BitValue(vmk2)],</span>
+<span class="sd">                    output_val=[BitValue(vmk2_out), BitValue(vx3_out), BitValue(vx8_out)],</span>
+<span class="sd">                    assign_outval2op_model=[(BitValue(vx5), BitModelBvAdd([BitValue((vmk0[6:]) :: ...</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">val_separators</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ChModel.get_round_separators"><a class="viewcode-back" href="../../../cascada.algebraic.chmodel.html#cascada.algebraic.chmodel.ChModel.get_round_separators">[docs]</a>    <span class="k">def</span> <span class="nf">get_round_separators</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the round separators if `func` is a `RoundBasedFunction`.</span>
+
+<span class="sd">        See also `abstractproperty.chmodel.ChModel.get_round_separators`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.operation import BvAnd</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.algebraic.value import BitValue, WordValue</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.algebraic.chmodel import ChModel</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64).key_schedule</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS.set_num_rounds(2)</span>
+<span class="sd">            &gt;&gt;&gt; ch_model = ChModel(Speck32_KS, BitValue, [&quot;vmk0&quot;, &quot;vmk1&quot;, &quot;vmk2&quot;])</span>
+<span class="sd">            &gt;&gt;&gt; sub_cms = ch_model.split(ch_model.get_round_separators())</span>
+<span class="sd">            &gt;&gt;&gt; for cm in sub_cms: print(cm)  # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS</span>
+<span class="sd">            ChModel(func=SpeckKeySchedule_2R_0S,</span>
+<span class="sd">                    input_val=[BitValue(vmk0), BitValue(vmk1), BitValue(vmk2)],</span>
+<span class="sd">                    output_val=[BitValue(vmk0_out), BitValue(vx3_out), BitValue(vmk2_out)],</span>
+<span class="sd">                    assign_outval2op_model=[(BitValue(vx1), BitModelBvAdd([BitValue((vmk1[6:]) :: ...</span>
+<span class="sd">            ChModel(func=SpeckKeySchedule_2R_1S,</span>
+<span class="sd">                    input_val=[BitValue(vmk0), BitValue(vx3), BitValue(vmk2)],</span>
+<span class="sd">                    output_val=[BitValue(vmk2_out), BitValue(vx3_out), BitValue(vx8_out)],</span>
+<span class="sd">                    assign_outval2op_model=[(BitValue(vx5), BitModelBvAdd([BitValue((vmk0[6:]) :: ...</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_round_separators</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="EncryptionChModel"><a class="viewcode-back" href="../../../cascada.algebraic.chmodel.html#cascada.algebraic.chmodel.EncryptionChModel">[docs]</a><span class="k">class</span> <span class="nc">EncryptionChModel</span><span class="p">(</span><span class="n">abstractproperty</span><span class="o">.</span><span class="n">chmodel</span><span class="o">.</span><span class="n">EncryptionChModel</span><span class="p">,</span> <span class="n">ChModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent algebraic characteristic models of encryption functions.</span>
+
+<span class="sd">    Given a `Cipher`, an `EncryptionChModel` is a bit-vector model</span>
+<span class="sd">    (see `ChModel`) of an algebraic characteristic over</span>
+<span class="sd">    the `Cipher.encryption` in the single-key setting</span>
+<span class="sd">    (where the `Cipher.key_schedule` is ignored and round key values</span>
+<span class="sd">    are set to `Value` objects containing `Variable` objects).</span>
+
+<span class="sd">    See also `algebraic.characteristic.EncryptionCharacteristic`.</span>
+
+<span class="sd">    In an `EncryptionChModel`, the plaintext values start with the prefix ``&quot;vp&quot;``,</span>
+<span class="sd">    the intermediate and output values start with the prefix ``&quot;vx&quot;``,</span>
+<span class="sd">    and the round key variables start with the prefix ``&quot;vmk&quot;``.</span>
+
+<span class="sd">    ::</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.algebraic.value import BitValue, WordValue</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.algebraic.chmodel import EncryptionChModel</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">        &gt;&gt;&gt; Speck32 = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64)</span>
+<span class="sd">        &gt;&gt;&gt; Speck32.set_num_rounds(2)</span>
+<span class="sd">        &gt;&gt;&gt; ch_model = EncryptionChModel(Speck32, BitValue)</span>
+<span class="sd">        &gt;&gt;&gt; ch_model  # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS</span>
+<span class="sd">        EncryptionChModel(cipher=SpeckCipher_2R,</span>
+<span class="sd">            input_val=[BitValue(vp0), BitValue(vp1)],</span>
+<span class="sd">            output_val=[BitValue(vx7_out), BitValue(vx9_out)],</span>
+<span class="sd">            external_var2val=[(vk0, BitValue(vk0)), (vk1, BitValue(vk1))],</span>
+<span class="sd">            assign_outval2op_model=[(BitValue(vx1), BitModelBvAdd([BitValue((vp0[6:]) :: ...</span>
+<span class="sd">        &gt;&gt;&gt; ch_model.ssa  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        SSA(input_vars=[vp0, vp1], output_vars=[vx7_out, vx9_out], external_vars=[vk0, vk1],</span>
+<span class="sd">            assignments=[(vx0, vp0 &gt;&gt;&gt; 7), (vx1, vx0 + vp1), (vx2, vx1 ^ vk0), (vx3, vp1 &lt;&lt;&lt; 2), (vx4, vx3 ^ vx2),</span>
+<span class="sd">                (vx5, vx2 &gt;&gt;&gt; 7), (vx6, vx5 + vx4), (vx7, vx6 ^ vk1), (vx8, vx4 &lt;&lt;&lt; 2), (vx9, vx8 ^ vx7),</span>
+<span class="sd">                (vx7_out, Id(vx7)), (vx9_out, Id(vx9))])</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_prefix</span> <span class="o">=</span> <span class="s2">&quot;v&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cipher</span><span class="p">,</span> <span class="n">val_type</span><span class="p">,</span> <span class="n">op_model_class2options</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">cipher</span><span class="p">,</span> <span class="n">prop_type</span><span class="o">=</span><span class="n">val_type</span><span class="p">,</span> <span class="n">op_model_class2options</span><span class="o">=</span><span class="n">op_model_class2options</span>
+        <span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_get_EncryptionCharacteristic_cls</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">cascada.algebraic.characteristic</span> <span class="kn">import</span> <span class="n">EncryptionCharacteristic</span> <span class="k">as</span> <span class="n">EncryptionCharacteristic_cls</span>
+        <span class="k">return</span> <span class="n">EncryptionCharacteristic_cls</span>
+
+<div class="viewcode-block" id="EncryptionChModel.vrepr"><a class="viewcode-back" href="../../../cascada.algebraic.chmodel.html#cascada.algebraic.chmodel.EncryptionChModel.vrepr">[docs]</a>    <span class="k">def</span> <span class="nf">vrepr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return an executable string representation.</span>
+
+<span class="sd">        See also `abstractproperty.chmodel.EncryptionChModel.vrepr`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.algebraic.value import BitValue, WordValue</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.algebraic.chmodel import EncryptionChModel</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">            &gt;&gt;&gt; Speck32 = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64)</span>
+<span class="sd">            &gt;&gt;&gt; Speck32.set_num_rounds(2)</span>
+<span class="sd">            &gt;&gt;&gt; EncryptionChModel(Speck32, BitValue).vrepr()</span>
+<span class="sd">            &#39;EncryptionChModel(cipher=SpeckCipher.set_num_rounds_and_return(2), val_type=BitValue)&#39;</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">vrepr</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="CipherChModel"><a class="viewcode-back" href="../../../cascada.algebraic.chmodel.html#cascada.algebraic.chmodel.CipherChModel">[docs]</a><span class="k">class</span> <span class="nc">CipherChModel</span><span class="p">(</span><span class="n">abstractproperty</span><span class="o">.</span><span class="n">chmodel</span><span class="o">.</span><span class="n">CipherChModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent algebraic characteristic models of ciphers.</span>
+
+<span class="sd">    Given a `Cipher`, a `CipherChModel` is a bit-vector model</span>
+<span class="sd">    of an algebraic characteristic</span>
+<span class="sd">    (see `algebraic.characteristic.CipherCharacteristic`) over the cipher.</span>
+
+<span class="sd">    A `CipherChModel` consists of a pair of `ChModel` where one models</span>
+<span class="sd">    the characteristic over the `Cipher.key_schedule`, and the other one</span>
+<span class="sd">    models the characteristic over the `Cipher.encryption`.</span>
+
+<span class="sd">    In a `CipherChModel`, the master key values start with the prefix ``&quot;vmk&quot;``,</span>
+<span class="sd">    the intermediate and output values of the key schedule start with the prefix ``&quot;vk&quot;``,</span>
+<span class="sd">    the plaintext values start with the prefix ``&quot;vp&quot;`` and intermediate and</span>
+<span class="sd">    output values of the encryption with the prefix ``&quot;vx&quot;``.</span>
+
+<span class="sd">    The round key values in the encryption characteristic</span>
+<span class="sd">    (the values of the external variables of the encryption `SSA`)</span>
+<span class="sd">    are set to the output values of the key-schedule characteristic.</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.algebraic.value import BitValue, WordValue</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.algebraic.chmodel import CipherChModel</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">        &gt;&gt;&gt; Speck32 = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64)</span>
+<span class="sd">        &gt;&gt;&gt; Speck32.set_num_rounds(2)</span>
+<span class="sd">        &gt;&gt;&gt; ch_model = CipherChModel(Speck32, BitValue)</span>
+<span class="sd">        &gt;&gt;&gt; ch_model  # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS</span>
+<span class="sd">        CipherChModel(ks_ch_model=ChModel(func=SpeckKeySchedule_1R,</span>
+<span class="sd">            input_val=[BitValue(vmk0), BitValue(vmk1)],</span>
+<span class="sd">            output_val=[BitValue(vmk1_out), BitValue(vk3_out)],</span>
+<span class="sd">            assign_outval2op_model=[(BitValue(vk1), BitModelBvAdd([BitValue((vmk0[6:]) :: ...</span>
+<span class="sd">        enc_ch_model=ChModel(func=SpeckEncryption_2R,</span>
+<span class="sd">            input_val=[BitValue(vp0), BitValue(vp1)],</span>
+<span class="sd">            output_val=[BitValue(vx7_out), BitValue(vx9_out)],</span>
+<span class="sd">            external_var2val=[(vmk1_out, BitValue(vmk1_out)), (vk3_out, BitValue(vk3_out))],</span>
+<span class="sd">            assign_outval2op_model=[(BitValue(vx1), BitModelBvAdd([BitValue((vp0[6:]) :: ...</span>
+<span class="sd">        &gt;&gt;&gt; ch_model.ks_ch_model.ssa  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        SSA(input_vars=[vmk0, vmk1], output_vars=[vmk1_out, vk3_out],</span>
+<span class="sd">            assignments=[(vk0, vmk0 &gt;&gt;&gt; 7), (vk1, vk0 + vmk1), (vk2, vmk1 &lt;&lt;&lt; 2), (vk3, vk2 ^ vk1),</span>
+<span class="sd">                (vmk1_out, Id(vmk1)), (vk3_out, Id(vk3))])</span>
+<span class="sd">        &gt;&gt;&gt; ch_model.enc_ch_model.ssa  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        SSA(input_vars=[vp0, vp1], output_vars=[vx7_out, vx9_out], external_vars=[vmk1_out, vk3_out],</span>
+<span class="sd">            assignments=[(vx0, vp0 &gt;&gt;&gt; 7), (vx1, vx0 + vp1), (vx2, vx1 ^ vmk1_out), (vx3, vp1 &lt;&lt;&lt; 2), (vx4, vx3 ^ vx2),</span>
+<span class="sd">                (vx5, vx2 &gt;&gt;&gt; 7), (vx6, vx5 + vx4), (vx7, vx6 ^ vk3_out), (vx8, vx4 &lt;&lt;&lt; 2), (vx9, vx8 ^ vx7),</span>
+<span class="sd">                (vx7_out, Id(vx7)), (vx9_out, Id(vx9))])</span>
+<span class="sd">        &gt;&gt;&gt; ch_model = CipherChModel(Speck32, WordValue)</span>
+<span class="sd">        &gt;&gt;&gt; ch_model  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        CipherChModel(ks_ch_model=ChModel(func=SpeckKeySchedule_1R,</span>
+<span class="sd">            input_val=[WordValue(vmk0), WordValue(vmk1)],</span>
+<span class="sd">            output_val=[WordValue(vmk1_out), WordValue(vk3_out)],</span>
+<span class="sd">            assign_outval2op_model=[(WordValue(vmk1_out), WordModelId(WordValue(vmk1))),</span>
+<span class="sd">                (WordValue(vk3_out), WordModelId(WordValue(vmk1 &lt;&lt;&lt; 2 ^ (vmk0 &gt;&gt;&gt; 7 + vmk1))))]),</span>
+<span class="sd">        enc_ch_model=ChModel(func=SpeckEncryption_2R,</span>
+<span class="sd">            input_val=[WordValue(vp0), WordValue(vp1)],</span>
+<span class="sd">            output_val=[WordValue(vx7_out), WordValue(vx9_out)],</span>
+<span class="sd">            external_var2val=[(vmk1_out, WordValue(vmk1_out)), (vk3_out, WordValue(vk3_out))],</span>
+<span class="sd">            assign_outval2op_model=[(WordValue(vx7_out), WordModelId(WordValue((((vp0 &gt;&gt;&gt; 7 + vp1) ^ vmk1_out) &gt;&gt;&gt;</span>
+<span class="sd">                    7 + (vp1 &lt;&lt;&lt; 2 ^ (vp0 &gt;&gt;&gt; 7 + vp1) ^ vmk1_out)) ^ vk3_out))),</span>
+<span class="sd">                (WordValue(vx9_out), WordModelId(WordValue((vp1 &lt;&lt;&lt; 2 ^ (vp0 &gt;&gt;&gt; 7 + vp1) ^ vmk1_out) &lt;&lt;&lt; 2 ^</span>
+<span class="sd">                    (((vp0 &gt;&gt;&gt; 7 + vp1) ^ vmk1_out) &gt;&gt;&gt; 7 + (vp1 &lt;&lt;&lt; 2 ^ (vp0 &gt;&gt;&gt; 7 + vp1) ^ vmk1_out)) ^ vk3_out)))]))</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_ChModel_cls</span> <span class="o">=</span> <span class="n">ChModel</span>
+    <span class="n">_prefix</span> <span class="o">=</span> <span class="s2">&quot;v&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cipher</span><span class="p">,</span> <span class="n">val_type</span><span class="p">,</span> <span class="n">op_model_class2options</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">cipher</span><span class="p">,</span> <span class="n">prop_type</span><span class="o">=</span><span class="n">val_type</span><span class="p">,</span> <span class="n">op_model_class2options</span><span class="o">=</span><span class="n">op_model_class2options</span>
+        <span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_get_CipherCharacteristic_cls</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">cascada.algebraic.characteristic</span> <span class="kn">import</span> <span class="n">CipherCharacteristic</span> <span class="k">as</span> <span class="n">CipherCharacteristic_cls</span>
+        <span class="k">return</span> <span class="n">CipherCharacteristic_cls</span>
+
+<div class="viewcode-block" id="CipherChModel.vrepr"><a class="viewcode-back" href="../../../cascada.algebraic.chmodel.html#cascada.algebraic.chmodel.CipherChModel.vrepr">[docs]</a>    <span class="k">def</span> <span class="nf">vrepr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return an executable string representation.</span>
+
+<span class="sd">        See also `abstractproperty.chmodel.CipherChModel.vrepr`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.algebraic.value import BitValue</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.algebraic.chmodel import CipherChModel</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">            &gt;&gt;&gt; Speck32 = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64)</span>
+<span class="sd">            &gt;&gt;&gt; Speck32.set_num_rounds(2)</span>
+<span class="sd">            &gt;&gt;&gt; CipherChModel(Speck32, BitValue).vrepr()</span>
+<span class="sd">            &#39;CipherChModel(cipher=SpeckCipher.set_num_rounds_and_return(2), val_type=BitValue)&#39;</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">vrepr</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CipherChModel.signature"><a class="viewcode-back" href="../../../cascada.algebraic.chmodel.html#cascada.algebraic.chmodel.CipherChModel.signature">[docs]</a>    <span class="k">def</span> <span class="nf">signature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ch_signature_type</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the signature of the characteristic model over the cipher.</span>
+
+<span class="sd">        See also `abstractproperty.chmodel.CipherChModel.signature`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.algebraic.value import BitValue</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.algebraic.chmodel import CipherChModel, ChModelSigType</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">            &gt;&gt;&gt; Speck32 = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64)</span>
+<span class="sd">            &gt;&gt;&gt; Speck32.set_num_rounds(2)</span>
+<span class="sd">            &gt;&gt;&gt; ch_model = CipherChModel(Speck32, BitValue)</span>
+<span class="sd">            &gt;&gt;&gt; ch_model.signature(ChModelSigType.Unique)</span>
+<span class="sd">            [vmk0, vmk1, vp0, vp1, vmk1_out, vk3_out]</span>
+<span class="sd">            &gt;&gt;&gt; ch_model.signature(ChModelSigType.InputOutput)  # doctest:+NORMALIZE_WHITESPACE</span>
+<span class="sd">            [vmk0, vmk1, vmk1_out, vk3_out, vp0, vp1, vx7_out, vx9_out]</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">ch_signature_type</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Adrián Ranea.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

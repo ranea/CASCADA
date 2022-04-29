@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cascada.abstractproperty.property &mdash; CASCADA 1.0.rc0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> CASCADA
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">CASCADA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../primitives_implemented.html">Primitives implemented</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cascada.html">API reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">CASCADA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>cascada.abstractproperty.property</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cascada.abstractproperty.property</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Provide a base class for properties like `Difference`, `LinearMask` or `Value`.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+
+<span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">core</span><span class="p">,</span> <span class="n">operation</span>
+
+
+<span class="k">def</span> <span class="nf">_tuplify</span><span class="p">(</span><span class="n">seq</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">seq</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">Sequence</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">seq</span><span class="p">])</span>
+
+
+<div class="viewcode-block" id="Property"><a class="viewcode-back" href="../../../cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property">[docs]</a><span class="k">class</span> <span class="nc">Property</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent bit-vector properties.</span>
+
+<span class="sd">    A (bit-vector) property pair, or simply a property, over a function :math:`f`</span>
+<span class="sd">    is a pair of bit-vectors :math:`(\\alpha, \\beta)` with</span>
+<span class="sd">    an associated propagation probability :math:`PP_f(\\alpha, \\beta)`.</span>
+<span class="sd">    In this case, we also say that the input property :math:`\\alpha` propagates</span>
+<span class="sd">    to the output property :math:`\\beta` with probability</span>
+<span class="sd">    :math:`PP_f(\\alpha, \\beta)`.</span>
+
+<span class="sd">    Each instance of this class represents an input or output property;</span>
+<span class="sd">    the underlying bit-vector value of the input or output property is stored</span>
+<span class="sd">    in the attribute `val`, but the associated function :math:`f`</span>
+<span class="sd">    is not stored within the `Property` object.</span>
+
+<span class="sd">    Note that arithmetic with properties is not supported.</span>
+<span class="sd">    For example, two `Property` objects ``d1`` and ``d2``</span>
+<span class="sd">    cannot be XORed, i.e., ``d1 ^ d2``.</span>
+<span class="sd">    This can be done instead by performing the arithmetic with</span>
+<span class="sd">    the property values and converting the resulting</span>
+<span class="sd">    `Term` to a property, that is, ``Property(d1.val ^ d2.val)``</span>
+
+<span class="sd">    This class is not meant to be instantiated but to provide a base</span>
+<span class="sd">    class to define bit-vector properties</span>
+<span class="sd">    such as `Difference`, `LinearMask` or `Value`.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        val: a `Term` representing the underlying value of the property.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Term</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the non-verbose string representation.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">(</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val</span><span class="p">))</span>
+
+    <span class="fm">__repr__</span> <span class="o">=</span> <span class="fm">__str__</span>
+
+    <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">val</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">val</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="Property.xreplace"><a class="viewcode-back" href="../../../cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property.xreplace">[docs]</a>    <span class="k">def</span> <span class="nf">xreplace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rule</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Replace occurrences of properties within the expression.</span>
+
+<span class="sd">        The argument ``rule`` is a dict-like object representing</span>
+<span class="sd">        the replacement rule.</span>
+
+<span class="sd">        This method is similar to SymPy `xreplace</span>
+<span class="sd">        &lt;https://docs.sympy.org/latest/modules/core.html?highlight=xreplace#</span>
+<span class="sd">        sympy.core.basic.Basic.xreplace&gt;`_ but with the restriction that</span>
+<span class="sd">        only `Property` objects are allowed in ``rule``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">rule</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rule</span><span class="p">[</span><span class="n">d</span><span class="p">],</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)),</span> \
+                <span class="sa">f</span><span class="s2">&quot;invalid xreplace rule (</span><span class="si">{</span><span class="n">d</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">rule</span><span class="p">[</span><span class="n">d</span><span class="p">]</span><span class="si">}</span><span class="s2">)&quot;</span>
+
+        <span class="n">rule</span> <span class="o">=</span> <span class="p">{</span><span class="n">d</span><span class="o">.</span><span class="n">val</span><span class="p">:</span> <span class="n">rule</span><span class="p">[</span><span class="n">d</span><span class="p">]</span><span class="o">.</span><span class="n">val</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">rule</span><span class="p">}</span>
+        <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span><span class="bp">self</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">xreplace</span><span class="p">(</span><span class="n">rule</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Property.vrepr"><a class="viewcode-back" href="../../../cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property.vrepr">[docs]</a>    <span class="k">def</span> <span class="nf">vrepr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return an executable string representation.</span>
+
+<span class="sd">        This method returns a string so that the relation</span>
+<span class="sd">        ``eval(self.vrepr()) == self`` holds.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">(</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">vrepr</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="Property.propagate"><a class="viewcode-back" href="../../../cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property.propagate">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">propagate</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">input_prop</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Propagate the given input property through the given operation.</span>
+
+<span class="sd">        Given a function :math:`y = f(x)`,</span>
+<span class="sd">        an input property :math:`p_x` propagates (over :math:`f`) to</span>
+<span class="sd">        an output property :math:`p_y` if the propagation probability</span>
+<span class="sd">        :math:`PP_f(\\alpha, \\beta)` is not zero.</span>
+
+<span class="sd">        Note that if :math:`f` has :math:`t` operands,</span>
+<span class="sd">        the input property is actually a list of :math:`t` properties, that is,</span>
+<span class="sd">        :math:`p_x = (p_{x_0}, p_{x_1}, \dots, p_{x_{t-1}})`,</span>
+<span class="sd">        and similar for :math:`p_y`.</span>
+
+<span class="sd">        For some functions, any input property propagates to a unique</span>
+<span class="sd">        output property with probability 1, and the output property</span>
+<span class="sd">        can be easily computed from the input property.</span>
+
+<span class="sd">        Examples of probability-one propagations are the following:</span>
+
+<span class="sd">        * For the `Value` property type, for any operation :math:`f` and any</span>
+<span class="sd">          input property :math:`p_x`, the output property :math:`p_y`</span>
+<span class="sd">          is uniquely determined and its bit-vector value is ``f(p_x.val)``.</span>
+<span class="sd">        * For the `Difference` property type with difference operation :math:`-`</span>
+<span class="sd">          (e.g., XOR),  for any linear (over :math:`-`) operation :math:`f` and any</span>
+<span class="sd">          input property :math:`p_x`, the output property :math:`p_y`</span>
+<span class="sd">          is uniquely determined and its bit-vector value is ``f(p_x.val)``.</span>
+<span class="sd">        * For the `LinearMask` property, for any XOR-linear operation :math:`f`</span>
+<span class="sd">          and any input property :math:`p_x`,</span>
+<span class="sd">          the output property :math:`p_y` is uniquely determined and its</span>
+<span class="sd">          bit-vector value satisfies ``p_x.val == M(p_y.val)``, where :math:`M`</span>
+<span class="sd">          is the transpose of the binary matrix representing :math:`f`.</span>
+
+<span class="sd">        If for the given `Operation` ``op`` any input property propagates</span>
+<span class="sd">        to a unique output property with probability 1 and the output property</span>
+<span class="sd">        can be easily computed from the input property, this method</span>
+<span class="sd">        returns the corresponding output property (for the given</span>
+<span class="sd">        input property ``input_prop``) as a `Property` object.</span>
+<span class="sd">        Otherwise, this method returns the</span>
+<span class="sd">        `abstractproperty.opmodel.OpModel` of the operation ``op``</span>
+<span class="sd">        with the given input property ``input_prop``.</span>
+
+<span class="sd">        .. note::</span>
+<span class="sd">            Operations ``op`` with scalar operands are not supported,</span>
+<span class="sd">            but these operands can be removed with `make_partial_operation`</span>
+<span class="sd">            and partial operations are supported by this method.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            op:  the bit-vector operator :math:`f` as an `Operation` subclass</span>
+<span class="sd">            input_prop: a list containing the input `Property` for each operand of</span>
+<span class="sd">                ``op`` (or simply the `Property` object if there is only</span>
+<span class="sd">                one operand)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;subclasses need to override this method&quot;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="PropConcat"><a class="viewcode-back" href="../../../cascada.abstractproperty.property.html#cascada.abstractproperty.property.PropConcat">[docs]</a><span class="k">class</span> <span class="nc">PropConcat</span><span class="p">(</span><span class="n">operation</span><span class="o">.</span><span class="n">Concat</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Subclass of `Concat` that propagates properties naturally.</span>
+
+<span class="sd">    The only difference between `Concat` and `PropConcat`</span>
+<span class="sd">    is that the latter one propagates (see `Property.propagate`)</span>
+<span class="sd">    an input `Property` list ``p0, p1`` as ``Property(Concat(p0.val, p1.val))``.</span>
+
+<span class="sd">     .. Implementation details:</span>
+
+<span class="sd">        This propagation is different, for example,</span>
+<span class="sd">        from  the one of Concat with RX differences.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_trivial_propagation</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="PropExtract"><a class="viewcode-back" href="../../../cascada.abstractproperty.property.html#cascada.abstractproperty.property.PropExtract">[docs]</a><span class="k">class</span> <span class="nc">PropExtract</span><span class="p">(</span><span class="n">operation</span><span class="o">.</span><span class="n">Extract</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Subclass of ``Extract`` that propagates properties naturally.</span>
+
+<span class="sd">    The only difference between `Extract` and `PropExtract`</span>
+<span class="sd">    is that the latter one (with fixed operands) propagates</span>
+<span class="sd">    (see `Property.propagate`) an input `Property` ``p`` as</span>
+<span class="sd">    ``Property(Extract_{·, i, j}(p0.val))``,</span>
+<span class="sd">    where ``i, j`` are the fixed operands.</span>
+
+<span class="sd">     .. Implementation details:</span>
+
+<span class="sd">        This propagation is different, for example,</span>
+<span class="sd">        from the one of Extract with linear masks.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_trivial_propagation</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="make_partial_propextract"><a class="viewcode-back" href="../../../cascada.abstractproperty.property.html#cascada.abstractproperty.property.make_partial_propextract">[docs]</a><span class="nd">@functools</span><span class="o">.</span><span class="n">lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>  <span class="c1"># temporary hack to create singletons</span>
+<span class="k">def</span> <span class="nf">make_partial_propextract</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return a `PartialOperation` of `PropExtract` that propagates properties naturally.</span>
+
+<span class="sd">    .. Implementation details:</span>
+
+<span class="sd">        The different between `make_partial_propextract` and</span>
+<span class="sd">        ``make_partial_operation(PropExtract, ...)` is that the</span>
+<span class="sd">        former partial operation propagates properties naturally</span>
+<span class="sd">        but not the latter one, as some properties do not</span>
+<span class="sd">        support partial operations without OpModels.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">partial_extract</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">make_partial_operation</span><span class="p">(</span><span class="n">PropExtract</span><span class="p">,</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">))</span>
+
+    <span class="k">class</span> <span class="nc">PartialPropExtract</span><span class="p">(</span><span class="n">partial_extract</span><span class="p">):</span>
+        <span class="n">_trivial_propagation</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># make_partial_operation doesn&#39;t preserve attributes</span>
+
+    <span class="k">assert</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">PartialPropExtract</span><span class="p">,</span> <span class="s2">&quot;_trivial_propagation&quot;</span><span class="p">)</span>
+
+    <span class="n">PartialPropExtract</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">=</span> <span class="n">partial_extract</span><span class="o">.</span><span class="vm">__name__</span>
+
+    <span class="k">return</span> <span class="n">PartialPropExtract</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Adrián Ranea.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

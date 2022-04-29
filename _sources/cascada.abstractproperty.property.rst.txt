@@ -1,0 +1,6 @@
+cascada.abstractproperty.property module
+========================================
+
+.. automodule:: cascada.abstractproperty.property
+   :members:
+   :show-inheritance:

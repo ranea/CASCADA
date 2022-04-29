@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cascada.abstractproperty.chmodel module &mdash; CASCADA 1.0.rc0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="cascada.abstractproperty.characteristic module" href="cascada.abstractproperty.characteristic.html" />
+    <link rel="prev" title="cascada.abstractproperty.tests.test_opmodel module" href="cascada.abstractproperty.tests.test_opmodel.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> CASCADA
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">CASCADA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="primitives_implemented.html">Primitives implemented</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="cascada.html">API reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="cascada.bitvector.html">cascada.bitvector module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.primitives.html">cascada.primitives module</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="cascada.abstractproperty.html">cascada.abstractproperty module</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="cascada.abstractproperty.property.html">cascada.abstractproperty.property module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.abstractproperty.opmodel.html">cascada.abstractproperty.opmodel module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.abstractproperty.tests.test_opmodel.html">cascada.abstractproperty.tests.test_opmodel module</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">cascada.abstractproperty.chmodel module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.abstractproperty.characteristic.html">cascada.abstractproperty.characteristic module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.differential.html">cascada.differential module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.linear.html">cascada.linear module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.algebraic.html">cascada.algebraic module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.smt.html">cascada.smt module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">CASCADA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="cascada.html">API reference</a> &raquo;</li>
+          <li><a href="cascada.abstractproperty.html">cascada.abstractproperty module</a> &raquo;</li>
+      <li>cascada.abstractproperty.chmodel module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/cascada.abstractproperty.chmodel.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-cascada.abstractproperty.chmodel">
+<span id="cascada-abstractproperty-chmodel-module"></span><h1>cascada.abstractproperty.chmodel module<a class="headerlink" href="#module-cascada.abstractproperty.chmodel" title="Permalink to this headline"></a></h1>
+<p>Manage bit-vector models of characteristics w.r.t an abstract property.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.abstractproperty.chmodel.ChModelSigType">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.abstractproperty.chmodel.</span></span><span class="sig-name descname"><span class="pre">ChModelSigType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/chmodel.html#ChModelSigType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.chmodel.ChModelSigType" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
+<p>List of signature types for a <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel" title="cascada.abstractproperty.chmodel.ChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChModel</span></code></a>.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.abstractproperty.chmodel.ChModelSigType.Unique">
+<span class="sig-name descname"><span class="pre">Unique</span></span><a class="headerlink" href="#cascada.abstractproperty.chmodel.ChModelSigType.Unique" title="Permalink to this definition"></a></dt>
+<dd><p>the signature includes all the properties in the
+characteristic model needed to uniquely identity
+the characteristic model; this might include
+the input or output <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> values,
+the non-constant external <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> objects of the <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel" title="cascada.abstractproperty.chmodel.ChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChModel</span></code></a>,
+or the input or output <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> values
+of the non-trivial assignments.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.abstractproperty.chmodel.ChModelSigType.InputOutput">
+<span class="sig-name descname"><span class="pre">InputOutput</span></span><a class="headerlink" href="#cascada.abstractproperty.chmodel.ChModelSigType.InputOutput" title="Permalink to this definition"></a></dt>
+<dd><p>the signature only includes the input and output
+<a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> values  of the <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel" title="cascada.abstractproperty.chmodel.ChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChModel</span></code></a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.abstractproperty.chmodel.ChModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.abstractproperty.chmodel.</span></span><span class="sig-name descname"><span class="pre">ChModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_prop_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'px'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">external_var2prop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op_model_class2options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/chmodel.html#ChModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.chmodel.ChModel" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Represent bit-vector models of characteristics w.r.t some property over bit-vector functions.</p>
+<p>A (bit-vector) model of a characteristic over a bit-vector function
+<span class="math notranslate nohighlight">\(f\)</span> for a particular <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> is a set of bit-vector constraints
+that models the probability of the characteristic.</p>
+<p>For the definition of characteristic and its probability
+see <a class="reference internal" href="cascada.abstractproperty.characteristic.html#cascada.abstractproperty.characteristic.Characteristic" title="cascada.abstractproperty.characteristic.Characteristic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.characteristic.Characteristic</span></code></a>.</p>
+<p>A <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel" title="cascada.abstractproperty.chmodel.ChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChModel</span></code></a> is mainly given by three bit-vector formulas or constraints:
+the validity constraint (see <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel.validity_assertions" title="cascada.abstractproperty.chmodel.ChModel.validity_assertions"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">validity_assertions</span></code></a>),
+the weight constraint (see <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel.weight_assertions" title="cascada.abstractproperty.chmodel.ChModel.weight_assertions"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">weight_assertions</span></code></a>),
+and probability-one constraint (see <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel.pr_one_assertions" title="cascada.abstractproperty.chmodel.ChModel.pr_one_assertions"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">pr_one_assertions</span></code></a>)</p>
+<p>A <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel" title="cascada.abstractproperty.chmodel.ChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChModel</span></code></a> object is defined for a type of <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a>, a <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.BvFunction" title="cascada.bitvector.ssa.BvFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvFunction</span></code></a>
+<span class="math notranslate nohighlight">\(f\)</span>, the names of the input property words and the <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a>
+of the external variables of the <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.SSA" title="cascada.bitvector.ssa.SSA"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SSA</span></code></a> of <span class="math notranslate nohighlight">\(f\)</span>.</p>
+<p>A <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel" title="cascada.abstractproperty.chmodel.ChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChModel</span></code></a> object also contains the symbolic properties <span class="math notranslate nohighlight">\(\Delta_{x_i}\)</span>
+in the trail as <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Variable" title="cascada.bitvector.core.Variable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Variable</span></code></a> objects and the models of the bit-vector operations
+(<a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel" title="cascada.abstractproperty.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.opmodel.OpModel</span></code></a> objects) of the non-trivial assignments
+<span class="math notranslate nohighlight">\(x_{i+1} \leftarrow f_i(x_i)\)</span> of the <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.SSA" title="cascada.bitvector.ssa.SSA"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SSA</span></code></a> representation of <span class="math notranslate nohighlight">\(f\)</span>.</p>
+<p>The <em>trivial assignments</em> are those that propagate properties
+deterministically (with probability one). The models for these assignments
+are not included in <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel" title="cascada.abstractproperty.chmodel.ChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChModel</span></code></a>. Instead, the symbolic output property
+of each trivial assignment is automatically computed from
+the symbolic input property.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>A <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel" title="cascada.abstractproperty.chmodel.ChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChModel</span></code></a> object can also be seen as a <em>symbolic</em> characteristic,
+where all the properties in the trail are represented by <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Variable" title="cascada.bitvector.core.Variable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Variable</span></code></a> objects.
+A particular instance of a characteristic with constant values of
+properties is represented by a
+<a class="reference internal" href="cascada.abstractproperty.characteristic.html#cascada.abstractproperty.characteristic.Characteristic" title="cascada.abstractproperty.characteristic.Characteristic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.characteristic.Characteristic</span></code></a> object.</p>
+</div>
+<p>A dictionary mapping <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel" title="cascada.abstractproperty.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.opmodel.OpModel</span></code></a> classes to dictionaries
+(mapping class attributes names to their values) can be given in
+the argument <code class="docutils literal notranslate"><span class="pre">op_model_class2options</span></code>.
+In that case, the class attributes of the <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel" title="cascada.abstractproperty.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.opmodel.OpModel</span></code></a>
+objects in the trail will be set to the values given in <code class="docutils literal notranslate"><span class="pre">op_model_class2options</span></code>.
+For example, <code class="docutils literal notranslate"><span class="pre">op_model_class2options={XorModelBvAddCt:</span> <span class="pre">{'precision':0}}</span></code>
+will set <code class="docutils literal notranslate"><span class="pre">precision</span></code> to 0 for all the <a class="reference internal" href="cascada.differential.opmodel.html#cascada.differential.opmodel.XorModelBvAddCt" title="cascada.differential.opmodel.XorModelBvAddCt"><code class="xref any py py-class docutils literal notranslate"><span class="pre">XorModelBvAddCt</span></code></a> models in the trail.</p>
+<p>If the given bit-vector function <span class="math notranslate nohighlight">\(f\)</span> is a <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.RoundBasedFunction" title="cascada.bitvector.ssa.RoundBasedFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RoundBasedFunction</span></code></a>
+including <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.RoundBasedFunction.add_round_outputs" title="cascada.bitvector.ssa.RoundBasedFunction.add_round_outputs"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">add_round_outputs</span></code></a> calls in its <code class="docutils literal notranslate"><span class="pre">eval</span></code>, then the
+characteristic model over each round can be obtaining by combining
+<a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel.split" title="cascada.abstractproperty.chmodel.ChModel.split"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">split</span></code></a> and <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel.get_round_separators" title="cascada.abstractproperty.chmodel.ChModel.get_round_separators"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">get_round_separators</span></code></a>.</p>
+<p>This class is not meant to be instantiated but to provide a base
+class for creating characteristic models w.r.t some property,
+(see <a class="reference internal" href="cascada.differential.chmodel.html#cascada.differential.chmodel.ChModel" title="cascada.differential.chmodel.ChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">differential.chmodel.ChModel</span></code></a>, <a class="reference internal" href="cascada.linear.chmodel.html#cascada.linear.chmodel.ChModel" title="cascada.linear.chmodel.ChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">linear.chmodel.ChModel</span></code></a>
+or <a class="reference internal" href="cascada.algebraic.chmodel.html#cascada.algebraic.chmodel.ChModel" title="cascada.algebraic.chmodel.ChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">algebraic.chmodel.ChModel</span></code></a> for some examples).</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.abstractproperty.chmodel.ChModel.func">
+<span class="sig-name descname"><span class="pre">func</span></span><a class="headerlink" href="#cascada.abstractproperty.chmodel.ChModel.func" title="Permalink to this definition"></a></dt>
+<dd><p>the <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.BvFunction" title="cascada.bitvector.ssa.BvFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvFunction</span></code></a> <span class="math notranslate nohighlight">\(f\)</span>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.abstractproperty.chmodel.ChModel.prop_type">
+<span class="sig-name descname"><span class="pre">prop_type</span></span><a class="headerlink" href="#cascada.abstractproperty.chmodel.ChModel.prop_type" title="Permalink to this definition"></a></dt>
+<dd><p>the type of <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> of the characteristic.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.abstractproperty.chmodel.ChModel.input_prop">
+<span class="sig-name descname"><span class="pre">input_prop</span></span><a class="headerlink" href="#cascada.abstractproperty.chmodel.ChModel.input_prop" title="Permalink to this definition"></a></dt>
+<dd><p>a list of <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> objects containing
+the (symbolic) input property.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.abstractproperty.chmodel.ChModel.output_prop">
+<span class="sig-name descname"><span class="pre">output_prop</span></span><a class="headerlink" href="#cascada.abstractproperty.chmodel.ChModel.output_prop" title="Permalink to this definition"></a></dt>
+<dd><p>a list of <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> objects containing
+the (symbolic) output property.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.abstractproperty.chmodel.ChModel.external_var2prop">
+<span class="sig-name descname"><span class="pre">external_var2prop</span></span><a class="headerlink" href="#cascada.abstractproperty.chmodel.ChModel.external_var2prop" title="Permalink to this definition"></a></dt>
+<dd><p>a <a class="reference external" href="https://docs.python.org/3/library/collections.html#collections.OrderedDict" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">collections.OrderedDict</span></code></a> mapping the external
+variables of <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel.ssa" title="cascada.abstractproperty.chmodel.ChModel.ssa"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">ssa</span></code></a> to their associated (symbolic or
+constant) <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> objects.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.abstractproperty.chmodel.ChModel.assign_outprop2op_model">
+<span class="sig-name descname"><span class="pre">assign_outprop2op_model</span></span><a class="headerlink" href="#cascada.abstractproperty.chmodel.ChModel.assign_outprop2op_model" title="Permalink to this definition"></a></dt>
+<dd><p>a <a class="reference external" href="https://docs.python.org/3/library/collections.html#collections.OrderedDict" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">collections.OrderedDict</span></code></a> mapping the
+output <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> <span class="math notranslate nohighlight">\(\Delta_{x_{i+1}}\)</span> of
+the non-trivial assignment <span class="math notranslate nohighlight">\(x_{i+1} \leftarrow f_i(x_i)\)</span> to
+the <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel" title="cascada.abstractproperty.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.opmodel.OpModel</span></code></a> of this assignment.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.abstractproperty.chmodel.ChModel.ssa">
+<span class="sig-name descname"><span class="pre">ssa</span></span><a class="headerlink" href="#cascada.abstractproperty.chmodel.ChModel.ssa" title="Permalink to this definition"></a></dt>
+<dd><p>the <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.SSA" title="cascada.bitvector.ssa.SSA"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SSA</span></code></a> of <span class="math notranslate nohighlight">\(f\)</span>, where the
+input, output and intermediate values share the same names
+as the input, output and intermediate properties of
+the characteristic.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.abstractproperty.chmodel.ChModel.var2prop">
+<span class="sig-name descname"><span class="pre">var2prop</span></span><a class="headerlink" href="#cascada.abstractproperty.chmodel.ChModel.var2prop" title="Permalink to this definition"></a></dt>
+<dd><p>a <a class="reference external" href="https://docs.python.org/3/library/collections.html#collections.OrderedDict" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">collections.OrderedDict</span></code></a> mapping each variable in <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel.ssa" title="cascada.abstractproperty.chmodel.ChModel.ssa"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">ssa</span></code></a>
+to its associated <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> object.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.abstractproperty.chmodel.ChModel.vrepr">
+<span class="sig-name descname"><span class="pre">vrepr</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/chmodel.html#ChModel.vrepr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.chmodel.ChModel.vrepr" title="Permalink to this definition"></a></dt>
+<dd><p>Return an executable string representation.</p>
+<p>This method returns a string so that <code class="docutils literal notranslate"><span class="pre">eval(self.vrepr())</span></code>
+returns a new <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel" title="cascada.abstractproperty.chmodel.ChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChModel</span></code></a> object with the same content.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.abstractproperty.chmodel.ChModel.validity_assertions">
+<span class="sig-name descname"><span class="pre">validity_assertions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/chmodel.html#ChModel.validity_assertions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.chmodel.ChModel.validity_assertions" title="Permalink to this definition"></a></dt>
+<dd><p>Return the validity constraint as a list of assertions.</p>
+<p>The validity constraint is a symbolic bit-vector expression
+(depending on the properties of the trail), and it is True
+if and only if the characteristic has non-zero probability.</p>
+<p>The list of assertions is a list of symbolic <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term" title="cascada.bitvector.core.Term"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Term</span></code></a> objects
+that form the validity constraint when combined with the
+<a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.BvAnd" title="cascada.bitvector.operation.BvAnd"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvAnd</span></code></a> operation.</p>
+<p>The assertion list is composed of the <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel.validity_constraint" title="cascada.abstractproperty.opmodel.OpModel.validity_constraint"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">OpModel.validity_constraint</span></code></a>
+of the models of the non-trivial assignments.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.abstractproperty.chmodel.ChModel.pr_one_assertions">
+<span class="sig-name descname"><span class="pre">pr_one_assertions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/chmodel.html#ChModel.pr_one_assertions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.chmodel.ChModel.pr_one_assertions" title="Permalink to this definition"></a></dt>
+<dd><p>Return the probability-one constraint as a list of assertions.</p>
+<p>Return the constraint that evaluates to True if the characteristic
+has probability-one as a list of assertions.</p>
+<p>The probability-one constraint is a symbolic bit-vector expression
+(depending on the properties of the trail), and it is True
+if and only if the characteristic has probability 1.</p>
+<p>The list of assertions is a list of symbolic <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term" title="cascada.bitvector.core.Term"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Term</span></code></a> objects
+that form the constraint when combined with the
+<a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.BvAnd" title="cascada.bitvector.operation.BvAnd"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvAnd</span></code></a> operation.</p>
+<p>The assertion list is composed of the <code class="docutils literal notranslate"><span class="pre">OpModel.pr_one_constraint</span></code>
+of the models of the non-trivial assignments.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.abstractproperty.chmodel.ChModel.weight_assertions">
+<span class="sig-name descname"><span class="pre">weight_assertions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ch_weight_variable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assign_weight_variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">truncate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/chmodel.html#ChModel.weight_assertions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.chmodel.ChModel.weight_assertions" title="Permalink to this definition"></a></dt>
+<dd><p>Return the weight constraint as a list of assertions.</p>
+<p>The weight constraint is a symbolic bit-vector expression
+that depends on the properties of the trail, the characteristic
+weight variable and the weight variables of the
+models of the non-trivial assignments.
+This expression is True if and only if the weight
+(negative binary logarithm of the probability) of the characteristic
+is equals to the characteristic weight variable.</p>
+<p>The list of assertions is a list of symbolic <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term" title="cascada.bitvector.core.Term"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Term</span></code></a> objects
+that form the weight constraint when combined with the
+<a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.BvAnd" title="cascada.bitvector.operation.BvAnd"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvAnd</span></code></a> operation.</p>
+<p>The assertion list is composed of the <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel.weight_constraint" title="cascada.abstractproperty.opmodel.OpModel.weight_constraint"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">OpModel.weight_constraint</span></code></a>
+of the models of the non-trivial assignments, plus
+a final assertion that sets the characteristic weight variable as
+the sum of the assignment weight variables.</p>
+<p>Similar as <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel" title="cascada.abstractproperty.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.opmodel.OpModel</span></code></a>, the characteristic weight variable
+can be interpreted as a rational value with <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel.num_frac_bits" title="cascada.abstractproperty.chmodel.ChModel.num_frac_bits"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">num_frac_bits</span></code></a>
+fractional bits, and the weight constraint can be True even if
+the characteristic weight variable is equals to the characteristic weight
+up to some error bounded by <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel.error" title="cascada.abstractproperty.chmodel.ChModel.error"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">error</span></code></a>.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">truncate</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>, the sum of the assignment weight variables
+is truncated (fractional bits are removed) and the result
+is compared to the characteristic weight variable.
+In other words, the characteristic weight variable represents
+the integer part of the weight of the characteristic probability
+if <code class="docutils literal notranslate"><span class="pre">truncate=True</span></code> (default case).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.abstractproperty.chmodel.ChModel.external_vars_validity_assertions">
+<span class="sig-name descname"><span class="pre">external_vars_validity_assertions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/chmodel.html#ChModel.external_vars_validity_assertions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.chmodel.ChModel.external_vars_validity_assertions" title="Permalink to this definition"></a></dt>
+<dd><p>Return the union of external variables of the constraints from <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel.validity_assertions" title="cascada.abstractproperty.chmodel.ChModel.validity_assertions"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">validity_assertions</span></code></a>.</p>
+<p>See <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel" title="cascada.abstractproperty.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.opmodel.OpModel</span></code></a> for the definition of
+an external variable of a constraint from a model.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.abstractproperty.chmodel.ChModel.external_vars_pr_one_assertions">
+<span class="sig-name descname"><span class="pre">external_vars_pr_one_assertions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/chmodel.html#ChModel.external_vars_pr_one_assertions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.chmodel.ChModel.external_vars_pr_one_assertions" title="Permalink to this definition"></a></dt>
+<dd><p>Return the union of external variables of the constraints from <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel.pr_one_assertions" title="cascada.abstractproperty.chmodel.ChModel.pr_one_assertions"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">pr_one_assertions</span></code></a>.</p>
+<p>See <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel" title="cascada.abstractproperty.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.opmodel.OpModel</span></code></a> for the definition of
+an external variable of a constraint from a model.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.abstractproperty.chmodel.ChModel.external_vars_weight_assertions">
+<span class="sig-name descname"><span class="pre">external_vars_weight_assertions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">assign_weight_variables</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/chmodel.html#ChModel.external_vars_weight_assertions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.chmodel.ChModel.external_vars_weight_assertions" title="Permalink to this definition"></a></dt>
+<dd><p>Return the union of external variables of the constraints from <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel.weight_assertions" title="cascada.abstractproperty.chmodel.ChModel.weight_assertions"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">weight_assertions</span></code></a>.</p>
+<p>See <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel" title="cascada.abstractproperty.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.opmodel.OpModel</span></code></a> for the definition of
+an external variable of a constraint from a model.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.abstractproperty.chmodel.ChModel.max_weight">
+<span class="sig-name descname"><span class="pre">max_weight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">truncate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/chmodel.html#ChModel.max_weight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.chmodel.ChModel.max_weight" title="Permalink to this definition"></a></dt>
+<dd><p>Return the maximum value the ch. weight variable can achieve in <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel.weight_assertions" title="cascada.abstractproperty.chmodel.ChModel.weight_assertions"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">weight_assertions</span></code></a>.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">truncate</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>, fractional bits are not considered
+in the ch. weight variable (see <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel.weight_assertions" title="cascada.abstractproperty.chmodel.ChModel.weight_assertions"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">weight_assertions</span></code></a>).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.abstractproperty.chmodel.ChModel.weight_width">
+<span class="sig-name descname"><span class="pre">weight_width</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">truncate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/chmodel.html#ChModel.weight_width"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.chmodel.ChModel.weight_width" title="Permalink to this definition"></a></dt>
+<dd><p>Return the width of the ch. weight variable used <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel.weight_assertions" title="cascada.abstractproperty.chmodel.ChModel.weight_assertions"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">weight_assertions</span></code></a>.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">truncate</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>, fractional bits are not considered
+in the ch. weight variable (see <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel.weight_assertions" title="cascada.abstractproperty.chmodel.ChModel.weight_assertions"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">weight_assertions</span></code></a>).</p>
+<p>For the doctests see <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel.max_weight" title="cascada.abstractproperty.chmodel.ChModel.max_weight"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">max_weight</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.abstractproperty.chmodel.ChModel.num_frac_bits">
+<span class="sig-name descname"><span class="pre">num_frac_bits</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/chmodel.html#ChModel.num_frac_bits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.chmodel.ChModel.num_frac_bits" title="Permalink to this definition"></a></dt>
+<dd><p>Return the number of fractional bits of the ch. weight variable used in
+<a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel.weight_assertions" title="cascada.abstractproperty.chmodel.ChModel.weight_assertions"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">weight_assertions</span></code></a>.</p>
+<p>If the number of fractional bits is <code class="docutils literal notranslate"><span class="pre">k</span></code>, then the bit-vector
+characteristic weight variable <code class="docutils literal notranslate"><span class="pre">w</span></code> of <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel.weight_assertions" title="cascada.abstractproperty.chmodel.ChModel.weight_assertions"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">weight_assertions</span></code></a>
+represents the number <code class="docutils literal notranslate"><span class="pre">2^{-k}</span> <span class="pre">*</span> <span class="pre">bv2int(w)</span></code>.
+In particular, if <code class="docutils literal notranslate"><span class="pre">k</span> <span class="pre">==</span> <span class="pre">0</span></code>, then <code class="docutils literal notranslate"><span class="pre">w</span></code> represents an integer number.
+Otherwise, the <code class="docutils literal notranslate"><span class="pre">k</span></code> least significant bits of <code class="docutils literal notranslate"><span class="pre">w</span></code> denote the
+fractional part of the number represented by <code class="docutils literal notranslate"><span class="pre">w</span></code>.</p>
+<p>For the doctests see <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel.max_weight" title="cascada.abstractproperty.chmodel.ChModel.max_weight"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">max_weight</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.abstractproperty.chmodel.ChModel.error">
+<span class="sig-name descname"><span class="pre">error</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/chmodel.html#ChModel.error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.chmodel.ChModel.error" title="Permalink to this definition"></a></dt>
+<dd><p>Return the maximum difference between <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel.weight_assertions" title="cascada.abstractproperty.chmodel.ChModel.weight_assertions"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">weight_assertions</span></code></a> and the exact weight.</p>
+<p>The exact weight is exact value (without error) of the negative binary
+logarithm (weight) of the characteristic probability.</p>
+<p>This method returns an upper bound (in absolute value) of the maximum difference
+(over all properties in the trail) between the bit-vector characteristic weight
+from <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel.weight_assertions" title="cascada.abstractproperty.chmodel.ChModel.weight_assertions"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">weight_assertions</span></code></a> and the exact weight.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.abstractproperty.chmodel.ChModel.signature">
+<span class="sig-name descname"><span class="pre">signature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sig_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/chmodel.html#ChModel.signature"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.chmodel.ChModel.signature" title="Permalink to this definition"></a></dt>
+<dd><p>Return the signature of the characteristic model.</p>
+<p>The argument <code class="docutils literal notranslate"><span class="pre">sig_type</span></code> is a type of the signature,
+see <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModelSigType" title="cascada.abstractproperty.chmodel.ChModelSigType"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChModelSigType</span></code></a>.</p>
+<p>The signature is an identifier of the characteristic model
+(used for comparing).
+Depending on the signature type, the identifier might
+uniquely represent the characteristic model or not.</p>
+<p>The signature does not include the <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> objects
+of the characteristic but their (symbolic) values
+(<a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Variable" title="cascada.bitvector.core.Variable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Variable</span></code></a> objects).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.abstractproperty.chmodel.ChModel.split">
+<span class="sig-name descname"><span class="pre">split</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_separators</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/chmodel.html#ChModel.split"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.chmodel.ChModel.split" title="Permalink to this definition"></a></dt>
+<dd><p>Split into multiple <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel" title="cascada.abstractproperty.chmodel.ChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChModel</span></code></a> objects given the list of property separators.</p>
+<p>Given the <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel" title="cascada.abstractproperty.chmodel.ChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChModel</span></code></a> with underlying <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.SSA" title="cascada.bitvector.ssa.SSA"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SSA</span></code></a> <span class="math notranslate nohighlight">\(s\)</span>, this method returns
+a list of ch. models with underlying <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.SSA" title="cascada.bitvector.ssa.SSA"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SSA</span></code></a> objects <span class="math notranslate nohighlight">\(s_1, s_2, ..., s_n\)</span>,
+such that their composition <span class="math notranslate nohighlight">\(s_n \circ s_{n-1} \dots \circ s_1\)</span>
+is functionally equivalent to <span class="math notranslate nohighlight">\(s\)</span>.</p>
+<p>The argument <code class="docutils literal notranslate"><span class="pre">prop_separators</span></code> is a list containing lists of properties.
+The <span class="math notranslate nohighlight">\(i\)</span>-th property list denote the last properties of the
+<span class="math notranslate nohighlight">\(i\)</span>-th ch. model.  In other words, the <span class="math notranslate nohighlight">\((i+1)\)</span>-th ch. model
+immediately starts after the last property in <code class="docutils literal notranslate"><span class="pre">prop_separators[i]</span></code>.</p>
+<p>To split into <span class="math notranslate nohighlight">\(n\)</span> ch. models, <code class="docutils literal notranslate"><span class="pre">prop_separators</span></code> must contain
+<span class="math notranslate nohighlight">\(n-1\)</span> lists, as the property list of the last ch. model is not given
+(its last properties are the output properties of the main model).</p>
+<p>Note the underlying functions of the new ch. models
+are <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.BvFunction" title="cascada.bitvector.ssa.BvFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvFunction</span></code></a> (and not <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.RoundBasedFunction" title="cascada.bitvector.ssa.RoundBasedFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RoundBasedFunction</span></code></a>) even if
+<a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel.func" title="cascada.abstractproperty.chmodel.ChModel.func"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">func</span></code></a> is a <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.RoundBasedFunction" title="cascada.bitvector.ssa.RoundBasedFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RoundBasedFunction</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.abstractproperty.chmodel.ChModel.get_formatted_logged_msgs">
+<span class="sig-name descname"><span class="pre">get_formatted_logged_msgs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/chmodel.html#ChModel.get_formatted_logged_msgs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.chmodel.ChModel.get_formatted_logged_msgs" title="Permalink to this definition"></a></dt>
+<dd><p>Return the list of logged messages.</p>
+<p>If <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel.func" title="cascada.abstractproperty.chmodel.ChModel.func"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">func</span></code></a> includes <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.BvFunction.log_msg" title="cascada.bitvector.ssa.BvFunction.log_msg"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">log_msg</span></code></a> calls in its <code class="docutils literal notranslate"><span class="pre">eval</span></code>, this method
+return the list of messages logged with the format field objects
+applied. Otherwise, an empty list is returned.</p>
+<p>In the first case, the <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Variable" title="cascada.bitvector.core.Variable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Variable</span></code></a> objects of <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel.ssa" title="cascada.abstractproperty.chmodel.ChModel.ssa"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">ssa</span></code></a> appearing in the
+format field objects are replaced with their associated symbolic
+<a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> objects.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.abstractproperty.chmodel.ChModel.get_round_separators">
+<span class="sig-name descname"><span class="pre">get_round_separators</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/chmodel.html#ChModel.get_round_separators"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.chmodel.ChModel.get_round_separators" title="Permalink to this definition"></a></dt>
+<dd><p>Return the round separators if <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel.func" title="cascada.abstractproperty.chmodel.ChModel.func"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">func</span></code></a> is a <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.RoundBasedFunction" title="cascada.bitvector.ssa.RoundBasedFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RoundBasedFunction</span></code></a>.</p>
+<p>If <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel.func" title="cascada.abstractproperty.chmodel.ChModel.func"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">func</span></code></a> includes <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.RoundBasedFunction.add_round_outputs" title="cascada.bitvector.ssa.RoundBasedFunction.add_round_outputs"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">add_round_outputs</span></code></a> calls in its <code class="docutils literal notranslate"><span class="pre">eval</span></code>,
+this method returns a list with the round <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> outputs
+delimiting the rounds. Otherwise, <code class="docutils literal notranslate"><span class="pre">None</span></code> is returned.</p>
+<p>In the first case, this list contains <code class="docutils literal notranslate"><span class="pre">num_rounds</span> <span class="pre">-</span> <span class="pre">1</span></code> entries,
+where the <code class="docutils literal notranslate"><span class="pre">i</span></code>-th entry is the list of <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> outputs of the
+<code class="docutils literal notranslate"><span class="pre">i</span></code>-th round. In particular, the output properties of the last
+round are not included in this list.</p>
+<p>The list returned by this method is meant to be used as the argument
+of <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel.split" title="cascada.abstractproperty.chmodel.ChModel.split"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">ChModel.split</span></code></a> to get the <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel" title="cascada.abstractproperty.chmodel.ChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChModel</span></code></a> object of each round.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.abstractproperty.chmodel.ChModel.dotprinting">
+<span class="sig-name descname"><span class="pre">dotprinting</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">repeat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vrepr_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/chmodel.html#ChModel.dotprinting"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.chmodel.ChModel.dotprinting" title="Permalink to this definition"></a></dt>
+<dd><p>Return the DOT description of the expression tree of <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel.assign_outprop2op_model" title="cascada.abstractproperty.chmodel.ChModel.assign_outprop2op_model"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">assign_outprop2op_model</span></code></a>.</p>
+<p>See also <a class="reference internal" href="cascada.bitvector.printing.html#cascada.bitvector.printing.dotprinting" title="cascada.bitvector.printing.dotprinting"><code class="xref any py py-func docutils literal notranslate"><span class="pre">printing.dotprinting</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>repeat</strong> – whether to use different nodes for common subexpressions
+(default True)</p></li>
+<li><p><strong>vrepr_label</strong> – whether to use the verbose representation (<a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term.vrepr" title="cascada.bitvector.core.Term.vrepr"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">Term.vrepr</span></code></a>)
+to label the nodes (default False)</p></li>
+<li><p><strong>kwargs</strong> – additional arguments passed to <a class="reference internal" href="cascada.bitvector.printing.html#cascada.bitvector.printing.dotprinting" title="cascada.bitvector.printing.dotprinting"><code class="xref any py py-func docutils literal notranslate"><span class="pre">printing.dotprinting</span></code></a></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.abstractproperty.chmodel.EncryptionChModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.abstractproperty.chmodel.</span></span><span class="sig-name descname"><span class="pre">EncryptionChModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cipher</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op_model_class2options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/chmodel.html#EncryptionChModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.chmodel.EncryptionChModel" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Represent characteristic models of encryption functions w.r.t some property.</p>
+<p>Given a <a class="reference internal" href="cascada.primitives.blockcipher.html#cascada.primitives.blockcipher.Cipher" title="cascada.primitives.blockcipher.Cipher"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Cipher</span></code></a>, an <a class="reference internal" href="#cascada.abstractproperty.chmodel.EncryptionChModel" title="cascada.abstractproperty.chmodel.EncryptionChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">EncryptionChModel</span></code></a> is a bit-vector model
+(see <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel" title="cascada.abstractproperty.chmodel.ChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChModel</span></code></a>) of a characteristic for a particular <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> over
+the <a class="reference internal" href="cascada.primitives.blockcipher.html#cascada.primitives.blockcipher.Cipher.encryption" title="cascada.primitives.blockcipher.Cipher.encryption"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">Cipher.encryption</span></code></a> (where the <a class="reference internal" href="cascada.primitives.blockcipher.html#cascada.primitives.blockcipher.Cipher.key_schedule" title="cascada.primitives.blockcipher.Cipher.key_schedule"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">Cipher.key_schedule</span></code></a>
+is ignored).</p>
+<p>See also <a class="reference internal" href="cascada.abstractproperty.characteristic.html#cascada.abstractproperty.characteristic.EncryptionCharacteristic" title="cascada.abstractproperty.characteristic.EncryptionCharacteristic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.characteristic.EncryptionCharacteristic</span></code></a>.</p>
+<p>This class is not meant to be instantiated but to provide a base
+class for creating characteristic models over encryption functions,
+(see <a class="reference internal" href="cascada.differential.chmodel.html#cascada.differential.chmodel.EncryptionChModel" title="cascada.differential.chmodel.EncryptionChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">differential.chmodel.EncryptionChModel</span></code></a>,
+<a class="reference internal" href="cascada.linear.chmodel.html#cascada.linear.chmodel.EncryptionChModel" title="cascada.linear.chmodel.EncryptionChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">linear.chmodel.EncryptionChModel</span></code></a> or <a class="reference internal" href="cascada.algebraic.chmodel.html#cascada.algebraic.chmodel.EncryptionChModel" title="cascada.algebraic.chmodel.EncryptionChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">algebraic.chmodel.EncryptionChModel</span></code></a>
+for some examples).</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.abstractproperty.chmodel.EncryptionChModel.cipher">
+<span class="sig-name descname"><span class="pre">cipher</span></span><a class="headerlink" href="#cascada.abstractproperty.chmodel.EncryptionChModel.cipher" title="Permalink to this definition"></a></dt>
+<dd><p>the block cipher as a <a class="reference internal" href="cascada.primitives.blockcipher.html#cascada.primitives.blockcipher.Cipher" title="cascada.primitives.blockcipher.Cipher"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Cipher</span></code></a> object</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.abstractproperty.chmodel.EncryptionChModel.vrepr">
+<span class="sig-name descname"><span class="pre">vrepr</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/chmodel.html#EncryptionChModel.vrepr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.chmodel.EncryptionChModel.vrepr" title="Permalink to this definition"></a></dt>
+<dd><p>Return an executable string representation.</p>
+<p>This method returns a string so that <code class="docutils literal notranslate"><span class="pre">eval(self.vrepr())</span></code>
+returns a new <a class="reference internal" href="#cascada.abstractproperty.chmodel.EncryptionChModel" title="cascada.abstractproperty.chmodel.EncryptionChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">EncryptionChModel</span></code></a> object with the same content.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.abstractproperty.chmodel.EncryptionChModel.split">
+<span class="sig-name descname"><span class="pre">split</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prop_separators</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/chmodel.html#EncryptionChModel.split"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.chmodel.EncryptionChModel.split" title="Permalink to this definition"></a></dt>
+<dd><p>Split into multiple <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel" title="cascada.abstractproperty.chmodel.ChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChModel</span></code></a> objects given the list of property separators.</p>
+<p>Given an <a class="reference internal" href="#cascada.abstractproperty.chmodel.EncryptionChModel" title="cascada.abstractproperty.chmodel.EncryptionChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">EncryptionChModel</span></code></a>, this method calls <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel.split" title="cascada.abstractproperty.chmodel.ChModel.split"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">ChModel.split</span></code></a> to
+split the characteristic model.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The new split characteristic models are instances of <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel" title="cascada.abstractproperty.chmodel.ChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChModel</span></code></a>
+and not of <a class="reference internal" href="#cascada.abstractproperty.chmodel.EncryptionChModel" title="cascada.abstractproperty.chmodel.EncryptionChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">EncryptionChModel</span></code></a>.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.abstractproperty.chmodel.CipherChModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.abstractproperty.chmodel.</span></span><span class="sig-name descname"><span class="pre">CipherChModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cipher</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op_model_class2options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/chmodel.html#CipherChModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.chmodel.CipherChModel" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Represent characteristic models of ciphers w.r.t some property.</p>
+<p>Given a <a class="reference internal" href="cascada.primitives.blockcipher.html#cascada.primitives.blockcipher.Cipher" title="cascada.primitives.blockcipher.Cipher"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Cipher</span></code></a>, a <a class="reference internal" href="#cascada.abstractproperty.chmodel.CipherChModel" title="cascada.abstractproperty.chmodel.CipherChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">CipherChModel</span></code></a> is a bit-vector model of a
+characteristic for a particular <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> over the cipher.</p>
+<p>See also <a class="reference internal" href="cascada.abstractproperty.characteristic.html#cascada.abstractproperty.characteristic.CipherCharacteristic" title="cascada.abstractproperty.characteristic.CipherCharacteristic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.characteristic.CipherCharacteristic</span></code></a>.</p>
+<p>A <a class="reference internal" href="#cascada.abstractproperty.chmodel.CipherChModel" title="cascada.abstractproperty.chmodel.CipherChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">CipherChModel</span></code></a> consists of a pair of <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel" title="cascada.abstractproperty.chmodel.ChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChModel</span></code></a> where one models
+the characteristic over the <a class="reference internal" href="cascada.primitives.blockcipher.html#cascada.primitives.blockcipher.Cipher.key_schedule" title="cascada.primitives.blockcipher.Cipher.key_schedule"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">Cipher.key_schedule</span></code></a>, and the other one
+models the characteristic over the <a class="reference internal" href="cascada.primitives.blockcipher.html#cascada.primitives.blockcipher.Cipher.encryption" title="cascada.primitives.blockcipher.Cipher.encryption"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">Cipher.encryption</span></code></a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The model of the characteristic over the <a class="reference internal" href="cascada.primitives.blockcipher.html#cascada.primitives.blockcipher.Cipher.encryption" title="cascada.primitives.blockcipher.Cipher.encryption"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">Cipher.encryption</span></code></a>
+is an instance of <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel" title="cascada.abstractproperty.chmodel.ChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChModel</span></code></a> and not an instance of <a class="reference internal" href="#cascada.abstractproperty.chmodel.EncryptionChModel" title="cascada.abstractproperty.chmodel.EncryptionChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">EncryptionChModel</span></code></a>.</p>
+</div>
+<p>The round key properties in the encryption characteristic
+(the properties of the external variables of the encryption <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.SSA" title="cascada.bitvector.ssa.SSA"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SSA</span></code></a>)
+are set to the output properties of the key-schedule characteristic.</p>
+<p>This class is not meant to be instantiated but to provide a base
+class for creating characteristic models over ciphers,
+(eee <a class="reference internal" href="cascada.differential.chmodel.html#cascada.differential.chmodel.CipherChModel" title="cascada.differential.chmodel.CipherChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">differential.chmodel.CipherChModel</span></code></a>
+or <a class="reference internal" href="cascada.algebraic.chmodel.html#cascada.algebraic.chmodel.CipherChModel" title="cascada.algebraic.chmodel.CipherChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">algebraic.chmodel.CipherChModel</span></code></a> for some examples).</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.abstractproperty.chmodel.CipherChModel.cipher">
+<span class="sig-name descname"><span class="pre">cipher</span></span><a class="headerlink" href="#cascada.abstractproperty.chmodel.CipherChModel.cipher" title="Permalink to this definition"></a></dt>
+<dd><p>the block cipher as a <a class="reference internal" href="cascada.primitives.blockcipher.html#cascada.primitives.blockcipher.Cipher" title="cascada.primitives.blockcipher.Cipher"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Cipher</span></code></a> object</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.abstractproperty.chmodel.CipherChModel.prop_type">
+<span class="sig-name descname"><span class="pre">prop_type</span></span><a class="headerlink" href="#cascada.abstractproperty.chmodel.CipherChModel.prop_type" title="Permalink to this definition"></a></dt>
+<dd><p>the type of <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> of the characteristic</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.abstractproperty.chmodel.CipherChModel.ks_ch_model">
+<span class="sig-name descname"><span class="pre">ks_ch_model</span></span><a class="headerlink" href="#cascada.abstractproperty.chmodel.CipherChModel.ks_ch_model" title="Permalink to this definition"></a></dt>
+<dd><p>the <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel" title="cascada.abstractproperty.chmodel.ChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChModel</span></code></a> of the key schedule characteristic</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.abstractproperty.chmodel.CipherChModel.enc_ch_model">
+<span class="sig-name descname"><span class="pre">enc_ch_model</span></span><a class="headerlink" href="#cascada.abstractproperty.chmodel.CipherChModel.enc_ch_model" title="Permalink to this definition"></a></dt>
+<dd><p>the <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel" title="cascada.abstractproperty.chmodel.ChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChModel</span></code></a> of the encryption characteristic</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.abstractproperty.chmodel.CipherChModel.vrepr">
+<span class="sig-name descname"><span class="pre">vrepr</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/chmodel.html#CipherChModel.vrepr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.chmodel.CipherChModel.vrepr" title="Permalink to this definition"></a></dt>
+<dd><p>Return an executable string representation.</p>
+<p>This method returns a string so that <code class="docutils literal notranslate"><span class="pre">eval(self.vrepr())</span></code>
+returns a new <a class="reference internal" href="#cascada.abstractproperty.chmodel.CipherChModel" title="cascada.abstractproperty.chmodel.CipherChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">CipherChModel</span></code></a> object with the same content.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.abstractproperty.chmodel.CipherChModel.signature">
+<span class="sig-name descname"><span class="pre">signature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ch_signature_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/chmodel.html#CipherChModel.signature"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.chmodel.CipherChModel.signature" title="Permalink to this definition"></a></dt>
+<dd><p>Return the signature of the characteristic model over the cipher.</p>
+<p>See also <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel.signature" title="cascada.abstractproperty.chmodel.ChModel.signature"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">ChModel.signature</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.abstractproperty.chmodel.CipherChModel.get_formatted_logged_msgs">
+<span class="sig-name descname"><span class="pre">get_formatted_logged_msgs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/chmodel.html#CipherChModel.get_formatted_logged_msgs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.chmodel.CipherChModel.get_formatted_logged_msgs" title="Permalink to this definition"></a></dt>
+<dd><p>Return the messages logged in the evaluation of the function
+with the format field objects applied.</p>
+<p>See also <a class="reference internal" href="#cascada.abstractproperty.chmodel.ChModel.get_formatted_logged_msgs" title="cascada.abstractproperty.chmodel.ChModel.get_formatted_logged_msgs"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">ChModel.get_formatted_logged_msgs</span></code></a>.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cascada.abstractproperty.tests.test_opmodel.html" class="btn btn-neutral float-left" title="cascada.abstractproperty.tests.test_opmodel module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cascada.abstractproperty.characteristic.html" class="btn btn-neutral float-right" title="cascada.abstractproperty.characteristic module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Adrián Ranea.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

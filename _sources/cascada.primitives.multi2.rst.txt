@@ -1,0 +1,6 @@
+cascada.primitives.multi2 module
+================================
+
+.. automodule:: cascada.primitives.multi2
+   :members:
+   :show-inheritance:

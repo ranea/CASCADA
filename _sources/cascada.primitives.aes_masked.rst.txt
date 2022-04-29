@@ -1,0 +1,6 @@
+cascada.primitives.aes_masked module
+====================================
+
+.. automodule:: cascada.primitives.aes_masked
+   :members:
+   :show-inheritance:

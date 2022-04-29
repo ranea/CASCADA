@@ -1,0 +1,6 @@
+﻿cascada.abstractproperty.characteristic module
+==============================================
+
+.. automodule:: cascada.abstractproperty.characteristic
+   :members:
+   :show-inheritance:

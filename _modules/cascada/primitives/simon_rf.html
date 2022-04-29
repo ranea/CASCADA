@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cascada.primitives.simon_rf &mdash; CASCADA 1.0.rc0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> CASCADA
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">CASCADA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../primitives_implemented.html">Primitives implemented</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cascada.html">API reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">CASCADA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>cascada.primitives.simon_rf</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cascada.primitives.simon_rf</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Simon-like round functions and their XOR and RX differential models.</span>
+
+<span class="sd">Source: Observations on the SIMON block cipher family https://eprint.iacr.org/2015/145</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">decimal</span>
+<span class="kn">import</span> <span class="nn">math</span>
+
+<span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">core</span>
+<span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span>
+<span class="kn">from</span> <span class="nn">cascada.bitvector.operation</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">SecondaryOperation</span><span class="p">,</span> <span class="n">RotateLeft</span><span class="p">,</span> <span class="n">BvComp</span><span class="p">,</span> <span class="n">Ite</span><span class="p">,</span> <span class="n">zero_extend</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">cascada.bitvector.secondaryop</span> <span class="kn">import</span> <span class="n">PopCount</span>
+
+<span class="kn">from</span> <span class="nn">cascada.differential.opmodel</span> <span class="kn">import</span> <span class="n">OpModel</span>
+<span class="kn">from</span> <span class="nn">cascada.differential.difference</span> <span class="kn">import</span> <span class="n">XorDiff</span><span class="p">,</span> <span class="n">RXDiff</span>
+
+
+<div class="viewcode-block" id="SimonRF"><a class="viewcode-back" href="../../../cascada.primitives.simon_rf.html#cascada.primitives.simon_rf.SimonRF">[docs]</a><span class="k">class</span> <span class="nc">SimonRF</span><span class="p">(</span><span class="n">SecondaryOperation</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The non-linear part of the round function of Simon.</span>
+
+<span class="sd">    This corresponds to ``f(x) = ((x &lt;&lt;&lt; a) &amp; (x &lt;&lt;&lt; b)) ^ (x &lt;&lt;&lt; c)``,</span>
+<span class="sd">    where ``(a, b, c) = (8, 1, 2)``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="mi">8</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="mi">2</span>
+
+    <span class="n">arity</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">is_symmetric</span> <span class="o">=</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="SimonRF.output_width"><a class="viewcode-back" href="../../../cascada.primitives.simon_rf.html#cascada.primitives.simon_rf.SimonRF.output_width">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">output_width</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">width</span></div>
+
+<div class="viewcode-block" id="SimonRF.eval"><a class="viewcode-back" href="../../../cascada.primitives.simon_rf.html#cascada.primitives.simon_rf.SimonRF.eval">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">RotateLeft</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">a</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">RotateLeft</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">b</span><span class="p">))</span> <span class="o">^</span> <span class="n">RotateLeft</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">c</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="XorModelSimonRF"><a class="viewcode-back" href="../../../cascada.primitives.simon_rf.html#cascada.primitives.simon_rf.XorModelSimonRF">[docs]</a><span class="k">class</span> <span class="nc">XorModelSimonRF</span><span class="p">(</span><span class="n">OpModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent the `XorDiff` `differential.opmodel.OpModel` of `SimonRF`.</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.differential.difference import XorDiff</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.primitives.simon_rf import XorModelSimonRF</span>
+<span class="sd">        &gt;&gt;&gt; alpha = XorDiff(Constant(0, 16))</span>
+<span class="sd">        &gt;&gt;&gt; f = XorModelSimonRF(alpha)</span>
+<span class="sd">        &gt;&gt;&gt; print(f.vrepr())</span>
+<span class="sd">        XorModelSimonRF(XorDiff(Constant(0x0000, width=16)))</span>
+<span class="sd">        &gt;&gt;&gt; x = Constant(0, 16)</span>
+<span class="sd">        &gt;&gt;&gt; f.eval_derivative(x)  # f(x + alpha) - f(x)</span>
+<span class="sd">        XorDiff(0x0000)</span>
+<span class="sd">        &gt;&gt;&gt; f.max_weight(), f.weight_width(), f.error(), f.num_frac_bits()</span>
+<span class="sd">        (15, 5, 0, 0)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">diff_type</span> <span class="o">=</span> <span class="n">XorDiff</span>
+    <span class="n">op</span> <span class="o">=</span> <span class="n">SimonRF</span>
+
+<div class="viewcode-block" id="XorModelSimonRF.validity_constraint"><a class="viewcode-back" href="../../../cascada.primitives.simon_rf.html#cascada.primitives.simon_rf.XorModelSimonRF.validity_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">validity_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_diff</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the validity constraint for a given output `XorDiff` difference.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.printing import BvWrapPrinter</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.difference import XorDiff</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.primitives.simon_rf import XorModelSimonRF</span>
+<span class="sd">            &gt;&gt;&gt; alpha = XorDiff(Constant(0, 16))</span>
+<span class="sd">            &gt;&gt;&gt; f = XorModelSimonRF(alpha)</span>
+<span class="sd">            &gt;&gt;&gt; f.validity_constraint(XorDiff(Constant(0, 16)))</span>
+<span class="sd">            0b1</span>
+<span class="sd">            &gt;&gt;&gt; u, v = Variable(&quot;u&quot;, 16), Variable(&quot;v&quot;, 16)</span>
+<span class="sd">            &gt;&gt;&gt; f = XorModelSimonRF(XorDiff(u))</span>
+<span class="sd">            &gt;&gt;&gt; result = f.validity_constraint(XorDiff(v))</span>
+<span class="sd">            &gt;&gt;&gt; print(BvWrapPrinter().doprint(result))</span>
+<span class="sd">            Ite(u == 0xffff,</span>
+<span class="sd">                (PopCount(v ^ (u &lt;&lt;&lt; 2))[0]) == 0b0,</span>
+<span class="sd">                BvComp(0x0000,</span>
+<span class="sd">                       BvOr((v ^ (u &lt;&lt;&lt; 2)) &amp; ~((u &lt;&lt;&lt; 8) | (u &lt;&lt;&lt; 1)),</span>
+<span class="sd">                            (v ^ (u &lt;&lt;&lt; 2) ^ ((v ^ (u &lt;&lt;&lt; 2)) &lt;&lt;&lt; 7)) &amp; (u &lt;&lt;&lt; 1) &amp; ~(u &lt;&lt;&lt; 8) &amp; (u &lt;&lt;&lt; 15)</span>
+<span class="sd">                       )</span>
+<span class="sd">                )</span>
+<span class="sd">            )</span>
+<span class="sd">            &gt;&gt;&gt; result.xreplace({u: Constant(0, 16), v: Constant(0, 16)})</span>
+<span class="sd">            0b1</span>
+
+<span class="sd">        See `OpModel.validity_constraint` for more information.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">b</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">c</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_diff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">width</span>
+        <span class="k">assert</span> <span class="n">math</span><span class="o">.</span><span class="n">gcd</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">a</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">a</span> <span class="o">&gt;</span> <span class="n">b</span> <span class="ow">and</span> <span class="n">n</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span>
+
+        <span class="n">alpha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_diff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">val</span>
+        <span class="n">Rol</span> <span class="o">=</span> <span class="n">RotateLeft</span>
+        <span class="n">varibits</span> <span class="o">=</span> <span class="n">Rol</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span> <span class="o">|</span> <span class="n">Rol</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">a</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span> <span class="o">%</span> <span class="n">n</span>
+        <span class="n">doublebits</span> <span class="o">=</span> <span class="p">(</span><span class="n">Rol</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="o">~</span><span class="n">Rol</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">a</span><span class="p">))</span> <span class="o">&amp;</span> <span class="n">Rol</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">r</span><span class="p">))</span>
+
+        <span class="n">beta</span> <span class="o">=</span> <span class="n">output_diff</span><span class="o">.</span><span class="n">val</span>
+        <span class="n">gamma</span> <span class="o">=</span> <span class="n">beta</span> <span class="o">^</span> <span class="n">Rol</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">is_even</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">BvComp</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="n">case2</span> <span class="o">=</span> <span class="n">BvComp</span><span class="p">(</span>
+            <span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">gamma</span> <span class="o">&amp;</span> <span class="p">(</span><span class="o">~</span><span class="n">varibits</span><span class="p">))</span> <span class="o">|</span> <span class="p">((</span><span class="n">gamma</span> <span class="o">^</span> <span class="n">Rol</span><span class="p">(</span><span class="n">gamma</span><span class="p">,</span> <span class="n">a</span> <span class="o">-</span> <span class="n">b</span><span class="p">))</span> <span class="o">&amp;</span> <span class="n">doublebits</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="n">condition</span> <span class="o">=</span> <span class="n">Ite</span><span class="p">(</span>
+            <span class="n">BvComp</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="o">~</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">)),</span>
+            <span class="n">is_even</span><span class="p">(</span><span class="n">PopCount</span><span class="p">(</span><span class="n">gamma</span><span class="p">)),</span>
+            <span class="n">case2</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">condition</span></div>
+
+<div class="viewcode-block" id="XorModelSimonRF.pr_one_constraint"><a class="viewcode-back" href="../../../cascada.primitives.simon_rf.html#cascada.primitives.simon_rf.XorModelSimonRF.pr_one_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">pr_one_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_diff</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the probability-one constraint for a given output `XorDiff`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.difference import XorDiff</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.primitives.simon_rf import XorModelSimonRF</span>
+<span class="sd">            &gt;&gt;&gt; alpha = XorDiff(Constant(0, 16))</span>
+<span class="sd">            &gt;&gt;&gt; f = XorModelSimonRF(alpha)</span>
+<span class="sd">            &gt;&gt;&gt; f.pr_one_constraint(XorDiff(Constant(0, 16)))</span>
+<span class="sd">            0b1</span>
+
+<span class="sd">        See `abstractproperty.opmodel.OpModel.pr_one_constraint` for more information.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">b</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">c</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_diff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">width</span>
+        <span class="k">assert</span> <span class="n">math</span><span class="o">.</span><span class="n">gcd</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">a</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">a</span> <span class="o">&gt;</span> <span class="n">b</span> <span class="ow">and</span> <span class="n">n</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span>
+
+        <span class="n">alpha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_diff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">val</span>
+        <span class="n">Rol</span> <span class="o">=</span> <span class="n">RotateLeft</span>
+        <span class="n">varibits</span> <span class="o">=</span> <span class="n">Rol</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span> <span class="o">|</span> <span class="n">Rol</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">a</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span> <span class="o">%</span> <span class="n">n</span>
+        <span class="n">doublebits</span> <span class="o">=</span> <span class="p">(</span><span class="n">Rol</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="o">~</span><span class="n">Rol</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">a</span><span class="p">))</span> <span class="o">&amp;</span> <span class="n">Rol</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">r</span><span class="p">))</span>
+
+        <span class="n">beta</span> <span class="o">=</span> <span class="n">output_diff</span><span class="o">.</span><span class="n">val</span>
+        <span class="n">gamma</span> <span class="o">=</span> <span class="n">beta</span> <span class="o">^</span> <span class="n">Rol</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+
+        <span class="n">case2</span> <span class="o">=</span> <span class="n">BvComp</span><span class="p">(</span>
+            <span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">gamma</span> <span class="o">&amp;</span> <span class="p">(</span><span class="o">~</span><span class="n">varibits</span><span class="p">))</span> <span class="o">|</span> <span class="p">((</span><span class="n">gamma</span> <span class="o">^</span> <span class="n">Rol</span><span class="p">(</span><span class="n">gamma</span><span class="p">,</span> <span class="n">a</span> <span class="o">-</span> <span class="n">b</span><span class="p">))</span> <span class="o">&amp;</span> <span class="n">doublebits</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="n">hw</span> <span class="o">=</span> <span class="n">varibits</span> <span class="o">^</span> <span class="n">doublebits</span>  <span class="c1"># no need to PopCount</span>
+
+        <span class="n">condition</span> <span class="o">=</span> <span class="o">~</span><span class="n">BvComp</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="o">~</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+        <span class="n">condition</span> <span class="o">&amp;=</span> <span class="n">case2</span>
+        <span class="n">condition</span> <span class="o">&amp;=</span> <span class="n">BvComp</span><span class="p">(</span><span class="n">hw</span><span class="p">,</span> <span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">hw</span><span class="o">.</span><span class="n">width</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">condition</span></div>
+
+<div class="viewcode-block" id="XorModelSimonRF.bv_weight"><a class="viewcode-back" href="../../../cascada.primitives.simon_rf.html#cascada.primitives.simon_rf.XorModelSimonRF.bv_weight">[docs]</a>    <span class="k">def</span> <span class="nf">bv_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_diff</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the bit-vector weight for a given output `XorDiff`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.printing import BvWrapPrinter</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.secondaryop import PopCount</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.difference import XorDiff</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.primitives.simon_rf import XorModelSimonRF</span>
+<span class="sd">            &gt;&gt;&gt; alpha = XorDiff(Constant(0, 16))</span>
+<span class="sd">            &gt;&gt;&gt; f = XorModelSimonRF(alpha)</span>
+<span class="sd">            &gt;&gt;&gt; f.bv_weight(XorDiff(Constant(0, 16)))</span>
+<span class="sd">            0b00000</span>
+<span class="sd">            &gt;&gt;&gt; alpha = XorDiff(Variable(&quot;u&quot;, 16))</span>
+<span class="sd">            &gt;&gt;&gt; f = XorModelSimonRF(alpha)</span>
+<span class="sd">            &gt;&gt;&gt; beta = XorDiff(Variable(&quot;v&quot;, 16))</span>
+<span class="sd">            &gt;&gt;&gt; print(BvWrapPrinter().doprint(f.bv_weight(beta)))</span>
+<span class="sd">            Ite(u == 0xffff,</span>
+<span class="sd">                0b01111,</span>
+<span class="sd">                PopCount(((u &lt;&lt;&lt; 8) | (u &lt;&lt;&lt; 1)) ^ ((u &lt;&lt;&lt; 1) &amp; ~(u &lt;&lt;&lt; 8) &amp; (u &lt;&lt;&lt; 15)))</span>
+<span class="sd">            )</span>
+
+<span class="sd">        See also `abstractproperty.opmodel.OpModel.bv_weight`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">b</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_diff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">width</span>
+        <span class="k">assert</span> <span class="n">math</span><span class="o">.</span><span class="n">gcd</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">a</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">a</span> <span class="o">&gt;</span> <span class="n">b</span> <span class="ow">and</span> <span class="n">n</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span>
+
+        <span class="n">alpha</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_diff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">val</span>
+        <span class="n">Rol</span> <span class="o">=</span> <span class="n">RotateLeft</span>
+        <span class="n">varibits</span> <span class="o">=</span> <span class="n">Rol</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span> <span class="o">|</span> <span class="n">Rol</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">a</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span> <span class="o">%</span> <span class="n">n</span>
+        <span class="n">doublebits</span> <span class="o">=</span> <span class="p">(</span><span class="n">Rol</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="o">~</span><span class="n">Rol</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">a</span><span class="p">))</span> <span class="o">&amp;</span> <span class="n">Rol</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">r</span><span class="p">))</span>
+
+        <span class="n">hw</span> <span class="o">=</span> <span class="n">PopCount</span><span class="p">(</span><span class="n">varibits</span> <span class="o">^</span> <span class="n">doublebits</span><span class="p">)</span>
+        <span class="n">width</span> <span class="o">=</span> <span class="nb">max</span><span class="p">((</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">bit_length</span><span class="p">(),</span> <span class="n">hw</span><span class="o">.</span><span class="n">width</span><span class="p">)</span>
+
+        <span class="n">value</span> <span class="o">=</span> <span class="n">Ite</span><span class="p">(</span>
+            <span class="n">BvComp</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="o">~</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">)),</span>
+            <span class="n">Constant</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">width</span><span class="p">),</span>
+            <span class="n">zero_extend</span><span class="p">(</span><span class="n">hw</span><span class="p">,</span> <span class="n">width</span> <span class="o">-</span> <span class="n">hw</span><span class="o">.</span><span class="n">width</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">value</span></div>
+
+<div class="viewcode-block" id="XorModelSimonRF.max_weight"><a class="viewcode-back" href="../../../cascada.primitives.simon_rf.html#cascada.primitives.simon_rf.XorModelSimonRF.max_weight">[docs]</a>    <span class="k">def</span> <span class="nf">max_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_diff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">width</span>
+        <span class="k">return</span> <span class="n">n</span> <span class="o">-</span> <span class="mi">1</span>  <span class="c1"># as an integer</span></div>
+
+<div class="viewcode-block" id="XorModelSimonRF.weight_width"><a class="viewcode-back" href="../../../cascada.primitives.simon_rf.html#cascada.primitives.simon_rf.XorModelSimonRF.weight_width">[docs]</a>    <span class="k">def</span> <span class="nf">weight_width</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_diff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">width</span>
+        <span class="k">return</span> <span class="nb">max</span><span class="p">((</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">bit_length</span><span class="p">(),</span> <span class="n">PopCount</span><span class="o">.</span><span class="n">output_width</span><span class="p">(</span><span class="n">core</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">n</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="XorModelSimonRF.decimal_weight"><a class="viewcode-back" href="../../../cascada.primitives.simon_rf.html#cascada.primitives.simon_rf.XorModelSimonRF.decimal_weight">[docs]</a>    <span class="k">def</span> <span class="nf">decimal_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_diff</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_assert_preconditions_decimal_weight</span><span class="p">(</span><span class="n">output_diff</span><span class="p">)</span>
+        <span class="n">dw</span> <span class="o">=</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bv_weight</span><span class="p">(</span><span class="n">output_diff</span><span class="p">)))</span>  <span class="c1"># num_frac_bits = 0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_assert_postconditions_decimal_weight</span><span class="p">(</span><span class="n">output_diff</span><span class="p">,</span> <span class="n">dw</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dw</span></div>
+
+<div class="viewcode-block" id="XorModelSimonRF.num_frac_bits"><a class="viewcode-back" href="../../../cascada.primitives.simon_rf.html#cascada.primitives.simon_rf.XorModelSimonRF.num_frac_bits">[docs]</a>    <span class="k">def</span> <span class="nf">num_frac_bits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="XorModelSimonRF.error"><a class="viewcode-back" href="../../../cascada.primitives.simon_rf.html#cascada.primitives.simon_rf.XorModelSimonRF.error">[docs]</a>    <span class="k">def</span> <span class="nf">error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">0</span></div></div>
+
+
+<div class="viewcode-block" id="RXModelSimonRF"><a class="viewcode-back" href="../../../cascada.primitives.simon_rf.html#cascada.primitives.simon_rf.RXModelSimonRF">[docs]</a><span class="k">class</span> <span class="nc">RXModelSimonRF</span><span class="p">(</span><span class="n">XorModelSimonRF</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent the `RXDiff` `differential.opmodel.OpModel` of `SimonRF`.</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.differential.difference import RXDiff</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.primitives.simon_rf import RXModelSimonRF</span>
+<span class="sd">        &gt;&gt;&gt; alpha = RXDiff(Constant(0, 16))</span>
+<span class="sd">        &gt;&gt;&gt; f = RXModelSimonRF(alpha)</span>
+<span class="sd">        &gt;&gt;&gt; print(f.vrepr())</span>
+<span class="sd">        RXModelSimonRF(RXDiff(Constant(0x0000, width=16)))</span>
+<span class="sd">        &gt;&gt;&gt; x = Constant(0, 16)</span>
+<span class="sd">        &gt;&gt;&gt; f.eval_derivative(x)  # f(x + alpha) - f(x)</span>
+<span class="sd">        RXDiff(0x0000)</span>
+<span class="sd">        &gt;&gt;&gt; f.max_weight(), f.weight_width(), f.error(), f.num_frac_bits()</span>
+<span class="sd">        (15, 5, 0, 0)</span>
+
+<span class="sd">    .. Implementation details:</span>
+
+<span class="sd">        For any bitwise operation, (w.l.o.g, unary op f(x))</span>
+<span class="sd">        ``Pr( RXDiff(d) propagates through f to RXDiff(d&#39;) ) =</span>
+<span class="sd">        Pr( Diff(d) propagates through f to Diff(d&#39;) )``, where</span>
+<span class="sd">        ``RXDiff(d) = RXDiff.from_pair(x, RotateLeft(x, 1) ^ d)``</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">diff_type</span> <span class="o">=</span> <span class="n">RXDiff</span>
+    <span class="n">op</span> <span class="o">=</span> <span class="n">SimonRF</span></div>
+
+
+<span class="n">SimonRF</span><span class="o">.</span><span class="n">xor_model</span> <span class="o">=</span> <span class="n">XorModelSimonRF</span>
+<span class="n">SimonRF</span><span class="o">.</span><span class="n">rx_model</span> <span class="o">=</span> <span class="n">RXModelSimonRF</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Adrián Ranea.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

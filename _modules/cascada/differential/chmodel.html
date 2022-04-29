@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cascada.differential.chmodel &mdash; CASCADA 1.0.rc0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> CASCADA
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">CASCADA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../primitives_implemented.html">Primitives implemented</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cascada.html">API reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">CASCADA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>cascada.differential.chmodel</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cascada.differential.chmodel</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Manage bit-vector models of differential characteristics.&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">core</span>
+<span class="kn">from</span> <span class="nn">cascada.differential</span> <span class="kn">import</span> <span class="n">difference</span>
+
+<span class="kn">from</span> <span class="nn">cascada</span> <span class="kn">import</span> <span class="n">abstractproperty</span>
+
+
+<span class="n">ChModelSigType</span> <span class="o">=</span> <span class="n">abstractproperty</span><span class="o">.</span><span class="n">chmodel</span><span class="o">.</span><span class="n">ChModelSigType</span>
+
+
+<div class="viewcode-block" id="ChModel"><a class="viewcode-back" href="../../../cascada.differential.chmodel.html#cascada.differential.chmodel.ChModel">[docs]</a><span class="k">class</span> <span class="nc">ChModel</span><span class="p">(</span><span class="n">abstractproperty</span><span class="o">.</span><span class="n">chmodel</span><span class="o">.</span><span class="n">ChModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent bit-vector models of differential characteristics over bit-vector functions.</span>
+
+<span class="sd">    Internally, this class is a subclass of `abstractproperty.chmodel.ChModel`,</span>
+<span class="sd">    where the `Property` is a `Difference` type and the probability of the</span>
+<span class="sd">    characteristic here considered is the product of the</span>
+<span class="sd">    probabilities of the differentials</span>
+<span class="sd">    :math:`(\Delta_{x_{i}} \mapsto \Delta_{x_{i+1}})` composing</span>
+<span class="sd">    the characteristic (see `differential.characteristic.Characteristic`).</span>
+
+<span class="sd">    If the `SSA` of the `BvFunction` contains external `Variable` objects</span>
+<span class="sd">    and their `Difference` objects are not provided in the initialization</span>
+<span class="sd">    through ``external_var2diff``, these free external differences</span>
+<span class="sd">    are set to zero when the argument ``diff_type`` is `XorDiff`.</span>
+
+<span class="sd">    .. note::</span>
+
+<span class="sd">        Free external differences are not supported by `ChModel`</span>
+<span class="sd">        when ``diff_type`` is `RXDiff`. For this type of difference,</span>
+<span class="sd">        all external differences must be provided in ``external_var2diff``.</span>
+
+<span class="sd">    ::</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.differential.difference import XorDiff, RXDiff</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.differential.chmodel import ChModel</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">        &gt;&gt;&gt; Speck32_KS = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64).key_schedule</span>
+<span class="sd">        &gt;&gt;&gt; Speck32_KS.set_num_rounds(2)</span>
+<span class="sd">        &gt;&gt;&gt; xor_ch_model = ChModel(Speck32_KS, XorDiff, [&quot;dmk0&quot;, &quot;dmk1&quot;, &quot;dmk2&quot;])</span>
+<span class="sd">        &gt;&gt;&gt; xor_ch_model  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        ChModel(func=SpeckKeySchedule_2R,</span>
+<span class="sd">            input_diff=[XorDiff(dmk0), XorDiff(dmk1), XorDiff(dmk2)],</span>
+<span class="sd">            output_diff=[XorDiff(dmk2_out), XorDiff(dx3_out), XorDiff(dx8_out)],</span>
+<span class="sd">            assign_outdiff2op_model=[(XorDiff(dx1), XorModelBvAdd([XorDiff(dmk1 &gt;&gt;&gt; 7), XorDiff(dmk2)])),</span>
+<span class="sd">                (XorDiff(dx5), XorModelBvAdd([XorDiff(dmk0 &gt;&gt;&gt; 7), XorDiff((dmk2 &lt;&lt;&lt; 2) ^ dx1)])),</span>
+<span class="sd">                (XorDiff(dmk2_out), XorModelId(XorDiff(dmk2))),</span>
+<span class="sd">                (XorDiff(dx3_out), XorModelId(XorDiff((dmk2 &lt;&lt;&lt; 2) ^ dx1))),</span>
+<span class="sd">                (XorDiff(dx8_out), XorModelId(XorDiff((((dmk2 &lt;&lt;&lt; 2) ^ dx1) &lt;&lt;&lt; 2) ^ dx5)))])</span>
+<span class="sd">        &gt;&gt;&gt; xor_ch_model.ssa  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        SSA(input_vars=[dmk0, dmk1, dmk2],</span>
+<span class="sd">            output_vars=[dmk2_out, dx3_out, dx8_out],</span>
+<span class="sd">            assignments=[(dx0, dmk1 &gt;&gt;&gt; 7), (dx1, dx0 + dmk2), (dx2, dmk2 &lt;&lt;&lt; 2), (dx3, dx2 ^ dx1),</span>
+<span class="sd">                (dx4, dmk0 &gt;&gt;&gt; 7), (dx5, dx4 + dx3), (dx6, dx5 ^ 0x0001), (dx7, dx3 &lt;&lt;&lt; 2), (dx8, dx7 ^ dx6),</span>
+<span class="sd">                (dmk2_out, Id(dmk2)), (dx3_out, Id(dx3)), (dx8_out, Id(dx8))])</span>
+<span class="sd">        &gt;&gt;&gt; rx_ch_model = ChModel(Speck32_KS, RXDiff, [&quot;dmk0&quot;, &quot;dmk1&quot;, &quot;dmk2&quot;])</span>
+<span class="sd">        &gt;&gt;&gt; rx_ch_model  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        ChModel(func=SpeckKeySchedule_2R,</span>
+<span class="sd">                input_diff=[RXDiff(dmk0), RXDiff(dmk1), RXDiff(dmk2)],</span>
+<span class="sd">                output_diff=[RXDiff(dmk2_out), RXDiff(dx3_out), RXDiff(dx8_out)],</span>
+<span class="sd">                assign_outdiff2op_model=[(RXDiff(dx1), RXModelBvAdd([RXDiff(dmk1 &gt;&gt;&gt; 7), RXDiff(dmk2)])),</span>
+<span class="sd">                    (RXDiff(dx5), RXModelBvAdd([RXDiff(dmk0 &gt;&gt;&gt; 7), RXDiff((dmk2 &lt;&lt;&lt; 2) ^ dx1)])),</span>
+<span class="sd">                    (RXDiff(dmk2_out), RXModelId(RXDiff(dmk2))),</span>
+<span class="sd">                    (RXDiff(dx3_out), RXModelId(RXDiff((dmk2 &lt;&lt;&lt; 2) ^ dx1))),</span>
+<span class="sd">                    (RXDiff(dx8_out), RXModelId(RXDiff((((dmk2 &lt;&lt;&lt; 2) ^ dx1) &lt;&lt;&lt; 2) ^ dx5 ^ 0x0003)))])</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        diff_type: the type of `Difference` of the characteristic (alias of</span>
+<span class="sd">            `abstractproperty.chmodel.ChModel.prop_type`).</span>
+<span class="sd">        input_diff: a list of `Difference` objects containing</span>
+<span class="sd">            the (symbolic) input difference (alias of</span>
+<span class="sd">            `abstractproperty.chmodel.ChModel.input_prop`).</span>
+<span class="sd">        output_diff: a list of `Difference` objects containing</span>
+<span class="sd">            the (symbolic) output difference (alias of</span>
+<span class="sd">            `abstractproperty.chmodel.ChModel.output_prop`).</span>
+<span class="sd">        external_var2diff: a `collections.OrderedDict` mapping the external</span>
+<span class="sd">            variables of `abstractproperty.chmodel.ChModel.ssa` to their</span>
+<span class="sd">            associated (symbolic or constant) `Difference` objects (alias of</span>
+<span class="sd">            `abstractproperty.chmodel.ChModel.external_var2prop`).</span>
+<span class="sd">        assign_outdiff2op_model: a `collections.OrderedDict` mapping the</span>
+<span class="sd">            output `Difference` :math:`\Delta_{x_{i+1}}` of</span>
+<span class="sd">            the non-trivial assignment  :math:`x_{i+1} \leftarrow f_i(x_i)` to</span>
+<span class="sd">            the `differential.opmodel.OpModel` of this assignment (alias of</span>
+<span class="sd">            `abstractproperty.chmodel.ChModel.assign_outprop2op_model`).</span>
+<span class="sd">        var2diff: a `collections.OrderedDict` mapping each variable in</span>
+<span class="sd">            `abstractproperty.chmodel.ChModel.ssa`</span>
+<span class="sd">            to its associated `Difference` object (alias of</span>
+<span class="sd">            `abstractproperty.chmodel.ChModel.var2prop`).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_prop_label</span> <span class="o">=</span> <span class="s2">&quot;diff&quot;</span>  <span class="c1"># for str and vrepr</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">diff_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">prop_type</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">input_diff</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_prop</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">output_diff</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_prop</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">external_var2diff</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">external_var2prop</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">assign_outdiff2op_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">assign_outprop2op_model</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">var2diff</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">var2prop</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_input_diff_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_input_prop_names</span>
+
+    <span class="k">def</span> <span class="nf">_get_property_missing_external_var</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">diff_type</span><span class="p">,</span> <span class="n">ext_var</span><span class="p">,</span> <span class="n">external_var2diff</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">diff_type</span> <span class="o">==</span> <span class="n">difference</span><span class="o">.</span><span class="n">XorDiff</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">diff_type</span><span class="p">(</span><span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">ext_var</span><span class="o">.</span><span class="n">width</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">diff_type</span> <span class="o">==</span> <span class="n">difference</span><span class="o">.</span><span class="n">RXDiff</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;found external variable </span><span class="si">{</span><span class="n">ext_var</span><span class="si">}</span><span class="s2"> with not RX-difference associated &quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;in external_var2prop=</span><span class="si">{</span><span class="n">external_var2diff</span><span class="si">}</span><span class="s2"> (required for RXDiff)&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">diff_type</span><span class="p">,</span> <span class="n">input_diff_names</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;dx&quot;</span><span class="p">,</span>
+                 <span class="n">external_var2diff</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">op_model_class2options</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">func</span><span class="p">,</span> <span class="n">prop_type</span><span class="o">=</span><span class="n">diff_type</span><span class="p">,</span> <span class="n">input_prop_names</span><span class="o">=</span><span class="n">input_diff_names</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
+            <span class="n">external_var2prop</span><span class="o">=</span><span class="n">external_var2diff</span><span class="p">,</span> <span class="n">op_model_class2options</span><span class="o">=</span><span class="n">op_model_class2options</span>
+        <span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_get_Characteristic_cls</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">cascada.differential.characteristic</span> <span class="kn">import</span> <span class="n">Characteristic</span> <span class="k">as</span> <span class="n">Characteristic_cls</span>
+        <span class="k">return</span> <span class="n">Characteristic_cls</span>
+
+<div class="viewcode-block" id="ChModel.vrepr"><a class="viewcode-back" href="../../../cascada.differential.chmodel.html#cascada.differential.chmodel.ChModel.vrepr">[docs]</a>    <span class="k">def</span> <span class="nf">vrepr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return an executable string representation.</span>
+
+<span class="sd">        See also `abstractproperty.chmodel.ChModel.vrepr`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.difference import XorDiff</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.chmodel import ChModel</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64).key_schedule</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS.set_num_rounds(2)</span>
+<span class="sd">            &gt;&gt;&gt; ch_model = ChModel(Speck32_KS, XorDiff, [&quot;dmk0&quot;, &quot;dmk1&quot;, &quot;dmk2&quot;])</span>
+<span class="sd">            &gt;&gt;&gt; ch_model.vrepr()  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">            &quot;ChModel(func=SpeckKeySchedule.set_num_rounds_and_return(2), diff_type=XorDiff,</span>
+<span class="sd">                     input_diff_names=[&#39;dmk0&#39;, &#39;dmk1&#39;, &#39;dmk2&#39;], prefix=&#39;dx&#39;)&quot;</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">vrepr</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ChModel.validity_assertions"><a class="viewcode-back" href="../../../cascada.differential.chmodel.html#cascada.differential.chmodel.ChModel.validity_assertions">[docs]</a>    <span class="k">def</span> <span class="nf">validity_assertions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the validity constraint as a list of assertions.</span>
+
+<span class="sd">        See also `abstractproperty.chmodel.ChModel.validity_assertions`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from functools import reduce</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.operation import BvAnd</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.difference import XorDiff</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.chmodel import ChModel</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64).key_schedule</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS.set_num_rounds(2)</span>
+<span class="sd">            &gt;&gt;&gt; xor_ch_model = ChModel(Speck32_KS, XorDiff, [&quot;dmk0&quot;, &quot;dmk1&quot;, &quot;dmk2&quot;])</span>
+<span class="sd">            &gt;&gt;&gt; assertions = xor_ch_model.validity_assertions()</span>
+<span class="sd">            &gt;&gt;&gt; for a in assertions: print(a)  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">            ((~((dmk1 &gt;&gt;&gt; 7) &lt;&lt; 0x0001) ^ (dmk2 &lt;&lt; 0x0001)) &amp; (~((dmk1 &gt;&gt;&gt; 7) &lt;&lt; 0x0001) ^ (dx1 &lt;&lt; 0x0001)) &amp;</span>
+<span class="sd">                ((dmk1 &gt;&gt;&gt; 7) ^ dmk2 ^ dx1 ^ ((dmk1 &gt;&gt;&gt; 7) &lt;&lt; 0x0001))) == 0x0000</span>
+<span class="sd">            ((~((dmk0 &gt;&gt;&gt; 7) &lt;&lt; 0x0001) ^ (((dmk2 &lt;&lt;&lt; 2) ^ dx1) &lt;&lt; 0x0001)) &amp; (~((dmk0 &gt;&gt;&gt; 7) &lt;&lt; 0x0001) ^</span>
+<span class="sd">                (dx5 &lt;&lt; 0x0001)) &amp; ((dmk0 &gt;&gt;&gt; 7) ^ (dmk2 &lt;&lt;&lt; 2) ^ dx1 ^ dx5 ^ ((dmk0 &gt;&gt;&gt; 7) &lt;&lt; 0x0001))) == 0x0000</span>
+<span class="sd">            dmk2 == dmk2_out</span>
+<span class="sd">            ((dmk2 &lt;&lt;&lt; 2) ^ dx1) == dx3_out</span>
+<span class="sd">            ((((dmk2 &lt;&lt;&lt; 2) ^ dx1) &lt;&lt;&lt; 2) ^ dx5) == dx8_out</span>
+<span class="sd">            &gt;&gt;&gt; validity_constraint = reduce(BvAnd, assertions)</span>
+<span class="sd">            &gt;&gt;&gt; validity_constraint  # doctest: +ELLIPSIS</span>
+<span class="sd">            (((~((dmk1 &gt;&gt;&gt; 7) &lt;&lt; 0x0001) ^ (dmk2 &lt;&lt; 0x0001)) &amp; ...</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">validity_assertions</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ChModel.pr_one_assertions"><a class="viewcode-back" href="../../../cascada.differential.chmodel.html#cascada.differential.chmodel.ChModel.pr_one_assertions">[docs]</a>    <span class="k">def</span> <span class="nf">pr_one_assertions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the probability-one constraint as a list of assertions.</span>
+
+<span class="sd">        See also `abstractproperty.chmodel.ChModel.pr_one_assertions`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.difference import XorDiff</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.chmodel import ChModel</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64).key_schedule</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS.set_num_rounds(2)</span>
+<span class="sd">            &gt;&gt;&gt; xor_ch_model = ChModel(Speck32_KS, XorDiff, [&quot;dmk0&quot;, &quot;dmk1&quot;, &quot;dmk2&quot;])</span>
+<span class="sd">            &gt;&gt;&gt; for a in xor_ch_model.pr_one_assertions(): print(a)  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">            (((~((dmk1 &gt;&gt;&gt; 7) &lt;&lt; 0x0001) ^ (dmk2 &lt;&lt; 0x0001)) &amp; (~((dmk1 &gt;&gt;&gt; 7) &lt;&lt; 0x0001) ^ (dx1 &lt;&lt; 0x0001)) &amp;</span>
+<span class="sd">                ((dmk1 &gt;&gt;&gt; 7) ^ dmk2 ^ dx1 ^ ((dmk1 &gt;&gt;&gt; 7) &lt;&lt; 0x0001))) == 0x0000) &amp; ((~((~(dmk1 &gt;&gt;&gt; 7) ^ dmk2) &amp;</span>
+<span class="sd">                (~(dmk1 &gt;&gt;&gt; 7) ^ dx1))[14:]) == 0b000000000000000)</span>
+<span class="sd">            (((~((dmk0 &gt;&gt;&gt; 7) &lt;&lt; 0x0001) ^ (((dmk2 &lt;&lt;&lt; 2) ^ dx1) &lt;&lt; 0x0001)) &amp; (~((dmk0 &gt;&gt;&gt; 7) &lt;&lt; 0x0001) ^</span>
+<span class="sd">                (dx5 &lt;&lt; 0x0001)) &amp; ((dmk0 &gt;&gt;&gt; 7) ^ (dmk2 &lt;&lt;&lt; 2) ^ dx1 ^ dx5 ^ ((dmk0 &gt;&gt;&gt; 7) &lt;&lt; 0x0001))) == 0x0000) &amp;</span>
+<span class="sd">                ((~((~(dmk0 &gt;&gt;&gt; 7) ^ (dmk2 &lt;&lt;&lt; 2) ^ dx1) &amp; (~(dmk0 &gt;&gt;&gt; 7) ^ dx5))[14:]) == 0b000000000000000)</span>
+<span class="sd">            dmk2 == dmk2_out</span>
+<span class="sd">            ((dmk2 &lt;&lt;&lt; 2) ^ dx1) == dx3_out</span>
+<span class="sd">            ((((dmk2 &lt;&lt;&lt; 2) ^ dx1) &lt;&lt;&lt; 2) ^ dx5) == dx8_out</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">pr_one_assertions</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ChModel.weight_assertions"><a class="viewcode-back" href="../../../cascada.differential.chmodel.html#cascada.differential.chmodel.ChModel.weight_assertions">[docs]</a>    <span class="k">def</span> <span class="nf">weight_assertions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ch_weight_variable</span><span class="p">,</span> <span class="n">assign_weight_variables</span><span class="p">,</span> <span class="n">truncate</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the weight constraint as a list of assertions.</span>
+
+<span class="sd">        See also `abstractproperty.chmodel.ChModel.weight_assertions`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.difference import XorDiff, RXDiff</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.chmodel import ChModel</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64).key_schedule</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS.set_num_rounds(2)</span>
+<span class="sd">            &gt;&gt;&gt; cm = ChModel(Speck32_KS, XorDiff, [&quot;dmk0&quot;, &quot;dmk1&quot;, &quot;dmk2&quot;])</span>
+<span class="sd">            &gt;&gt;&gt; cwv = Variable(&quot;w&quot;, cm.weight_width())</span>
+<span class="sd">            &gt;&gt;&gt; omvs = [Variable(f&quot;w{i}&quot;, om.weight_width()) for i, om in enumerate(cm.assign_outdiff2op_model.values())]</span>
+<span class="sd">            &gt;&gt;&gt; for a in cm.weight_assertions(cwv, omvs): print(a)  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">            w0 == PopCount(~((~(dmk1 &gt;&gt;&gt; 7) ^ dmk2) &amp; (~(dmk1 &gt;&gt;&gt; 7) ^ dx1))[14:])</span>
+<span class="sd">            w1 == PopCount(~((~(dmk0 &gt;&gt;&gt; 7) ^ (dmk2 &lt;&lt;&lt; 2) ^ dx1) &amp; (~(dmk0 &gt;&gt;&gt; 7) ^ dx5))[14:])</span>
+<span class="sd">            w2 == 0b0</span>
+<span class="sd">            w3 == 0b0</span>
+<span class="sd">            w4 == 0b0</span>
+<span class="sd">            w == ((0b0 :: w0) + (0b0 :: w1))</span>
+<span class="sd">            &gt;&gt;&gt; cm = ChModel(Speck32_KS, RXDiff, [&quot;dmk0&quot;, &quot;dmk1&quot;, &quot;dmk2&quot;])  # RXDiff for the fb</span>
+<span class="sd">            &gt;&gt;&gt; cwv = Variable(&quot;w&quot;, cm.weight_width())</span>
+<span class="sd">            &gt;&gt;&gt; omvs = [Variable(f&quot;w{i}&quot;, om.weight_width()) for i, om in enumerate(cm.assign_outdiff2op_model.values())]</span>
+<span class="sd">            &gt;&gt;&gt; for a in cm.weight_assertions(cwv, omvs): print(a)  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">            w0 == (((0x0 :: PopCount(((((dmk1 &gt;&gt;&gt; 7)[:1]) ^ (dx1[:1])) | ((dmk2[:1]) ^ (dx1[:1])))[13:])) &lt;&lt; 0x03) +</span>
+<span class="sd">                (Ite(~((dmk1[8]) ^ (dmk2[1]) ^ (dx1[1])), 0x0b, 0x18)))</span>
+<span class="sd">            w1 == (((0x0 :: PopCount(((((dmk0 &gt;&gt;&gt; 7)[:1]) ^ (dx5[:1])) | ((((dmk2 &lt;&lt;&lt; 2) ^ dx1)[:1]) ^</span>
+<span class="sd">                (dx5[:1])))[13:])) &lt;&lt; 0x03) + (Ite(~((dmk0[8]) ^ (((dmk2 &lt;&lt;&lt; 2) ^ dx1)[1]) ^ (dx5[1])), 0x0b, 0x18)))</span>
+<span class="sd">            w2 == 0b0</span>
+<span class="sd">            w3 == 0b0</span>
+<span class="sd">            w4 == 0b0</span>
+<span class="sd">            w == (((0b0 :: w0) + (0b0 :: w1))[:3])</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">weight_assertions</span><span class="p">(</span><span class="n">ch_weight_variable</span><span class="p">,</span> <span class="n">assign_weight_variables</span><span class="p">,</span> <span class="n">truncate</span><span class="o">=</span><span class="n">truncate</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ChModel.max_weight"><a class="viewcode-back" href="../../../cascada.differential.chmodel.html#cascada.differential.chmodel.ChModel.max_weight">[docs]</a>    <span class="k">def</span> <span class="nf">max_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">truncate</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the maximum value the ch. weight variable can achieve in `weight_assertions`.</span>
+
+<span class="sd">        See also `abstractproperty.chmodel.ChModel.max_weight`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.difference import XorDiff, RXDiff</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.chmodel import ChModel</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64).key_schedule</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS.set_num_rounds(2)</span>
+<span class="sd">            &gt;&gt;&gt; xor_cm = ChModel(Speck32_KS, XorDiff, [&quot;dmk0&quot;, &quot;dmk1&quot;, &quot;dmk2&quot;])</span>
+<span class="sd">            &gt;&gt;&gt; xor_cm.max_weight(), xor_cm.weight_width(), xor_cm.num_frac_bits()</span>
+<span class="sd">            (30, 5, 0)</span>
+<span class="sd">            &gt;&gt;&gt; rx_cm = ChModel(Speck32_KS, RXDiff, [&quot;dmk0&quot;, &quot;dmk1&quot;, &quot;dmk2&quot;])</span>
+<span class="sd">            &gt;&gt;&gt; rx_cm.num_frac_bits()</span>
+<span class="sd">            3</span>
+<span class="sd">            &gt;&gt;&gt; rx_cm.max_weight(), rx_cm.weight_width()</span>
+<span class="sd">            (34, 6)</span>
+<span class="sd">            &gt;&gt;&gt; rx_cm.max_weight(truncate=False), rx_cm.weight_width(truncate=False)</span>
+<span class="sd">            (272, 9)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">max_weight</span><span class="p">(</span><span class="n">truncate</span><span class="o">=</span><span class="n">truncate</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ChModel.error"><a class="viewcode-back" href="../../../cascada.differential.chmodel.html#cascada.differential.chmodel.ChModel.error">[docs]</a>    <span class="k">def</span> <span class="nf">error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the maximum difference between `weight_assertions` and the exact weight.</span>
+
+<span class="sd">        See also `abstractproperty.chmodel.ChModel.error`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.difference import XorDiff, RXDiff</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.opmodel import RXModelBvAdd</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.chmodel import ChModel</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64).key_schedule</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS.set_num_rounds(2)</span>
+<span class="sd">            &gt;&gt;&gt; ChModel(Speck32_KS, XorDiff, [&quot;dmk0&quot;, &quot;dmk1&quot;, &quot;dmk2&quot;]).error()</span>
+<span class="sd">            0</span>
+<span class="sd">            &gt;&gt;&gt; ChModel(Speck32_KS, RXDiff, [&quot;dmk0&quot;, &quot;dmk1&quot;, &quot;dmk2&quot;]).error()</span>
+<span class="sd">            Decimal(&#39;2.102441455630541244332995062&#39;)</span>
+<span class="sd">            &gt;&gt;&gt; opt = {RXModelBvAdd: {&quot;precision&quot;: 0}}</span>
+<span class="sd">            &gt;&gt;&gt; ChModel(Speck32_KS, RXDiff, [&quot;dmk0&quot;, &quot;dmk1&quot;, &quot;dmk2&quot;], op_model_class2options=opt).error()</span>
+<span class="sd">            Decimal(&#39;2.852441455630541244332995062&#39;)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ChModel.signature"><a class="viewcode-back" href="../../../cascada.differential.chmodel.html#cascada.differential.chmodel.ChModel.signature">[docs]</a>    <span class="k">def</span> <span class="nf">signature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sig_type</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the signature of the characteristic model.</span>
+
+<span class="sd">        See also `abstractproperty.chmodel.ChModel.signature`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.difference import XorDiff</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.chmodel import ChModel, ChModelSigType</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64).key_schedule</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS.set_num_rounds(2)</span>
+<span class="sd">            &gt;&gt;&gt; ch_model = ChModel(Speck32_KS, XorDiff, [&quot;dmk0&quot;, &quot;dmk1&quot;, &quot;dmk2&quot;])</span>
+<span class="sd">            &gt;&gt;&gt; ch_model.signature(ChModelSigType.Unique)</span>
+<span class="sd">            [dmk0, dmk1, dmk2, dx1, dx5]</span>
+<span class="sd">            &gt;&gt;&gt; ch_model.signature(ChModelSigType.InputOutput)</span>
+<span class="sd">            [dmk0, dmk1, dmk2, dmk2_out, dx3_out, dx8_out]</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">sig_type</span> <span class="o">==</span> <span class="n">ChModelSigType</span><span class="o">.</span><span class="n">Unique</span><span class="p">:</span>
+            <span class="c1"># only the input, external and output differences of non-trivial assignments</span>
+            <span class="c1"># are needed to fully propagate the characteristic</span>
+            <span class="n">sig_var</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">val</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_prop</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">val</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ssa</span><span class="o">.</span><span class="n">_input_vars_not_used</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">ext_var</span><span class="p">,</span> <span class="n">prop</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">external_var2prop</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prop</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">):</span>
+                    <span class="n">sig_var</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ext_var</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">outprop</span><span class="p">,</span> <span class="n">op_model</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">assign_outprop2op_model</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">op_model</span><span class="o">.</span><span class="n">max_weight</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">sig_var</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">outprop</span><span class="o">.</span><span class="n">val</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">sig_var</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">sig_type</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ChModel.split"><a class="viewcode-back" href="../../../cascada.differential.chmodel.html#cascada.differential.chmodel.ChModel.split">[docs]</a>    <span class="k">def</span> <span class="nf">split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">diff_separators</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Split into multiple `ChModel` objects given the list of difference separators.</span>
+
+<span class="sd">        See also `abstractproperty.chmodel.ChModel.split`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.difference import XorDiff</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.chmodel import ChModel, ChModelSigType</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64).key_schedule</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS.set_num_rounds(2)</span>
+<span class="sd">            &gt;&gt;&gt; ch_model = ChModel(Speck32_KS, XorDiff, [&quot;dmk0&quot;, &quot;dmk1&quot;, &quot;dmk2&quot;])</span>
+<span class="sd">            &gt;&gt;&gt; tuple(ch_model.ssa.assignments.items())  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">            ((dx0, dmk1 &gt;&gt;&gt; 7), (dx1, dx0 + dmk2), (dx2, dmk2 &lt;&lt;&lt; 2), (dx3, dx2 ^ dx1),</span>
+<span class="sd">            (dx4, dmk0 &gt;&gt;&gt; 7), (dx5, dx4 + dx3), (dx6, dx5 ^ 0x0001), (dx7, dx3 &lt;&lt;&lt; 2), (dx8, dx7 ^ dx6),</span>
+<span class="sd">            (dmk2_out, Id(dmk2)), (dx3_out, Id(dx3)), (dx8_out, Id(dx8)))</span>
+<span class="sd">            &gt;&gt;&gt; diff_separators = [ (XorDiff(Variable(&quot;dx2&quot;, width=16)), XorDiff(Variable(&quot;dx3&quot;, width=16))), ]</span>
+<span class="sd">            &gt;&gt;&gt; for cm in ch_model.split(diff_separators): print(cm)  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">            ChModel(func=SpeckKeySchedule_2R_0S,</span>
+<span class="sd">                    input_diff=[XorDiff(dmk0), XorDiff(dmk1), XorDiff(dmk2)],</span>
+<span class="sd">                    output_diff=[XorDiff(dmk0_out), XorDiff(dx3_out), XorDiff(dmk2_out)],</span>
+<span class="sd">                    assign_outdiff2op_model=[(XorDiff(dx1), XorModelBvAdd([XorDiff(dmk1 &gt;&gt;&gt; 7), XorDiff(dmk2)])),</span>
+<span class="sd">                        (XorDiff(dmk0_out), XorModelId(XorDiff(dmk0))),</span>
+<span class="sd">                        (XorDiff(dx3_out), XorModelId(XorDiff((dmk2 &lt;&lt;&lt; 2) ^ dx1))),</span>
+<span class="sd">                        (XorDiff(dmk2_out), XorModelId(XorDiff(dmk2)))])</span>
+<span class="sd">            ChModel(func=SpeckKeySchedule_2R_1S,</span>
+<span class="sd">                    input_diff=[XorDiff(dmk0), XorDiff(dx3), XorDiff(dmk2)],</span>
+<span class="sd">                    output_diff=[XorDiff(dmk2_out), XorDiff(dx3_out), XorDiff(dx8_out)],</span>
+<span class="sd">                    assign_outdiff2op_model=[(XorDiff(dx5), XorModelBvAdd([XorDiff(dmk0 &gt;&gt;&gt; 7), XorDiff(dx3)])),</span>
+<span class="sd">                        (XorDiff(dmk2_out), XorModelId(XorDiff(dmk2))),</span>
+<span class="sd">                        (XorDiff(dx3_out), XorModelId(XorDiff(dx3))),</span>
+<span class="sd">                        (XorDiff(dx8_out), XorModelId(XorDiff((dx3 &lt;&lt;&lt; 2) ^ dx5)))])</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># avoid diff_separators=diff_separators (parent might be abstract)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">diff_separators</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ChModel.get_round_separators"><a class="viewcode-back" href="../../../cascada.differential.chmodel.html#cascada.differential.chmodel.ChModel.get_round_separators">[docs]</a>    <span class="k">def</span> <span class="nf">get_round_separators</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the round separators if `func` is a `RoundBasedFunction`.</span>
+
+<span class="sd">        See also `abstractproperty.chmodel.ChModel.get_round_separators`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.difference import XorDiff</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.chmodel import ChModel</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64).key_schedule</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS.set_num_rounds(2)</span>
+<span class="sd">            &gt;&gt;&gt; ch_model = ChModel(Speck32_KS, XorDiff, [&quot;dmk0&quot;, &quot;dmk1&quot;, &quot;dmk2&quot;])</span>
+<span class="sd">            &gt;&gt;&gt; sub_cms = ch_model.split(ch_model.get_round_separators())</span>
+<span class="sd">            &gt;&gt;&gt; for cm in sub_cms: print(cm)  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">            ChModel(func=SpeckKeySchedule_2R_0S,</span>
+<span class="sd">                    input_diff=[XorDiff(dmk0), XorDiff(dmk1), XorDiff(dmk2)],</span>
+<span class="sd">                    output_diff=[XorDiff(dmk0_out), XorDiff(dx3_out), XorDiff(dmk2_out)],</span>
+<span class="sd">                    assign_outdiff2op_model=[(XorDiff(dx1), XorModelBvAdd([XorDiff(dmk1 &gt;&gt;&gt; 7), XorDiff(dmk2)])),</span>
+<span class="sd">                        (XorDiff(dmk0_out), XorModelId(XorDiff(dmk0))),</span>
+<span class="sd">                        (XorDiff(dx3_out), XorModelId(XorDiff((dmk2 &lt;&lt;&lt; 2) ^ dx1))),</span>
+<span class="sd">                        (XorDiff(dmk2_out), XorModelId(XorDiff(dmk2)))])</span>
+<span class="sd">            ChModel(func=SpeckKeySchedule_2R_1S,</span>
+<span class="sd">                    input_diff=[XorDiff(dmk0), XorDiff(dx3), XorDiff(dmk2)],</span>
+<span class="sd">                    output_diff=[XorDiff(dmk2_out), XorDiff(dx3_out), XorDiff(dx8_out)],</span>
+<span class="sd">                    assign_outdiff2op_model=[(XorDiff(dx5), XorModelBvAdd([XorDiff(dmk0 &gt;&gt;&gt; 7), XorDiff(dx3)])),</span>
+<span class="sd">                        (XorDiff(dmk2_out), XorModelId(XorDiff(dmk2))),</span>
+<span class="sd">                        (XorDiff(dx3_out), XorModelId(XorDiff(dx3))),</span>
+<span class="sd">                        (XorDiff(dx8_out), XorModelId(XorDiff((dx3 &lt;&lt;&lt; 2) ^ dx5)))])</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_round_separators</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="EncryptionChModel"><a class="viewcode-back" href="../../../cascada.differential.chmodel.html#cascada.differential.chmodel.EncryptionChModel">[docs]</a><span class="k">class</span> <span class="nc">EncryptionChModel</span><span class="p">(</span><span class="n">abstractproperty</span><span class="o">.</span><span class="n">chmodel</span><span class="o">.</span><span class="n">EncryptionChModel</span><span class="p">,</span> <span class="n">ChModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent differential characteristic models of encryption functions.</span>
+
+<span class="sd">    Given a `Cipher`, an `EncryptionChModel` is a bit-vector model</span>
+<span class="sd">    (see `ChModel`) of a differential characteristic over</span>
+<span class="sd">    the `Cipher.encryption` in the single-key setting</span>
+<span class="sd">    (where the `Cipher.key_schedule` is ignored and round key differences are</span>
+<span class="sd">    set to zero).</span>
+
+<span class="sd">    .. note::</span>
+
+<span class="sd">        `EncryptionChModel` only supports `XorDiff` for ``diff_type``</span>
+<span class="sd">        (and not `RXDiff`).</span>
+
+<span class="sd">    See also `differential.characteristic.EncryptionCharacteristic`.</span>
+
+<span class="sd">    In an `EncryptionChModel`, the plaintext differences start with the prefix ``&quot;dp&quot;``,</span>
+<span class="sd">    the intermediate and output differences start with the prefix ``&quot;dx&quot;``,</span>
+<span class="sd">    and the round key differences (the differences of the external variables</span>
+<span class="sd">    of the encryption `SSA`) start with the prefix ``&quot;dk&quot;``.</span>
+
+<span class="sd">    ::</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.differential.difference import XorDiff</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.differential.chmodel import EncryptionChModel</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">        &gt;&gt;&gt; Speck32 = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64)</span>
+<span class="sd">        &gt;&gt;&gt; Speck32.set_num_rounds(2)</span>
+<span class="sd">        &gt;&gt;&gt; ch_model = EncryptionChModel(Speck32, XorDiff)</span>
+<span class="sd">        &gt;&gt;&gt; ch_model  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        EncryptionChModel(cipher=SpeckCipher_2R, input_diff=[XorDiff(dp0), XorDiff(dp1)],</span>
+<span class="sd">            output_diff=[XorDiff(dx7_out), XorDiff(dx9_out)],</span>
+<span class="sd">            external_var2diff=[(dk0, XorDiff(0x0000)), (dk1, XorDiff(0x0000))],</span>
+<span class="sd">            assign_outdiff2op_model=[(XorDiff(dx1), XorModelBvAdd([XorDiff(dp0 &gt;&gt;&gt; 7), XorDiff(dp1)])),</span>
+<span class="sd">                (XorDiff(dx6), XorModelBvAdd([XorDiff(dx1 &gt;&gt;&gt; 7), XorDiff((dp1 &lt;&lt;&lt; 2) ^ dx1)])),</span>
+<span class="sd">                (XorDiff(dx7_out), XorModelId(XorDiff(dx6))),</span>
+<span class="sd">                (XorDiff(dx9_out), XorModelId(XorDiff((((dp1 &lt;&lt;&lt; 2) ^ dx1) &lt;&lt;&lt; 2) ^ dx6)))])</span>
+<span class="sd">        &gt;&gt;&gt; ch_model.ssa  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        SSA(input_vars=[dp0, dp1], output_vars=[dx7_out, dx9_out], external_vars=[dk0, dk1],</span>
+<span class="sd">            assignments=[(dx0, dp0 &gt;&gt;&gt; 7), (dx1, dx0 + dp1), (dx2, dx1 ^ dk0), (dx3, dp1 &lt;&lt;&lt; 2),</span>
+<span class="sd">                (dx4, dx3 ^ dx2), (dx5, dx2 &gt;&gt;&gt; 7), (dx6, dx5 + dx4), (dx7, dx6 ^ dk1),</span>
+<span class="sd">                (dx8, dx4 &lt;&lt;&lt; 2), (dx9, dx8 ^ dx7), (dx7_out, Id(dx7)), (dx9_out, Id(dx9))])</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_prefix</span> <span class="o">=</span> <span class="s2">&quot;d&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cipher</span><span class="p">,</span> <span class="n">diff_type</span><span class="p">,</span> <span class="n">op_model_class2options</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">cipher</span><span class="p">,</span> <span class="n">prop_type</span><span class="o">=</span><span class="n">diff_type</span><span class="p">,</span> <span class="n">op_model_class2options</span><span class="o">=</span><span class="n">op_model_class2options</span>
+        <span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_get_EncryptionCharacteristic_cls</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">cascada.differential.characteristic</span> <span class="kn">import</span> <span class="n">EncryptionCharacteristic</span> <span class="k">as</span> <span class="n">EncryptionCharacteristic_cls</span>
+        <span class="k">return</span> <span class="n">EncryptionCharacteristic_cls</span>
+
+<div class="viewcode-block" id="EncryptionChModel.vrepr"><a class="viewcode-back" href="../../../cascada.differential.chmodel.html#cascada.differential.chmodel.EncryptionChModel.vrepr">[docs]</a>    <span class="k">def</span> <span class="nf">vrepr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return an executable string representation.</span>
+
+<span class="sd">        See also `abstractproperty.chmodel.EncryptionChModel.vrepr`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.difference import XorDiff</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.chmodel import EncryptionChModel</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">            &gt;&gt;&gt; Speck32 = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64)</span>
+<span class="sd">            &gt;&gt;&gt; Speck32.set_num_rounds(2)</span>
+<span class="sd">            &gt;&gt;&gt; EncryptionChModel(Speck32, XorDiff).vrepr()</span>
+<span class="sd">            &#39;EncryptionChModel(cipher=SpeckCipher.set_num_rounds_and_return(2), diff_type=XorDiff)&#39;</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">vrepr</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="CipherChModel"><a class="viewcode-back" href="../../../cascada.differential.chmodel.html#cascada.differential.chmodel.CipherChModel">[docs]</a><span class="k">class</span> <span class="nc">CipherChModel</span><span class="p">(</span><span class="n">abstractproperty</span><span class="o">.</span><span class="n">chmodel</span><span class="o">.</span><span class="n">CipherChModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent related-key differential characteristic models of ciphers.</span>
+
+<span class="sd">    Given a `Cipher`, a `CipherChModel` is a bit-vector model</span>
+<span class="sd">    of a related-key differential characteristic</span>
+<span class="sd">    (see `differential.characteristic.CipherCharacteristic`) over the cipher.</span>
+
+<span class="sd">    A `CipherChModel` consists of a pair of `ChModel` where one models</span>
+<span class="sd">    the characteristic over the `Cipher.key_schedule`, and the other one</span>
+<span class="sd">    models the characteristic over the `Cipher.encryption`.</span>
+
+<span class="sd">    In a `CipherChModel`, the master key differences start with the prefix ``&quot;dmk&quot;``,</span>
+<span class="sd">    the intermediate and output differences of the key schedule start with the prefix ``&quot;dk&quot;``,</span>
+<span class="sd">    the plaintext differences start with the prefix ``&quot;dp&quot;`` and intermediate and</span>
+<span class="sd">    output differences of the encryption with the prefix ``&quot;dx&quot;``.</span>
+
+<span class="sd">    The round key differences in the encryption characteristic</span>
+<span class="sd">    (the differences of the external variables of the encryption `SSA`)</span>
+<span class="sd">    are set to the output differences of the key-schedule characteristic.</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.differential.difference import XorDiff, RXDiff</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.differential.chmodel import CipherChModel</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">        &gt;&gt;&gt; Speck32 = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64)</span>
+<span class="sd">        &gt;&gt;&gt; Speck32.set_num_rounds(2)</span>
+<span class="sd">        &gt;&gt;&gt; xor_ch_model = CipherChModel(Speck32, XorDiff)</span>
+<span class="sd">        &gt;&gt;&gt; xor_ch_model  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        CipherChModel(ks_ch_model=ChModel(func=SpeckKeySchedule_1R,</span>
+<span class="sd">            input_diff=[XorDiff(dmk0), XorDiff(dmk1)],</span>
+<span class="sd">            output_diff=[XorDiff(dmk1_out), XorDiff(dk3_out)],</span>
+<span class="sd">            assign_outdiff2op_model=[(XorDiff(dk1), XorModelBvAdd([XorDiff(dmk0 &gt;&gt;&gt; 7), XorDiff(dmk1)])),</span>
+<span class="sd">                (XorDiff(dmk1_out), XorModelId(XorDiff(dmk1))),</span>
+<span class="sd">                (XorDiff(dk3_out), XorModelId(XorDiff((dmk1 &lt;&lt;&lt; 2) ^ dk1)))]),</span>
+<span class="sd">        enc_ch_model=ChModel(func=SpeckEncryption_2R,</span>
+<span class="sd">            input_diff=[XorDiff(dp0), XorDiff(dp1)],</span>
+<span class="sd">            output_diff=[XorDiff(dx7_out), XorDiff(dx9_out)],</span>
+<span class="sd">            external_var2diff=[(dmk1_out, XorDiff(dmk1_out)), (dk3_out, XorDiff(dk3_out))],</span>
+<span class="sd">            assign_outdiff2op_model=[(XorDiff(dx1), XorModelBvAdd([XorDiff(dp0 &gt;&gt;&gt; 7), XorDiff(dp1)])),</span>
+<span class="sd">                (XorDiff(dx6), XorModelBvAdd([XorDiff((dx1 ^ dmk1_out) &gt;&gt;&gt; 7), XorDiff((dp1 &lt;&lt;&lt; 2) ^ dx1 ^ dmk1_out)])),</span>
+<span class="sd">                (XorDiff(dx7_out), XorModelId(XorDiff(dx6 ^ dk3_out))),</span>
+<span class="sd">                (XorDiff(dx9_out), XorModelId(XorDiff((((dp1 &lt;&lt;&lt; 2) ^ dx1 ^ dmk1_out) &lt;&lt;&lt; 2) ^ dx6 ^ dk3_out)))]))</span>
+<span class="sd">        &gt;&gt;&gt; xor_ch_model.ks_ch_model.ssa  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        SSA(input_vars=[dmk0, dmk1], output_vars=[dmk1_out, dk3_out],</span>
+<span class="sd">            assignments=[(dk0, dmk0 &gt;&gt;&gt; 7), (dk1, dk0 + dmk1), (dk2, dmk1 &lt;&lt;&lt; 2),</span>
+<span class="sd">                (dk3, dk2 ^ dk1), (dmk1_out, Id(dmk1)), (dk3_out, Id(dk3))])</span>
+<span class="sd">        &gt;&gt;&gt; xor_ch_model.enc_ch_model.ssa  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        SSA(input_vars=[dp0, dp1], output_vars=[dx7_out, dx9_out], external_vars=[dmk1_out, dk3_out],</span>
+<span class="sd">            assignments=[(dx0, dp0 &gt;&gt;&gt; 7), (dx1, dx0 + dp1), (dx2, dx1 ^ dmk1_out), (dx3, dp1 &lt;&lt;&lt; 2),</span>
+<span class="sd">                (dx4, dx3 ^ dx2), (dx5, dx2 &gt;&gt;&gt; 7), (dx6, dx5 + dx4), (dx7, dx6 ^ dk3_out), (dx8, dx4 &lt;&lt;&lt; 2),</span>
+<span class="sd">                (dx9, dx8 ^ dx7), (dx7_out, Id(dx7)), (dx9_out, Id(dx9))])</span>
+<span class="sd">        &gt;&gt;&gt; rx_ch_model = CipherChModel(Speck32, RXDiff)</span>
+<span class="sd">        &gt;&gt;&gt; rx_ch_model  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        CipherChModel(ks_ch_model=ChModel(func=SpeckKeySchedule_1R,</span>
+<span class="sd">            input_diff=[RXDiff(dmk0), RXDiff(dmk1)],</span>
+<span class="sd">            output_diff=[RXDiff(dmk1_out), RXDiff(dk3_out)],</span>
+<span class="sd">            assign_outdiff2op_model=[(RXDiff(dk1), RXModelBvAdd([RXDiff(dmk0 &gt;&gt;&gt; 7), RXDiff(dmk1)])),</span>
+<span class="sd">                (RXDiff(dmk1_out), RXModelId(RXDiff(dmk1))),</span>
+<span class="sd">                (RXDiff(dk3_out), RXModelId(RXDiff((dmk1 &lt;&lt;&lt; 2) ^ dk1)))]),</span>
+<span class="sd">            enc_ch_model=ChModel(func=SpeckEncryption_2R,</span>
+<span class="sd">                input_diff=[RXDiff(dp0), RXDiff(dp1)],</span>
+<span class="sd">                output_diff=[RXDiff(dx7_out), RXDiff(dx9_out)],</span>
+<span class="sd">                external_var2diff=[(dmk1_out, RXDiff(dmk1_out)), (dk3_out, RXDiff(dk3_out))],</span>
+<span class="sd">                assign_outdiff2op_model=[(RXDiff(dx1), RXModelBvAdd([RXDiff(dp0 &gt;&gt;&gt; 7), RXDiff(dp1)])),</span>
+<span class="sd">                    (RXDiff(dx6), RXModelBvAdd([RXDiff((dx1 ^ dmk1_out) &gt;&gt;&gt; 7), RXDiff((dp1 &lt;&lt;&lt; 2) ^ dx1 ^ dmk1_out)])),</span>
+<span class="sd">                    (RXDiff(dx7_out), RXModelId(RXDiff(dx6 ^ dk3_out))),</span>
+<span class="sd">                    (RXDiff(dx9_out), RXModelId(RXDiff((((dp1 &lt;&lt;&lt; 2) ^ dx1 ^ dmk1_out) &lt;&lt;&lt; 2) ^ dx6 ^ dk3_out)))]))</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_ChModel_cls</span> <span class="o">=</span> <span class="n">ChModel</span>
+    <span class="n">_prefix</span> <span class="o">=</span> <span class="s2">&quot;d&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cipher</span><span class="p">,</span> <span class="n">diff_type</span><span class="p">,</span> <span class="n">op_model_class2options</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">cipher</span><span class="p">,</span> <span class="n">prop_type</span><span class="o">=</span><span class="n">diff_type</span><span class="p">,</span> <span class="n">op_model_class2options</span><span class="o">=</span><span class="n">op_model_class2options</span>
+        <span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_get_CipherCharacteristic_cls</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">cascada.differential.characteristic</span> <span class="kn">import</span> <span class="n">CipherCharacteristic</span> <span class="k">as</span> <span class="n">CipherCharacteristic_cls</span>
+        <span class="k">return</span> <span class="n">CipherCharacteristic_cls</span>
+
+<div class="viewcode-block" id="CipherChModel.vrepr"><a class="viewcode-back" href="../../../cascada.differential.chmodel.html#cascada.differential.chmodel.CipherChModel.vrepr">[docs]</a>    <span class="k">def</span> <span class="nf">vrepr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return an executable string representation.</span>
+
+<span class="sd">        See also `abstractproperty.chmodel.CipherChModel.vrepr`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.difference import XorDiff</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.chmodel import CipherChModel</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">            &gt;&gt;&gt; Speck32 = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64)</span>
+<span class="sd">            &gt;&gt;&gt; Speck32.set_num_rounds(2)</span>
+<span class="sd">            &gt;&gt;&gt; CipherChModel(Speck32, XorDiff).vrepr()</span>
+<span class="sd">            &#39;CipherChModel(cipher=SpeckCipher.set_num_rounds_and_return(2), diff_type=XorDiff)&#39;</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">vrepr</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CipherChModel.signature"><a class="viewcode-back" href="../../../cascada.differential.chmodel.html#cascada.differential.chmodel.CipherChModel.signature">[docs]</a>    <span class="k">def</span> <span class="nf">signature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ch_signature_type</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the signature of the characteristic model over the cipher.</span>
+
+<span class="sd">        See also `abstractproperty.chmodel.CipherChModel.signature`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.difference import XorDiff</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.chmodel import CipherChModel, ChModelSigType</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">            &gt;&gt;&gt; Speck32 = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64)</span>
+<span class="sd">            &gt;&gt;&gt; Speck32.set_num_rounds(2)</span>
+<span class="sd">            &gt;&gt;&gt; rkch_model = CipherChModel(Speck32, XorDiff)</span>
+<span class="sd">            &gt;&gt;&gt; rkch_model.signature(ChModelSigType.Unique)</span>
+<span class="sd">            [dmk0, dmk1, dk1, dp0, dp1, dmk1_out, dk3_out, dx1, dx6]</span>
+<span class="sd">            &gt;&gt;&gt; rkch_model.signature(ChModelSigType.InputOutput)  # doctest:+NORMALIZE_WHITESPACE</span>
+<span class="sd">            [dmk0, dmk1, dmk1_out, dk3_out, dp0, dp1, dx7_out, dx9_out]</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">ch_signature_type</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Adrián Ranea.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,6 @@
+cascada.primitives.tea module
+=============================
+
+.. automodule:: cascada.primitives.tea
+   :members:
+   :show-inheritance:

@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cascada.smt.wrappedchmodel &mdash; CASCADA 1.0.rc0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> CASCADA
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">CASCADA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../primitives_implemented.html">Primitives implemented</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cascada.html">API reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">CASCADA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>cascada.smt.wrappedchmodel</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cascada.smt.wrappedchmodel</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Wrap bit-vector functions for characteristics with one non-trivial transition.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">hashlib</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="kn">from</span> <span class="nn">cascada</span> <span class="kn">import</span> <span class="n">abstractproperty</span>
+<span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">core</span>
+<span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">operation</span>
+<span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">context</span>
+<span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">ssa</span> <span class="k">as</span> <span class="n">cascada_ssa</span>
+<span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">blockcipher</span>
+<span class="kn">from</span> <span class="nn">cascada.smt</span> <span class="kn">import</span> <span class="n">chsearch</span>
+
+
+<span class="nb">zip</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="nb">zip</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ChFuncAsOp"><a class="viewcode-back" href="../../../cascada.smt.wrappedchmodel.html#cascada.smt.wrappedchmodel.ChFuncAsOp">[docs]</a><span class="k">class</span> <span class="nc">ChFuncAsOp</span><span class="p">(</span><span class="n">operation</span><span class="o">.</span><span class="n">SecondaryOperation</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent bit-vector operations wrapping functions of characteristic models.</span>
+
+<span class="sd">    Given a characteristic model</span>
+<span class="sd">    (i.e., `abstractproperty.chmodel.ChModel`),</span>
+<span class="sd">    a `ChFuncAsOp` operation is a `SecondaryOperation` that wraps</span>
+<span class="sd">    the underlying bit-vector function of the characteristic model.</span>
+
+<span class="sd">    The operands of the wrapping operation are the</span>
+<span class="sd">    input operands of the bit-vector function and its external variables.</span>
+<span class="sd">    The ``eval`` method of wrapping operation calls the ``eval`` method</span>
+<span class="sd">    of the bit-vector function and concatenates (with `PropConcat`)</span>
+<span class="sd">    the outputs of the bit-vector function into a single bit-vector.</span>
+<span class="sd">    This single bit-vector is the output of the wrapping operation.</span>
+
+<span class="sd">    This class is not meant to be instantiated but to provide a base</span>
+<span class="sd">    class to define secondary operators wrapping bit-vector functions</span>
+<span class="sd">    generated through `make_chfunc_as_op`.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        ch_model: the characteristic model of the bit-vector function.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">arity</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">is_symmetric</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">is_simple</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="n">ch_model</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># needed for vrepr</span>
+
+<div class="viewcode-block" id="ChFuncAsOp.vrepr"><a class="viewcode-back" href="../../../cascada.smt.wrappedchmodel.html#cascada.smt.wrappedchmodel.ChFuncAsOp.vrepr">[docs]</a>    <span class="k">def</span> <span class="nf">vrepr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">ch_model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">ch_model</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">make_chfunc_as_op</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="n">ch_model</span><span class="o">.</span><span class="n">vrepr</span><span class="p">()</span><span class="si">}</span><span class="s2">)&quot;</span></div>
+
+<div class="viewcode-block" id="ChFuncAsOp.condition"><a class="viewcode-back" href="../../../cascada.smt.wrappedchmodel.html#cascada.smt.wrappedchmodel.ChFuncAsOp.condition">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">condition</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="n">ext_widths</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">width</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">external_var2prop</span><span class="p">]</span>
+        <span class="n">widths</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">input_widths</span> <span class="o">+</span> <span class="n">ext_widths</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">widths</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">width</span> <span class="o">==</span> <span class="n">w</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">widths</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="ChFuncAsOp.output_width"><a class="viewcode-back" href="../../../cascada.smt.wrappedchmodel.html#cascada.smt.wrappedchmodel.ChFuncAsOp.output_width">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">output_width</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">output_widths</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ChFuncAsOp.eval"><a class="viewcode-back" href="../../../cascada.smt.wrappedchmodel.html#cascada.smt.wrappedchmodel.ChFuncAsOp.eval">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="c1"># avoid __new__ to avoid round outputs</span>
+        <span class="c1"># ssa instead of _func due to the external variables</span>
+        <span class="n">func_ssa</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">ssa</span>
+        <span class="n">ne</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">func_ssa</span><span class="o">.</span><span class="n">external_vars</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ne</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># ·[:-0] returns []</span>
+            <span class="n">input_args</span><span class="p">,</span> <span class="n">ext_args</span> <span class="o">=</span> <span class="n">args</span><span class="p">,</span> <span class="p">[]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">input_args</span><span class="p">,</span> <span class="n">ext_args</span> <span class="o">=</span> <span class="n">args</span><span class="p">[:</span><span class="o">-</span><span class="n">ne</span><span class="p">],</span> <span class="n">args</span><span class="p">[</span><span class="o">-</span><span class="n">ne</span><span class="p">:]</span>
+        <span class="n">external_var2val</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span> <span class="n">ext_args</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">func_ssa</span><span class="o">.</span><span class="n">external_vars</span><span class="p">)}</span>
+        <span class="n">out_func</span> <span class="o">=</span> <span class="n">func_ssa</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">input_args</span><span class="p">,</span> <span class="n">external_var2val</span><span class="o">=</span><span class="n">external_var2val</span><span class="p">,</span> <span class="n">symbolic_inputs</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">abstractproperty</span><span class="o">.</span><span class="n">property</span><span class="o">.</span><span class="n">PropConcat</span><span class="p">,</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">out_func</span><span class="p">))</span></div></div>
+
+
+<div class="viewcode-block" id="make_chfunc_as_op"><a class="viewcode-back" href="../../../cascada.smt.wrappedchmodel.html#cascada.smt.wrappedchmodel.make_chfunc_as_op">[docs]</a><span class="k">def</span> <span class="nf">make_chfunc_as_op</span><span class="p">(</span><span class="n">ch_model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the `ChFuncAsOp` of the given characteristic model.</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.differential.difference import XorDiff</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.differential.chmodel import EncryptionChModel</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.smt.wrappedchmodel import make_chfunc_as_op</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">        &gt;&gt;&gt; Speck32 = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64)</span>
+<span class="sd">        &gt;&gt;&gt; Speck32.set_num_rounds(2)</span>
+<span class="sd">        &gt;&gt;&gt; plaintext = [Variable(&quot;p0&quot;, 16), Variable(&quot;p1&quot;, 16)]</span>
+<span class="sd">        &gt;&gt;&gt; round_keys = [Variable(&quot;k0&quot;, 16), Variable(&quot;k1&quot;, 16)]</span>
+<span class="sd">        &gt;&gt;&gt; Speck32.encryption.round_keys = round_keys</span>
+<span class="sd">        &gt;&gt;&gt; Speck32.encryption(*plaintext, symbolic_inputs=True)  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        ((((((p0 &gt;&gt;&gt; 7) + p1) ^ k0) &gt;&gt;&gt; 7) + ((p1 &lt;&lt;&lt; 2) ^ ((p0 &gt;&gt;&gt; 7) + p1) ^ k0)) ^ k1,</span>
+<span class="sd">        (((p1 &lt;&lt;&lt; 2) ^ ((p0 &gt;&gt;&gt; 7) + p1) ^ k0) &lt;&lt;&lt; 2) ^ (((((p0 &gt;&gt;&gt; 7) + p1) ^ k0) &gt;&gt;&gt; 7) + ((p1 &lt;&lt;&lt; 2) ^ ((p0 &gt;&gt;&gt; 7) + p1) ^ k0)) ^ k1)</span>
+<span class="sd">        &gt;&gt;&gt; SpeckEncAsOp = make_chfunc_as_op(EncryptionChModel(Speck32, XorDiff))</span>
+<span class="sd">        &gt;&gt;&gt; SpeckEncAsOp(*(plaintext + round_keys))</span>
+<span class="sd">        SpeckEncryption_2RAsOp(p0, p1, k0, k1)</span>
+<span class="sd">        &gt;&gt;&gt; SpeckEncAsOp(*(plaintext + round_keys)).doit()  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        Id((p1 &lt;&lt;&lt; 2 ^ (p0 &gt;&gt;&gt; 7 + p1) ^ k0) &lt;&lt;&lt; 2 ^ (((p0 &gt;&gt;&gt; 7 + p1) ^ k0) &gt;&gt;&gt; 7 + (p1 &lt;&lt;&lt; 2 ^ (p0 &gt;&gt;&gt; 7 + p1) ^ k0)) ^ k1) ::</span>
+<span class="sd">        Id((((p0 &gt;&gt;&gt; 7 + p1) ^ k0) &gt;&gt;&gt; 7 + (p1 &lt;&lt;&lt; 2 ^ (p0 &gt;&gt;&gt; 7 + p1) ^ k0)) ^ k1)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ch_model</span><span class="p">,</span> <span class="n">abstractproperty</span><span class="o">.</span><span class="n">chmodel</span><span class="o">.</span><span class="n">ChModel</span><span class="p">)</span>
+
+    <span class="n">input_widths</span> <span class="o">=</span> <span class="n">ch_model</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">input_widths</span>
+    <span class="n">external_widths</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">width</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">ch_model</span><span class="o">.</span><span class="n">external_var2prop</span><span class="p">]</span>
+    <span class="n">_ch_model</span> <span class="o">=</span> <span class="n">ch_model</span>
+
+    <span class="k">class</span> <span class="nc">MyChFuncAsOp</span><span class="p">(</span><span class="n">ChFuncAsOp</span><span class="p">):</span>
+        <span class="n">arity</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">input_widths</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">external_widths</span><span class="p">),</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">ch_model</span> <span class="o">=</span> <span class="n">_ch_model</span>
+
+    <span class="n">MyChFuncAsOp</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ch_model</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span><span class="si">}</span><span class="s2">AsOp&quot;</span>
+
+    <span class="k">return</span> <span class="n">MyChFuncAsOp</span></div>
+
+
+<div class="viewcode-block" id="ModelChFuncAsOp"><a class="viewcode-back" href="../../../cascada.smt.wrappedchmodel.html#cascada.smt.wrappedchmodel.ModelChFuncAsOp">[docs]</a><span class="k">class</span> <span class="nc">ModelChFuncAsOp</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent models of `ChFuncAsOp` operations.</span>
+
+<span class="sd">    The model of a `ChFuncAsOp` operation is the set of bit-vector constraints</span>
+<span class="sd">    that models the propagation probability over the `ChFuncAsOp` operation</span>
+<span class="sd">    (see `abstractproperty.opmodel.OpModel`).</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">        The model of a `ChFuncAsOp` operation models the probability</span>
+<span class="sd">        that the input property :math:`\\alpha`</span>
+<span class="sd">        propagates to the output property :math:`\\beta`</span>
+<span class="sd">        over the `ChFuncAsOp` operation, and ignores the properties</span>
+<span class="sd">        of the intermediate values of the `ChFuncAsOp` operation.</span>
+
+<span class="sd">        For the `Difference`/`LinearMask` property types,</span>
+<span class="sd">        the model of a `ChFuncAsOp` models the probability of the</span>
+<span class="sd">        differential/hull (instead of the probability of the characteristic).</span>
+
+<span class="sd">    The constraints of the model of a `ChFuncAsOp` operation are obtained</span>
+<span class="sd">    from the underlying characteristic model.</span>
+<span class="sd">    Specifically, the methods</span>
+<span class="sd">    `abstractproperty.opmodel.OpModel.validity_constraint`,</span>
+<span class="sd">    `abstractproperty.opmodel.OpModel.pr_one_constraint`</span>
+<span class="sd">    and `abstractproperty.opmodel.OpModel.weight_constraint`</span>
+<span class="sd">    of `ModelChFuncAsOp` used the methods</span>
+<span class="sd">    `abstractproperty.chmodel.ChModel.validity_assertions`,</span>
+<span class="sd">    `abstractproperty.chmodel.ChModel.pr_one_assertions` and</span>
+<span class="sd">    `abstractproperty.chmodel.ChModel.weight_assertions`</span>
+<span class="sd">    of the characteristic model respectively.</span>
+<span class="sd">    Note that the external variables of ``validity_constraint``,</span>
+<span class="sd">    ``pr_one_constraint`` and ``weight_constraint`` include</span>
+<span class="sd">    the intermediate properties in the characteristic model</span>
+<span class="sd">    (the external variables of ``weight_constraint`` also include</span>
+<span class="sd">    the intermediate weight variables).</span>
+
+<span class="sd">    The weight returned by the `abstractproperty.opmodel.OpModel.decimal_weight`</span>
+<span class="sd">    method of `ModelChFuncAsOp` is computed by internally calling</span>
+<span class="sd">    `ChFinder.find_next_ch` using the underlying characteristic model.</span>
+<span class="sd">    In other words, the returned weight is a very weak approximation (with</span>
+<span class="sd">    big `abstractproperty.opmodel.OpModel.error`) of the actual weight,</span>
+<span class="sd">    since the returned weight is the weight of a random characteristic</span>
+<span class="sd">    satisfying the underlying characteristic model.</span>
+
+<span class="sd">    This class is not meant to be instantiated but to provide a base</span>
+<span class="sd">    class for models generated through `make_chfuncasop_model`.</span>
+
+<span class="sd">    .. Implementation details:</span>
+
+<span class="sd">        This class does not subclass `abstractproperty.opmodel.OpModel`,</span>
+<span class="sd">        but subclasses of this class defined for a particular `Property`</span>
+<span class="sd">        must subclass the corresponding ``OpModel``.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ch_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The underlying characteristic model of `ChFuncAsOp`.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">ch_model</span>
+
+    <span class="k">def</span> <span class="nf">_get_full_input_vars_xreplace_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">self_full_input_vars</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">val</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_prop</span><span class="p">]</span>
+        <span class="n">ch_full_input_vars</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">val</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">input_prop</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">external_var2prop</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">self_full_input_vars</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">ch_full_input_vars</span><span class="p">)</span>
+        <span class="n">my_dict</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">ch_var</span><span class="p">,</span> <span class="n">self_var</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">ch_full_input_vars</span><span class="p">,</span> <span class="n">self_full_input_vars</span><span class="p">):</span>
+            <span class="n">my_dict</span><span class="p">[</span><span class="n">ch_var</span><span class="p">]</span> <span class="o">=</span> <span class="n">self_var</span>
+        <span class="k">return</span> <span class="n">my_dict</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_validity_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_stored_validity_constraint&quot;</span><span class="p">)</span> <span class="ow">or</span> \
+                <span class="bp">self</span><span class="o">.</span><span class="n">_stored_validity_constraint</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_prop</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">context</span><span class="o">.</span><span class="n">Simplification</span><span class="p">(</span><span class="kc">False</span><span class="p">),</span> <span class="n">context</span><span class="o">.</span><span class="n">Cache</span><span class="p">(</span><span class="kc">False</span><span class="p">):</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_full_input_vars_xreplace_dict</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_stored_validity_constraint</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">operation</span><span class="o">.</span><span class="n">BvAnd</span><span class="p">,</span> <span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">xreplace</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">validity_assertions</span><span class="p">())),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">input_prop</span>
+                <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stored_validity_constraint</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_pr_one_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_stored_pr_one_constraint&quot;</span><span class="p">)</span> <span class="ow">or</span> \
+                <span class="bp">self</span><span class="o">.</span><span class="n">_stored_pr_one_constraint</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_prop</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">context</span><span class="o">.</span><span class="n">Simplification</span><span class="p">(</span><span class="kc">False</span><span class="p">),</span> <span class="n">context</span><span class="o">.</span><span class="n">Cache</span><span class="p">(</span><span class="kc">False</span><span class="p">):</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_full_input_vars_xreplace_dict</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_stored_pr_one_constraint</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">operation</span><span class="o">.</span><span class="n">BvAnd</span><span class="p">,</span> <span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">xreplace</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">pr_one_assertions</span><span class="p">())),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">input_prop</span>
+                <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stored_pr_one_constraint</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_get_out_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_prop</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="n">output_prop</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">width</span> <span class="o">==</span> <span class="nb">sum</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">width</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">output_prop</span><span class="p">)</span>
+        <span class="n">cm_out_val</span> <span class="o">=</span> <span class="nb">reversed</span><span class="p">([</span><span class="n">p</span><span class="o">.</span><span class="n">val</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">output_prop</span><span class="p">])</span>
+        <span class="n">cm_out_val</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">operation</span><span class="o">.</span><span class="n">Concat</span><span class="p">,</span> <span class="n">cm_out_val</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvComp</span><span class="p">(</span><span class="n">output_prop</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="n">cm_out_val</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">validity_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_prop</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_out_constraint</span><span class="p">(</span><span class="n">output_prop</span><span class="p">)</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validity_constraint</span>
+
+    <span class="k">def</span> <span class="nf">pr_one_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_prop</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_out_constraint</span><span class="p">(</span><span class="n">output_prop</span><span class="p">)</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pr_one_constraint</span>
+
+    <span class="k">def</span> <span class="nf">external_vars_validity_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_prop</span><span class="p">):</span>
+        <span class="n">external_vars</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validity_constraint</span><span class="o">.</span><span class="n">atoms</span><span class="p">(</span><span class="n">core</span><span class="o">.</span><span class="n">Variable</span><span class="p">)</span>
+        <span class="c1"># remove self_full_input_prop</span>
+        <span class="n">external_vars</span><span class="o">.</span><span class="n">difference_update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_full_input_vars_xreplace_dict</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">output_prop</span><span class="p">:</span>
+            <span class="n">external_vars</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">val</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="n">v</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">external_vars</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_full_input_vars_xreplace_dict</span><span class="p">())</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">external_vars</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">external_vars_pr_one_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_prop</span><span class="p">):</span>
+        <span class="n">external_vars</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pr_one_constraint</span><span class="o">.</span><span class="n">atoms</span><span class="p">(</span><span class="n">core</span><span class="o">.</span><span class="n">Variable</span><span class="p">)</span>
+        <span class="n">external_vars</span><span class="o">.</span><span class="n">difference_update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_full_input_vars_xreplace_dict</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">output_prop</span><span class="p">:</span>
+            <span class="n">external_vars</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">val</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="n">v</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">external_vars</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_full_input_vars_xreplace_dict</span><span class="p">())</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">external_vars</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_weight_variable_assign_weight_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">cm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ch_model</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">blake2b</span><span class="p">(</span><span class="n">digest_size</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">vrepr</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">vrepr</span><span class="p">()</span>
+        <span class="n">h</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+        <span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;_w_tmp&quot;</span> <span class="o">+</span> <span class="n">h</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+        <span class="n">weight_variable</span> <span class="o">=</span> <span class="n">core</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">cm</span><span class="o">.</span><span class="n">weight_width</span><span class="p">())</span>
+        <span class="n">assign_weight_variables</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">om</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cm</span><span class="o">.</span><span class="n">assign_outprop2op_model</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+            <span class="n">assign_weight_variables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">core</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">om</span><span class="o">.</span><span class="n">weight_width</span><span class="p">()))</span>
+        <span class="k">return</span> <span class="n">weight_variable</span><span class="p">,</span> <span class="n">assign_weight_variables</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_weight_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_stored_weight_constraint&quot;</span><span class="p">)</span> <span class="ow">or</span> \
+                <span class="bp">self</span><span class="o">.</span><span class="n">_stored_weight_constraint</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_prop</span><span class="p">:</span>
+            <span class="n">wv</span><span class="p">,</span> <span class="n">awvs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_weight_variable_assign_weight_variables</span><span class="p">()</span>
+            <span class="k">with</span> <span class="n">context</span><span class="o">.</span><span class="n">Simplification</span><span class="p">(</span><span class="kc">False</span><span class="p">),</span> <span class="n">context</span><span class="o">.</span><span class="n">Cache</span><span class="p">(</span><span class="kc">False</span><span class="p">):</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_full_input_vars_xreplace_dict</span><span class="p">()</span>
+                <span class="n">wa</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">weight_assertions</span><span class="p">(</span><span class="n">wv</span><span class="p">,</span> <span class="n">awvs</span><span class="p">,</span> <span class="n">truncate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_stored_weight_constraint</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">operation</span><span class="o">.</span><span class="n">BvAnd</span><span class="p">,</span> <span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">xreplace</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">wa</span><span class="p">)),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">input_prop</span><span class="p">,</span>
+                    <span class="n">wv</span><span class="p">,</span>
+                <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stored_weight_constraint</span>
+
+    <span class="k">def</span> <span class="nf">weight_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_prop</span><span class="p">,</span> <span class="n">weight_variable</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_out_constraint</span><span class="p">(</span><span class="n">output_prop</span><span class="p">)</span> <span class="o">&amp;</span> \
+               <span class="n">operation</span><span class="o">.</span><span class="n">BvComp</span><span class="p">(</span><span class="n">weight_variable</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weight_constraint</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">&amp;</span> \
+               <span class="bp">self</span><span class="o">.</span><span class="n">_weight_constraint</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">external_vars_weight_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_prop</span><span class="p">,</span> <span class="n">weight_variable</span><span class="p">):</span>
+        <span class="n">external_vars</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weight_constraint</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">atoms</span><span class="p">(</span><span class="n">core</span><span class="o">.</span><span class="n">Variable</span><span class="p">)</span>  <span class="c1"># includes wa and awvs</span>
+        <span class="n">external_vars</span><span class="o">.</span><span class="n">difference_update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_full_input_vars_xreplace_dict</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">output_prop</span><span class="p">:</span>
+            <span class="n">external_vars</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">val</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="n">v</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">external_vars</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_full_input_vars_xreplace_dict</span><span class="p">())</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">external_vars</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">max_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">max_weight</span><span class="p">(</span><span class="n">truncate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">weight_width</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">weight_width</span><span class="p">(</span><span class="n">truncate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">decimal_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_prop</span><span class="p">,</span> <span class="o">**</span><span class="n">extra_chfinder_args</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_inout_prop2decimal_weight&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_inout_prop2decimal_weight</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_prop</span><span class="p">,</span> <span class="n">output_prop</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inout_prop2decimal_weight</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inout_prop2decimal_weight</span><span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_prop</span><span class="p">,</span> <span class="n">output_prop</span><span class="p">)]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_assert_preconditions_decimal_weight</span><span class="p">(</span><span class="n">output_prop</span><span class="p">)</span>
+
+        <span class="kn">from</span> <span class="nn">pysmt</span> <span class="kn">import</span> <span class="n">environment</span><span class="p">,</span> <span class="n">logics</span>
+
+        <span class="k">if</span> <span class="n">extra_chfinder_args</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">extra_chfinder_args</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="s2">&quot;assert_type&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">extra_chfinder_args</span>
+            <span class="k">assert</span> <span class="s2">&quot;initial_constraints&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">extra_chfinder_args</span>
+        <span class="k">if</span> <span class="s2">&quot;solver_name&quot;</span> <span class="ow">in</span> <span class="n">extra_chfinder_args</span><span class="p">:</span>
+            <span class="n">solver_name</span> <span class="o">=</span> <span class="n">extra_chfinder_args</span><span class="p">[</span><span class="s2">&quot;solver_name&quot;</span><span class="p">]</span>
+            <span class="k">del</span> <span class="n">extra_chfinder_args</span><span class="p">[</span><span class="s2">&quot;solver_name&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">list_solver_name</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">environment</span><span class="o">.</span><span class="n">get_env</span><span class="p">()</span><span class="o">.</span><span class="n">factory</span><span class="o">.</span><span class="n">all_solvers</span><span class="p">(</span><span class="n">logics</span><span class="o">.</span><span class="n">QF_BV</span><span class="p">))</span>
+            <span class="k">if</span> <span class="s2">&quot;btor&quot;</span> <span class="ow">in</span> <span class="n">list_solver_name</span><span class="p">:</span>
+                <span class="n">solver_name</span> <span class="o">=</span> <span class="s2">&quot;btor&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">solver_name</span> <span class="o">=</span> <span class="n">list_solver_name</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># ch_finder needs _get_full_input_vars_xreplace_dict because</span>
+        <span class="c1"># ch_finder uses self.ch_model.validity_assertions and not self._validity_constraint</span>
+        <span class="c1"># (however some vars from _get_full_input_vars_xreplace_dict might not appear</span>
+        <span class="c1"># in validity_assertions like round keys in some cases)</span>
+
+        <span class="n">var_prop2ct_prop</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="n">ext_vars</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">constraint</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">validity_assertions</span><span class="p">():</span>
+            <span class="n">ext_vars</span> <span class="o">|=</span> <span class="n">constraint</span><span class="o">.</span><span class="n">atoms</span><span class="p">(</span><span class="n">core</span><span class="o">.</span><span class="n">Variable</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">ch_var</span><span class="p">,</span> <span class="n">self_var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_full_input_vars_xreplace_dict</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">ch_var</span> <span class="ow">in</span> <span class="n">ext_vars</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">self_var</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Variable</span><span class="p">):</span>
+                    <span class="k">assert</span> <span class="n">self_var</span> <span class="ow">in</span> <span class="n">ext_vars</span>
+                <span class="n">var_prop2ct_prop</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">prop_type</span><span class="p">(</span><span class="n">ch_var</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">prop_type</span><span class="p">(</span><span class="n">self_var</span><span class="p">)</span>
+
+        <span class="c1"># # debugging</span>
+        <span class="c1"># print(&quot;\nch_model:&quot;, self.ch_model)</span>
+        <span class="c1"># print(&quot;ch_model ssa:&quot;, self.ch_model.ssa)</span>
+        <span class="c1"># print(&quot;input_prop:&quot;, self.input_prop)</span>
+        <span class="c1"># print(&quot;output_prop:&quot;, output_prop)</span>
+        <span class="c1"># print(&quot;initial_constraints (_get_out_constraint):&quot;, self._get_out_constraint(output_prop))</span>
+        <span class="c1"># print(&quot;var_prop2ct_prop:&quot;, var_prop2ct_prop)</span>
+        <span class="c1"># print(&quot;-----&quot;)</span>
+        <span class="c1"># print(&quot;validity_constraint:&quot;, self.validity_constraint(output_prop))</span>
+        <span class="c1"># print(&quot;external_vars_validity_constraint:&quot;, self.external_vars_validity_constraint(output_prop))</span>
+        <span class="c1"># print(&quot;-----&quot;)</span>
+        <span class="c1"># print(&quot;ch_model validity_assertions:&quot;, self.ch_model.validity_assertions())</span>
+        <span class="c1"># print(&quot;ch_model external_vars_validity_assertions:&quot;, self.ch_model.external_vars_validity_assertions(), &quot;\n&quot;)</span>
+        <span class="c1"># #</span>
+
+        <span class="n">ch_finder</span> <span class="o">=</span> <span class="n">chsearch</span><span class="o">.</span><span class="n">ChFinder</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ch_model</span><span class="p">,</span>
+            <span class="n">assert_type</span><span class="o">=</span><span class="n">chsearch</span><span class="o">.</span><span class="n">ChModelAssertType</span><span class="o">.</span><span class="n">Validity</span><span class="p">,</span>
+            <span class="n">solver_name</span><span class="o">=</span><span class="n">solver_name</span><span class="p">,</span>
+            <span class="n">initial_constraints</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_out_constraint</span><span class="p">(</span><span class="n">output_prop</span><span class="p">)],</span>
+            <span class="n">var_prop2ct_prop</span><span class="o">=</span><span class="n">var_prop2ct_prop</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">extra_chfinder_args</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">ch_found</span> <span class="ow">in</span> <span class="n">ch_finder</span><span class="o">.</span><span class="n">find_next_ch</span><span class="p">():</span>
+            <span class="c1"># # debugging</span>
+            <span class="c1"># print(&quot;ch_found:&quot;, ch_found)</span>
+            <span class="c1">#</span>
+            <span class="n">dw</span> <span class="o">=</span> <span class="n">ch_found</span><span class="o">.</span><span class="n">ch_weight</span>
+            <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">abstractproperty</span><span class="o">.</span><span class="n">opmodel</span><span class="o">.</span><span class="n">InvalidOpModelError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2">.decimal_weight(</span><span class="si">{</span><span class="n">output_prop</span><span class="si">}</span><span class="s2">) cannot be obtained &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;since </span><span class="si">{</span><span class="n">output_prop</span><span class="si">}</span><span class="s2"> &lt;- </span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2"> is not valid&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_assert_postconditions_decimal_weight</span><span class="p">(</span><span class="n">output_prop</span><span class="p">,</span> <span class="n">dw</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_inout_prop2decimal_weight</span><span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_prop</span><span class="p">,</span> <span class="n">output_prop</span><span class="p">)]</span> <span class="o">=</span> <span class="n">dw</span>
+        <span class="k">return</span> <span class="n">dw</span>
+
+    <span class="k">def</span> <span class="nf">num_frac_bits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_weight</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">error</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="make_chfuncasop_model"><a class="viewcode-back" href="../../../cascada.smt.wrappedchmodel.html#cascada.smt.wrappedchmodel.make_chfuncasop_model">[docs]</a><span class="k">def</span> <span class="nf">make_chfuncasop_model</span><span class="p">(</span><span class="n">my_chfunc_as_op</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the `ModelChFuncAsOp` of the given `ChFuncAsOp`.</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.differential.difference import XorDiff</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.differential.chmodel import EncryptionChModel</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.smt.wrappedchmodel import make_chfunc_as_op, make_chfuncasop_model</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">        &gt;&gt;&gt; Speck32 = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64)</span>
+<span class="sd">        &gt;&gt;&gt; Speck32.set_num_rounds(2)</span>
+<span class="sd">        &gt;&gt;&gt; SpeckEncAsOp = make_chfunc_as_op(EncryptionChModel(Speck32, XorDiff))</span>
+<span class="sd">        &gt;&gt;&gt; ModelSpeckEncAsOp = make_chfuncasop_model(SpeckEncAsOp)</span>
+<span class="sd">        &gt;&gt;&gt; input_diff = [XorDiff(Constant(0, 16))]*4</span>
+<span class="sd">        &gt;&gt;&gt; f = ModelSpeckEncAsOp(input_diff)</span>
+<span class="sd">        &gt;&gt;&gt; print(f.vrepr())  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        XorModelSpeckEncryption_2RAsOp([XorDiff(Constant(0x0000, width=16)), XorDiff(Constant(0x0000, width=16)),</span>
+<span class="sd">            XorDiff(Constant(0x0000, width=16)), XorDiff(Constant(0x0000, width=16))])</span>
+<span class="sd">        &gt;&gt;&gt; f.validity_constraint(XorDiff(Constant(0, 32)))  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        (0x00000000 == (dx9_out :: dx7_out)) &amp;</span>
+<span class="sd">        ((~(dx1 &lt;&lt; 0x0001) &amp; dx1) == 0x0000) &amp;</span>
+<span class="sd">        (((~((dx1 &gt;&gt;&gt; 7) &lt;&lt; 0x0001) ^ (dx1 &lt;&lt; 0x0001)) &amp; (~((dx1 &gt;&gt;&gt; 7) &lt;&lt; 0x0001) ^ (dx6 &lt;&lt; 0x0001)) &amp;</span>
+<span class="sd">            ((dx1 &gt;&gt;&gt; 7) ^ dx1 ^ dx6 ^ ((dx1 &gt;&gt;&gt; 7) &lt;&lt; 0x0001))) == 0x0000) &amp;</span>
+<span class="sd">        (dx6 == dx7_out) &amp; (((dx1 &lt;&lt;&lt; 2) ^ dx6) == dx9_out)</span>
+<span class="sd">        &gt;&gt;&gt; f.external_vars_validity_constraint(XorDiff(Constant(0, 32)))</span>
+<span class="sd">        [dx1, dx6, dx7_out, dx9_out]</span>
+<span class="sd">        &gt;&gt;&gt; w = Variable(&quot;w&quot;, f.weight_width())</span>
+<span class="sd">        &gt;&gt;&gt; f.weight_constraint(XorDiff(Constant(0, 32)), w)  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        (0x00000000 == (dx9_out :: dx7_out)) &amp;</span>
+<span class="sd">        (w == _w_tmp74c4f05762c354cc149091e363577700) &amp;</span>
+<span class="sd">        (_w_tmp74c4f05762c354cc149091e363577700_0 == PopCount(dx1[14:])) &amp;</span>
+<span class="sd">        (_w_tmp74c4f05762c354cc149091e363577700_1 == PopCount(~((~(dx1 &gt;&gt;&gt; 7) ^ dx1) &amp; (~(dx1 &gt;&gt;&gt; 7) ^ dx6))[14:])) &amp;</span>
+<span class="sd">        (_w_tmp74c4f05762c354cc149091e363577700_2 == 0b0) &amp;</span>
+<span class="sd">        (_w_tmp74c4f05762c354cc149091e363577700_3 == 0b0) &amp;</span>
+<span class="sd">        (_w_tmp74c4f05762c354cc149091e363577700 == ((0b0 :: _w_tmp74c4f05762c354cc149091e363577700_0) +</span>
+<span class="sd">            (0b0 :: _w_tmp74c4f05762c354cc149091e363577700_1)))</span>
+<span class="sd">        &gt;&gt;&gt; f.external_vars_weight_constraint(XorDiff(Constant(0, 32)), w)  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        [_w_tmp74c4f05762c354cc149091e363577700, _w_tmp74c4f05762c354cc149091e363577700_0,</span>
+<span class="sd">        _w_tmp74c4f05762c354cc149091e363577700_1, _w_tmp74c4f05762c354cc149091e363577700_2,</span>
+<span class="sd">        _w_tmp74c4f05762c354cc149091e363577700_3, dx1, dx6, dx7_out, dx9_out]</span>
+<span class="sd">        &gt;&gt;&gt; f.max_weight(), f.weight_width(), f.error(), f.num_frac_bits()</span>
+<span class="sd">        (30, 5, 30, 0)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">my_chfunc_as_op</span><span class="p">,</span> <span class="n">ChFuncAsOp</span><span class="p">)</span>
+
+    <span class="kn">from</span> <span class="nn">cascada.differential.difference</span> <span class="kn">import</span> <span class="n">XorDiff</span><span class="p">,</span> <span class="n">RXDiff</span>
+    <span class="kn">from</span> <span class="nn">cascada.linear.mask</span> <span class="kn">import</span> <span class="n">LinearMask</span>
+    <span class="kn">from</span> <span class="nn">cascada.algebraic.value</span> <span class="kn">import</span> <span class="n">WordValue</span><span class="p">,</span> <span class="n">BitValue</span>
+
+    <span class="n">ch_model</span> <span class="o">=</span> <span class="n">my_chfunc_as_op</span><span class="o">.</span><span class="n">ch_model</span>
+
+    <span class="k">if</span> <span class="n">ch_model</span><span class="o">.</span><span class="n">prop_type</span> <span class="ow">in</span> <span class="p">[</span><span class="n">XorDiff</span><span class="p">,</span> <span class="n">RXDiff</span><span class="p">]:</span>
+        <span class="kn">from</span> <span class="nn">cascada.differential.opmodel</span> <span class="kn">import</span> <span class="n">OpModel</span>
+    <span class="k">elif</span> <span class="n">ch_model</span><span class="o">.</span><span class="n">prop_type</span> <span class="o">==</span> <span class="n">LinearMask</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">cascada.linear.opmodel</span> <span class="kn">import</span> <span class="n">OpModel</span>
+    <span class="k">elif</span> <span class="n">ch_model</span><span class="o">.</span><span class="n">prop_type</span> <span class="ow">in</span> <span class="p">[</span><span class="n">WordValue</span><span class="p">,</span> <span class="n">BitValue</span><span class="p">]:</span>
+        <span class="kn">from</span> <span class="nn">cascada.algebraic.opmodel</span> <span class="kn">import</span> <span class="n">OpModel</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;property </span><span class="si">{</span><span class="n">ch_model</span><span class="o">.</span><span class="n">prop_type</span><span class="si">}</span><span class="s2"> not supported&quot;</span><span class="p">)</span>
+
+    <span class="k">class</span> <span class="nc">MyModelChFuncAsOp</span><span class="p">(</span><span class="n">ModelChFuncAsOp</span><span class="p">,</span> <span class="n">OpModel</span><span class="p">):</span>
+        <span class="n">op</span> <span class="o">=</span> <span class="n">my_chfunc_as_op</span>
+
+    <span class="c1"># if ch_model.prop_type in [XorDiff, RXDiff]:</span>
+    <span class="c1">#     setattr(ModelFunc, &quot;diff_type&quot;, ch_model.prop_type)</span>
+
+    <span class="k">if</span> <span class="n">ch_model</span><span class="o">.</span><span class="n">prop_type</span> <span class="o">==</span> <span class="n">XorDiff</span><span class="p">:</span>
+        <span class="n">MyModelChFuncAsOp</span><span class="o">.</span><span class="n">diff_type</span> <span class="o">=</span> <span class="n">XorDiff</span>
+        <span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;Xor&quot;</span>
+    <span class="k">elif</span> <span class="n">ch_model</span><span class="o">.</span><span class="n">prop_type</span> <span class="o">==</span> <span class="n">RXDiff</span><span class="p">:</span>
+        <span class="n">MyModelChFuncAsOp</span><span class="o">.</span><span class="n">diff_type</span> <span class="o">=</span> <span class="n">RXDiff</span>
+        <span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;RX&quot;</span>
+    <span class="k">elif</span> <span class="n">ch_model</span><span class="o">.</span><span class="n">prop_type</span> <span class="o">==</span> <span class="n">LinearMask</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">MyModelChFuncAsOp</span><span class="o">.</span><span class="n">prop_type</span> <span class="o">==</span> <span class="n">LinearMask</span>
+        <span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;Linear&quot;</span>
+    <span class="k">elif</span> <span class="n">ch_model</span><span class="o">.</span><span class="n">prop_type</span> <span class="o">==</span> <span class="n">WordValue</span><span class="p">:</span>
+        <span class="n">MyModelChFuncAsOp</span><span class="o">.</span><span class="n">val_type</span> <span class="o">=</span> <span class="n">WordValue</span>
+        <span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;Word&quot;</span>
+    <span class="k">elif</span> <span class="n">ch_model</span><span class="o">.</span><span class="n">prop_type</span> <span class="o">==</span> <span class="n">BitValue</span><span class="p">:</span>
+        <span class="n">MyModelChFuncAsOp</span><span class="o">.</span><span class="n">val_type</span> <span class="o">=</span> <span class="n">BitValue</span>
+        <span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;Bit&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;property </span><span class="si">{</span><span class="n">ch_model</span><span class="o">.</span><span class="n">prop_type</span><span class="si">}</span><span class="s2"> not supported&quot;</span><span class="p">)</span>
+
+    <span class="n">MyModelChFuncAsOp</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">Model</span><span class="si">{</span><span class="n">my_chfunc_as_op</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">return</span> <span class="n">MyModelChFuncAsOp</span></div>
+
+
+<div class="viewcode-block" id="get_wrapped_chfunc"><a class="viewcode-back" href="../../../cascada.smt.wrappedchmodel.html#cascada.smt.wrappedchmodel.get_wrapped_chfunc">[docs]</a><span class="k">def</span> <span class="nf">get_wrapped_chfunc</span><span class="p">(</span><span class="n">ch_model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Wrap and return the underlying bit-vector function of a characteristic model.</span>
+
+<span class="sd">    Given a characteristic model (i.e., `abstractproperty.chmodel.ChModel`)</span>
+<span class="sd">    of a bit-vector function :math:`f`, returns a functionally-equivalent</span>
+<span class="sd">    (same input-output behaviour) bit-vector function :math:`g` that contains</span>
+<span class="sd">    the `ChFuncAsOp` of :math:`f` and the output extraction (using `PropExtract`)</span>
+<span class="sd">    of the single-output of `ChFuncAsOp`.</span>
+
+<span class="sd">    Note that the returned wrapped function :math:`g` is a</span>
+<span class="sd">    `BvFunction` (and not a `RoundBasedFunction`)</span>
+<span class="sd">    even if `func` is a `RoundBasedFunction`.</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Constant</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.ssa import RoundBasedFunction</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.linear.chmodel import ChModel</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.smt.wrappedchmodel import get_wrapped_chfunc</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">        &gt;&gt;&gt; Speck32_KS = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64).key_schedule</span>
+<span class="sd">        &gt;&gt;&gt; Speck32_KS.set_num_rounds(2)</span>
+<span class="sd">        &gt;&gt;&gt; ch_model = ChModel(Speck32_KS, LinearMask, [&quot;mk0&quot;, &quot;mk1&quot;, &quot;mk2&quot;])</span>
+<span class="sd">        &gt;&gt;&gt; WrappedSpeck32KS = get_wrapped_chfunc(ch_model)</span>
+<span class="sd">        &gt;&gt;&gt; ch_model.func.get_name(), WrappedSpeck32KS.get_name()</span>
+<span class="sd">        (&#39;SpeckKeySchedule_2R&#39;, &#39;WrappedSpeckKeySchedule_2R&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; ch_model.func.to_ssa([&quot;mk0&quot;, &quot;mk1&quot;, &quot;mk2&quot;], &quot;k&quot;)  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        SSA(input_vars=[mk0, mk1, mk2], output_vars=[mk2_out, k3_out, k8_out],</span>
+<span class="sd">            assignments=[(k0, mk1 &gt;&gt;&gt; 7), (k1, k0 + mk2), (k2, mk2 &lt;&lt;&lt; 2), (k3, k2 ^ k1),</span>
+<span class="sd">            (k4, mk0 &gt;&gt;&gt; 7), (k5, k4 + k3), (k6, k5 ^ 0x0001), (k7, k3 &lt;&lt;&lt; 2), (k8, k7 ^ k6),</span>
+<span class="sd">            (mk2_out, Id(mk2)), (k3_out, Id(k3)), (k8_out, Id(k8))])</span>
+<span class="sd">        &gt;&gt;&gt; WrappedSpeck32KS.to_ssa([&quot;mk0&quot;, &quot;mk1&quot;, &quot;mk2&quot;], &quot;k&quot;) # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        SSA(input_vars=[mk0, mk1, mk2], output_vars=[k1_out, k2_out, k3_out],</span>
+<span class="sd">            assignments=[(k0, SpeckKeySchedule_2RAsOp(mk0, mk1, mk2)),</span>
+<span class="sd">            (k1, PropExtract_{·, 15, 0}(k0)), (k2, PropExtract_{·, 31, 16}(k0)), (k3, PropExtract_{·, 47, 32}(k0)),</span>
+<span class="sd">            (k1_out, Id(k1)), (k2_out, Id(k2)), (k3_out, Id(k3))])</span>
+<span class="sd">        &gt;&gt;&gt; masterkey = [Constant(0, 16)]*3</span>
+<span class="sd">        &gt;&gt;&gt; ch_model.func(*masterkey)</span>
+<span class="sd">        (0x0000, 0x0000, 0x0001)</span>
+<span class="sd">        &gt;&gt;&gt; WrappedSpeck32KS(*masterkey)</span>
+<span class="sd">        (0x0000, 0x0000, 0x0001)</span>
+<span class="sd">        &gt;&gt;&gt; issubclass(ch_model.func, RoundBasedFunction), issubclass(WrappedSpeck32KS, RoundBasedFunction)</span>
+<span class="sd">        (True, False)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ch_model</span><span class="p">,</span> <span class="n">abstractproperty</span><span class="o">.</span><span class="n">chmodel</span><span class="o">.</span><span class="n">ChModel</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">ch_model</span><span class="o">.</span><span class="n">func</span><span class="p">,</span> <span class="s2">&quot;_chfunc_as_op&quot;</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;wrapping functions already wrapped is not supported&quot;</span><span class="p">)</span>
+
+    <span class="c1"># - creating the Op</span>
+
+    <span class="n">chfunc_as_op</span> <span class="o">=</span> <span class="n">make_chfunc_as_op</span><span class="p">(</span><span class="n">ch_model</span><span class="p">)</span>
+
+    <span class="c1"># - creating the OpModel and linking it to the Op</span>
+
+    <span class="kn">from</span> <span class="nn">cascada.differential.difference</span> <span class="kn">import</span> <span class="n">XorDiff</span><span class="p">,</span> <span class="n">RXDiff</span>
+    <span class="kn">from</span> <span class="nn">cascada.linear.mask</span> <span class="kn">import</span> <span class="n">LinearMask</span>
+    <span class="kn">from</span> <span class="nn">cascada.algebraic.value</span> <span class="kn">import</span> <span class="n">WordValue</span><span class="p">,</span> <span class="n">BitValue</span>
+
+    <span class="k">if</span> <span class="n">ch_model</span><span class="o">.</span><span class="n">prop_type</span> <span class="o">==</span> <span class="n">XorDiff</span><span class="p">:</span>
+        <span class="n">prop_model_name</span> <span class="o">=</span> <span class="s2">&quot;xor_model&quot;</span>
+    <span class="k">elif</span> <span class="n">ch_model</span><span class="o">.</span><span class="n">prop_type</span> <span class="o">==</span> <span class="n">RXDiff</span><span class="p">:</span>
+        <span class="n">prop_model_name</span> <span class="o">=</span> <span class="s2">&quot;rx_model&quot;</span>
+    <span class="k">elif</span> <span class="n">ch_model</span><span class="o">.</span><span class="n">prop_type</span> <span class="o">==</span> <span class="n">LinearMask</span><span class="p">:</span>
+        <span class="n">prop_model_name</span> <span class="o">=</span> <span class="s2">&quot;linear_model&quot;</span>
+    <span class="k">elif</span> <span class="n">ch_model</span><span class="o">.</span><span class="n">prop_type</span> <span class="o">==</span> <span class="n">WordValue</span><span class="p">:</span>
+        <span class="n">prop_model_name</span> <span class="o">=</span> <span class="s2">&quot;word_model&quot;</span>
+    <span class="k">elif</span> <span class="n">ch_model</span><span class="o">.</span><span class="n">prop_type</span> <span class="o">==</span> <span class="n">BitValue</span><span class="p">:</span>
+        <span class="n">prop_model_name</span> <span class="o">=</span> <span class="s2">&quot;bit_model&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;property </span><span class="si">{</span><span class="n">ch_model</span><span class="o">.</span><span class="n">prop_type</span><span class="si">}</span><span class="s2"> not supported&quot;</span><span class="p">)</span>
+
+    <span class="n">chfuncasop_model</span> <span class="o">=</span> <span class="n">make_chfuncasop_model</span><span class="p">(</span><span class="n">chfunc_as_op</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">property_opmodel</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">input_prop</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">chfuncasop_model</span><span class="p">(</span><span class="n">input_prop</span><span class="p">)</span>
+
+    <span class="nb">setattr</span><span class="p">(</span><span class="n">chfunc_as_op</span><span class="p">,</span> <span class="n">prop_model_name</span><span class="p">,</span> <span class="nb">classmethod</span><span class="p">(</span><span class="n">property_opmodel</span><span class="p">))</span>
+
+    <span class="c1"># - creating the wrapping function</span>
+
+    <span class="n">func</span> <span class="o">=</span> <span class="n">ch_model</span><span class="o">.</span><span class="n">func</span>
+
+    <span class="c1"># subclassing BvFunction (and not func) to avoid subclassing RoundBasedFunction</span>
+    <span class="k">class</span> <span class="nc">WrappingFunc</span><span class="p">(</span><span class="n">cascada_ssa</span><span class="o">.</span><span class="n">BvFunction</span><span class="p">):</span>
+        <span class="n">input_widths</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="n">input_widths</span>
+        <span class="n">output_widths</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="n">output_widths</span>
+
+        <span class="n">_ignore_replace_multiuse_vars</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">_chfunc_as_op</span> <span class="o">=</span> <span class="n">chfunc_as_op</span>
+
+        <span class="nd">@classmethod</span>
+        <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">blockcipher</span><span class="o">.</span><span class="n">Encryption</span><span class="p">):</span>
+                <span class="c1"># ch_model.ssa.external_vars might be different that round_keys</span>
+                <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">round_keys</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_chfunc_as_op</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">ssa</span><span class="o">.</span><span class="n">external_vars</span><span class="p">)</span>
+                <span class="n">ext_vars</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">round_keys</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ext_vars</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_chfunc_as_op</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">ssa</span><span class="o">.</span><span class="n">external_vars</span><span class="p">)</span>
+            <span class="n">out_wop</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_chfunc_as_op</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">args</span><span class="o">+</span><span class="n">ext_vars</span><span class="p">))</span>
+            <span class="n">out_func</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">output_widths</span><span class="p">:</span>
+                <span class="n">partial_propextract</span> <span class="o">=</span> <span class="n">abstractproperty</span><span class="o">.</span><span class="n">property</span><span class="o">.</span><span class="n">make_partial_propextract</span><span class="p">(</span><span class="n">w</span> <span class="o">+</span> <span class="n">offset</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">offset</span><span class="p">)</span>
+                <span class="n">out_func</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">partial_propextract</span><span class="p">(</span><span class="n">out_wop</span><span class="p">))</span>
+                <span class="n">offset</span> <span class="o">+=</span> <span class="n">w</span>
+            <span class="k">assert</span> <span class="n">offset</span> <span class="o">==</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">output_widths</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">out_func</span><span class="p">)</span>
+
+    <span class="n">WrappingFunc</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Wrapped</span><span class="si">{</span><span class="n">func</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">return</span> <span class="n">WrappingFunc</span></div>
+
+
+<div class="viewcode-block" id="get_wrapped_chcipher"><a class="viewcode-back" href="../../../cascada.smt.wrappedchmodel.html#cascada.smt.wrappedchmodel.get_wrapped_chcipher">[docs]</a><span class="k">def</span> <span class="nf">get_wrapped_chcipher</span><span class="p">(</span><span class="n">ch_model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Wrap and return the underlying cipher of a characteristic model.</span>
+
+<span class="sd">    Given a characteristic model (i.e., `abstractproperty.chmodel.CipherChModel`)</span>
+<span class="sd">    of a `Cipher`, returns a functionally-equivalent cipher where the</span>
+<span class="sd">    key-schedule and encryption functions are wrapped by `get_wrapped_chfunc`.</span>
+
+<span class="sd">    If the given characteristic model is an `abstractproperty.chmodel.EncryptionChModel`</span>
+<span class="sd">    of a `Cipher.encryption`, then a functionally-equivalent cipher is returned</span>
+<span class="sd">    where only the encryption function is wrapped by `get_wrapped_chfunc`.</span>
+
+<span class="sd">    Note that the returned wrapped cipher is not iterated (see `Cipher`)</span>
+<span class="sd">    even if the given cipher is iterated.</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Constant</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.differential.difference import XorDiff</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.differential.chmodel import EncryptionChModel</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.smt.wrappedchmodel import get_wrapped_chcipher</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">        &gt;&gt;&gt; Speck32 = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64)</span>
+<span class="sd">        &gt;&gt;&gt; Speck32.set_num_rounds(2)</span>
+<span class="sd">        &gt;&gt;&gt; ch_model = EncryptionChModel(Speck32, XorDiff)</span>
+<span class="sd">        &gt;&gt;&gt; WrappedSpeck32 = get_wrapped_chcipher(ch_model)</span>
+<span class="sd">        &gt;&gt;&gt; WrappedSpeck32Enc = WrappedSpeck32.encryption</span>
+<span class="sd">        &gt;&gt;&gt; ch_model.func.get_name(), WrappedSpeck32Enc.get_name()</span>
+<span class="sd">        (&#39;SpeckEncryption_2R&#39;, &#39;WrappedSpeckEncryption_2R&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; ch_model.func.to_ssa([&quot;p0&quot;, &quot;p1&quot;], &quot;x&quot;)  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        SSA(input_vars=[p0, p1], output_vars=[x7_out, x9_out], external_vars=[dk0, dk1],</span>
+<span class="sd">            assignments=[(x0, p0 &gt;&gt;&gt; 7), (x1, x0 + p1), (x2, x1 ^ dk0), (x3, p1 &lt;&lt;&lt; 2), (x4, x3 ^ x2),</span>
+<span class="sd">                (x5, x2 &gt;&gt;&gt; 7), (x6, x5 + x4), (x7, x6 ^ dk1), (x8, x4 &lt;&lt;&lt; 2), (x9, x8 ^ x7),</span>
+<span class="sd">                (x7_out, Id(x7)), (x9_out, Id(x9))])</span>
+<span class="sd">        &gt;&gt;&gt; WrappedSpeck32Enc.round_keys = ch_model.func.round_keys[:]</span>
+<span class="sd">        &gt;&gt;&gt; WrappedSpeck32Enc.to_ssa([&quot;p0&quot;, &quot;p1&quot;], &quot;x&quot;)  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        SSA(input_vars=[p0, p1], output_vars=[x1_out, x2_out], external_vars=[dk0, dk1],</span>
+<span class="sd">            assignments=[(x0, SpeckEncryption_2RAsOp(p0, p1, dk0, dk1)),</span>
+<span class="sd">                (x1, PropExtract_{·, 15, 0}(x0)), (x2, PropExtract_{·, 31, 16}(x0)),</span>
+<span class="sd">                (x1_out, Id(x1)), (x2_out, Id(x2))])</span>
+<span class="sd">        &gt;&gt;&gt; plaintext = Constant(1, 16), Constant(2, 16)</span>
+<span class="sd">        &gt;&gt;&gt; list(ch_model.func(*plaintext, symbolic_inputs=True))  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        [(((0x0202 ^ dk0) &gt;&gt;&gt; 7) + (0x020a ^ dk0)) ^ dk1,</span>
+<span class="sd">        ((0x020a ^ dk0) &lt;&lt;&lt; 2) ^ (((0x0202 ^ dk0) &gt;&gt;&gt; 7) + (0x020a ^ dk0)) ^ dk1]</span>
+<span class="sd">        &gt;&gt;&gt; [x.doit() for x in WrappedSpeck32Enc(*plaintext, symbolic_inputs=True)]  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        [Id(((0x0202 ^ dk0) &gt;&gt;&gt; 7 + (0x020a ^ dk0)) ^ dk1),</span>
+<span class="sd">        Id((0x020a ^ dk0) &lt;&lt;&lt; 2 ^ ((0x0202 ^ dk0) &gt;&gt;&gt; 7 + (0x020a ^ dk0)) ^ dk1)]</span>
+<span class="sd">        &gt;&gt;&gt; Speck32.num_rounds, WrappedSpeck32.num_rounds</span>
+<span class="sd">        (2, None)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ch_model</span><span class="p">,</span> <span class="n">abstractproperty</span><span class="o">.</span><span class="n">chmodel</span><span class="o">.</span><span class="n">EncryptionChModel</span><span class="p">):</span>
+        <span class="n">wrapped_ks</span> <span class="o">=</span> <span class="n">ch_model</span><span class="o">.</span><span class="n">cipher</span><span class="o">.</span><span class="n">key_schedule</span>
+        <span class="n">aux_wrapped_enc</span> <span class="o">=</span> <span class="n">get_wrapped_chfunc</span><span class="p">(</span><span class="n">ch_model</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ch_model</span><span class="p">,</span> <span class="n">abstractproperty</span><span class="o">.</span><span class="n">chmodel</span><span class="o">.</span><span class="n">CipherChModel</span><span class="p">)</span>
+        <span class="n">wrapped_ks</span> <span class="o">=</span> <span class="n">get_wrapped_chfunc</span><span class="p">(</span><span class="n">ch_model</span><span class="o">.</span><span class="n">ks_ch_model</span><span class="p">)</span>
+        <span class="n">aux_wrapped_enc</span> <span class="o">=</span> <span class="n">get_wrapped_chfunc</span><span class="p">(</span><span class="n">ch_model</span><span class="o">.</span><span class="n">enc_ch_model</span><span class="p">)</span>
+
+    <span class="k">class</span> <span class="nc">WrappedEnc</span><span class="p">(</span><span class="n">blockcipher</span><span class="o">.</span><span class="n">Encryption</span><span class="p">,</span> <span class="n">aux_wrapped_enc</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="n">WrappedEnc</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">=</span> <span class="n">aux_wrapped_enc</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span>
+
+    <span class="k">class</span> <span class="nc">WrappingCipher</span><span class="p">(</span><span class="n">blockcipher</span><span class="o">.</span><span class="n">Cipher</span><span class="p">):</span>
+        <span class="n">key_schedule</span> <span class="o">=</span> <span class="n">wrapped_ks</span>
+        <span class="n">encryption</span> <span class="o">=</span> <span class="n">WrappedEnc</span>
+        <span class="n">num_rounds</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">WrappingCipher</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Wrapped</span><span class="si">{</span><span class="n">ch_model</span><span class="o">.</span><span class="n">cipher</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">return</span> <span class="n">WrappingCipher</span></div>
+
+
+<div class="viewcode-block" id="get_wrapped_chmodel"><a class="viewcode-back" href="../../../cascada.smt.wrappedchmodel.html#cascada.smt.wrappedchmodel.get_wrapped_chmodel">[docs]</a><span class="k">def</span> <span class="nf">get_wrapped_chmodel</span><span class="p">(</span><span class="n">ch_model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return a wrapped model of the given characteristic model.</span>
+
+<span class="sd">    Given a characteristic model of a bit-vector function :math:`f`</span>
+<span class="sd">    (i.e., `abstractproperty.chmodel.ChModel`),</span>
+<span class="sd">    a wrapped model is a characteristic model of the wrapped function</span>
+<span class="sd">    of :math:`f` through `get_wrapped_chfunc`.</span>
+<span class="sd">    If the given characteristic model is an</span>
+<span class="sd">    `abstractproperty.chmodel.EncryptionChModel`, the wrapped encryption</span>
+<span class="sd">    is obtained through `get_wrapped_chcipher`.</span>
+
+<span class="sd">    The wrapped model only has one non-`ModelIdentity` transition:</span>
+<span class="sd">    the `ModelChFuncAsOp` of the `ChFuncAsOp` of :math:`f`.</span>
+
+<span class="sd">    To avoid name collisions between the given characteristic model and the</span>
+<span class="sd">    returned wrapped model (except for the external variables),</span>
+<span class="sd">    an underscore is added to the variable prefix of the returned wrapped model.</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.differential.difference import XorDiff</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.differential.chmodel import EncryptionChModel</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.smt.wrappedchmodel import get_wrapped_chmodel</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">        &gt;&gt;&gt; Speck32 = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64)</span>
+<span class="sd">        &gt;&gt;&gt; Speck32.set_num_rounds(2)</span>
+<span class="sd">        &gt;&gt;&gt; ch_model = EncryptionChModel(Speck32, XorDiff)</span>
+<span class="sd">        &gt;&gt;&gt; wrapped_ch_model = get_wrapped_chmodel(ch_model)</span>
+<span class="sd">        &gt;&gt;&gt; wrapped_ch_model  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">         EncryptionChModel(cipher=WrappedSpeckCipher_2R,</span>
+<span class="sd">            input_diff=[XorDiff(_dp0), XorDiff(_dp1)],</span>
+<span class="sd">            output_diff=[XorDiff(_dx1_out), XorDiff(_dx2_out)],</span>
+<span class="sd">            external_var2diff=[(_dk0, XorDiff(0x0000)), (_dk1, XorDiff(0x0000))],</span>
+<span class="sd">            assign_outdiff2op_model=[(XorDiff(_dx0), XorModelSpeckEncryption_2RAsOp([XorDiff(_dp0), XorDiff(_dp1), XorDiff(0x0000), XorDiff(0x0000)])),</span>
+<span class="sd">                (XorDiff(_dx1_out), XorModelId(XorDiff(PropExtract_{·, 15, 0}(_dx0)))),</span>
+<span class="sd">                (XorDiff(_dx2_out), XorModelId(XorDiff(PropExtract_{·, 31, 16}(_dx0))))])</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.linear.chmodel import ChModel</span>
+<span class="sd">        &gt;&gt;&gt; Speck32_KS = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64).key_schedule</span>
+<span class="sd">        &gt;&gt;&gt; Speck32_KS.set_num_rounds(2)</span>
+<span class="sd">        &gt;&gt;&gt; ch_model = ChModel(Speck32_KS, LinearMask, [&quot;mk0&quot;, &quot;mk1&quot;, &quot;mk2&quot;])</span>
+<span class="sd">        &gt;&gt;&gt; wrapped_ch_model = get_wrapped_chmodel(ch_model)</span>
+<span class="sd">        &gt;&gt;&gt; wrapped_ch_model  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        ChModel(func=WrappedSpeckKeySchedule_2R,</span>
+<span class="sd">            input_mask=[LinearMask(_mk0), LinearMask(_mk1), LinearMask(_mk2)],</span>
+<span class="sd">            output_mask=[LinearMask(_mx1_out), LinearMask(_mx2_out), LinearMask(_mx3_out)],</span>
+<span class="sd">            assign_outmask2op_model=[(LinearMask(_mx0), LinearModelSpeckKeySchedule_2RAsOp([LinearMask(_mk0), LinearMask(_mk1), LinearMask(_mk2)])),</span>
+<span class="sd">                (LinearMask(_mx1_out), LinearModelId(LinearMask(PropExtract_{·, 15, 0}(_mx0)))),</span>
+<span class="sd">                (LinearMask(_mx2_out), LinearModelId(LinearMask(PropExtract_{·, 31, 16}(_mx0)))),</span>
+<span class="sd">                (LinearMask(_mx3_out), LinearModelId(LinearMask(PropExtract_{·, 47, 32}(_mx0))))])</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ch_model</span><span class="p">,</span> <span class="n">abstractproperty</span><span class="o">.</span><span class="n">chmodel</span><span class="o">.</span><span class="n">ChModel</span><span class="p">)</span>
+
+    <span class="n">non_id_transitions</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">op_model</span> <span class="ow">in</span> <span class="n">ch_model</span><span class="o">.</span><span class="n">assign_outprop2op_model</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">op_model</span><span class="p">,</span> <span class="n">abstractproperty</span><span class="o">.</span><span class="n">opmodel</span><span class="o">.</span><span class="n">ModelIdentity</span><span class="p">):</span>
+            <span class="n">non_id_transitions</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">non_id_transitions</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;wrapping a characteristic model with &quot;</span>
+                      <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">non_id_transitions</span><span class="si">}</span><span class="s2"> non-ModelIdentity transition&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ch_model</span><span class="p">,</span> <span class="n">abstractproperty</span><span class="o">.</span><span class="n">chmodel</span><span class="o">.</span><span class="n">EncryptionChModel</span><span class="p">):</span>
+        <span class="n">wrapped_cipher</span> <span class="o">=</span> <span class="n">get_wrapped_chcipher</span><span class="p">(</span><span class="n">ch_model</span><span class="p">)</span>
+
+        <span class="k">class</span> <span class="nc">WrappedEncryptionChModel</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">ch_model</span><span class="p">)):</span>
+            <span class="n">_prefix</span> <span class="o">=</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">ch_model</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">_prefix</span>
+
+        <span class="n">WrappedEncryptionChModel</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">ch_model</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span>
+
+        <span class="n">wrapped_ch_model</span> <span class="o">=</span> <span class="n">WrappedEncryptionChModel</span><span class="p">(</span>
+            <span class="n">wrapped_cipher</span><span class="p">,</span> <span class="n">ch_model</span><span class="o">.</span><span class="n">prop_type</span><span class="p">,</span>
+            <span class="n">op_model_class2options</span><span class="o">=</span><span class="n">ch_model</span><span class="o">.</span><span class="n">_op_model_class2options</span><span class="p">)</span>
+        <span class="n">wrapped_op</span> <span class="o">=</span> <span class="n">wrapped_cipher</span><span class="o">.</span><span class="n">encryption</span><span class="o">.</span><span class="n">_chfunc_as_op</span>
+        <span class="n">ext_var_names_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>  <span class="c1"># round keys are part of wrapped_op and not of ch_model</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># assert isinstance(ch_model, abstractproperty.chmodel.ChModel)</span>
+        <span class="n">wrapped_func</span> <span class="o">=</span> <span class="n">get_wrapped_chfunc</span><span class="p">(</span><span class="n">ch_model</span><span class="p">)</span>
+        <span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">ch_model</span><span class="o">.</span><span class="n">_prefix</span>
+        <span class="n">input_prop_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">v</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">ch_model</span><span class="o">.</span><span class="n">input_prop</span><span class="p">]</span>
+        <span class="k">while</span> <span class="nb">any</span><span class="p">(</span><span class="n">ipn</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span> <span class="k">for</span> <span class="n">ipn</span> <span class="ow">in</span> <span class="n">input_prop_names</span><span class="p">):</span>
+            <span class="n">prefix</span> <span class="o">+=</span> <span class="n">prefix</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">wrapped_ch_model</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">ch_model</span><span class="p">)</span><span class="o">.</span><span class="n">_prop_new</span><span class="p">(</span>
+            <span class="n">wrapped_func</span><span class="p">,</span> <span class="n">ch_model</span><span class="o">.</span><span class="n">prop_type</span><span class="p">,</span>
+            <span class="n">input_prop_names</span><span class="o">=</span><span class="n">input_prop_names</span><span class="p">,</span>
+            <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
+            <span class="n">external_var2prop</span><span class="o">=</span><span class="n">ch_model</span><span class="o">.</span><span class="n">external_var2prop</span><span class="p">,</span>
+            <span class="n">op_model_class2options</span><span class="o">=</span><span class="n">ch_model</span><span class="o">.</span><span class="n">_op_model_class2options</span>
+        <span class="p">)</span>
+        <span class="n">wrapped_op</span> <span class="o">=</span> <span class="n">wrapped_func</span><span class="o">.</span><span class="n">_chfunc_as_op</span>
+        <span class="n">ext_var_names_set</span> <span class="o">=</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">wrapped_ch_model</span><span class="o">.</span><span class="n">external_var2prop</span><span class="p">}</span>
+
+    <span class="c1"># ensure no name collision</span>
+    <span class="n">intersection</span> <span class="o">=</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">wrapped_ch_model</span><span class="o">.</span><span class="n">var2prop</span><span class="p">}</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span>
+        <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">wrapped_op</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">var2prop</span><span class="p">})</span>
+    <span class="k">assert</span> <span class="n">intersection</span> <span class="o">==</span> <span class="n">ext_var_names_set</span>
+
+    <span class="k">assert</span> <span class="nb">list</span><span class="p">(</span><span class="n">wrapped_ch_model</span><span class="o">.</span><span class="n">assign_outprop2op_model</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">op</span> <span class="o">==</span> <span class="n">wrapped_op</span>
+    <span class="k">for</span> <span class="n">op_model</span> <span class="ow">in</span> <span class="n">wrapped_ch_model</span><span class="o">.</span><span class="n">assign_outprop2op_model</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">op_model</span><span class="o">.</span><span class="n">op</span> <span class="o">!=</span> <span class="n">wrapped_op</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">op_model</span><span class="p">,</span> <span class="n">abstractproperty</span><span class="o">.</span><span class="n">opmodel</span><span class="o">.</span><span class="n">ModelIdentity</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;invalid OpModel </span><span class="si">{</span><span class="n">op_model</span><span class="si">}</span><span class="s2"> in wrapped model </span><span class="si">{</span><span class="n">wrapped_ch_model</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">wrapped_ch_model</span><span class="o">.</span><span class="n">_unwrapped_ch_model</span> <span class="o">=</span> <span class="n">ch_model</span>  <span class="c1"># used in InvalidPropFinder._check</span>
+
+    <span class="k">for</span> <span class="n">v1</span><span class="p">,</span> <span class="n">v2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">ch_model</span><span class="o">.</span><span class="n">external_var2prop</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="n">wrapped_ch_model</span><span class="o">.</span><span class="n">external_var2prop</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v1</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v2</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">):</span>
+            <span class="k">assert</span> <span class="n">v1</span> <span class="o">==</span> <span class="n">v2</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="n">ch_model</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">wrapped_ch_model</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">return</span> <span class="n">wrapped_ch_model</span></div>
+
+
+<div class="viewcode-block" id="get_wrapped_cipher_chmodel"><a class="viewcode-back" href="../../../cascada.smt.wrappedchmodel.html#cascada.smt.wrappedchmodel.get_wrapped_cipher_chmodel">[docs]</a><span class="k">def</span> <span class="nf">get_wrapped_cipher_chmodel</span><span class="p">(</span><span class="n">cipher_ch_model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return a wrapped model of the given cipher characteristic model.</span>
+
+<span class="sd">    Given a characteristic model of a `Cipher`</span>
+<span class="sd">    (i.e., `abstractproperty.chmodel.CipherChModel`),</span>
+<span class="sd">    a wrapped model is a characteristic model of the wrapped cipher</span>
+<span class="sd">    through `get_wrapped_chcipher`.</span>
+
+<span class="sd">    The wrapped model only has two non-`ModelIdentity` transitions:</span>
+<span class="sd">    the `ModelChFuncAsOp` of the `ChFuncAsOp` of the key-schedule function</span>
+<span class="sd">    and the `ModelChFuncAsOp` of the `ChFuncAsOp` of the encryption function.</span>
+
+<span class="sd">    To avoid name collisions between the given cipher characteristic model</span>
+<span class="sd">    and the returned wrapped model, an underscore is added to the variable</span>
+<span class="sd">    prefix of the returned wrapped model.</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.differential.difference import RXDiff</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.differential.chmodel import CipherChModel</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.smt.wrappedchmodel import get_wrapped_cipher_chmodel</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">        &gt;&gt;&gt; Speck32 = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64)</span>
+<span class="sd">        &gt;&gt;&gt; Speck32.set_num_rounds(2)</span>
+<span class="sd">        &gt;&gt;&gt; ch_model = CipherChModel(Speck32, RXDiff)</span>
+<span class="sd">        &gt;&gt;&gt; wrapped_ch_model = get_wrapped_cipher_chmodel(ch_model)</span>
+<span class="sd">        &gt;&gt;&gt; wrapped_ch_model  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        CipherChModel(ks_ch_model=ChModel(func=WrappedSpeckKeySchedule_1R,</span>
+<span class="sd">            input_diff=[RXDiff(_dmk0), RXDiff(_dmk1)],</span>
+<span class="sd">            output_diff=[RXDiff(_dk1_out), RXDiff(_dk2_out)],</span>
+<span class="sd">            assign_outdiff2op_model=[(RXDiff(_dk0), RXModelSpeckKeySchedule_1RAsOp([RXDiff(_dmk0), RXDiff(_dmk1)])),</span>
+<span class="sd">                (RXDiff(_dk1_out), RXModelId(RXDiff(PropExtract_{·, 15, 0}(_dk0)))),</span>
+<span class="sd">                (RXDiff(_dk2_out), RXModelId(RXDiff(PropExtract_{·, 31, 16}(_dk0))))]),</span>
+<span class="sd">            enc_ch_model=ChModel(func=WrappedSpeckEncryption_2R,</span>
+<span class="sd">                input_diff=[RXDiff(_dp0), RXDiff(_dp1)],</span>
+<span class="sd">                output_diff=[RXDiff(_dx1_out), RXDiff(_dx2_out)],</span>
+<span class="sd">                external_var2diff=[(_dk1_out, RXDiff(_dk1_out)), (_dk2_out, RXDiff(_dk2_out))],</span>
+<span class="sd">                assign_outdiff2op_model=[(RXDiff(_dx0), RXModelSpeckEncryption_2RAsOp([RXDiff(_dp0), RXDiff(_dp1), RXDiff(_dk1_out), RXDiff(_dk2_out)])),</span>
+<span class="sd">                    (RXDiff(_dx1_out), RXModelId(RXDiff(PropExtract_{·, 15, 0}(_dx0)))),</span>
+<span class="sd">                    (RXDiff(_dx2_out), RXModelId(RXDiff(PropExtract_{·, 31, 16}(_dx0))))]))</span>
+
+<span class="sd">    See also `get_wrapped_chmodel`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cipher_ch_model</span><span class="p">,</span> <span class="n">abstractproperty</span><span class="o">.</span><span class="n">chmodel</span><span class="o">.</span><span class="n">CipherChModel</span><span class="p">)</span>
+
+    <span class="n">non_id_transitions</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">cm</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([</span><span class="n">cipher_ch_model</span><span class="o">.</span><span class="n">ks_ch_model</span><span class="p">,</span> <span class="n">cipher_ch_model</span><span class="o">.</span><span class="n">enc_ch_model</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">op_model</span> <span class="ow">in</span> <span class="n">cm</span><span class="o">.</span><span class="n">assign_outprop2op_model</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">op_model</span><span class="p">,</span> <span class="n">abstractproperty</span><span class="o">.</span><span class="n">opmodel</span><span class="o">.</span><span class="n">ModelIdentity</span><span class="p">):</span>
+                <span class="n">non_id_transitions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">non_id_transitions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">non_id_transitions</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;wrapping a cipher characteristic model with &quot;</span>
+                      <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">non_id_transitions</span><span class="si">}</span><span class="s2"> non-ModelIdentity transitions&quot;</span><span class="p">)</span>
+
+    <span class="n">wrapped_cipher</span> <span class="o">=</span> <span class="n">get_wrapped_chcipher</span><span class="p">(</span><span class="n">cipher_ch_model</span><span class="p">)</span>
+
+    <span class="k">class</span> <span class="nc">WrappedCipherChModel</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">cipher_ch_model</span><span class="p">)):</span>
+        <span class="n">_prefix</span> <span class="o">=</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">cipher_ch_model</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">_prefix</span>
+
+    <span class="n">WrappedCipherChModel</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">cipher_ch_model</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span>
+
+    <span class="n">wrapped_cipher_ch_model</span> <span class="o">=</span> <span class="n">WrappedCipherChModel</span><span class="p">(</span>
+        <span class="n">wrapped_cipher</span><span class="p">,</span> <span class="n">cipher_ch_model</span><span class="o">.</span><span class="n">prop_type</span><span class="p">,</span>
+        <span class="n">op_model_class2options</span><span class="o">=</span><span class="n">cipher_ch_model</span><span class="o">.</span><span class="n">_op_model_class2options</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">cm</span> <span class="ow">in</span> <span class="p">[</span><span class="n">wrapped_cipher_ch_model</span><span class="o">.</span><span class="n">ks_ch_model</span><span class="p">,</span> <span class="n">wrapped_cipher_ch_model</span><span class="o">.</span><span class="n">enc_ch_model</span><span class="p">]:</span>
+        <span class="n">wrapped_op</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">func</span><span class="o">.</span><span class="n">_chfunc_as_op</span>
+
+        <span class="n">intersection</span> <span class="o">=</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">cm</span><span class="o">.</span><span class="n">var2prop</span><span class="p">}</span><span class="o">.</span><span class="n">intersection</span><span class="p">({</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">wrapped_op</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">var2prop</span><span class="p">})</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">intersection</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">intersection</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="k">assert</span> <span class="nb">list</span><span class="p">(</span><span class="n">cm</span><span class="o">.</span><span class="n">assign_outprop2op_model</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">op</span> <span class="o">==</span> <span class="n">wrapped_op</span>
+        <span class="k">for</span> <span class="n">op_model</span> <span class="ow">in</span> <span class="n">cm</span><span class="o">.</span><span class="n">assign_outprop2op_model</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">op_model</span><span class="o">.</span><span class="n">op</span> <span class="o">!=</span> <span class="n">wrapped_op</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">op_model</span><span class="p">,</span> <span class="n">abstractproperty</span><span class="o">.</span><span class="n">opmodel</span><span class="o">.</span><span class="n">ModelIdentity</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;invalid OpModel </span><span class="si">{</span><span class="n">op_model</span><span class="si">}</span><span class="s2"> in wrapped model </span><span class="si">{</span><span class="n">wrapped_cipher_ch_model</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">wrapped_cipher_ch_model</span><span class="o">.</span><span class="n">_unwrapped_cipher_ch_model</span> <span class="o">=</span> <span class="n">cipher_ch_model</span>  <span class="c1"># used in InvalidCipherPropFinder._check</span>
+    <span class="n">wrapped_cipher_ch_model</span><span class="o">.</span><span class="n">ks_ch_model</span><span class="o">.</span><span class="n">_unwrapped_ch_model</span> <span class="o">=</span> <span class="n">cipher_ch_model</span><span class="o">.</span><span class="n">ks_ch_model</span>
+    <span class="n">wrapped_cipher_ch_model</span><span class="o">.</span><span class="n">enc_ch_model</span><span class="o">.</span><span class="n">_unwrapped_ch_model</span> <span class="o">=</span> <span class="n">cipher_ch_model</span><span class="o">.</span><span class="n">enc_ch_model</span>
+
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">wrapped_cipher_ch_model</span><span class="o">.</span><span class="n">ks_ch_model</span><span class="o">.</span><span class="n">external_var2prop</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">cipher_ch_model</span><span class="o">.</span><span class="n">ks_ch_model</span><span class="o">.</span><span class="n">external_var2prop</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">v1</span><span class="p">,</span> <span class="n">v2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+            <span class="n">wrapped_cipher_ch_model</span><span class="o">.</span><span class="n">enc_ch_model</span><span class="o">.</span><span class="n">external_var2prop</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span>
+            <span class="n">cipher_ch_model</span><span class="o">.</span><span class="n">enc_ch_model</span><span class="o">.</span><span class="n">external_var2prop</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v1</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v2</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">):</span>
+            <span class="k">assert</span> <span class="n">v1</span> <span class="o">==</span> <span class="n">v2</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="n">cipher_ch_model</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">wrapped_cipher_ch_model</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">return</span> <span class="n">wrapped_cipher_ch_model</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Adrián Ranea.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

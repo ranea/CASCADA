@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cascada.linear.chmodel &mdash; CASCADA 1.0.rc0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> CASCADA
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">CASCADA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../primitives_implemented.html">Primitives implemented</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cascada.html">API reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">CASCADA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>cascada.linear.chmodel</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cascada.linear.chmodel</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Manage bit-vector models of linear characteristics.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">operation</span><span class="p">,</span> <span class="n">core</span>
+<span class="kn">from</span> <span class="nn">cascada.linear.mask</span> <span class="kn">import</span> <span class="n">LinearMask</span>
+<span class="kn">from</span> <span class="nn">cascada.linear</span> <span class="kn">import</span> <span class="n">opmodel</span> <span class="k">as</span> <span class="n">cascada_opmodel</span>
+
+<span class="kn">from</span> <span class="nn">cascada</span> <span class="kn">import</span> <span class="n">abstractproperty</span>
+
+
+<span class="n">ChModelSigType</span> <span class="o">=</span> <span class="n">abstractproperty</span><span class="o">.</span><span class="n">chmodel</span><span class="o">.</span><span class="n">ChModelSigType</span>
+
+
+<div class="viewcode-block" id="ChModel"><a class="viewcode-back" href="../../../cascada.linear.chmodel.html#cascada.linear.chmodel.ChModel">[docs]</a><span class="k">class</span> <span class="nc">ChModel</span><span class="p">(</span><span class="n">abstractproperty</span><span class="o">.</span><span class="n">chmodel</span><span class="o">.</span><span class="n">ChModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent bit-vector models of linear characteristics over bit-vector functions.</span>
+
+<span class="sd">    Internally, this class is a subclass of `abstractproperty.chmodel.ChModel`,</span>
+<span class="sd">    where the `Property` is a `LinearMask` type and the probability of the</span>
+<span class="sd">    characteristic here considered is the product of the</span>
+<span class="sd">    absolute linear correlation of the linear approximations</span>
+<span class="sd">    :math:`(\Delta_{x_{i}} \mapsto \Delta_{x_{i+1}})` composing</span>
+<span class="sd">    the characteristic (see `linear.characteristic.Characteristic`).</span>
+
+<span class="sd">    To handle the propagation of masks through branching subroutines</span>
+<span class="sd">    (i.e., :math:`x \mapsto (x, x)`), the `SSA` of the `BvFunction` is computed</span>
+<span class="sd">    with the initialization argument ``replace_multiuse_vars`` set to ``True``</span>
+<span class="sd">    and the new free masks are wrapped in `LinearModelFreeBranch` objects</span>
+<span class="sd">    (see also `SSA` and `LinearModelFreeBranch`).</span>
+
+<span class="sd">    If the `SSA` of the `BvFunction` contains external `Variable` objects</span>
+<span class="sd">    and their `LinearMask` objects are not provided in the initialization</span>
+<span class="sd">    through ``external_var2mask``, these free external masks</span>
+<span class="sd">    are wrapped in `LinearMask` objects.</span>
+
+<span class="sd">    Linear characteristic models of functions with unused input vars</span>
+<span class="sd">    is currently not supported.</span>
+
+<span class="sd">    ::</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.linear.chmodel import ChModel</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">        &gt;&gt;&gt; Speck32_KS = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64).key_schedule</span>
+<span class="sd">        &gt;&gt;&gt; Speck32_KS.set_num_rounds(2)</span>
+<span class="sd">        &gt;&gt;&gt; ch_model = ChModel(Speck32_KS, LinearMask, [&quot;mk0&quot;, &quot;mk1&quot;, &quot;mk2&quot;])</span>
+<span class="sd">        &gt;&gt;&gt; ch_model  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        ChModel(func=SpeckKeySchedule_2R,</span>
+<span class="sd">                input_mask=[LinearMask(mk0), LinearMask(mk1), LinearMask(mk2)],</span>
+<span class="sd">                output_mask=[LinearMask(mk2_out), LinearMask(mx3_out), LinearMask(mx8_out)],</span>
+<span class="sd">                assign_outmask2op_model=[(LinearMask(mk2__0), LinearModelFreeBranch(LinearMask(mk2))),</span>
+<span class="sd">                    (LinearMask(mk2__1), LinearModelFreeBranch(LinearMask(mk2))),</span>
+<span class="sd">                    (LinearMask(mx1), LinearModelBvAdd([LinearMask(mk1 &gt;&gt;&gt; 7), LinearMask(mk2__0)])),</span>
+<span class="sd">                    (LinearMask(mx3), LinearModelBvXor([LinearMask(mk2__1 &lt;&lt;&lt; 2), LinearMask(mx1)])),</span>
+<span class="sd">                    (LinearMask(mx3__0), LinearModelFreeBranch(LinearMask(mx3))),</span>
+<span class="sd">                    (LinearMask(mx3__1), LinearModelFreeBranch(LinearMask(mx3))),</span>
+<span class="sd">                    (LinearMask(mx5), LinearModelBvAdd([LinearMask(mk0 &gt;&gt;&gt; 7), LinearMask(mx3__0)])),</span>
+<span class="sd">                    (LinearMask(mx8), LinearModelBvXor([LinearMask(mx3__1 &lt;&lt;&lt; 2), LinearMask(mx5)])),</span>
+<span class="sd">                    (LinearMask(mk2_out), LinearModelId(LinearMask(mk2 ^ mk2__0 ^ mk2__1))),</span>
+<span class="sd">                    (LinearMask(mx3_out), LinearModelId(LinearMask(mx3 ^ mx3__0 ^ mx3__1))),</span>
+<span class="sd">                    (LinearMask(mx8_out), LinearModelId(LinearMask(mx8)))])</span>
+<span class="sd">        &gt;&gt;&gt; ch_model.ssa  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        SSA(input_vars=[mk0, mk1, mk2],</span>
+<span class="sd">            output_vars=[mk2_out, mx3_out, mx8_out],</span>
+<span class="sd">            assignments=[(mx0, mk1 &gt;&gt;&gt; 7), (mk2__0, Id(mk2)), (mk2__1, Id(mk2)), (mk2__2, Id(mk2)),</span>
+<span class="sd">                    (mx1, mx0 + mk2__0), (mx2, mk2__1 &lt;&lt;&lt; 2), (mx3, mx2 ^ mx1),</span>
+<span class="sd">                (mx4, mk0 &gt;&gt;&gt; 7), (mx3__0, Id(mx3)), (mx3__1, Id(mx3)), (mx3__2, Id(mx3)),</span>
+<span class="sd">                    (mx5, mx4 + mx3__0), (mx6, mx5 ^ 0x0001), (mx7, mx3__1 &lt;&lt;&lt; 2), (mx8, mx7 ^ mx6),</span>
+<span class="sd">                (mk2_out, Id(mk2__2)), (mx3_out, Id(mx3__2)), (mx8_out, Id(mx8))])</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        mask_type: the mask type (currently only `LinearMask` is supported);</span>
+<span class="sd">            alias of `abstractproperty.chmodel.ChModel.prop_type`.</span>
+<span class="sd">        input_mask: a list of `LinearMask` objects containing</span>
+<span class="sd">            the (symbolic) input mask (alias of</span>
+<span class="sd">            `abstractproperty.chmodel.ChModel.input_prop`).</span>
+<span class="sd">        output_mask: a list of `LinearMask` objects containing</span>
+<span class="sd">            the (symbolic) output mask (alias of</span>
+<span class="sd">            `abstractproperty.chmodel.ChModel.output_prop`).</span>
+<span class="sd">        external_var2mask: a `collections.OrderedDict` mapping the external</span>
+<span class="sd">            variables of `abstractproperty.chmodel.ChModel.ssa` to their</span>
+<span class="sd">            associated (symbolic or constant) `LinearMask` objects (alias of</span>
+<span class="sd">            `abstractproperty.chmodel.ChModel.external_var2prop`).</span>
+<span class="sd">        assign_outmask2op_model: a `collections.OrderedDict` mapping the</span>
+<span class="sd">            output `LinearMask` :math:`\Delta_{x_{i+1}}` of</span>
+<span class="sd">            the non-trivial assignment  :math:`x_{i+1} \leftarrow f_i(x_i)` to</span>
+<span class="sd">            the `linear.opmodel.OpModel` of this assignment (alias of</span>
+<span class="sd">            `abstractproperty.chmodel.ChModel.assign_outprop2op_model`).</span>
+<span class="sd">        var2mask: a `collections.OrderedDict` mapping each variable in</span>
+<span class="sd">            `abstractproperty.chmodel.ChModel.ssa`</span>
+<span class="sd">            to its associated `LinearMask` object (alias of</span>
+<span class="sd">            `abstractproperty.chmodel.ChModel.var2prop`).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_prop_label</span> <span class="o">=</span> <span class="s2">&quot;mask&quot;</span>  <span class="c1"># for str and vrepr</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">mask_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">prop_type</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">input_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_prop</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">output_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_prop</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">external_var2mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">external_var2prop</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">assign_outmask2op_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">assign_outprop2op_model</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">var2mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">var2prop</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_input_mask_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_input_prop_names</span>
+
+    <span class="k">def</span> <span class="nf">_func2ssa</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">prefix</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">func</span><span class="o">.</span><span class="n">to_ssa</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">id_prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span> <span class="n">decompose_sec_ops</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">replace_multiuse_vars</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_propagate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">input_mask</span><span class="p">,</span> <span class="n">outvar_op</span><span class="p">):</span>
+        <span class="n">outvar_is_input_prop_extract</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvIdentity</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_mask</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+            <span class="c1"># check if this op belongs to a branching operation</span>
+            <span class="c1"># branching notation: a single left variable branching into multiples right variables</span>
+            <span class="n">right_var</span> <span class="o">=</span> <span class="n">outvar_op</span>
+            <span class="k">if</span> <span class="n">right_var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ssa</span><span class="o">.</span><span class="n">singleuse_var2multiuse_var</span><span class="p">:</span>
+                <span class="n">left_var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ssa</span><span class="o">.</span><span class="n">singleuse_var2multiuse_var</span><span class="p">[</span><span class="n">right_var</span><span class="p">]</span>
+
+                <span class="k">for</span> <span class="n">ssa_var</span><span class="p">,</span> <span class="n">ssa_expr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ssa</span><span class="o">.</span><span class="n">assignments</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ssa_expr</span><span class="p">,</span> <span class="n">operation</span><span class="o">.</span><span class="n">PartialOperation</span><span class="p">)</span> <span class="ow">and</span> \
+                            <span class="n">ssa_expr</span><span class="o">.</span><span class="n">base_op</span> <span class="o">==</span> <span class="n">abstractproperty</span><span class="o">.</span><span class="n">property</span><span class="o">.</span><span class="n">PropExtract</span> <span class="ow">and</span> \
+                            <span class="n">ssa_expr</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">right_var</span><span class="p">:</span>
+                        <span class="n">outvar_is_input_prop_extract</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="k">break</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">outvar_is_input_prop_extract</span><span class="p">:</span>
+                    <span class="c1"># check if right_var is last branch of a branching operation</span>
+                    <span class="k">if</span> <span class="n">right_var</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">ssa</span><span class="o">.</span><span class="n">multiuse_var2singleuse_vars</span><span class="p">[</span><span class="n">left_var</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                        <span class="n">left_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">var2mask</span><span class="p">[</span><span class="n">left_var</span><span class="p">]</span><span class="o">.</span><span class="n">val</span>
+                        <span class="n">other_right_variables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ssa</span><span class="o">.</span><span class="n">multiuse_var2singleuse_vars</span><span class="p">[</span><span class="n">left_var</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                        <span class="n">other_right_masks</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">var2mask</span><span class="p">[</span><span class="n">v</span><span class="p">]</span><span class="o">.</span><span class="n">val</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">other_right_variables</span><span class="p">]</span>
+                        <span class="n">all_other_masks</span> <span class="o">=</span> <span class="p">[</span><span class="n">left_mask</span><span class="p">]</span> <span class="o">+</span> <span class="n">other_right_masks</span>
+                        <span class="k">return</span> <span class="n">LinearMask</span><span class="p">(</span><span class="n">functools</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">operation</span><span class="o">.</span><span class="n">BvXor</span><span class="p">,</span> <span class="n">all_other_masks</span><span class="p">))</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="n">cascada_opmodel</span><span class="o">.</span><span class="n">LinearModelFreeBranch</span><span class="p">(</span><span class="n">input_mask</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">outvar_is_input_prop_extract</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">outvar_op</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ssa</span><span class="o">.</span><span class="n">singleuse_var2multiuse_var</span>
+
+        <span class="n">output_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask_type</span><span class="o">.</span><span class="n">propagate</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">input_mask</span><span class="p">)</span>
+
+        <span class="c1"># check that no external mask is used in a non-trivial OpModel</span>
+        <span class="c1">#   Example: function f(x0) = x0 ^ (k0 &amp; 1).</span>
+        <span class="c1">#   Without this check, its trail will contain the non-trivial OpModel (mk1, BvAndCt_1(mk0))</span>
+        <span class="c1">#   which will either append a non-zero weight or fix the masks mk0 and mk1,</span>
+        <span class="c1">#   (and might lead to an invalid trail if multiple non-trivial OpModel involving mk1, mk0).</span>
+        <span class="c1">#   However, this OpModel is not needed since we can move (k0 &amp; 1) to the key schedule.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">output_mask</span><span class="p">,</span> <span class="n">LinearMask</span><span class="p">)</span> <span class="ow">and</span> \
+                <span class="nb">any</span><span class="p">(</span><span class="n">im</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">external_var2mask</span> <span class="k">for</span> <span class="n">im</span> <span class="ow">in</span> <span class="n">input_mask</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;linear ChModel does not support non-trivial assignments &quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;involving external variables, as </span><span class="si">{</span><span class="n">input_mask</span><span class="si">}</span><span class="s2"> -› </span><span class="si">{</span><span class="n">output_mask</span><span class="si">}</span><span class="s2">, &quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;external_var2mask = </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">external_var2mask</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">output_mask</span>
+
+    <span class="k">def</span> <span class="nf">_get_property_missing_external_var</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask_type</span><span class="p">,</span> <span class="n">ext_var</span><span class="p">,</span> <span class="n">external_var2mask</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">mask_type</span><span class="p">(</span><span class="n">ext_var</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_check_input_vars_not_used</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func_ssa</span><span class="p">):</span>
+        <span class="c1"># if f(x) = M(x) is a linear function then</span>
+        <span class="c1">#   (alpha, beta) = (a, b) is a linear approx. with Cr. +-1 if a = M^t · b</span>
+        <span class="c1"># let f(p0, p1) = (p0)  // p1 input var not used</span>
+        <span class="c1">#   M = [I, 0], (a0, a1) = [I 0]^T (b0) = (b0, 0)</span>
+        <span class="c1"># that is, an extra assertion p1 == 0 needs to be added for every p1 input var not used</span>
+        <span class="c1"># currently, adding extra assertion without adding assignments it is not supported</span>
+        <span class="k">if</span> <span class="n">func_ssa</span><span class="o">.</span><span class="n">_input_vars_not_used</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;linear characteristic models of functions with unused input vars is not supported&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">mask_type</span><span class="p">,</span> <span class="n">input_mask_names</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;mx&quot;</span><span class="p">,</span>
+                 <span class="n">external_var2mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">op_model_class2options</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">func</span><span class="p">,</span> <span class="n">prop_type</span><span class="o">=</span><span class="n">mask_type</span><span class="p">,</span> <span class="n">input_prop_names</span><span class="o">=</span><span class="n">input_mask_names</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
+            <span class="n">external_var2prop</span><span class="o">=</span><span class="n">external_var2mask</span><span class="p">,</span> <span class="n">op_model_class2options</span><span class="o">=</span><span class="n">op_model_class2options</span>
+        <span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_get_Characteristic_cls</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">cascada.linear.characteristic</span> <span class="kn">import</span> <span class="n">Characteristic</span> <span class="k">as</span> <span class="n">Characteristic_cls</span>
+        <span class="k">return</span> <span class="n">Characteristic_cls</span>
+
+<div class="viewcode-block" id="ChModel.vrepr"><a class="viewcode-back" href="../../../cascada.linear.chmodel.html#cascada.linear.chmodel.ChModel.vrepr">[docs]</a>    <span class="k">def</span> <span class="nf">vrepr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return an executable string representation.</span>
+
+<span class="sd">        See also `abstractproperty.chmodel.ChModel.vrepr`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.chmodel import ChModel</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64).key_schedule</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS.set_num_rounds(2)</span>
+<span class="sd">            &gt;&gt;&gt; ch_model = ChModel(Speck32_KS, LinearMask, [&quot;mk0&quot;, &quot;mk1&quot;, &quot;mk2&quot;])</span>
+<span class="sd">            &gt;&gt;&gt; ch_model.vrepr()  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">            &quot;ChModel(func=SpeckKeySchedule.set_num_rounds_and_return(2), mask_type=LinearMask,</span>
+<span class="sd">                     input_mask_names=[&#39;mk0&#39;, &#39;mk1&#39;, &#39;mk2&#39;], prefix=&#39;mx&#39;)&quot;</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">vrepr</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ChModel.validity_assertions"><a class="viewcode-back" href="../../../cascada.linear.chmodel.html#cascada.linear.chmodel.ChModel.validity_assertions">[docs]</a>    <span class="k">def</span> <span class="nf">validity_assertions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the validity constraint as a list of assertions.</span>
+
+<span class="sd">        See also `abstractproperty.chmodel.ChModel.validity_assertions`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from functools import reduce</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.operation import BvAnd</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.chmodel import ChModel</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64).key_schedule</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS.set_num_rounds(2)</span>
+<span class="sd">            &gt;&gt;&gt; ch_model = ChModel(Speck32_KS, LinearMask, [&quot;mk0&quot;, &quot;mk1&quot;, &quot;mk2&quot;])</span>
+<span class="sd">            &gt;&gt;&gt; assertions = ch_model.validity_assertions()</span>
+<span class="sd">            &gt;&gt;&gt; for a in assertions: print(a)  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">            ((~((mx1 ^ (mk1 &gt;&gt;&gt; 7)) | (mx1 ^ mk2__0)) | _tmp5b87dfbff36ecd792bff9b4a837080cc) == 0xffff) &amp;</span>
+<span class="sd">                ((_tmp5b87dfbff36ecd792bff9b4a837080cc ^ (_tmp5b87dfbff36ecd792bff9b4a837080cc &gt;&gt; 0x0001) ^</span>
+<span class="sd">                ((mx1 ^ (mk1 &gt;&gt;&gt; 7) ^ mk2__0) &gt;&gt; 0x0001)) == 0x0000)</span>
+<span class="sd">            ((mk2__1 &lt;&lt;&lt; 2) == mx1) &amp; ((mk2__1 &lt;&lt;&lt; 2) == mx3)</span>
+<span class="sd">            ((~((mx5 ^ (mk0 &gt;&gt;&gt; 7)) | (mx5 ^ mx3__0)) | _tmp496354c626556f9b918d51527d988998) == 0xffff) &amp;</span>
+<span class="sd">                ((_tmp496354c626556f9b918d51527d988998 ^ (_tmp496354c626556f9b918d51527d988998 &gt;&gt; 0x0001) ^</span>
+<span class="sd">                ((mx5 ^ (mk0 &gt;&gt;&gt; 7) ^ mx3__0) &gt;&gt; 0x0001)) == 0x0000)</span>
+<span class="sd">            ((mx3__1 &lt;&lt;&lt; 2) == mx5) &amp; ((mx3__1 &lt;&lt;&lt; 2) == mx8)</span>
+<span class="sd">            (mk2 ^ mk2__0 ^ mk2__1) == mk2_out</span>
+<span class="sd">            (mx3 ^ mx3__0 ^ mx3__1) == mx3_out</span>
+<span class="sd">            mx8 == mx8_out</span>
+<span class="sd">            &gt;&gt;&gt; validity_constraint = reduce(BvAnd, assertions)</span>
+<span class="sd">            &gt;&gt;&gt; validity_constraint  # doctest: +ELLIPSIS</span>
+<span class="sd">            ((~((mx1 ^ (mk1 &gt;&gt;&gt; 7)) | (mx1 ^ mk2__0)) | ...</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">validity_assertions</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ChModel.pr_one_assertions"><a class="viewcode-back" href="../../../cascada.linear.chmodel.html#cascada.linear.chmodel.ChModel.pr_one_assertions">[docs]</a>    <span class="k">def</span> <span class="nf">pr_one_assertions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the probability-one constraint as a list of assertions.</span>
+
+<span class="sd">        See also `abstractproperty.chmodel.ChModel.pr_one_assertions`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.chmodel import ChModel</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64).key_schedule</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS.set_num_rounds(2)</span>
+<span class="sd">            &gt;&gt;&gt; ch_model = ChModel(Speck32_KS, LinearMask, [&quot;mk0&quot;, &quot;mk1&quot;, &quot;mk2&quot;])</span>
+<span class="sd">            &gt;&gt;&gt; for a in ch_model.pr_one_assertions(): print(a)  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">            (~((mx1 ^ (mk1 &gt;&gt;&gt; 7)) | (mx1 ^ mk2__0)) == 0xffff) &amp; (((mx1 ^ (mk1 &gt;&gt;&gt; 7) ^ mk2__0)[:1]) == 0b000000000000000)</span>
+<span class="sd">            ((mk2__1 &lt;&lt;&lt; 2) == mx1) &amp; ((mk2__1 &lt;&lt;&lt; 2) == mx3)</span>
+<span class="sd">            (~((mx5 ^ (mk0 &gt;&gt;&gt; 7)) | (mx5 ^ mx3__0)) == 0xffff) &amp; (((mx5 ^ (mk0 &gt;&gt;&gt; 7) ^ mx3__0)[:1]) == 0b000000000000000)</span>
+<span class="sd">            ((mx3__1 &lt;&lt;&lt; 2) == mx5) &amp; ((mx3__1 &lt;&lt;&lt; 2) == mx8)</span>
+<span class="sd">            (mk2 ^ mk2__0 ^ mk2__1) == mk2_out</span>
+<span class="sd">            (mx3 ^ mx3__0 ^ mx3__1) == mx3_out</span>
+<span class="sd">            mx8 == mx8_out</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">pr_one_assertions</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ChModel.weight_assertions"><a class="viewcode-back" href="../../../cascada.linear.chmodel.html#cascada.linear.chmodel.ChModel.weight_assertions">[docs]</a>    <span class="k">def</span> <span class="nf">weight_assertions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ch_weight_variable</span><span class="p">,</span> <span class="n">assign_weight_variables</span><span class="p">,</span> <span class="n">truncate</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the weight constraint as a list of assertions.</span>
+
+<span class="sd">        See also `abstractproperty.chmodel.ChModel.weight_assertions`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.chmodel import ChModel</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64).key_schedule</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS.set_num_rounds(2)</span>
+<span class="sd">            &gt;&gt;&gt; cm = ChModel(Speck32_KS, LinearMask, [&quot;mk0&quot;, &quot;mk1&quot;, &quot;mk2&quot;])</span>
+<span class="sd">            &gt;&gt;&gt; cwv = Variable(&quot;w&quot;, cm.weight_width())</span>
+<span class="sd">            &gt;&gt;&gt; omvs = [Variable(f&quot;w{i}&quot;, om.weight_width()) for i, om in enumerate(cm.assign_outmask2op_model.values())]</span>
+<span class="sd">            &gt;&gt;&gt; for a in cm.weight_assertions(cwv, omvs): print(a)  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">            w0 == 0b0</span>
+<span class="sd">            w1 == 0b0</span>
+<span class="sd">            (PopCount(_tmp5b87dfbff36ecd792bff9b4a837080cc[14:]) == w2) &amp; ((_tmp5b87dfbff36ecd792bff9b4a837080cc ^</span>
+<span class="sd">                (_tmp5b87dfbff36ecd792bff9b4a837080cc &gt;&gt; 0x0001) ^ ((mx1 ^ (mk1 &gt;&gt;&gt; 7) ^ mk2__0) &gt;&gt; 0x0001)) == 0x0000)</span>
+<span class="sd">            w3 == 0b0</span>
+<span class="sd">            w4 == 0b0</span>
+<span class="sd">            w5 == 0b0</span>
+<span class="sd">            (PopCount(_tmp496354c626556f9b918d51527d988998[14:]) == w6) &amp; ((_tmp496354c626556f9b918d51527d988998 ^</span>
+<span class="sd">                (_tmp496354c626556f9b918d51527d988998 &gt;&gt; 0x0001) ^ ((mx5 ^ (mk0 &gt;&gt;&gt; 7) ^ mx3__0) &gt;&gt; 0x0001)) == 0x0000)</span>
+<span class="sd">            w7 == 0b0</span>
+<span class="sd">            w8 == 0b0</span>
+<span class="sd">            w9 == 0b0</span>
+<span class="sd">            w10 == 0b0</span>
+<span class="sd">            w == ((0b0 :: w2) + (0b0 :: w6))</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">weight_assertions</span><span class="p">(</span><span class="n">ch_weight_variable</span><span class="p">,</span> <span class="n">assign_weight_variables</span><span class="p">,</span> <span class="n">truncate</span><span class="o">=</span><span class="n">truncate</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ChModel.max_weight"><a class="viewcode-back" href="../../../cascada.linear.chmodel.html#cascada.linear.chmodel.ChModel.max_weight">[docs]</a>    <span class="k">def</span> <span class="nf">max_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">truncate</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the maximum value the ch. weight variable can achieve in `weight_assertions`.</span>
+
+<span class="sd">        See also `abstractproperty.chmodel.ChModel.max_weight`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.chmodel import ChModel</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64).key_schedule</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS.set_num_rounds(2)</span>
+<span class="sd">            &gt;&gt;&gt; cm = ChModel(Speck32_KS, LinearMask, [&quot;mk0&quot;, &quot;mk1&quot;, &quot;mk2&quot;])</span>
+<span class="sd">            &gt;&gt;&gt; cm.max_weight(), cm.weight_width(), cm.num_frac_bits()</span>
+<span class="sd">            (30, 5, 0)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">max_weight</span><span class="p">(</span><span class="n">truncate</span><span class="o">=</span><span class="n">truncate</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ChModel.error"><a class="viewcode-back" href="../../../cascada.linear.chmodel.html#cascada.linear.chmodel.ChModel.error">[docs]</a>    <span class="k">def</span> <span class="nf">error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the maximum difference between `weight_assertions` and the exact weight.</span>
+
+<span class="sd">        See also `abstractproperty.chmodel.ChModel.error`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.chmodel import ChModel</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64).key_schedule</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS.set_num_rounds(2)</span>
+<span class="sd">            &gt;&gt;&gt; ChModel(Speck32_KS, LinearMask, [&quot;mk0&quot;, &quot;mk1&quot;, &quot;mk2&quot;]).error()</span>
+<span class="sd">            0</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ChModel.signature"><a class="viewcode-back" href="../../../cascada.linear.chmodel.html#cascada.linear.chmodel.ChModel.signature">[docs]</a>    <span class="k">def</span> <span class="nf">signature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sig_type</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the signature of the characteristic model.</span>
+
+<span class="sd">        See also `abstractproperty.chmodel.ChModel.signature`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.chmodel import ChModel, ChModelSigType</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64).key_schedule</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS.set_num_rounds(2)</span>
+<span class="sd">            &gt;&gt;&gt; ch_model = ChModel(Speck32_KS, LinearMask, [&quot;mk0&quot;, &quot;mk1&quot;, &quot;mk2&quot;])</span>
+<span class="sd">            &gt;&gt;&gt; ch_model.signature(ChModelSigType.Unique)</span>
+<span class="sd">            [mk2, mk1, mk2__0, mx3, mk0, mx3__0, mk2_out, mx3_out, mx8_out]</span>
+<span class="sd">            &gt;&gt;&gt; ch_model.signature(ChModelSigType.InputOutput)</span>
+<span class="sd">            [mk0, mk1, mk2, mk2_out, mx3_out, mx8_out]</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">sig_type</span> <span class="o">==</span> <span class="n">ChModelSigType</span><span class="o">.</span><span class="n">Unique</span><span class="p">:</span>
+            <span class="c1"># only the output, external and input masks of non-trivial assignments</span>
+            <span class="c1"># are needed to fully propagate the characteristic</span>
+            <span class="n">sig_var</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">ext_var</span><span class="p">,</span> <span class="n">prop</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">external_var2prop</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prop</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">):</span>
+                    <span class="n">sig_var</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ext_var</span><span class="p">)</span>
+
+            <span class="k">def</span> <span class="nf">sig_var_add_vars_from_expr</span><span class="p">(</span><span class="n">expr</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">expr</span><span class="o">.</span><span class="n">atoms</span><span class="p">(</span><span class="n">core</span><span class="o">.</span><span class="n">Variable</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">v</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sig_var</span><span class="p">:</span>
+                        <span class="n">sig_var</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">op_model</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">assign_outprop2op_model</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">op_model</span><span class="p">,</span> <span class="n">cascada_opmodel</span><span class="o">.</span><span class="n">LinearModelFreeBranch</span><span class="p">):</span>
+                    <span class="n">sig_var_add_vars_from_expr</span><span class="p">(</span><span class="n">op_model</span><span class="o">.</span><span class="n">input_prop</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">val</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">op_model</span><span class="o">.</span><span class="n">max_weight</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">input_prop</span> <span class="ow">in</span> <span class="n">op_model</span><span class="o">.</span><span class="n">input_prop</span><span class="p">:</span>
+                        <span class="n">sig_var_add_vars_from_expr</span><span class="p">(</span><span class="n">input_prop</span><span class="o">.</span><span class="n">val</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_prop</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">val</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sig_var</span><span class="p">:</span>
+                    <span class="n">sig_var</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">val</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">sig_var</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">sig_type</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ChModel.split"><a class="viewcode-back" href="../../../cascada.linear.chmodel.html#cascada.linear.chmodel.ChModel.split">[docs]</a>    <span class="k">def</span> <span class="nf">split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask_separators</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Split into multiple `ChModel` objects given the list of mask separators.</span>
+
+<span class="sd">        See also `abstractproperty.chmodel.ChModel.split`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.chmodel import ChModel, ChModelSigType</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64).key_schedule</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS.set_num_rounds(2)</span>
+<span class="sd">            &gt;&gt;&gt; ch_model = ChModel(Speck32_KS, LinearMask, [&quot;mk0&quot;, &quot;mk1&quot;, &quot;mk2&quot;])</span>
+<span class="sd">            &gt;&gt;&gt; tuple(ch_model.ssa.assignments.items())  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">            ((mx0, mk1 &gt;&gt;&gt; 7), (mk2__0, Id(mk2)), (mk2__1, Id(mk2)), (mk2__2, Id(mk2)),</span>
+<span class="sd">                (mx1, mx0 + mk2__0), (mx2, mk2__1 &lt;&lt;&lt; 2), (mx3, mx2 ^ mx1),</span>
+<span class="sd">            (mx4, mk0 &gt;&gt;&gt; 7), (mx3__0, Id(mx3)), (mx3__1, Id(mx3)), (mx3__2, Id(mx3)),</span>
+<span class="sd">                (mx5, mx4 + mx3__0), (mx6, mx5 ^ 0x0001), (mx7, mx3__1 &lt;&lt;&lt; 2), (mx8, mx7 ^ mx6),</span>
+<span class="sd">            (mk2_out, Id(mk2__2)), (mx3_out, Id(mx3__2)), (mx8_out, Id(mx8)))</span>
+<span class="sd">            &gt;&gt;&gt; mask_separators = [ (LinearMask(Variable(&quot;mx2&quot;, width=16)), LinearMask(Variable(&quot;mx3&quot;, width=16))), ]</span>
+<span class="sd">            &gt;&gt;&gt; for cm in ch_model.split(mask_separators): print(cm)  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">            ChModel(func=SpeckKeySchedule_2R_0S,</span>
+<span class="sd">                    input_mask=[LinearMask(mk0), LinearMask(mk1), LinearMask(mk2)],</span>
+<span class="sd">                    output_mask=[LinearMask(mk0_out), LinearMask(mx3_out), LinearMask(mk2__2_out)],</span>
+<span class="sd">                    assign_outmask2op_model=[(LinearMask(mk2__0), LinearModelFreeBranch(LinearMask(mk2))),</span>
+<span class="sd">                        (LinearMask(mk2__1), LinearModelFreeBranch(LinearMask(mk2))),</span>
+<span class="sd">                        (LinearMask(mx1), LinearModelBvAdd([LinearMask(mk1 &gt;&gt;&gt; 7), LinearMask(mk2__0)])),</span>
+<span class="sd">                        (LinearMask(mx3), LinearModelBvXor([LinearMask(mk2__1 &lt;&lt;&lt; 2), LinearMask(mx1)])),</span>
+<span class="sd">                        (LinearMask(mk0_out), LinearModelId(LinearMask(mk0))),</span>
+<span class="sd">                        (LinearMask(mx3_out), LinearModelId(LinearMask(mx3))),</span>
+<span class="sd">                        (LinearMask(mk2__2_out), LinearModelId(LinearMask(mk2 ^ mk2__0 ^ mk2__1)))])</span>
+<span class="sd">            ChModel(func=SpeckKeySchedule_2R_1S,</span>
+<span class="sd">                    input_mask=[LinearMask(mk0), LinearMask(mx3), LinearMask(mk2__2)],</span>
+<span class="sd">                    output_mask=[LinearMask(mk2_out), LinearMask(mx3_out), LinearMask(mx8_out)],</span>
+<span class="sd">                    assign_outmask2op_model=[(LinearMask(mx3__0), LinearModelFreeBranch(LinearMask(mx3))),</span>
+<span class="sd">                        (LinearMask(mx3__1), LinearModelFreeBranch(LinearMask(mx3))),</span>
+<span class="sd">                        (LinearMask(mx5), LinearModelBvAdd([LinearMask(mk0 &gt;&gt;&gt; 7), LinearMask(mx3__0)])),</span>
+<span class="sd">                        (LinearMask(mx8), LinearModelBvXor([LinearMask(mx3__1 &lt;&lt;&lt; 2), LinearMask(mx5)])),</span>
+<span class="sd">                        (LinearMask(mk2_out), LinearModelId(LinearMask(mk2__2))),</span>
+<span class="sd">                        (LinearMask(mx3_out), LinearModelId(LinearMask(mx3 ^ mx3__0 ^ mx3__1))),</span>
+<span class="sd">                        (LinearMask(mx8_out), LinearModelId(LinearMask(mx8)))])</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">mask_separators</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ChModel.get_round_separators"><a class="viewcode-back" href="../../../cascada.linear.chmodel.html#cascada.linear.chmodel.ChModel.get_round_separators">[docs]</a>    <span class="k">def</span> <span class="nf">get_round_separators</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the round separators if `func` is a `RoundBasedFunction`.</span>
+
+<span class="sd">        See also `abstractproperty.chmodel.ChModel.get_round_separators`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.chmodel import ChModel</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64).key_schedule</span>
+<span class="sd">            &gt;&gt;&gt; Speck32_KS.set_num_rounds(2)</span>
+<span class="sd">            &gt;&gt;&gt; ch_model = ChModel(Speck32_KS, LinearMask, [&quot;mk0&quot;, &quot;mk1&quot;, &quot;mk2&quot;])</span>
+<span class="sd">            &gt;&gt;&gt; sub_cms = ch_model.split(ch_model.get_round_separators())</span>
+<span class="sd">            &gt;&gt;&gt; for cm in sub_cms: print(cm)  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">            ChModel(func=SpeckKeySchedule_2R_0S,</span>
+<span class="sd">                    input_mask=[LinearMask(mk0), LinearMask(mk1), LinearMask(mk2)],</span>
+<span class="sd">                    output_mask=[LinearMask(mk0_out), LinearMask(mx3_out), LinearMask(mk2__2_out)],</span>
+<span class="sd">                    assign_outmask2op_model=[(LinearMask(mk2__0), LinearModelFreeBranch(LinearMask(mk2))),</span>
+<span class="sd">                        (LinearMask(mk2__1), LinearModelFreeBranch(LinearMask(mk2))),</span>
+<span class="sd">                        (LinearMask(mx1), LinearModelBvAdd([LinearMask(mk1 &gt;&gt;&gt; 7), LinearMask(mk2__0)])),</span>
+<span class="sd">                        (LinearMask(mx3), LinearModelBvXor([LinearMask(mk2__1 &lt;&lt;&lt; 2), LinearMask(mx1)])),</span>
+<span class="sd">                        (LinearMask(mk0_out), LinearModelId(LinearMask(mk0))),</span>
+<span class="sd">                        (LinearMask(mx3_out), LinearModelId(LinearMask(mx3))),</span>
+<span class="sd">                        (LinearMask(mk2__2_out), LinearModelId(LinearMask(mk2 ^ mk2__0 ^ mk2__1)))])</span>
+<span class="sd">            ChModel(func=SpeckKeySchedule_2R_1S,</span>
+<span class="sd">                    input_mask=[LinearMask(mk0), LinearMask(mx3), LinearMask(mk2__2)],</span>
+<span class="sd">                    output_mask=[LinearMask(mk2_out), LinearMask(mx3_out), LinearMask(mx8_out)],</span>
+<span class="sd">                    assign_outmask2op_model=[(LinearMask(mx3__0), LinearModelFreeBranch(LinearMask(mx3))),</span>
+<span class="sd">                        (LinearMask(mx3__1), LinearModelFreeBranch(LinearMask(mx3))),</span>
+<span class="sd">                        (LinearMask(mx5), LinearModelBvAdd([LinearMask(mk0 &gt;&gt;&gt; 7), LinearMask(mx3__0)])),</span>
+<span class="sd">                        (LinearMask(mx8), LinearModelBvXor([LinearMask(mx3__1 &lt;&lt;&lt; 2), LinearMask(mx5)])),</span>
+<span class="sd">                        (LinearMask(mk2_out), LinearModelId(LinearMask(mk2__2))),</span>
+<span class="sd">                        (LinearMask(mx3_out), LinearModelId(LinearMask(mx3 ^ mx3__0 ^ mx3__1))),</span>
+<span class="sd">                        (LinearMask(mx8_out), LinearModelId(LinearMask(mx8)))])</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_round_separators</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="EncryptionChModel"><a class="viewcode-back" href="../../../cascada.linear.chmodel.html#cascada.linear.chmodel.EncryptionChModel">[docs]</a><span class="k">class</span> <span class="nc">EncryptionChModel</span><span class="p">(</span><span class="n">abstractproperty</span><span class="o">.</span><span class="n">chmodel</span><span class="o">.</span><span class="n">EncryptionChModel</span><span class="p">,</span> <span class="n">ChModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent linear characteristic models of encryption functions.</span>
+
+<span class="sd">    Given a `Cipher`, an `EncryptionChModel` is a bit-vector model</span>
+<span class="sd">    (see `ChModel`) of a linear characteristic over</span>
+<span class="sd">    the `Cipher.encryption`</span>
+<span class="sd">    (where the `Cipher.key_schedule` is ignored and round key masks</span>
+<span class="sd">    are set to `LinearMask` objects containing `Variable` objects).</span>
+
+<span class="sd">    See also `linear.characteristic.EncryptionCharacteristic`.</span>
+
+<span class="sd">    In an `EncryptionChModel`, the plaintext masks start with the prefix ``&quot;mp&quot;``,</span>
+<span class="sd">    the intermediate and output masks start with the prefix ``&quot;mx&quot;``,</span>
+<span class="sd">    and the round key masks (the masks of the external variables</span>
+<span class="sd">    of the encryption `SSA`) start with the prefix ``&quot;mk&quot;``.</span>
+
+<span class="sd">    ::</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.linear.chmodel import EncryptionChModel</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">        &gt;&gt;&gt; Speck32 = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64)</span>
+<span class="sd">        &gt;&gt;&gt; Speck32.set_num_rounds(2)</span>
+<span class="sd">        &gt;&gt;&gt; ch_model = EncryptionChModel(Speck32, LinearMask)</span>
+<span class="sd">        &gt;&gt;&gt; ch_model  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        EncryptionChModel(cipher=SpeckCipher_2R,</span>
+<span class="sd">            input_mask=[LinearMask(mp0), LinearMask(mp1)],</span>
+<span class="sd">            output_mask=[LinearMask(mx7_out), LinearMask(mx9_out)],</span>
+<span class="sd">            external_var2mask=[(mk0, LinearMask(mk0)), (mk1, LinearMask(mk1))],</span>
+<span class="sd">            assign_outmask2op_model=[(LinearMask(mp1__0), LinearModelFreeBranch(LinearMask(mp1))),</span>
+<span class="sd">                (LinearMask(mx1), LinearModelBvAdd([LinearMask(mp0 &gt;&gt;&gt; 7), LinearMask(mp1__0)])),</span>
+<span class="sd">                (LinearMask(mx2), LinearModelBvXor([LinearMask(mx1), LinearMask(mk0)])),</span>
+<span class="sd">                (LinearMask(mx2__0), LinearModelFreeBranch(LinearMask(mx2))),</span>
+<span class="sd">                (LinearMask(mx4), LinearModelBvXor([LinearMask((mp1 ^ mp1__0) &lt;&lt;&lt; 2), LinearMask(mx2__0)])),</span>
+<span class="sd">                (LinearMask(mx4__0), LinearModelFreeBranch(LinearMask(mx4))),</span>
+<span class="sd">                (LinearMask(mx6), LinearModelBvAdd([LinearMask((mx2 ^ mx2__0) &gt;&gt;&gt; 7), LinearMask(mx4__0)])),</span>
+<span class="sd">                (LinearMask(mx7), LinearModelBvXor([LinearMask(mx6), LinearMask(mk1)])),</span>
+<span class="sd">                (LinearMask(mx7__0), LinearModelFreeBranch(LinearMask(mx7))),</span>
+<span class="sd">                (LinearMask(mx9), LinearModelBvXor([LinearMask((mx4 ^ mx4__0) &lt;&lt;&lt; 2), LinearMask(mx7__0)])),</span>
+<span class="sd">                (LinearMask(mx7_out), LinearModelId(LinearMask(mx7 ^ mx7__0))),</span>
+<span class="sd">                (LinearMask(mx9_out), LinearModelId(LinearMask(mx9)))])</span>
+<span class="sd">        &gt;&gt;&gt; ch_model.ssa  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        SSA(input_vars=[mp0, mp1], output_vars=[mx7_out, mx9_out], external_vars=[mk0, mk1],</span>
+<span class="sd">        assignments=[(mx0, mp0 &gt;&gt;&gt; 7), (mp1__0, Id(mp1)), (mp1__1, Id(mp1)),</span>
+<span class="sd">            (mx1, mx0 + mp1__0), (mx2, mx1 ^ mk0), (mx3, mp1__1 &lt;&lt;&lt; 2), (mx2__0, Id(mx2)), (mx2__1, Id(mx2)),</span>
+<span class="sd">                (mx4, mx3 ^ mx2__0), (mx5, mx2__1 &gt;&gt;&gt; 7), (mx4__0, Id(mx4)), (mx4__1, Id(mx4)),</span>
+<span class="sd">            (mx6, mx5 + mx4__0), (mx7, mx6 ^ mk1), (mx8, mx4__1 &lt;&lt;&lt; 2), (mx7__0, Id(mx7)), (mx7__1, Id(mx7)),</span>
+<span class="sd">                (mx9, mx8 ^ mx7__0), (mx7_out, Id(mx7__1)), (mx9_out, Id(mx9))])</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_prefix</span> <span class="o">=</span> <span class="s2">&quot;m&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cipher</span><span class="p">,</span> <span class="n">mask_type</span><span class="p">,</span> <span class="n">op_model_class2options</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">cipher</span><span class="p">,</span> <span class="n">prop_type</span><span class="o">=</span><span class="n">mask_type</span><span class="p">,</span> <span class="n">op_model_class2options</span><span class="o">=</span><span class="n">op_model_class2options</span>
+        <span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_get_EncryptionCharacteristic_cls</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">cascada.linear.characteristic</span> <span class="kn">import</span> <span class="n">EncryptionCharacteristic</span> <span class="k">as</span> <span class="n">EncryptionCharacteristic_cls</span>
+        <span class="k">return</span> <span class="n">EncryptionCharacteristic_cls</span>
+
+<div class="viewcode-block" id="EncryptionChModel.vrepr"><a class="viewcode-back" href="../../../cascada.linear.chmodel.html#cascada.linear.chmodel.EncryptionChModel.vrepr">[docs]</a>    <span class="k">def</span> <span class="nf">vrepr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return an executable string representation.</span>
+
+<span class="sd">        See also `abstractproperty.chmodel.EncryptionChModel.vrepr`.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.mask import LinearMask</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.linear.chmodel import EncryptionChModel</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">            &gt;&gt;&gt; Speck32 = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64)</span>
+<span class="sd">            &gt;&gt;&gt; Speck32.set_num_rounds(2)</span>
+<span class="sd">            &gt;&gt;&gt; EncryptionChModel(Speck32, LinearMask).vrepr()</span>
+<span class="sd">            &#39;EncryptionChModel(cipher=SpeckCipher.set_num_rounds_and_return(2), mask_type=LinearMask)&#39;</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">vrepr</span><span class="p">()</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Adrián Ranea.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

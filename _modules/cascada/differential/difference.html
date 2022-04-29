@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cascada.differential.difference &mdash; CASCADA 1.0.rc0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> CASCADA
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">CASCADA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../primitives_implemented.html">Primitives implemented</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cascada.html">API reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">CASCADA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>cascada.differential.difference</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cascada.differential.difference</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Represent types of difference properties in the context of differential cryptanalysis.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">core</span>
+<span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">operation</span>
+<span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">secondaryop</span>
+<span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">ssa</span> <span class="k">as</span> <span class="n">cascada_ssa</span>
+
+<span class="kn">from</span> <span class="nn">cascada</span> <span class="kn">import</span> <span class="n">abstractproperty</span>
+
+
+<div class="viewcode-block" id="Difference"><a class="viewcode-back" href="../../../cascada.differential.difference.html#cascada.differential.difference.Difference">[docs]</a><span class="k">class</span> <span class="nc">Difference</span><span class="p">(</span><span class="n">abstractproperty</span><span class="o">.</span><span class="n">property</span><span class="o">.</span><span class="n">Property</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent difference properties.</span>
+
+<span class="sd">    The *difference* between two `Term` objects :math:`x` and :math:`y`</span>
+<span class="sd">    is defined as :math:`\\alpha = y - x`</span>
+<span class="sd">    for some *difference operation* :math:`-` (a bit-vector `Operation`).</span>
+<span class="sd">    In other words, the pair :math:`(x, x + \\alpha)` has difference</span>
+<span class="sd">    :math:`\\alpha`, where :math:`+` is the &quot;inverse&quot; of the difference operation.</span>
+
+<span class="sd">    Given a function :math:`f`,  a `Difference` property pair</span>
+<span class="sd">    (also called a differential) :math:`(\\alpha, \\beta)`</span>
+<span class="sd">    is a bit-vector `Property` :math:`(\\alpha, \\beta)` where the</span>
+<span class="sd">    propagation probability (also called the differential probability)</span>
+<span class="sd">    is defined as</span>
+<span class="sd">    :math:`DP(\\alpha, \\beta) =</span>
+<span class="sd">    \# \{ x \ : \ f(x + \\alpha) - f(x)  = \\beta \} / 2^{n}`,</span>
+<span class="sd">    that is, the fraction of input pairs with input difference</span>
+<span class="sd">    :math:`\\alpha` that lead to output pairs with difference :math:`\\beta`.</span>
+
+<span class="sd">    The most common difference used in differential cryptanalysis</span>
+<span class="sd">    is the XOR difference `XorDiff` (where the difference operation</span>
+<span class="sd">    is `BvXor`). Other examples are the additive difference</span>
+<span class="sd">    (where the difference operation is `BvSub`) or the rotational-XOR</span>
+<span class="sd">    difference `RXDiff`.</span>
+
+<span class="sd">    This class is not meant to be instantiated but to provide a base</span>
+<span class="sd">    class to represent types of differences.</span>
+
+<span class="sd">    Internally, `Difference` is a subclass of `Property` (as `LinearMask`).</span>
+<span class="sd">    The `Difference` methods inherited from `Property` requiring</span>
+<span class="sd">    arguments of type `Property` should be called instead with arguments</span>
+<span class="sd">    of type `Difference`.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        diff_op: the difference `Operation`.</span>
+<span class="sd">        inv_diff_op: the inverse of the difference operation.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">diff_op</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">inv_diff_op</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="Difference.get_pair_element"><a class="viewcode-back" href="../../../cascada.differential.difference.html#cascada.differential.difference.Difference.get_pair_element">[docs]</a>    <span class="k">def</span> <span class="nf">get_pair_element</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the `Term` :math:`y` such that :math:`y = \\alpha + x`.&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Term</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">inv_diff_op</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">val</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Difference.from_pair"><a class="viewcode-back" href="../../../cascada.differential.difference.html#cascada.differential.difference.Difference.from_pair">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_pair</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the `Difference` :math:`\\alpha = y - x` given two `Term`.&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Term</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Term</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">diff_op</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>  <span class="c1"># The order of the operands is important</span></div></div>
+
+
+<div class="viewcode-block" id="XorDiff"><a class="viewcode-back" href="../../../cascada.differential.difference.html#cascada.differential.difference.XorDiff">[docs]</a><span class="k">class</span> <span class="nc">XorDiff</span><span class="p">(</span><span class="n">Difference</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent XOR difference properties.</span>
+
+<span class="sd">    The XOR difference of two `Term` is given by the XOR</span>
+<span class="sd">    of the terms. In other words, the *difference operation*</span>
+<span class="sd">    of `XorDiff` is the `BvXor` (see `Difference`).</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.differential.difference import XorDiff</span>
+<span class="sd">        &gt;&gt;&gt; x, y = Constant(0b000, 3), Constant(0b000, 3)</span>
+<span class="sd">        &gt;&gt;&gt; alpha = XorDiff.from_pair(x, y)</span>
+<span class="sd">        &gt;&gt;&gt; alpha</span>
+<span class="sd">        XorDiff(0b000)</span>
+<span class="sd">        &gt;&gt;&gt; alpha.get_pair_element(x)</span>
+<span class="sd">        0b000</span>
+<span class="sd">        &gt;&gt;&gt; x, y = Constant(0b010, 3), Constant(0b101, 3)</span>
+<span class="sd">        &gt;&gt;&gt; alpha = XorDiff.from_pair(x, y)</span>
+<span class="sd">        &gt;&gt;&gt; alpha</span>
+<span class="sd">        XorDiff(0b111)</span>
+<span class="sd">        &gt;&gt;&gt; alpha.get_pair_element(x)</span>
+<span class="sd">        0b101</span>
+<span class="sd">        &gt;&gt;&gt; k = Variable(&quot;k&quot;, 8)</span>
+<span class="sd">        &gt;&gt;&gt; alpha = XorDiff.from_pair(k, k)</span>
+<span class="sd">        &gt;&gt;&gt; alpha</span>
+<span class="sd">        XorDiff(0x00)</span>
+<span class="sd">        &gt;&gt;&gt; alpha.get_pair_element(k)</span>
+<span class="sd">        k</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">diff_op</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvXor</span>
+    <span class="n">inv_diff_op</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvXor</span>
+
+<div class="viewcode-block" id="XorDiff.propagate"><a class="viewcode-back" href="../../../cascada.differential.difference.html#cascada.differential.difference.XorDiff.propagate">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">propagate</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">input_diff</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Propagate the given input difference of type `XorDiff` through the given operation.</span>
+
+<span class="sd">        For any operation ``op`` linear with respect to `BvXor` and any</span>
+<span class="sd">        input difference ``input_diff``, the output difference</span>
+<span class="sd">        is uniquely determined and its bit-vector value is ``f(input_diff.val)``.</span>
+
+<span class="sd">        See `Property.propagate` for more information.</span>
+
+<span class="sd">        User-defined or new `Operation` ``op`` can store its associated</span>
+<span class="sd">        `XorDiff` `differential.opmodel.OpModel` in ``op.xor_model``,</span>
+<span class="sd">        as this method first checks whether ``op`` has its associated</span>
+<span class="sd">        `differential.opmodel.OpModel` stored in the class attribute ``xor_model``.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Variable, Constant</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.operation import BvXor, BvAdd, BvIdentity</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.operation import make_partial_operation</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.difference import XorDiff</span>
+<span class="sd">            &gt;&gt;&gt; d1, d2 = XorDiff(Variable(&quot;d1&quot;, 8)), XorDiff(Variable(&quot;d2&quot;, 8))</span>
+<span class="sd">            &gt;&gt;&gt; XorDiff.propagate(BvXor, [d1, d2])</span>
+<span class="sd">            XorDiff(d1 ^ d2)</span>
+<span class="sd">            &gt;&gt;&gt; Xor1 = make_partial_operation(BvXor, tuple([None, Constant(1, 8)]))</span>
+<span class="sd">            &gt;&gt;&gt; XorDiff.propagate(Xor1, d1)</span>
+<span class="sd">            XorDiff(d1)</span>
+<span class="sd">            &gt;&gt;&gt; XorDiff.propagate(BvAdd, [d1, d2])</span>
+<span class="sd">            XorModelBvAdd([XorDiff(d1), XorDiff(d2)])</span>
+<span class="sd">            &gt;&gt;&gt; Add1 = make_partial_operation(BvAdd, tuple([None, Constant(1, 8)]))</span>
+<span class="sd">            &gt;&gt;&gt; XorDiff.propagate(Add1, d1)</span>
+<span class="sd">            XorModelBvAddCt_{·, 0x01}(XorDiff(d1))</span>
+<span class="sd">            &gt;&gt;&gt; XorDiff.propagate(BvIdentity, d1)</span>
+<span class="sd">            XorModelId(XorDiff(d1))</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">input_diff</span> <span class="o">=</span> <span class="n">abstractproperty</span><span class="o">.</span><span class="n">property</span><span class="o">.</span><span class="n">_tuplify</span><span class="p">(</span><span class="n">input_diff</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_diff</span><span class="p">)</span> <span class="o">==</span> <span class="nb">sum</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">arity</span><span class="p">)</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;invalid arguments: op=</span><span class="si">{}</span><span class="s2">, input_diff=</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">op</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+            <span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">vrepr</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Term</span><span class="p">)</span> <span class="k">else</span> <span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">input_diff</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">diff</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span> <span class="k">for</span> <span class="n">diff</span> <span class="ow">in</span> <span class="n">input_diff</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="s2">&quot;_trivial_propagation&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">op</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">val</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">input_diff</span><span class="p">]))</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="s2">&quot;xor_model&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">op</span><span class="o">.</span><span class="n">xor_model</span><span class="p">(</span><span class="n">input_diff</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvNot</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">input_diff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvXor</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">op</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">val</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">input_diff</span><span class="p">]))</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvAnd</span><span class="p">:</span>
+            <span class="c1"># imported here to avoid circular imports</span>
+            <span class="kn">from</span> <span class="nn">cascada.differential</span> <span class="kn">import</span> <span class="n">opmodel</span>
+            <span class="k">return</span> <span class="n">opmodel</span><span class="o">.</span><span class="n">XorModelBvAnd</span><span class="p">(</span><span class="n">input_diff</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvOr</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">cascada.differential</span> <span class="kn">import</span> <span class="n">opmodel</span>
+            <span class="k">return</span> <span class="n">opmodel</span><span class="o">.</span><span class="n">XorModelBvOr</span><span class="p">(</span><span class="n">input_diff</span><span class="p">)</span>
+
+        <span class="c1"># RotateLeft, ..., BvLshr only allowed for constant offsets (see below)</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvAdd</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">cascada.differential</span> <span class="kn">import</span> <span class="n">opmodel</span>
+            <span class="k">return</span> <span class="n">opmodel</span><span class="o">.</span><span class="n">XorModelBvAdd</span><span class="p">(</span><span class="n">input_diff</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvSub</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">cascada.differential</span> <span class="kn">import</span> <span class="n">opmodel</span>
+            <span class="k">return</span> <span class="n">opmodel</span><span class="o">.</span><span class="n">XorModelBvSub</span><span class="p">(</span><span class="n">input_diff</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvNeg</span><span class="p">:</span>
+            <span class="c1"># XorModelBvNeg == XorModelBvAddCt(Ct1) since -x = ~x + 1</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">input_diff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># BvNot does not change differences</span>
+            <span class="n">ct</span> <span class="o">=</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">width</span><span class="p">)</span>
+            <span class="kn">from</span> <span class="nn">cascada.differential</span> <span class="kn">import</span> <span class="n">opmodel</span>
+            <span class="k">return</span> <span class="n">opmodel</span><span class="o">.</span><span class="n">make_partial_op_model</span><span class="p">(</span><span class="n">opmodel</span><span class="o">.</span><span class="n">XorModelBvAddCt</span><span class="p">,</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">ct</span><span class="p">))(</span><span class="n">d</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">Concat</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">op</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">val</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">input_diff</span><span class="p">]))</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="n">cascada_ssa</span><span class="o">.</span><span class="n">SSAReturn</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_diff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">):</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;constant propagation of output difference in &quot;</span>
+                              <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.propagate(op=</span><span class="si">{</span><span class="n">op</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">, &quot;</span>
+                              <span class="sa">f</span><span class="s2">&quot;input_diff=</span><span class="si">{</span><span class="n">input_diff</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="kn">from</span> <span class="nn">cascada.differential</span> <span class="kn">import</span> <span class="n">opmodel</span>
+            <span class="k">return</span> <span class="n">opmodel</span><span class="o">.</span><span class="n">XorModelId</span><span class="p">(</span><span class="n">input_diff</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvIdentity</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_diff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">input_diff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="kn">from</span> <span class="nn">cascada.differential</span> <span class="kn">import</span> <span class="n">opmodel</span>
+                <span class="k">return</span> <span class="n">opmodel</span><span class="o">.</span><span class="n">XorModelId</span><span class="p">(</span><span class="n">input_diff</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="n">secondaryop</span><span class="o">.</span><span class="n">BvIf</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">cascada.differential</span> <span class="kn">import</span> <span class="n">opmodel</span>
+            <span class="k">return</span> <span class="n">opmodel</span><span class="o">.</span><span class="n">XorModelBvIf</span><span class="p">(</span><span class="n">input_diff</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="n">secondaryop</span><span class="o">.</span><span class="n">BvMaj</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">cascada.differential</span> <span class="kn">import</span> <span class="n">opmodel</span>
+            <span class="k">return</span> <span class="n">opmodel</span><span class="o">.</span><span class="n">XorModelBvMaj</span><span class="p">(</span><span class="n">input_diff</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">operation</span><span class="o">.</span><span class="n">PartialOperation</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">base_op</span> <span class="ow">in</span> <span class="p">[</span><span class="n">operation</span><span class="o">.</span><span class="n">BvXor</span><span class="p">,</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvOr</span><span class="p">,</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvAnd</span><span class="p">]:</span>
+                <span class="n">d1_val</span> <span class="o">=</span> <span class="n">input_diff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">val</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">base_op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvXor</span><span class="p">:</span>
+                    <span class="n">d2_val</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_pair</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span><span class="o">.</span><span class="n">val</span>
+                    <span class="n">new_op</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvXor</span>
+                <span class="k">elif</span> <span class="n">op</span><span class="o">.</span><span class="n">base_op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvOr</span><span class="p">:</span>
+                    <span class="n">d2_val</span> <span class="o">=</span> <span class="o">~</span><span class="n">val</span>
+                    <span class="n">new_op</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvAnd</span>
+                <span class="k">elif</span> <span class="n">op</span><span class="o">.</span><span class="n">base_op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvAnd</span><span class="p">:</span>
+                    <span class="n">d2_val</span> <span class="o">=</span> <span class="n">val</span>
+                    <span class="n">new_op</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvAnd</span>
+                <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">new_op</span><span class="p">(</span><span class="n">d1_val</span><span class="p">,</span> <span class="n">d2_val</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">base_op</span> <span class="ow">in</span> <span class="p">[</span><span class="n">operation</span><span class="o">.</span><span class="n">RotateLeft</span><span class="p">,</span> <span class="n">operation</span><span class="o">.</span><span class="n">RotateRight</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_diff</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+                    <span class="n">d</span> <span class="o">=</span> <span class="n">input_diff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">base_op</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">base_op</span> <span class="ow">in</span> <span class="p">[</span><span class="n">operation</span><span class="o">.</span><span class="n">BvShl</span><span class="p">,</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvLshr</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_diff</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+                    <span class="n">d</span> <span class="o">=</span> <span class="n">input_diff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">base_op</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">base_op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvAdd</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_diff</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="n">input_diff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">ct</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">ct</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">d</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="kn">from</span> <span class="nn">cascada.differential</span> <span class="kn">import</span> <span class="n">opmodel</span>
+                    <span class="k">return</span> <span class="n">opmodel</span><span class="o">.</span><span class="n">make_partial_op_model</span><span class="p">(</span><span class="n">opmodel</span><span class="o">.</span><span class="n">XorModelBvAddCt</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">)(</span><span class="n">d</span><span class="p">)</span>
+
+            <span class="c1"># currently if left op is fixed with a ct, then else code below is executed</span>
+            <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">base_op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvSub</span> <span class="ow">and</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_diff</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="n">input_diff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">ct</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">ct</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">d</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="kn">from</span> <span class="nn">cascada.differential</span> <span class="kn">import</span> <span class="n">opmodel</span>
+                    <span class="k">return</span> <span class="n">opmodel</span><span class="o">.</span><span class="n">make_partial_op_model</span><span class="p">(</span><span class="n">opmodel</span><span class="o">.</span><span class="n">XorModelBvSubCt</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">)(</span><span class="n">d</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">base_op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">Extract</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_diff</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+                    <span class="n">d</span> <span class="o">=</span> <span class="n">input_diff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">base_op</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># e.g., BvIf, BvMaj</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;XorDiff OpModel of </span><span class="si">{</span><span class="n">op</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> is not implemented;&quot;</span>
+                              <span class="sa">f</span><span class="s2">&quot; instead using OpModel of </span><span class="si">{</span><span class="n">op</span><span class="o">.</span><span class="n">base_op</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> with &quot;</span>
+                              <span class="sa">f</span><span class="s2">&quot;zero difference for each fixed operand&quot;</span><span class="p">)</span>
+                <span class="n">new_input_diff</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">counter_non_fixed_args</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">for</span> <span class="n">fa</span> <span class="ow">in</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">fa</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fa</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                        <span class="n">new_input_diff</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">from_pair</span><span class="p">(</span><span class="n">fa</span><span class="p">,</span> <span class="n">fa</span><span class="p">))</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">new_input_diff</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">input_diff</span><span class="p">[</span><span class="n">counter_non_fixed_args</span><span class="p">])</span>
+                        <span class="n">counter_non_fixed_args</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_diff</span><span class="p">)</span> <span class="o">==</span> <span class="n">counter_non_fixed_args</span>
+                <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">propagate</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">base_op</span><span class="p">,</span> <span class="n">new_input_diff</span><span class="p">)</span>
+
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="RXOp"><a class="viewcode-back" href="../../../cascada.differential.difference.html#cascada.differential.difference.RXOp">[docs]</a><span class="k">class</span> <span class="nc">RXOp</span><span class="p">(</span><span class="n">operation</span><span class="o">.</span><span class="n">SecondaryOperation</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The difference operation of `RXDiff` given by ``(x, y) |--&gt; (x &lt;&lt;&lt; 1) ^ y.``&quot;&quot;&quot;</span>
+
+    <span class="n">arity</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">is_symmetric</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">is_simple</span> <span class="o">=</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="RXOp.condition"><a class="viewcode-back" href="../../../cascada.differential.difference.html#cascada.differential.difference.RXOp.condition">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">condition</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">width</span> <span class="o">==</span> <span class="n">y</span><span class="o">.</span><span class="n">width</span></div>
+
+<div class="viewcode-block" id="RXOp.output_width"><a class="viewcode-back" href="../../../cascada.differential.difference.html#cascada.differential.difference.RXOp.output_width">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">output_width</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">width</span></div>
+
+<div class="viewcode-block" id="RXOp.eval"><a class="viewcode-back" href="../../../cascada.differential.difference.html#cascada.differential.difference.RXOp.eval">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">operation</span><span class="o">.</span><span class="n">RotateLeft</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">^</span> <span class="n">y</span></div></div>
+
+
+<div class="viewcode-block" id="RXInvOp"><a class="viewcode-back" href="../../../cascada.differential.difference.html#cascada.differential.difference.RXInvOp">[docs]</a><span class="k">class</span> <span class="nc">RXInvOp</span><span class="p">(</span><span class="n">operation</span><span class="o">.</span><span class="n">SecondaryOperation</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The inverse of the difference operation of `RXDiff` given by ``(x, d) |--&gt; (x &lt;&lt;&lt; 1) ^ d.``&quot;&quot;&quot;</span>
+
+    <span class="n">arity</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">is_symmetric</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">is_simple</span> <span class="o">=</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="RXInvOp.condition"><a class="viewcode-back" href="../../../cascada.differential.difference.html#cascada.differential.difference.RXInvOp.condition">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">condition</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">width</span> <span class="o">==</span> <span class="n">d</span><span class="o">.</span><span class="n">width</span></div>
+
+<div class="viewcode-block" id="RXInvOp.output_width"><a class="viewcode-back" href="../../../cascada.differential.difference.html#cascada.differential.difference.RXInvOp.output_width">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">output_width</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">width</span></div>
+
+<div class="viewcode-block" id="RXInvOp.eval"><a class="viewcode-back" href="../../../cascada.differential.difference.html#cascada.differential.difference.RXInvOp.eval">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">operation</span><span class="o">.</span><span class="n">RotateLeft</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">^</span> <span class="n">d</span></div></div>
+
+
+<div class="viewcode-block" id="RXDiff"><a class="viewcode-back" href="../../../cascada.differential.difference.html#cascada.differential.difference.RXDiff">[docs]</a><span class="k">class</span> <span class="nc">RXDiff</span><span class="p">(</span><span class="n">Difference</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent rotational-XOR (RX) difference properties.</span>
+
+<span class="sd">    The pair ``(x, (x &lt;&lt;&lt; 1) ^ d)`` has RX difference ``d``.</span>
+<span class="sd">    In other words,  the RX difference of two `Term` ``x`` and ``y``</span>
+<span class="sd">    is defined as ``(x &lt;&lt;&lt; 1) ^ y``.</span>
+
+<span class="sd">    This definition of rotational-XOR difference is equivalent but</span>
+<span class="sd">    slightly different to the definitions presented in</span>
+<span class="sd">    `Rotational Cryptanalysis in the Presence of Constants</span>
+<span class="sd">    &lt;https://doi.org/10.13154/tosc.v2016.i1.57-70&gt;`_</span>
+<span class="sd">    and `Rotational-XOR Cryptanalysis of Reduced-round SPECK</span>
+<span class="sd">    &lt;https://doi.org/10.13154/tosc.v2017.i3.24-36&gt;`_.</span>
+
+<span class="sd">    See `Difference` for more information.</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.operation import RotateLeft</span>
+<span class="sd">        &gt;&gt;&gt; from cascada.differential.difference import RXDiff</span>
+<span class="sd">        &gt;&gt;&gt; x, y = Constant(0b000, 3), Constant(0b000, 3)</span>
+<span class="sd">        &gt;&gt;&gt; alpha = RXDiff.from_pair(x, y)</span>
+<span class="sd">        &gt;&gt;&gt; alpha</span>
+<span class="sd">        RXDiff(0b000)</span>
+<span class="sd">        &gt;&gt;&gt; alpha.get_pair_element(x)</span>
+<span class="sd">        0b000</span>
+<span class="sd">        &gt;&gt;&gt; x, y = Constant(0b000, 3), Constant(0b001, 3)</span>
+<span class="sd">        &gt;&gt;&gt; alpha = RXDiff.from_pair(x, y)</span>
+<span class="sd">        &gt;&gt;&gt; alpha</span>
+<span class="sd">        RXDiff(0b001)</span>
+<span class="sd">        &gt;&gt;&gt; alpha.get_pair_element(x)</span>
+<span class="sd">        0b001</span>
+<span class="sd">        &gt;&gt;&gt; x, y, d = Variable(&quot;x&quot;, 3),  Variable(&quot;y&quot;, 3), Variable(&quot;d&quot;, 3)</span>
+<span class="sd">        &gt;&gt;&gt; RXDiff.from_pair(x, y).val.doit()  # RXOp is a SecondaryOperation</span>
+<span class="sd">        (x &lt;&lt;&lt; 1) ^ y</span>
+<span class="sd">        &gt;&gt;&gt; RXDiff.from_pair(x, RotateLeft(x, 1) ^ d).val.doit()</span>
+<span class="sd">        d</span>
+<span class="sd">        &gt;&gt;&gt; RXDiff(d).get_pair_element(x).doit()</span>
+<span class="sd">        (x &lt;&lt;&lt; 1) ^ d</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">diff_op</span> <span class="o">=</span> <span class="n">RXOp</span>
+    <span class="n">inv_diff_op</span> <span class="o">=</span> <span class="n">RXInvOp</span>
+
+<div class="viewcode-block" id="RXDiff.propagate"><a class="viewcode-back" href="../../../cascada.differential.difference.html#cascada.differential.difference.RXDiff.propagate">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">propagate</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">input_diff</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Propagate the given input difference of type `RXDiff` through the given operation.</span>
+
+<span class="sd">        For any operation ``op`` linear with respect to `RXOp` and any</span>
+<span class="sd">        input difference ``input_diff``, the output difference</span>
+<span class="sd">        is uniquely determined and its bit-vector value is ``f(input_diff.val)``.</span>
+
+<span class="sd">        See `Property.propagate` for more information.</span>
+
+<span class="sd">        User-defined or new `Operation` ``op`` can store its associated `RXDiff`</span>
+<span class="sd">        `differential.opmodel.OpModel` in ``op.rx_model``, as this method first</span>
+<span class="sd">        checks whether ``op`` has its associated `differential.opmodel.OpModel`</span>
+<span class="sd">        stored in the class attribute ``rx_model``.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Variable, Constant</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.operation import BvAdd, BvXor, BvShl, BvIdentity</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.operation import make_partial_operation</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.difference import RXDiff</span>
+<span class="sd">            &gt;&gt;&gt; d1, d2 = RXDiff(Variable(&quot;d1&quot;, 8)), RXDiff(Variable(&quot;d2&quot;, 8))</span>
+<span class="sd">            &gt;&gt;&gt; RXDiff.propagate(BvXor, [d1, d2])</span>
+<span class="sd">            RXDiff(d1 ^ d2)</span>
+<span class="sd">            &gt;&gt;&gt; Xor1 = make_partial_operation(BvXor, tuple([None, Constant(1, 8)]))</span>
+<span class="sd">            &gt;&gt;&gt; RXDiff.propagate(Xor1, d1)</span>
+<span class="sd">            RXDiff(d1 ^ 0x03)</span>
+<span class="sd">            &gt;&gt;&gt; RXDiff.propagate(BvAdd, [d1, d2])</span>
+<span class="sd">            RXModelBvAdd([RXDiff(d1), RXDiff(d2)])</span>
+<span class="sd">            &gt;&gt;&gt; Shl1 = make_partial_operation(BvShl, tuple([None, Constant(1, 8)]))</span>
+<span class="sd">            &gt;&gt;&gt; RXDiff.propagate(Shl1, d1)</span>
+<span class="sd">            RXModelBvShlCt_{·, 0x01}(RXDiff(d1))</span>
+<span class="sd">            &gt;&gt;&gt; RXDiff.propagate(BvIdentity, d1)</span>
+<span class="sd">            RXModelId(RXDiff(d1))</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">input_diff</span> <span class="o">=</span> <span class="n">abstractproperty</span><span class="o">.</span><span class="n">property</span><span class="o">.</span><span class="n">_tuplify</span><span class="p">(</span><span class="n">input_diff</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_diff</span><span class="p">)</span> <span class="o">==</span> <span class="nb">sum</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">arity</span><span class="p">)</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;invalid arguments: op=</span><span class="si">{}</span><span class="s2">, input_diff=</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">op</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+            <span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">vrepr</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Term</span><span class="p">)</span> <span class="k">else</span> <span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">input_diff</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">diff</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span> <span class="k">for</span> <span class="n">diff</span> <span class="ow">in</span> <span class="n">input_diff</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="s2">&quot;_trivial_propagation&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">op</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">val</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">input_diff</span><span class="p">]))</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="s2">&quot;rx_model&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">op</span><span class="o">.</span><span class="n">rx_model</span><span class="p">(</span><span class="n">input_diff</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvNot</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">input_diff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvXor</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">op</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">val</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">input_diff</span><span class="p">]))</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvAnd</span><span class="p">:</span>
+            <span class="c1"># imported here to avoid circular imports</span>
+            <span class="kn">from</span> <span class="nn">cascada.differential</span> <span class="kn">import</span> <span class="n">opmodel</span>
+            <span class="k">return</span> <span class="n">opmodel</span><span class="o">.</span><span class="n">RXModelBvAnd</span><span class="p">(</span><span class="n">input_diff</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvOr</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">cascada.differential</span> <span class="kn">import</span> <span class="n">opmodel</span>
+            <span class="k">return</span> <span class="n">opmodel</span><span class="o">.</span><span class="n">RXModelBvOr</span><span class="p">(</span><span class="n">input_diff</span><span class="p">)</span>
+
+        <span class="c1"># RotateLeft, ..., BvLshr only allowed for constant offsets (see below)</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvAdd</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">cascada.differential</span> <span class="kn">import</span> <span class="n">opmodel</span>
+            <span class="k">return</span> <span class="n">opmodel</span><span class="o">.</span><span class="n">RXModelBvAdd</span><span class="p">(</span><span class="n">input_diff</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvSub</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">cascada.differential</span> <span class="kn">import</span> <span class="n">opmodel</span>
+            <span class="k">return</span> <span class="n">opmodel</span><span class="o">.</span><span class="n">RXModelBvSub</span><span class="p">(</span><span class="n">input_diff</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvNeg</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">cascada.differential</span> <span class="kn">import</span> <span class="n">opmodel</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;RXDiff OpModel of </span><span class="si">{</span><span class="n">op</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> is not implemented;&quot;</span>
+                          <span class="sa">f</span><span class="s2">&quot; instead using </span><span class="si">{</span><span class="n">opmodel</span><span class="o">.</span><span class="n">RXModelBvSub</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">d2</span> <span class="o">=</span> <span class="n">input_diff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="n">d2</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">width</span>
+            <span class="n">d1</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_pair</span><span class="p">(</span><span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">opmodel</span><span class="o">.</span><span class="n">RXModelBvSub</span><span class="p">([</span><span class="n">d1</span><span class="p">,</span> <span class="n">d2</span><span class="p">])</span>
+
+        <span class="c1"># Concat RX-propagation is not deterministic</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="n">cascada_ssa</span><span class="o">.</span><span class="n">SSAReturn</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_diff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">):</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;constant propagation of output difference in &quot;</span>
+                              <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.propagate(op=</span><span class="si">{</span><span class="n">op</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">, &quot;</span>
+                              <span class="sa">f</span><span class="s2">&quot;input_diff=</span><span class="si">{</span><span class="n">input_diff</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="kn">from</span> <span class="nn">cascada.differential</span> <span class="kn">import</span> <span class="n">opmodel</span>
+            <span class="k">return</span> <span class="n">opmodel</span><span class="o">.</span><span class="n">RXModelId</span><span class="p">(</span><span class="n">input_diff</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvIdentity</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_diff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">input_diff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="kn">from</span> <span class="nn">cascada.differential</span> <span class="kn">import</span> <span class="n">opmodel</span>
+                <span class="k">return</span> <span class="n">opmodel</span><span class="o">.</span><span class="n">RXModelId</span><span class="p">(</span><span class="n">input_diff</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="n">secondaryop</span><span class="o">.</span><span class="n">BvIf</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">cascada.differential</span> <span class="kn">import</span> <span class="n">opmodel</span>
+            <span class="k">return</span> <span class="n">opmodel</span><span class="o">.</span><span class="n">RXModelBvIf</span><span class="p">(</span><span class="n">input_diff</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="n">secondaryop</span><span class="o">.</span><span class="n">BvMaj</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">cascada.differential</span> <span class="kn">import</span> <span class="n">opmodel</span>
+            <span class="k">return</span> <span class="n">opmodel</span><span class="o">.</span><span class="n">RXModelBvMaj</span><span class="p">(</span><span class="n">input_diff</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">operation</span><span class="o">.</span><span class="n">PartialOperation</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">base_op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvXor</span><span class="p">:</span>
+                <span class="n">d1</span> <span class="o">=</span> <span class="n">input_diff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">d2</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_pair</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+                <span class="n">input_diff</span> <span class="o">=</span> <span class="p">[</span><span class="n">d1</span><span class="p">,</span> <span class="n">d2</span><span class="p">]</span>
+                <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">base_op</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">val</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">input_diff</span><span class="p">]))</span>
+
+            <span class="c1"># fixed BvAnd and BvOr non-trivial to propagate</span>
+
+            <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">base_op</span> <span class="ow">in</span> <span class="p">[</span><span class="n">operation</span><span class="o">.</span><span class="n">RotateLeft</span><span class="p">,</span> <span class="n">operation</span><span class="o">.</span><span class="n">RotateRight</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_diff</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+                    <span class="n">d</span> <span class="o">=</span> <span class="n">input_diff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">base_op</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">base_op</span> <span class="ow">in</span> <span class="p">[</span><span class="n">operation</span><span class="o">.</span><span class="n">BvShl</span><span class="p">,</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvLshr</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_diff</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+                    <span class="n">d</span> <span class="o">=</span> <span class="n">input_diff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">ct</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="n">ct</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="n">d</span>
+                    <span class="k">elif</span> <span class="n">ct</span> <span class="o">&gt;=</span> <span class="n">d</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">width</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="n">d</span><span class="p">)(</span><span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">width</span><span class="p">))</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="kn">from</span> <span class="nn">cascada.differential</span> <span class="kn">import</span> <span class="n">opmodel</span>
+                        <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">base_op</span> <span class="o">==</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvShl</span><span class="p">:</span>
+                            <span class="n">my_op_model</span> <span class="o">=</span> <span class="n">opmodel</span><span class="o">.</span><span class="n">RXModelBvShlCt</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">my_op_model</span> <span class="o">=</span> <span class="n">opmodel</span><span class="o">.</span><span class="n">RXModelBvLshrCt</span>
+                        <span class="k">return</span> <span class="n">opmodel</span><span class="o">.</span><span class="n">make_partial_op_model</span><span class="p">(</span><span class="n">my_op_model</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">)(</span><span class="n">d</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+            <span class="c1"># Extract is non-trivial for some indices</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># e.g., BvAnd, BvIf</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;RXDiff OpModel of </span><span class="si">{</span><span class="n">op</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> is not implemented;&quot;</span>
+                              <span class="sa">f</span><span class="s2">&quot; instead using OpModel of </span><span class="si">{</span><span class="n">op</span><span class="o">.</span><span class="n">base_op</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> with &quot;</span>
+                              <span class="sa">f</span><span class="s2">&quot;constant differences for fixed operands&quot;</span><span class="p">)</span>
+                <span class="n">new_input_diff</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">counter_non_fixed_args</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">for</span> <span class="n">fa</span> <span class="ow">in</span> <span class="n">op</span><span class="o">.</span><span class="n">fixed_args</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">fa</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fa</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                        <span class="n">new_input_diff</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">from_pair</span><span class="p">(</span><span class="n">fa</span><span class="p">,</span> <span class="n">fa</span><span class="p">))</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">new_input_diff</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">input_diff</span><span class="p">[</span><span class="n">counter_non_fixed_args</span><span class="p">])</span>
+                        <span class="n">counter_non_fixed_args</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_diff</span><span class="p">)</span> <span class="o">==</span> <span class="n">counter_non_fixed_args</span>
+                <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">propagate</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">base_op</span><span class="p">,</span> <span class="n">new_input_diff</span><span class="p">)</span>
+
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Adrián Ranea.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

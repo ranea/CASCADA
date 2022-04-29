@@ -1,0 +1,6 @@
+cascada.linear.mask module
+==========================
+
+.. automodule:: cascada.linear.mask
+   :members:
+   :show-inheritance:

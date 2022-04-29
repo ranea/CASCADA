@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cascada.bitvector.core &mdash; CASCADA 1.0.rc0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> CASCADA
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">CASCADA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../primitives_implemented.html">Primitives implemented</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cascada.html">API reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">CASCADA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>cascada.bitvector.core</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cascada.bitvector.core</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Provide the basic bit-vector types.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">math</span>
+
+<span class="kn">from</span> <span class="nn">sympy.core</span> <span class="kn">import</span> <span class="n">basic</span>
+
+
+<div class="viewcode-block" id="Term"><a class="viewcode-back" href="../../../cascada.bitvector.core.html#cascada.bitvector.core.Term">[docs]</a><span class="k">class</span> <span class="nc">Term</span><span class="p">(</span><span class="n">basic</span><span class="o">.</span><span class="n">Basic</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent bit-vector terms.</span>
+
+<span class="sd">    Bit-vector terms are constants, variables and operations applied to terms.</span>
+
+<span class="sd">    Bit-vector terms support many operations with the standard</span>
+<span class="sd">    operators symbols (&lt;=, +, ^, etc.). See `operation`</span>
+<span class="sd">    for more information.</span>
+
+<span class="sd">    This class is not meant to be instantiated but to provide a base</span>
+<span class="sd">    class for the different types of terms.</span>
+
+<span class="sd">    Note that Term inherits the methods of the SymPy class `Basic</span>
+<span class="sd">    &lt;http://docs.sympy.org/latest/modules/core.html#module-sympy.core.basic&gt;`_;</span>
+<span class="sd">    many of these methods work with bit-vector terms out of the box.</span>
+
+<span class="sd">    .. Implementation details:</span>
+
+<span class="sd">        Subclasses must implement the following methods:</span>
+
+<span class="sd">        - __hash__() if eq is overridden.</span>
+<span class="sd">        - _hashable_content() if new object attributes are defined.</span>
+<span class="sd">        - class_key(), current order</span>
+
+<span class="sd">            Constant: 1, 0, cls.__name__</span>
+<span class="sd">            Variable: 2, 0, cls.__name__</span>
+<span class="sd">            PrimaryOperation: 3, 0, cls.__name__</span>
+<span class="sd">            SecondaryOperation: 4, 0, cls.__name__</span>
+
+<span class="sd">        Sympy&#39;s order:</span>
+
+<span class="sd">            Number: 1, 0, cls.__name__</span>
+<span class="sd">            Atom: 2, 0, cls.__name__</span>
+<span class="sd">            Mul: 3, 0, cls.__name__</span>
+<span class="sd">            Add: 3, 1, cls.__name__</span>
+<span class="sd">            Pow: 3, 2, cls.__name__</span>
+<span class="sd">            Function: 4, i, name</span>
+<span class="sd">            Core: 5, 0, cls.__name__</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Bitwise operators</span>
+
+    <span class="k">def</span> <span class="fm">__invert__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Override ~ operator.&quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">operation</span>
+        <span class="k">return</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvNot</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__and__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Override &amp; operator.&quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">operation</span>
+        <span class="k">return</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvAnd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="fm">__rand__</span> <span class="o">=</span> <span class="fm">__and__</span>
+
+    <span class="k">def</span> <span class="fm">__or__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Override | operator.&quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">operation</span>
+        <span class="k">return</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvOr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="fm">__ror__</span> <span class="o">=</span> <span class="fm">__or__</span>
+
+    <span class="k">def</span> <span class="fm">__xor__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Override ^ operator.&quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">operation</span>
+        <span class="k">return</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvXor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="fm">__rxor__</span> <span class="o">=</span> <span class="fm">__xor__</span>
+
+    <span class="c1"># Relational operators</span>
+
+    <span class="k">def</span> <span class="fm">__lt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Override &lt; operator.&quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">operation</span>
+        <span class="k">return</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvUlt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__le__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Override &lt;= operator.&quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">operation</span>
+        <span class="k">return</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvUle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__gt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Override &gt; operator.&quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">operation</span>
+        <span class="k">return</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvUgt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__ge__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Override &gt;= operator.&quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">operation</span>
+        <span class="k">return</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvUge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="c1"># Shifts</span>
+
+    <span class="k">def</span> <span class="fm">__lshift__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Override &lt;&lt; operator.&quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">operation</span>
+        <span class="k">return</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvShl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__rlshift__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Override reflected &lt;&lt; operator.&quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">operation</span>
+        <span class="k">return</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvShl</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__rshift__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Override &gt;&gt; operator.&quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">operation</span>
+        <span class="k">return</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvLshr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__rrshift__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Override reflected &gt;&gt; operator.&quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">operation</span>
+        <span class="k">return</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvLshr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+
+    <span class="c1"># Arithmetic operators</span>
+
+    <span class="k">def</span> <span class="fm">__neg__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Override unary minus - operator.&quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">operation</span>
+        <span class="k">return</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvNeg</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Override + operator.&quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">operation</span>
+        <span class="k">return</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvAdd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="fm">__radd__</span> <span class="o">=</span> <span class="fm">__add__</span>
+
+    <span class="k">def</span> <span class="fm">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Override - operator.&quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">operation</span>
+        <span class="k">return</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvSub</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__rsub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Override other - operator.&quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">operation</span>
+        <span class="k">return</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvSub</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Override * operator.&quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">operation</span>
+        <span class="k">return</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvMul</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="fm">__rmul__</span> <span class="o">=</span> <span class="fm">__mul__</span>
+
+    <span class="k">def</span> <span class="fm">__truediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Override / operator.&quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">operation</span>
+        <span class="k">return</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvUdiv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__rtruediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Override reflected / operator.&quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">operation</span>
+        <span class="k">return</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvUdiv</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__mod__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Override % operator.&quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">operation</span>
+        <span class="k">return</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvUrem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__rmod__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Override reflected % operator.&quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">operation</span>
+        <span class="k">return</span> <span class="n">operation</span><span class="o">.</span><span class="n">BvUrem</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+
+    <span class="c1"># end Boolean methods (relational methods from Expr)</span>
+
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;_width&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">width</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="n">width</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="n">basic</span><span class="o">.</span><span class="n">Basic</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">_width</span> <span class="o">=</span> <span class="n">width</span>
+        <span class="k">return</span> <span class="n">obj</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Override [] operator.&quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">operation</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
+            <span class="k">assert</span> <span class="n">key</span><span class="o">.</span><span class="n">step</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">key</span><span class="o">.</span><span class="n">step</span> <span class="o">==</span> <span class="mi">1</span>
+
+            <span class="n">i</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">start</span> <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s2">&quot;first index out of range&quot;</span><span class="p">)</span>
+
+            <span class="n">j</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">stop</span> <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">stop</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span>
+            <span class="k">if</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">j</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="ow">or</span> <span class="n">j</span> <span class="o">&gt;</span> <span class="n">i</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s2">&quot;second index out of range&quot;</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">operation</span><span class="o">.</span><span class="n">Extract</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">key</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s2">&quot;index out of range&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">operation</span><span class="o">.</span><span class="n">Extract</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;invalid index&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Necessary since __getitem__ is defined</span>
+        <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Term is not iterable&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the non-verbose string representation.&quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">printing</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">printing</span><span class="o">.</span><span class="n">BvStrPrinter</span><span class="p">())</span><span class="o">.</span><span class="n">doprint</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="fm">__repr__</span> <span class="o">=</span> <span class="fm">__str__</span>
+
+    <span class="k">def</span> <span class="nf">_hashable_content</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the information of the object to compute its hash.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">width</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The bit-width of the term.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_width</span>
+
+<div class="viewcode-block" id="Term.formula_size"><a class="viewcode-back" href="../../../cascada.bitvector.core.html#cascada.bitvector.core.Term.formula_size">[docs]</a>    <span class="k">def</span> <span class="nf">formula_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the formula size of the bit-vector term.</span>
+
+<span class="sd">        As defined in `Complexity of Fixed-Size Bit-Vector Logics</span>
+<span class="sd">        &lt;https://doi.org/10.1007/s00224-015-9653-1&gt;`_.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span> <span class="nf">log2</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">n</span><span class="p">)))</span>
+
+        <span class="k">def</span> <span class="nf">bin_enc</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="k">return</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">log2</span><span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">size</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">bin_enc</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                <span class="n">size</span> <span class="o">+=</span> <span class="n">bin_enc</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">size</span> <span class="o">+=</span> <span class="n">arg</span><span class="o">.</span><span class="n">formula_size</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">size</span></div>
+
+<div class="viewcode-block" id="Term.vrepr"><a class="viewcode-back" href="../../../cascada.bitvector.core.html#cascada.bitvector.core.Term.vrepr">[docs]</a>    <span class="k">def</span> <span class="nf">vrepr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return an executable string representation.</span>
+
+<span class="sd">        This method returns a string so that the relation</span>
+<span class="sd">        ``eval(expr.vrepr())) == expr`` holds when ``expr`` is a `Term`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">printing</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">printing</span><span class="o">.</span><span class="n">BvReprPrinter</span><span class="p">())</span><span class="o">.</span><span class="n">doprint</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Term.srepr"><a class="viewcode-back" href="../../../cascada.bitvector.core.html#cascada.bitvector.core.Term.srepr">[docs]</a>    <span class="k">def</span> <span class="nf">srepr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a short string representation.</span>
+
+<span class="sd">        This method returns a short string describing</span>
+<span class="sd">        the bit-vector term, as opposed to `vrepr` which</span>
+<span class="sd">        returns a long and executable string representation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">printing</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">printing</span><span class="o">.</span><span class="n">BvShortPrinter</span><span class="p">())</span><span class="o">.</span><span class="n">doprint</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Term.crepr"><a class="viewcode-back" href="../../../cascada.bitvector.core.html#cascada.bitvector.core.Term.crepr">[docs]</a>    <span class="k">def</span> <span class="nf">crepr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a C code representation.</span>
+
+<span class="sd">        This method returns a string with an expression in the</span>
+<span class="sd">        C programming language that evaluates to ``self``.</span>
+
+<span class="sd">        Bit-vector widths larger than 128 are not supported.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">            &gt;&gt;&gt; (Variable(&quot;a&quot;, 4) * Constant(2, 4)).crepr()</span>
+<span class="sd">            &#39;(a * 0x2U) &amp; 0xfU&#39;</span>
+<span class="sd">            &gt;&gt;&gt; (Variable(&quot;a&quot;, 8) &lt; Constant(1, 8)).crepr()</span>
+<span class="sd">            &#39;(_Bool)((a &lt; 0x1U) &amp; 0x1U)&#39;</span>
+<span class="sd">            &gt;&gt;&gt; Variable(&#39;a&#39;, 8)[2:1].crepr()</span>
+<span class="sd">            &#39;(a &gt;&gt; 0x1U) &amp; 0x3U&#39;</span>
+<span class="sd">            &gt;&gt;&gt; Constant(1, 96).crepr()</span>
+<span class="sd">            &#39;((__uint128)(0x1ULL)) &amp; (((__uint128)(0xffffffffULL) &lt;&lt; 64) | ((__uint128)(0xffffffffffffffffULL)))&#39;</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">printing</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">&gt;</span> <span class="mi">128</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;crepr does not support bit-vector widths larger than 128&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">printing</span><span class="o">.</span><span class="n">BvCCodePrinter</span><span class="p">())</span><span class="o">.</span><span class="n">doprint</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Term.doit"><a class="viewcode-back" href="../../../cascada.bitvector.core.html#cascada.bitvector.core.Term.doit">[docs]</a>    <span class="k">def</span> <span class="nf">doit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eval_sec_ops</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sort_symmetric_args</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Evaluate the term.</span>
+
+<span class="sd">        Similar to Sympy&#39;s `doit</span>
+<span class="sd">        &lt;https://docs.sympy.org/latest/modules/core.html#sympy.core.basic.Basic.doit&gt;`_</span>
+<span class="sd">        method, this method evaluate the term in case it was not evaluated</span>
+<span class="sd">        by default (like `SecondaryOperation` objects).</span>
+
+<span class="sd">        If ``eval_sec_ops`` is ``True``, the evaluation is done</span>
+<span class="sd">        with the context `SecondaryOperationEvaluation` enabled.</span>
+
+<span class="sd">        If ``sort_symmetric_args`` is ``True``, arguments of</span>
+<span class="sd">        symmetric `Operation` objects are sorted.</span>
+
+<span class="sd">        See also `PrimaryOperationEvaluation` and `SecondaryOperationEvaluation`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_Atom</span> <span class="ow">or</span> <span class="p">(</span>
+                <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_doit_eval_sec_ops&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="n">eval_sec_ops</span> <span class="ow">and</span> \
+                <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_doit_sort_symmetric_args&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="n">sort_symmetric_args</span>
+        <span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span>
+
+        <span class="c1"># recursive evaluation like Sympy&#39;s doit</span>
+        <span class="kn">from</span> <span class="nn">cascada.bitvector.context</span> <span class="kn">import</span> <span class="n">PrimaryOperationEvaluation</span>
+        <span class="kn">from</span> <span class="nn">cascada.bitvector.context</span> <span class="kn">import</span> <span class="n">SecondaryOperationEvaluation</span>
+        <span class="k">with</span> <span class="n">PrimaryOperationEvaluation</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span> \
+                <span class="n">SecondaryOperationEvaluation</span><span class="p">(</span><span class="n">eval_sec_ops</span><span class="p">):</span>
+            <span class="n">new_args</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">Term</span><span class="p">):</span>
+                    <span class="n">new_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">arg</span><span class="o">.</span><span class="n">doit</span><span class="p">(</span><span class="n">eval_sec_ops</span><span class="o">=</span><span class="n">eval_sec_ops</span><span class="p">,</span>
+                                             <span class="n">sort_symmetric_args</span><span class="o">=</span><span class="n">sort_symmetric_args</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">new_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">sort_symmetric_args</span> <span class="ow">and</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;is_symmetric&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="kn">from</span> <span class="nn">sympy</span> <span class="kn">import</span> <span class="n">default_sort_key</span>
+                <span class="n">new_args</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">new_args</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">default_sort_key</span><span class="p">)</span>
+            <span class="n">new_term</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span><span class="o">*</span><span class="n">new_args</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">new_term</span><span class="o">.</span><span class="n">is_Atom</span><span class="p">:</span>
+            <span class="n">new_term</span><span class="o">.</span><span class="n">_doit_eval_sec_ops</span> <span class="o">=</span> <span class="n">eval_sec_ops</span>
+            <span class="n">new_term</span><span class="o">.</span><span class="n">_doit_sort_symmetric_args</span> <span class="o">=</span> <span class="n">sort_symmetric_args</span>
+        <span class="k">return</span> <span class="n">new_term</span></div>
+
+    <span class="c1"># def is_subexpression(self, t):</span>
+    <span class="c1">#     &quot;&quot;&quot;Return True if the term is contained in the given expression.</span>
+    <span class="c1">#</span>
+    <span class="c1">#         &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+    <span class="c1">#         &gt;&gt;&gt; t = Constant(1, 4) + Variable(&quot;v&quot;, 4)</span>
+    <span class="c1">#         &gt;&gt;&gt; Variable(&quot;v&quot;, 4).is_subexpression(t)</span>
+    <span class="c1">#         True</span>
+    <span class="c1">#         &gt;&gt;&gt; Constant(2, 4).is_subexpression(t)</span>
+    <span class="c1">#         False</span>
+    <span class="c1">#</span>
+    <span class="c1">#     &quot;&quot;&quot;</span>
+    <span class="c1">#     assert isinstance(t, Term)</span>
+    <span class="c1">#     for sub in basic.preorder_traversal(t):</span>
+    <span class="c1">#         if self == sub:</span>
+    <span class="c1">#             return True</span>
+    <span class="c1">#     else:</span>
+    <span class="c1">#         return False</span>
+
+<div class="viewcode-block" id="Term.class_key"><a class="viewcode-back" href="../../../cascada.bitvector.core.html#cascada.bitvector.core.Term.class_key">[docs]</a>    <span class="k">def</span> <span class="nf">class_key</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the key (identifier) of the class for sorting.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;subclasses need to override this method&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Term.atoms"><a class="viewcode-back" href="../../../cascada.bitvector.core.html#cascada.bitvector.core.Term.atoms">[docs]</a>    <span class="k">def</span> <span class="nf">atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">types</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the *atoms* that form the current object.</span>
+
+<span class="sd">        This can be used to get all the bit-vectors of type `Constant` or</span>
+<span class="sd">        the bit-vectors of type `Variable` from a bit-vector expression.</span>
+
+<span class="sd">        For more information see</span>
+<span class="sd">        `SymPy&#39;s atoms method &lt;https://docs.sympy.org/latest/modules/core.html#sympy.core.basic.Basic.atoms&gt;`_.</span>
+<span class="sd">        This method is similar to the SymPy variant but this method</span>
+<span class="sd">        doesn&#39;t throw an exception when one of the arguments is of type &#39;int&#39;.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Constant, Variable</span>
+<span class="sd">            &gt;&gt;&gt; expr = Constant(1, 4) + Variable(&quot;a&quot;, 4)</span>
+<span class="sd">            &gt;&gt;&gt; expr.atoms(Constant)</span>
+<span class="sd">            {0x1}</span>
+<span class="sd">            &gt;&gt;&gt; expr.atoms(Variable)</span>
+<span class="sd">            {a}</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">sympy</span> <span class="kn">import</span> <span class="n">preorder_traversal</span>
+        <span class="k">if</span> <span class="n">types</span><span class="p">:</span>
+            <span class="n">types</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">t</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="k">else</span> <span class="nb">type</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">types</span><span class="p">])</span>
+        <span class="n">nodes</span> <span class="o">=</span> <span class="n">preorder_traversal</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">types</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="p">{</span><span class="n">node</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">nodes</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">types</span><span class="p">)}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="p">{</span><span class="n">node</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">nodes</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">node</span><span class="o">.</span><span class="n">args</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">result</span></div></div>
+
+
+<div class="viewcode-block" id="Constant"><a class="viewcode-back" href="../../../cascada.bitvector.core.html#cascada.bitvector.core.Constant">[docs]</a><span class="k">class</span> <span class="nc">Constant</span><span class="p">(</span><span class="n">basic</span><span class="o">.</span><span class="n">Atom</span><span class="p">,</span> <span class="n">Term</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent bit-vector constants.</span>
+
+<span class="sd">    Bit-vector constants are interpreted as unsigned integers in base 2,</span>
+<span class="sd">    that is, a bit-vector :math:`(x_{n-1}, \dots, x_1, x_0)`,</span>
+<span class="sd">    where :math:`x_0` or ``x[0]`` denotes the LSB located at position 0,</span>
+<span class="sd">    represents the non-negative integer :math:`x_0 + 2 x_1 + \dots + 2^{n-1} x_{n-1}`.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        val: the integer value.</span>
+<span class="sd">        width: the bit-width.</span>
+
+<span class="sd">    ::</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Constant</span>
+<span class="sd">        &gt;&gt;&gt; Constant(3, 12)</span>
+<span class="sd">        0x003</span>
+<span class="sd">        &gt;&gt;&gt; Constant(0b11, 12)</span>
+<span class="sd">        0x003</span>
+<span class="sd">        &gt;&gt;&gt; Constant(0x003, 12)</span>
+<span class="sd">        0x003</span>
+<span class="sd">        &gt;&gt;&gt; Constant(3, 12).vrepr()</span>
+<span class="sd">        &#39;Constant(0x003, width=12)&#39;</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__int__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">val</span>
+
+    <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__hash__</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Override == operator.</span>
+
+<span class="sd">        .. Implementation details:</span>
+
+<span class="sd">            (From Basic): if a class that overrides __eq__() needs to retain the</span>
+<span class="sd">            implementation of __hash__() from a parent class, the</span>
+<span class="sd">            interpreter must be told this explicitly by setting __hash__ =</span>
+<span class="sd">            &lt;ParentClass&gt;.__hash__. Otherwise the inheritance of __hash__()</span>
+<span class="sd">            will be blocked, just as if __hash__ had been explicitly set to</span>
+<span class="sd">            None.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">val</span> <span class="o">==</span> <span class="n">other</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Constant</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">width</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">val</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">val</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="c1"># def __index__(self):</span>
+    <span class="c1">#     &quot;&quot;&quot;Return an int to be used inside a slice [ : : ].&quot;&quot;&quot;</span>
+    <span class="c1">#     return self.int</span>
+
+    <span class="k">def</span> <span class="nf">_hashable_content</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a tuple of information about self to compute its hash.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span>
+
+<div class="viewcode-block" id="Constant.class_key"><a class="viewcode-back" href="../../../cascada.bitvector.core.html#cascada.bitvector.core.Constant.class_key">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">class_key</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the key (identifier) of the class for sorting.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span></div>
+
+    <span class="c1"># end Integer</span>
+
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;_val&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">width</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">val</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="o">**</span> <span class="n">width</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="n">Term</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">)</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">_val</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="k">return</span> <span class="n">obj</span>
+
+    <span class="k">def</span> <span class="fm">__bool__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span> <span class="o">==</span> <span class="n">Constant</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;only 1-bit constants implement bool()&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">val</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The integer represented by the bit-vector constant.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_val</span>
+
+<div class="viewcode-block" id="Constant.formula_size"><a class="viewcode-back" href="../../../cascada.bitvector.core.html#cascada.bitvector.core.Constant.formula_size">[docs]</a>    <span class="k">def</span> <span class="nf">formula_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The formula size of the constant.&quot;&quot;&quot;</span>
+        <span class="k">def</span> <span class="nf">log2</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">n</span><span class="p">)))</span>
+
+        <span class="k">def</span> <span class="nf">bin_enc</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="k">return</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">log2</span><span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">log2</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">bin_enc</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Constant.bin"><a class="viewcode-back" href="../../../cascada.bitvector.core.html#cascada.bitvector.core.Constant.bin">[docs]</a>    <span class="k">def</span> <span class="nf">bin</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the python-like binary representation.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Constant</span>
+<span class="sd">            &gt;&gt;&gt; print(Constant(3, 4).bin())</span>
+<span class="sd">            0b0011</span>
+<span class="sd">            &gt;&gt;&gt; print(Constant(4, 6).bin())</span>
+<span class="sd">            0b000100</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">width</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">+</span> <span class="mi">2</span>  <span class="c1"># 2 due to &#39;0b&#39;</span>
+        <span class="k">return</span> <span class="nb">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;0=#</span><span class="si">{}</span><span class="s1">b&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Constant.hex"><a class="viewcode-back" href="../../../cascada.bitvector.core.html#cascada.bitvector.core.Constant.hex">[docs]</a>    <span class="k">def</span> <span class="nf">hex</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the python-like hexadecimal representation.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Constant</span>
+<span class="sd">            &gt;&gt;&gt; print(Constant(3, 4).hex())</span>
+<span class="sd">            0x3</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">%</span> <span class="mi">4</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="n">width</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">//</span> <span class="mi">4</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span>
+        <span class="k">return</span> <span class="nb">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="s1">&#39;0=#</span><span class="si">{}</span><span class="s1">x&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Constant.oct"><a class="viewcode-back" href="../../../cascada.bitvector.core.html#cascada.bitvector.core.Constant.oct">[docs]</a>    <span class="k">def</span> <span class="nf">oct</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the python-like octal representation.</span>
+
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Constant</span>
+<span class="sd">            &gt;&gt;&gt; print(Constant(4, 6).oct())</span>
+<span class="sd">            0o04</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">%</span> <span class="mi">3</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="n">width</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">//</span> <span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span>
+        <span class="k">return</span> <span class="nb">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="s1">&#39;0=#</span><span class="si">{}</span><span class="s1">o&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="p">))</span></div></div>
+
+
+<div class="viewcode-block" id="Variable"><a class="viewcode-back" href="../../../cascada.bitvector.core.html#cascada.bitvector.core.Variable">[docs]</a><span class="k">class</span> <span class="nc">Variable</span><span class="p">(</span><span class="n">basic</span><span class="o">.</span><span class="n">Atom</span><span class="p">,</span> <span class="n">Term</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represent bit-vector variables.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name: the name of the variable.</span>
+<span class="sd">        width: the bit-width.</span>
+
+<span class="sd">    ::</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import Variable</span>
+<span class="sd">        &gt;&gt;&gt; Variable(&quot;x&quot;, 12)</span>
+<span class="sd">        x</span>
+<span class="sd">        &gt;&gt;&gt; Variable(&quot;x&quot;, 12).vrepr()</span>
+<span class="sd">        &quot;Variable(&#39;x&#39;, width=12)&quot;</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_hashable_content</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a tuple of information about self to compute hash.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span>
+
+    <span class="c1"># def __call__(self, *args):</span>
+    <span class="c1">#     from sympy.core.function as function</span>
+    <span class="c1">#     return function.UndefinedFunction(self.name, self.width)(*args)</span>
+
+    <span class="c1"># end Symbol</span>
+
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;_name&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="n">allowed_symbols</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;allowed_symbols&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">isalnum</span><span class="p">()</span> <span class="ow">or</span> <span class="n">c</span> <span class="o">==</span> <span class="s2">&quot;_&quot;</span> <span class="ow">or</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">allowed_symbols</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">name</span><span class="p">)</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="n">Term</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">)</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
+
+        <span class="k">return</span> <span class="n">obj</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The name of the variable.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>
+
+<div class="viewcode-block" id="Variable.formula_size"><a class="viewcode-back" href="../../../cascada.bitvector.core.html#cascada.bitvector.core.Variable.formula_size">[docs]</a>    <span class="k">def</span> <span class="nf">formula_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The formula size of the variable.&quot;&quot;&quot;</span>
+        <span class="k">def</span> <span class="nf">log2</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">n</span><span class="p">)))</span>
+
+        <span class="k">def</span> <span class="nf">bin_enc</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="k">return</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">log2</span><span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">bin_enc</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="bitvectify"><a class="viewcode-back" href="../../../cascada.bitvector.core.html#cascada.bitvector.core.bitvectify">[docs]</a><span class="k">def</span> <span class="nf">bitvectify</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">width</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert the argument *t* to a bit-vector `Term` of bit-width *width*.</span>
+
+<span class="sd">        &gt;&gt;&gt; from cascada.bitvector.core import bitvectify</span>
+<span class="sd">        &gt;&gt;&gt; print(bitvectify(0, 8).vrepr())</span>
+<span class="sd">        Constant(0b00000000, width=8)</span>
+<span class="sd">        &gt;&gt;&gt; print(bitvectify(&quot;x&quot;, 8).vrepr())</span>
+<span class="sd">        Variable(&#39;x&#39;, width=8)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Constant</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">width</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Variable</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">width</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">Term</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="n">t</span><span class="o">.</span><span class="n">width</span> <span class="o">==</span> <span class="n">width</span>
+        <span class="k">return</span> <span class="n">t</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;cannot convert &#39;</span><span class="si">{}</span><span class="s2">&#39; to a bit-vector&quot;</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Adrián Ranea.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

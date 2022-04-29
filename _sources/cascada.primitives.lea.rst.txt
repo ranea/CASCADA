@@ -1,0 +1,6 @@
+cascada.primitives.lea module
+=============================
+
+.. automodule:: cascada.primitives.lea
+   :members:
+   :show-inheritance:

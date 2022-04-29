@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cascada.primitives.skinny128 &mdash; CASCADA 1.0.rc0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> CASCADA
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">CASCADA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../primitives_implemented.html">Primitives implemented</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cascada.html">API reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">CASCADA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>cascada.primitives.skinny128</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for cascada.primitives.skinny128</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;SKINNY-128-128.</span>
+
+<span class="sd">TK1 version, where the tweakey size is equal to the block size.</span>
+
+<span class="sd">A `WeakModel` is used to model the XOR and linear models of the S-box.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span>
+<span class="kn">from</span> <span class="nn">cascada.bitvector.operation</span> <span class="kn">import</span> <span class="n">BvIdentity</span>
+<span class="kn">from</span> <span class="nn">cascada.bitvector.secondaryop</span> <span class="kn">import</span> <span class="n">LutOperation</span>
+<span class="kn">from</span> <span class="nn">cascada.bitvector.ssa</span> <span class="kn">import</span> <span class="n">RoundBasedFunction</span>
+<span class="kn">from</span> <span class="nn">cascada.differential.difference</span> <span class="kn">import</span> <span class="n">XorDiff</span>
+<span class="kn">from</span> <span class="nn">cascada.differential.opmodel</span> <span class="kn">import</span> <span class="n">get_weak_model</span> <span class="k">as</span> <span class="n">get_differential_weak_model</span>
+<span class="kn">from</span> <span class="nn">cascada.linear.opmodel</span> <span class="kn">import</span> <span class="n">get_weak_model</span> <span class="k">as</span> <span class="n">get_linear_weak_model</span>
+<span class="kn">from</span> <span class="nn">cascada.primitives.blockcipher</span> <span class="kn">import</span> <span class="n">Encryption</span><span class="p">,</span> <span class="n">Cipher</span>
+
+
+<span class="kn">from</span> <span class="nn">cascada.primitives.aes_like</span> <span class="kn">import</span> <span class="n">LoggingMode</span><span class="p">,</span> <span class="n">AESLikeFunction</span>
+
+
+<span class="n">default_num_rounds</span> <span class="o">=</span> <span class="mi">40</span>
+
+
+<div class="viewcode-block" id="SKINNYTweakeySchedule"><a class="viewcode-back" href="../../../cascada.primitives.skinny128.html#cascada.primitives.skinny128.SKINNYTweakeySchedule">[docs]</a><span class="k">class</span> <span class="nc">SKINNYTweakeySchedule</span><span class="p">(</span><span class="n">RoundBasedFunction</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Key schedule of SKINNY-128-128.&quot;&quot;&quot;</span>
+    <span class="n">num_rounds</span> <span class="o">=</span> <span class="n">default_num_rounds</span>
+    <span class="n">input_widths</span> <span class="o">=</span> <span class="p">[</span><span class="mi">8</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="o">*</span><span class="mi">4</span><span class="p">)]</span>
+    <span class="n">output_widths</span> <span class="o">=</span> <span class="p">[</span><span class="mi">8</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="o">*</span><span class="mi">2</span> <span class="o">*</span> <span class="n">default_num_rounds</span><span class="p">)]</span>  <span class="c1"># 2 rows per round</span>
+    <span class="n">_min_num_rounds</span> <span class="o">=</span> <span class="mi">2</span>
+
+<div class="viewcode-block" id="SKINNYTweakeySchedule.set_num_rounds"><a class="viewcode-back" href="../../../cascada.primitives.skinny128.html#cascada.primitives.skinny128.SKINNYTweakeySchedule.set_num_rounds">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">set_num_rounds</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">new_num_rounds</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span> <span class="o">=</span> <span class="n">new_num_rounds</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">output_widths</span> <span class="o">=</span> <span class="p">[</span><span class="mi">8</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="o">*</span><span class="mi">2</span> <span class="o">*</span> <span class="n">new_num_rounds</span><span class="p">)]</span></div>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">permutation_Pt</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">input_state</span><span class="p">):</span>
+        <span class="c1"># TK1[i] ← TK1[PT[i]]</span>
+        <span class="n">Pt</span> <span class="o">=</span> <span class="p">[</span><span class="mi">9</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_state</span><span class="p">)</span> <span class="o">==</span> <span class="mi">16</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">Pt</span><span class="p">)</span>
+        <span class="n">output_state</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">16</span><span class="p">):</span>
+            <span class="n">output_state</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">input_state</span><span class="p">[</span><span class="n">Pt</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span>
+        <span class="k">return</span> <span class="n">output_state</span>
+
+<div class="viewcode-block" id="SKINNYTweakeySchedule.eval"><a class="viewcode-back" href="../../../cascada.primitives.skinny128.html#cascada.primitives.skinny128.SKINNYTweakeySchedule.eval">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">master_key</span><span class="p">):</span>
+        <span class="n">tweakey_state</span> <span class="o">=</span> <span class="n">master_key</span>
+        <span class="n">list_tweakey_bytes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">tweakey_state</span><span class="p">[:</span><span class="mi">4</span><span class="o">*</span><span class="mi">2</span><span class="p">])</span>  <span class="c1"># first 2 rows</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="c1"># no LFSR in TK1</span>
+            <span class="n">tweakey_state</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">permutation_Pt</span><span class="p">(</span><span class="n">tweakey_state</span><span class="p">)</span>
+            <span class="n">list_tweakey_bytes</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">tweakey_state</span><span class="p">[:</span><span class="mi">4</span><span class="o">*</span><span class="mi">2</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">list_tweakey_bytes</span></div></div>
+
+
+<span class="n">_lut</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="mi">101</span><span class="p">,</span> <span class="mi">76</span><span class="p">,</span> <span class="mi">106</span><span class="p">,</span> <span class="mi">66</span><span class="p">,</span> <span class="mi">75</span><span class="p">,</span> <span class="mi">99</span><span class="p">,</span> <span class="mi">67</span><span class="p">,</span> <span class="mi">107</span><span class="p">,</span> <span class="mi">85</span><span class="p">,</span> <span class="mi">117</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="mi">122</span><span class="p">,</span> <span class="mi">83</span><span class="p">,</span> <span class="mi">115</span><span class="p">,</span> <span class="mi">91</span><span class="p">,</span> <span class="mi">123</span><span class="p">,</span> <span class="mi">53</span><span class="p">,</span> <span class="mi">140</span><span class="p">,</span>
+    <span class="mi">58</span><span class="p">,</span> <span class="mi">129</span><span class="p">,</span> <span class="mi">137</span><span class="p">,</span> <span class="mi">51</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">59</span><span class="p">,</span> <span class="mi">149</span><span class="p">,</span> <span class="mi">37</span><span class="p">,</span> <span class="mi">152</span><span class="p">,</span> <span class="mi">42</span><span class="p">,</span> <span class="mi">144</span><span class="p">,</span> <span class="mi">35</span><span class="p">,</span> <span class="mi">153</span><span class="p">,</span> <span class="mi">43</span><span class="p">,</span> <span class="mi">229</span><span class="p">,</span> <span class="mi">204</span><span class="p">,</span> <span class="mi">232</span><span class="p">,</span>
+    <span class="mi">193</span><span class="p">,</span> <span class="mi">201</span><span class="p">,</span> <span class="mi">224</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">233</span><span class="p">,</span> <span class="mi">213</span><span class="p">,</span> <span class="mi">245</span><span class="p">,</span> <span class="mi">216</span><span class="p">,</span> <span class="mi">248</span><span class="p">,</span> <span class="mi">208</span><span class="p">,</span> <span class="mi">240</span><span class="p">,</span> <span class="mi">217</span><span class="p">,</span> <span class="mi">249</span><span class="p">,</span> <span class="mi">165</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">168</span><span class="p">,</span>
+    <span class="mi">18</span><span class="p">,</span> <span class="mi">27</span><span class="p">,</span> <span class="mi">160</span><span class="p">,</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">169</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">181</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">184</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">176</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">185</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">136</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">133</span><span class="p">,</span> <span class="mi">141</span><span class="p">,</span>
+    <span class="mi">52</span><span class="p">,</span> <span class="mi">132</span><span class="p">,</span> <span class="mi">61</span><span class="p">,</span> <span class="mi">145</span><span class="p">,</span> <span class="mi">34</span><span class="p">,</span> <span class="mi">156</span><span class="p">,</span> <span class="mi">44</span><span class="p">,</span> <span class="mi">148</span><span class="p">,</span> <span class="mi">36</span><span class="p">,</span> <span class="mi">157</span><span class="p">,</span> <span class="mi">45</span><span class="p">,</span> <span class="mi">98</span><span class="p">,</span> <span class="mi">74</span><span class="p">,</span> <span class="mi">108</span><span class="p">,</span> <span class="mi">69</span><span class="p">,</span> <span class="mi">77</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">68</span><span class="p">,</span>
+    <span class="mi">109</span><span class="p">,</span> <span class="mi">82</span><span class="p">,</span> <span class="mi">114</span><span class="p">,</span> <span class="mi">92</span><span class="p">,</span> <span class="mi">124</span><span class="p">,</span> <span class="mi">84</span><span class="p">,</span> <span class="mi">116</span><span class="p">,</span> <span class="mi">93</span><span class="p">,</span> <span class="mi">125</span><span class="p">,</span> <span class="mi">161</span><span class="p">,</span> <span class="mi">26</span><span class="p">,</span> <span class="mi">172</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">29</span><span class="p">,</span> <span class="mi">164</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">173</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="mi">177</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">188</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">180</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">189</span><span class="p">,</span> <span class="mi">225</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">236</span><span class="p">,</span> <span class="mi">197</span><span class="p">,</span> <span class="mi">205</span><span class="p">,</span> <span class="mi">228</span><span class="p">,</span> <span class="mi">196</span><span class="p">,</span> <span class="mi">237</span><span class="p">,</span> <span class="mi">209</span><span class="p">,</span>
+    <span class="mi">241</span><span class="p">,</span> <span class="mi">220</span><span class="p">,</span> <span class="mi">252</span><span class="p">,</span> <span class="mi">212</span><span class="p">,</span> <span class="mi">244</span><span class="p">,</span> <span class="mi">221</span><span class="p">,</span> <span class="mi">253</span><span class="p">,</span> <span class="mi">54</span><span class="p">,</span> <span class="mi">142</span><span class="p">,</span> <span class="mi">56</span><span class="p">,</span> <span class="mi">130</span><span class="p">,</span> <span class="mi">139</span><span class="p">,</span> <span class="mi">48</span><span class="p">,</span> <span class="mi">131</span><span class="p">,</span> <span class="mi">57</span><span class="p">,</span> <span class="mi">150</span><span class="p">,</span> <span class="mi">38</span><span class="p">,</span>
+    <span class="mi">154</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">147</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">155</span><span class="p">,</span> <span class="mi">41</span><span class="p">,</span> <span class="mi">102</span><span class="p">,</span> <span class="mi">78</span><span class="p">,</span> <span class="mi">104</span><span class="p">,</span> <span class="mi">65</span><span class="p">,</span> <span class="mi">73</span><span class="p">,</span> <span class="mi">96</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">105</span><span class="p">,</span> <span class="mi">86</span><span class="p">,</span> <span class="mi">118</span><span class="p">,</span> <span class="mi">88</span><span class="p">,</span> <span class="mi">120</span><span class="p">,</span>
+    <span class="mi">80</span><span class="p">,</span> <span class="mi">112</span><span class="p">,</span> <span class="mi">89</span><span class="p">,</span> <span class="mi">121</span><span class="p">,</span> <span class="mi">166</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">170</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">163</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">171</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">182</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">186</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">179</span><span class="p">,</span>
+    <span class="mi">9</span><span class="p">,</span> <span class="mi">187</span><span class="p">,</span> <span class="mi">230</span><span class="p">,</span> <span class="mi">206</span><span class="p">,</span> <span class="mi">234</span><span class="p">,</span> <span class="mi">194</span><span class="p">,</span> <span class="mi">203</span><span class="p">,</span> <span class="mi">227</span><span class="p">,</span> <span class="mi">195</span><span class="p">,</span> <span class="mi">235</span><span class="p">,</span> <span class="mi">214</span><span class="p">,</span> <span class="mi">246</span><span class="p">,</span> <span class="mi">218</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> <span class="mi">211</span><span class="p">,</span> <span class="mi">243</span><span class="p">,</span>
+    <span class="mi">219</span><span class="p">,</span> <span class="mi">251</span><span class="p">,</span> <span class="mi">49</span><span class="p">,</span> <span class="mi">138</span><span class="p">,</span> <span class="mi">62</span><span class="p">,</span> <span class="mi">134</span><span class="p">,</span> <span class="mi">143</span><span class="p">,</span> <span class="mi">55</span><span class="p">,</span> <span class="mi">135</span><span class="p">,</span> <span class="mi">63</span><span class="p">,</span> <span class="mi">146</span><span class="p">,</span> <span class="mi">33</span><span class="p">,</span> <span class="mi">158</span><span class="p">,</span> <span class="mi">46</span><span class="p">,</span> <span class="mi">151</span><span class="p">,</span> <span class="mi">39</span><span class="p">,</span> <span class="mi">159</span><span class="p">,</span>
+    <span class="mi">47</span><span class="p">,</span> <span class="mi">97</span><span class="p">,</span> <span class="mi">72</span><span class="p">,</span> <span class="mi">110</span><span class="p">,</span> <span class="mi">70</span><span class="p">,</span> <span class="mi">79</span><span class="p">,</span> <span class="mi">103</span><span class="p">,</span> <span class="mi">71</span><span class="p">,</span> <span class="mi">111</span><span class="p">,</span> <span class="mi">81</span><span class="p">,</span> <span class="mi">113</span><span class="p">,</span> <span class="mi">94</span><span class="p">,</span> <span class="mi">126</span><span class="p">,</span> <span class="mi">87</span><span class="p">,</span> <span class="mi">119</span><span class="p">,</span> <span class="mi">95</span><span class="p">,</span> <span class="mi">127</span><span class="p">,</span> <span class="mi">162</span><span class="p">,</span>
+    <span class="mi">24</span><span class="p">,</span> <span class="mi">174</span><span class="p">,</span> <span class="mi">22</span><span class="p">,</span> <span class="mi">31</span><span class="p">,</span> <span class="mi">167</span><span class="p">,</span> <span class="mi">23</span><span class="p">,</span> <span class="mi">175</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">178</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">190</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">183</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">191</span><span class="p">,</span> <span class="mi">226</span><span class="p">,</span> <span class="mi">202</span><span class="p">,</span> <span class="mi">238</span><span class="p">,</span>
+    <span class="mi">198</span><span class="p">,</span> <span class="mi">207</span><span class="p">,</span> <span class="mi">231</span><span class="p">,</span> <span class="mi">199</span><span class="p">,</span> <span class="mi">239</span><span class="p">,</span> <span class="mi">210</span><span class="p">,</span> <span class="mi">242</span><span class="p">,</span> <span class="mi">222</span><span class="p">,</span> <span class="mi">254</span><span class="p">,</span> <span class="mi">215</span><span class="p">,</span> <span class="mi">247</span><span class="p">,</span> <span class="mi">223</span><span class="p">,</span> <span class="mi">255</span>
+<span class="p">]</span>
+
+
+<div class="viewcode-block" id="SboxLut"><a class="viewcode-back" href="../../../cascada.primitives.skinny128.html#cascada.primitives.skinny128.SboxLut">[docs]</a><span class="k">class</span> <span class="nc">SboxLut</span><span class="p">(</span><span class="n">LutOperation</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The 8-bit S-box of SKINNY-128-128.&quot;&quot;&quot;</span>
+    <span class="n">lut</span> <span class="o">=</span> <span class="p">[</span><span class="n">Constant</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">_lut</span><span class="p">]</span></div>
+
+
+<span class="c1"># weight 1 to count number of active S-boxes</span>
+<span class="n">SboxLut</span><span class="o">.</span><span class="n">xor_model</span> <span class="o">=</span> <span class="n">get_differential_weak_model</span><span class="p">(</span><span class="n">SboxLut</span><span class="p">,</span> <span class="n">XorDiff</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">SboxLut</span><span class="o">.</span><span class="n">linear_model</span> <span class="o">=</span> <span class="n">get_linear_weak_model</span><span class="p">(</span><span class="n">SboxLut</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="SKINNYEncryption"><a class="viewcode-back" href="../../../cascada.primitives.skinny128.html#cascada.primitives.skinny128.SKINNYEncryption">[docs]</a><span class="k">class</span> <span class="nc">SKINNYEncryption</span><span class="p">(</span><span class="n">Encryption</span><span class="p">,</span> <span class="n">AESLikeFunction</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Encryption function of SKINNY-128-128.&quot;&quot;&quot;</span>
+
+    <span class="n">num_rounds</span> <span class="o">=</span> <span class="n">default_num_rounds</span>
+    <span class="n">num_rows</span><span class="p">,</span> <span class="n">num_columns</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span>
+    <span class="n">cell_width</span> <span class="o">=</span> <span class="mi">8</span>
+
+    <span class="n">ignore_first_sub_cells</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">sbox</span> <span class="o">=</span> <span class="n">SboxLut</span>
+
+    <span class="n">name_add_round_constants</span><span class="p">,</span> <span class="n">name_sub_cells</span> <span class="o">=</span> <span class="s2">&quot;AddRoundTweakey&quot;</span><span class="p">,</span> <span class="s2">&quot;SubCells&quot;</span>
+    <span class="n">logging_mode</span> <span class="o">=</span> <span class="n">LoggingMode</span><span class="o">.</span><span class="n">Silent</span>
+
+    <span class="n">round_constants</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="mh">0x01</span><span class="p">,</span> <span class="mh">0x03</span><span class="p">,</span> <span class="mh">0x07</span><span class="p">,</span> <span class="mh">0x0F</span><span class="p">,</span> <span class="mh">0x1F</span><span class="p">,</span> <span class="mh">0x3E</span><span class="p">,</span> <span class="mh">0x3D</span><span class="p">,</span> <span class="mh">0x3B</span><span class="p">,</span> <span class="mh">0x37</span><span class="p">,</span> <span class="mh">0x2F</span><span class="p">,</span> <span class="mh">0x1E</span><span class="p">,</span> <span class="mh">0x3C</span><span class="p">,</span> <span class="mh">0x39</span><span class="p">,</span> <span class="mh">0x33</span><span class="p">,</span> <span class="mh">0x27</span><span class="p">,</span> <span class="mh">0x0E</span><span class="p">,</span>
+        <span class="mh">0x1D</span><span class="p">,</span> <span class="mh">0x3A</span><span class="p">,</span> <span class="mh">0x35</span><span class="p">,</span> <span class="mh">0x2B</span><span class="p">,</span> <span class="mh">0x16</span><span class="p">,</span> <span class="mh">0x2C</span><span class="p">,</span> <span class="mh">0x18</span><span class="p">,</span> <span class="mh">0x30</span><span class="p">,</span> <span class="mh">0x21</span><span class="p">,</span> <span class="mh">0x02</span><span class="p">,</span> <span class="mh">0x05</span><span class="p">,</span> <span class="mh">0x0B</span><span class="p">,</span> <span class="mh">0x17</span><span class="p">,</span> <span class="mh">0x2E</span><span class="p">,</span> <span class="mh">0x1C</span><span class="p">,</span> <span class="mh">0x38</span><span class="p">,</span>
+        <span class="mh">0x31</span><span class="p">,</span> <span class="mh">0x23</span><span class="p">,</span> <span class="mh">0x06</span><span class="p">,</span> <span class="mh">0x0D</span><span class="p">,</span> <span class="mh">0x1B</span><span class="p">,</span> <span class="mh">0x36</span><span class="p">,</span> <span class="mh">0x2D</span><span class="p">,</span> <span class="mh">0x1A</span><span class="p">,</span> <span class="mh">0x34</span><span class="p">,</span> <span class="mh">0x29</span><span class="p">,</span> <span class="mh">0x12</span><span class="p">,</span> <span class="mh">0x24</span><span class="p">,</span> <span class="mh">0x08</span><span class="p">,</span> <span class="mh">0x11</span><span class="p">,</span> <span class="mh">0x22</span><span class="p">,</span> <span class="mh">0x04</span><span class="p">,</span>
+        <span class="mh">0x09</span><span class="p">,</span> <span class="mh">0x13</span><span class="p">,</span> <span class="mh">0x26</span><span class="p">,</span> <span class="mh">0x0c</span><span class="p">,</span> <span class="mh">0x19</span><span class="p">,</span> <span class="mh">0x32</span><span class="p">,</span> <span class="mh">0x25</span><span class="p">,</span> <span class="mh">0x0a</span><span class="p">,</span> <span class="mh">0x15</span><span class="p">,</span> <span class="mh">0x2a</span><span class="p">,</span> <span class="mh">0x14</span><span class="p">,</span> <span class="mh">0x28</span><span class="p">,</span> <span class="mh">0x10</span><span class="p">,</span> <span class="mh">0x20</span>
+    <span class="p">]</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">shift_rows</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">my_matrix_state</span><span class="p">):</span>
+        <span class="n">new_matrix_state</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span><span class="p">[:]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">my_matrix_state</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_rows</span><span class="p">):</span>
+            <span class="n">offset</span> <span class="o">=</span> <span class="n">r</span>  <span class="c1"># shift offset (0 for r=0, 1 for r=1, ...)</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_columns</span><span class="p">):</span>
+                <span class="c1"># rotate to the right</span>
+                <span class="n">new_matrix_state</span><span class="p">[</span><span class="n">r</span><span class="p">][</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">my_matrix_state</span><span class="p">[</span><span class="n">r</span><span class="p">][(</span><span class="n">c</span> <span class="o">-</span> <span class="n">offset</span><span class="p">)</span> <span class="o">%</span> <span class="bp">cls</span><span class="o">.</span><span class="n">num_columns</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">logging_mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">LoggingMode</span><span class="o">.</span><span class="n">Silent</span><span class="p">,</span> <span class="n">LoggingMode</span><span class="o">.</span><span class="n">RoundOutputs</span><span class="p">]:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">log_msg</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;output of </span><span class="si">{</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s1">&#39;name_shift_rows&#39;</span><span class="p">,</span> <span class="s1">&#39;ShiftRows&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">log_activity_matrix_state</span><span class="p">(</span><span class="n">new_matrix_state</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">new_matrix_state</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">mix_columns</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">my_matrix_state</span><span class="p">):</span>
+        <span class="n">new_matrix_state</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span><span class="p">[:]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">my_matrix_state</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">index_column</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_columns</span><span class="p">):</span>
+            <span class="n">input_column</span> <span class="o">=</span> <span class="p">[</span><span class="n">my_matrix_state</span><span class="p">[</span><span class="n">r</span><span class="p">][</span><span class="n">index_column</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_rows</span><span class="p">)]</span>
+
+            <span class="c1"># M =</span>
+            <span class="c1"># 1 0 1 1</span>
+            <span class="c1"># 1 0 0 0</span>
+            <span class="c1"># 0 1 1 0</span>
+            <span class="c1"># 1 0 1 0</span>
+            <span class="n">output_column</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">input_column</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">^</span> <span class="n">input_column</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">^</span> <span class="n">input_column</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+                <span class="n">input_column</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="n">input_column</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">^</span> <span class="n">input_column</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+                <span class="n">input_column</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">^</span> <span class="n">input_column</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="p">]</span>
+
+            <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_rows</span><span class="p">):</span>
+                <span class="n">new_matrix_state</span><span class="p">[</span><span class="n">r</span><span class="p">][</span><span class="n">index_column</span><span class="p">]</span> <span class="o">=</span> <span class="n">BvIdentity</span><span class="p">(</span><span class="n">output_column</span><span class="p">[</span><span class="n">r</span><span class="p">])</span>  <span class="c1"># copy with new name</span>
+
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">logging_mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">LoggingMode</span><span class="o">.</span><span class="n">Silent</span><span class="p">,</span> <span class="n">LoggingMode</span><span class="o">.</span><span class="n">RoundOutputs</span><span class="p">]:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">log_msg</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;output of </span><span class="si">{</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s1">&#39;name_mix_columns&#39;</span><span class="p">,</span> <span class="s1">&#39;MixColumns&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">log_activity_matrix_state</span><span class="p">(</span><span class="n">new_matrix_state</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">new_matrix_state</span>
+
+<div class="viewcode-block" id="SKINNYEncryption.eval"><a class="viewcode-back" href="../../../cascada.primitives.skinny128.html#cascada.primitives.skinny128.SKINNYEncryption.eval">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">plaintext</span><span class="p">):</span>
+        <span class="n">matrix_state</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">list2matrix</span><span class="p">(</span><span class="n">plaintext</span><span class="p">,</span> <span class="n">column_order</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">logging_mode</span> <span class="o">!=</span> <span class="n">LoggingMode</span><span class="o">.</span><span class="n">Silent</span><span class="p">:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">log_msg</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">plaintext:&quot;</span><span class="p">)</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">log_activity_matrix_state</span><span class="p">(</span><span class="n">matrix_state</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">r</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">cls</span><span class="o">.</span><span class="n">ignore_first_sub_cells</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">matrix_state</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">sub_cells</span><span class="p">(</span><span class="n">matrix_state</span><span class="p">)</span>
+
+            <span class="c1"># AddConstants</span>
+            <span class="n">round_constant</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">round_constants</span><span class="p">[</span><span class="n">r</span><span class="p">]</span>
+            <span class="n">c0</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="n">round_constant</span> <span class="o">&amp;</span> <span class="mh">0xF</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">cell_width</span><span class="p">)</span>
+            <span class="n">c1</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="n">round_constant</span> <span class="o">&gt;&gt;</span> <span class="mi">4</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">cell_width</span><span class="p">)</span>
+            <span class="n">c2</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="mh">0x2</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">cell_width</span><span class="p">)</span>
+            <span class="n">matrix_state</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">^=</span> <span class="n">c0</span>
+            <span class="n">matrix_state</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">^=</span> <span class="n">c1</span>
+            <span class="n">matrix_state</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">^=</span> <span class="n">c2</span>
+            <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">logging_mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">LoggingMode</span><span class="o">.</span><span class="n">Silent</span><span class="p">,</span> <span class="n">LoggingMode</span><span class="o">.</span><span class="n">RoundOutputs</span><span class="p">]:</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">log_msg</span><span class="p">(</span><span class="s2">&quot;output of AddConstants:&quot;</span><span class="p">)</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">log_activity_matrix_state</span><span class="p">(</span><span class="n">matrix_state</span><span class="p">)</span>
+
+            <span class="n">current_round_key</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">round_keys</span><span class="p">[</span><span class="n">r</span><span class="o">*</span><span class="p">(</span><span class="mi">4</span><span class="o">*</span><span class="mi">2</span><span class="p">):</span> <span class="p">(</span><span class="n">r</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mi">4</span><span class="o">*</span><span class="mi">2</span><span class="p">)])</span>  <span class="c1"># first 2 rows</span>
+            <span class="n">current_round_key</span> <span class="o">+=</span> <span class="p">[</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">cell_width</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="o">*</span><span class="mi">2</span><span class="p">)]</span>  <span class="c1"># last 2 rows</span>
+            <span class="n">matrix_round_keys</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">list2matrix</span><span class="p">(</span><span class="n">current_round_key</span><span class="p">,</span> <span class="n">column_order</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">matrix_state</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">add_round_constant</span><span class="p">(</span><span class="n">matrix_state</span><span class="p">,</span> <span class="n">matrix_round_keys</span><span class="p">)</span>
+
+            <span class="n">matrix_state</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">shift_rows</span><span class="p">(</span><span class="n">matrix_state</span><span class="p">)</span>
+            <span class="n">matrix_state</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">mix_columns</span><span class="p">(</span><span class="n">matrix_state</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">logging_mode</span> <span class="o">!=</span> <span class="n">LoggingMode</span><span class="o">.</span><span class="n">Silent</span><span class="p">:</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">log_msg</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;output of round </span><span class="si">{</span><span class="n">r</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">log_activity_matrix_state</span><span class="p">(</span><span class="n">matrix_state</span><span class="p">)</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">log_msg</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="p">[])</span>
+
+            <span class="bp">cls</span><span class="o">.</span><span class="n">add_round_outputs</span><span class="p">(</span><span class="o">*</span><span class="bp">cls</span><span class="o">.</span><span class="n">matrix2list</span><span class="p">(</span><span class="n">matrix_state</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">matrix2list</span><span class="p">(</span><span class="n">matrix_state</span><span class="p">,</span> <span class="n">column_order</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span></div></div>
+
+
+<div class="viewcode-block" id="SKINNYCipher"><a class="viewcode-back" href="../../../cascada.primitives.skinny128.html#cascada.primitives.skinny128.SKINNYCipher">[docs]</a><span class="k">class</span> <span class="nc">SKINNYCipher</span><span class="p">(</span><span class="n">Cipher</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The block cipher SKINNY-128-128.&quot;&quot;&quot;</span>
+    <span class="n">key_schedule</span> <span class="o">=</span> <span class="n">SKINNYTweakeySchedule</span>
+    <span class="n">encryption</span> <span class="o">=</span> <span class="n">SKINNYEncryption</span>
+
+<div class="viewcode-block" id="SKINNYCipher.set_num_rounds"><a class="viewcode-back" href="../../../cascada.primitives.skinny128.html#cascada.primitives.skinny128.SKINNYCipher.set_num_rounds">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">set_num_rounds</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">new_num_rounds</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">key_schedule</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="n">new_num_rounds</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">encryption</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="n">new_num_rounds</span><span class="p">)</span></div>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">test</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="n">old_num_rounds</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span>
+        <span class="n">old_ignore</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">encryption</span><span class="o">.</span><span class="n">ignore_first_sub_cells</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">encryption</span><span class="o">.</span><span class="n">ignore_first_sub_cells</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="n">default_num_rounds</span><span class="p">)</span>
+
+        <span class="n">key</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x4f</span><span class="p">,</span> <span class="mh">0x55</span><span class="p">,</span> <span class="mh">0xcf</span><span class="p">,</span> <span class="mh">0xb0</span><span class="p">,</span>
+               <span class="mh">0x52</span><span class="p">,</span> <span class="mh">0x0c</span><span class="p">,</span> <span class="mh">0xac</span><span class="p">,</span> <span class="mh">0x52</span><span class="p">,</span>
+               <span class="mh">0xfd</span><span class="p">,</span> <span class="mh">0x92</span><span class="p">,</span> <span class="mh">0xc1</span><span class="p">,</span> <span class="mh">0x5f</span><span class="p">,</span>
+               <span class="mh">0x37</span><span class="p">,</span> <span class="mh">0x07</span><span class="p">,</span> <span class="mh">0x3e</span><span class="p">,</span> <span class="mh">0x93</span><span class="p">]</span>
+        <span class="n">plaintext</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0xf2</span><span class="p">,</span> <span class="mh">0x0a</span><span class="p">,</span> <span class="mh">0xdb</span><span class="p">,</span> <span class="mh">0x0e</span><span class="p">,</span>
+                     <span class="mh">0xb0</span><span class="p">,</span> <span class="mh">0x8b</span><span class="p">,</span> <span class="mh">0x64</span><span class="p">,</span> <span class="mh">0x8a</span><span class="p">,</span>
+                     <span class="mh">0x3b</span><span class="p">,</span> <span class="mh">0x2e</span><span class="p">,</span> <span class="mh">0xee</span><span class="p">,</span> <span class="mh">0xd1</span><span class="p">,</span>
+                     <span class="mh">0xf0</span><span class="p">,</span> <span class="mh">0xad</span><span class="p">,</span> <span class="mh">0xda</span><span class="p">,</span> <span class="mh">0x14</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="nb">list</span><span class="p">(</span><span class="bp">cls</span><span class="p">(</span><span class="n">plaintext</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span> <span class="o">==</span> <span class="p">[</span>
+            <span class="mh">0x22</span><span class="p">,</span> <span class="mh">0xff</span><span class="p">,</span> <span class="mh">0x30</span><span class="p">,</span> <span class="mh">0xd4</span><span class="p">,</span>
+            <span class="mh">0x98</span><span class="p">,</span> <span class="mh">0xea</span><span class="p">,</span> <span class="mh">0x62</span><span class="p">,</span> <span class="mh">0xd7</span><span class="p">,</span>
+            <span class="mh">0xe4</span><span class="p">,</span> <span class="mh">0x5b</span><span class="p">,</span> <span class="mh">0x47</span><span class="p">,</span> <span class="mh">0x6e</span><span class="p">,</span>
+            <span class="mh">0x33</span><span class="p">,</span> <span class="mh">0x67</span><span class="p">,</span> <span class="mh">0x5b</span><span class="p">,</span> <span class="mh">0x74</span><span class="p">]</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="n">old_num_rounds</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">encryption</span><span class="o">.</span><span class="n">ignore_first_sub_cells</span> <span class="o">=</span> <span class="n">old_ignore</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Adrián Ranea.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cascada.smt.invalidpropsearch module &mdash; CASCADA 1.0.rc0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="cascada.smt.wrappedchmodel module" href="cascada.smt.wrappedchmodel.html" />
+    <link rel="prev" title="cascada.smt.chsearch module" href="cascada.smt.chsearch.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> CASCADA
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">CASCADA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="primitives_implemented.html">Primitives implemented</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="cascada.html">API reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="cascada.bitvector.html">cascada.bitvector module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.primitives.html">cascada.primitives module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.abstractproperty.html">cascada.abstractproperty module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.differential.html">cascada.differential module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.linear.html">cascada.linear module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.algebraic.html">cascada.algebraic module</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="cascada.smt.html">cascada.smt module</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="cascada.smt.pysmttypes.html">cascada.smt.pysmttypes module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.smt.chsearch.html">cascada.smt.chsearch module</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">cascada.smt.invalidpropsearch module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.smt.wrappedchmodel.html">cascada.smt.wrappedchmodel module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">CASCADA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="cascada.html">API reference</a> &raquo;</li>
+          <li><a href="cascada.smt.html">cascada.smt module</a> &raquo;</li>
+      <li>cascada.smt.invalidpropsearch module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/cascada.smt.invalidpropsearch.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-cascada.smt.invalidpropsearch">
+<span id="cascada-smt-invalidpropsearch-module"></span><h1>cascada.smt.invalidpropsearch module<a class="headerlink" href="#module-cascada.smt.invalidpropsearch" title="Permalink to this headline"></a></h1>
+<p>Search for zero-probability (invalid) properties
+(e.g., impossible differentials or zero-correlation hulls)
+by modeling the search as a sequence of SMT problems.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.smt.invalidpropsearch.ActiveBitMode">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.smt.invalidpropsearch.</span></span><span class="sig-name descname"><span class="pre">ActiveBitMode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/smt/invalidpropsearch.html#ActiveBitMode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.smt.invalidpropsearch.ActiveBitMode" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
+<p>Represent the subsets of bit-vectors available depending on
+which bits are activated (set to 1) for <code class="docutils literal notranslate"><span class="pre">find_next_invalidprop_activebitmode</span></code>.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.smt.invalidpropsearch.ActiveBitMode.Default">
+<span class="sig-name descname"><span class="pre">Default</span></span><a class="headerlink" href="#cascada.smt.invalidpropsearch.ActiveBitMode.Default" title="Permalink to this definition"></a></dt>
+<dd><p>all bit-vectors</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.smt.invalidpropsearch.ActiveBitMode.SingleBit">
+<span class="sig-name descname"><span class="pre">SingleBit</span></span><a class="headerlink" href="#cascada.smt.invalidpropsearch.ActiveBitMode.SingleBit" title="Permalink to this definition"></a></dt>
+<dd><p>bit-vectors with up to one bit activated (zero included)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.smt.invalidpropsearch.ActiveBitMode.MSBbit">
+<span class="sig-name descname"><span class="pre">MSBbit</span></span><a class="headerlink" href="#cascada.smt.invalidpropsearch.ActiveBitMode.MSBbit" title="Permalink to this definition"></a></dt>
+<dd><p>bit-vectors with up to the most significant bit activated (zero included)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.smt.invalidpropsearch.ActiveBitMode.Zero">
+<span class="sig-name descname"><span class="pre">Zero</span></span><a class="headerlink" href="#cascada.smt.invalidpropsearch.ActiveBitMode.Zero" title="Permalink to this definition"></a></dt>
+<dd><p>the zero bit-vector</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.smt.invalidpropsearch.InvalidPropFinder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.smt.invalidpropsearch.</span></span><span class="sig-name descname"><span class="pre">InvalidPropFinder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ch_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_universally_invalid_ch_found</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">printing_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">PrintingMode.Silent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/smt/invalidpropsearch.html#InvalidPropFinder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.smt.invalidpropsearch.InvalidPropFinder" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="cascada.smt.chsearch.html#cascada.smt.chsearch.ChFinder" title="cascada.smt.chsearch.ChFinder"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.smt.chsearch.ChFinder</span></code></a></p>
+<p>Search for zero-probability (invalid) property pairs by modeling the search as a sequence of SMT problems.</p>
+<p>Given a characteristic model
+defined for a particular <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> (e.g., <a class="reference internal" href="cascada.differential.difference.html#cascada.differential.difference.XorDiff" title="cascada.differential.difference.XorDiff"><code class="xref any py py-class docutils literal notranslate"><span class="pre">XorDiff</span></code></a> or <a class="reference internal" href="cascada.linear.mask.html#cascada.linear.mask.LinearMask" title="cascada.linear.mask.LinearMask"><code class="xref any py py-class docutils literal notranslate"><span class="pre">LinearMask</span></code></a>),
+this class finds <em>universally-invalid</em> characteristics
+following the characteristic model by modelling the search as a sequence
+of SMT problems in the bit-vector theory.</p>
+<p>A <em>universally-invalid</em> characteristic is a characteristic
+where the characteristic input property <span class="math notranslate nohighlight">\(\alpha\)</span>
+propagates to the characteristic output property <span class="math notranslate nohighlight">\(\beta\)</span>
+with probability zero regardless of the intermediate properties
+(i.e., for all assignments of the intermediate properties).
+In other words, the input-output property pair
+<span class="math notranslate nohighlight">\((\alpha, \beta)\)</span> has zero propagation probability.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For the <a class="reference internal" href="cascada.differential.difference.html#cascada.differential.difference.Difference" title="cascada.differential.difference.Difference"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Difference</span></code></a> (resp. <a class="reference internal" href="cascada.linear.mask.html#cascada.linear.mask.LinearMask" title="cascada.linear.mask.LinearMask"><code class="xref any py py-class docutils literal notranslate"><span class="pre">LinearMask</span></code></a>) property,
+a universally-invalid characteristic is actually an impossible
+differential (resp. a zero-correlation hull).</p>
+<p>Search for universally-invalid algebraic characteristic is not supported.</p>
+</div>
+<p>Consider the SMT problem <span class="math notranslate nohighlight">\(\Omega\)</span> of whether there exists a
+valid characteristic with constant input property <span class="math notranslate nohighlight">\(\alpha\)</span>
+and constant output property <span class="math notranslate nohighlight">\(\beta\)</span>
+(and where the intermediate properties are not specified).
+The main idea of the SMT-based search is that one can check whether
+<span class="math notranslate nohighlight">\(\alpha\)</span> propagates to <span class="math notranslate nohighlight">\(\beta\)</span> with probability zero
+by checking whether <span class="math notranslate nohighlight">\(\Omega\)</span> is unsatisfisable (UNSAT).
+Note that only the validity constraints are needed to build <span class="math notranslate nohighlight">\(\Omega\)</span>;
+the weight constraints are ignored when searching for universally-invalid characteristics.</p>
+<p>The initialization argument <code class="docutils literal notranslate"><span class="pre">ch_model</span></code> must be a subclass of
+<a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel" title="cascada.abstractproperty.chmodel.ChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.chmodel.ChModel</span></code></a> with up to one non-trivial transitions
+(<a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel" title="cascada.abstractproperty.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.opmodel.OpModel</span></code></a> excluding <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.ModelIdentity" title="cascada.abstractproperty.opmodel.ModelIdentity"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ModelIdentity</span></code></a>),
+since a zero-probability characteristic with up to one non-trivial transitions
+is a universally-invalid characteristic.
+For a characteristic model with more than one non-trivial transitions,
+the function <a class="reference internal" href="cascada.smt.wrappedchmodel.html#cascada.smt.wrappedchmodel.get_wrapped_chmodel" title="cascada.smt.wrappedchmodel.get_wrapped_chmodel"><code class="xref any py py-func docutils literal notranslate"><span class="pre">get_wrapped_chmodel</span></code></a> can be used to wrap the characteristic
+model into an equivalent characteristic model with one non-trivial transition.</p>
+<p>An <a class="reference internal" href="#cascada.smt.invalidpropsearch.InvalidPropFinder" title="cascada.smt.invalidpropsearch.InvalidPropFinder"><code class="xref any py py-class docutils literal notranslate"><span class="pre">InvalidPropFinder</span></code></a> object is also an instance of <a class="reference internal" href="cascada.smt.chsearch.html#cascada.smt.chsearch.ChFinder" title="cascada.smt.chsearch.ChFinder"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChFinder</span></code></a> where
+<a class="reference internal" href="cascada.smt.chsearch.html#cascada.smt.chsearch.ChFinder.assert_type" title="cascada.smt.chsearch.ChFinder.assert_type"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">assert_type</span></code></a> is <a class="reference internal" href="cascada.smt.chsearch.html#cascada.smt.chsearch.ChModelAssertType.Validity" title="cascada.smt.chsearch.ChModelAssertType.Validity"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">Validity</span></code></a> and with the given initialization arguments
+<code class="docutils literal notranslate"><span class="pre">ch_model</span></code>,  <code class="docutils literal notranslate"><span class="pre">solver_name</span></code>, <code class="docutils literal notranslate"><span class="pre">printing_mode</span></code>, <code class="docutils literal notranslate"><span class="pre">filename</span></code>, <code class="docutils literal notranslate"><span class="pre">solver_seed</span></code>
+and <code class="docutils literal notranslate"><span class="pre">env=env</span></code>. See also <a class="reference internal" href="cascada.smt.chsearch.html#cascada.smt.chsearch.ChFinder" title="cascada.smt.chsearch.ChFinder"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChFinder</span></code></a>.</p>
+<p>Similar as <a class="reference internal" href="cascada.smt.chsearch.html#cascada.smt.chsearch.ChFinder" title="cascada.smt.chsearch.ChFinder"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChFinder</span></code></a>,  the methods of <a class="reference internal" href="#cascada.smt.invalidpropsearch.InvalidPropFinder" title="cascada.smt.invalidpropsearch.InvalidPropFinder"><code class="xref any py py-class docutils literal notranslate"><span class="pre">InvalidPropFinder</span></code></a> that search for
+universally-invalid characteristics are Python <a class="reference external" href="https://docs.python.org/3/glossary.html#term-generator" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">generator</span></code></a> functions,
+returning an <a class="reference external" href="https://docs.python.org/3/glossary.html#term-iterator" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">iterator</span></code></a> that yields the universally-invalid characteristics
+found in the search.
+If initialization argument <code class="docutils literal notranslate"><span class="pre">ch_model</span></code> is a <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel" title="cascada.abstractproperty.chmodel.ChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.chmodel.ChModel</span></code></a>
+(resp. <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.EncryptionChModel" title="cascada.abstractproperty.chmodel.EncryptionChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.chmodel.EncryptionChModel</span></code></a>),
+then these methods yield
+<a class="reference internal" href="cascada.abstractproperty.characteristic.html#cascada.abstractproperty.characteristic.Characteristic" title="cascada.abstractproperty.characteristic.Characteristic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.characteristic.Characteristic</span></code></a>
+(resp. <a class="reference internal" href="cascada.abstractproperty.characteristic.html#cascada.abstractproperty.characteristic.EncryptionCharacteristic" title="cascada.abstractproperty.characteristic.EncryptionCharacteristic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.characteristic.EncryptionCharacteristic</span></code></a>) objects.</p>
+<p>If the initialization argument <code class="docutils literal notranslate"><span class="pre">check_universally_invalid_ch_found</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>,
+all universally-invalid characteristics found in the search are checked by searching
+for a valid characteristic with the same input and output property with
+<a class="reference internal" href="cascada.smt.chsearch.html#cascada.smt.chsearch.ChFinder.find_next_ch" title="cascada.smt.chsearch.ChFinder.find_next_ch"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">ChFinder.find_next_ch</span></code></a>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># example of SMT problem of universally-invalid LinearMask-EncryptionCharacteristic of (wrapped) Speck32</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.linear.mask</span> <span class="kn">import</span> <span class="n">LinearMask</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.linear.chmodel</span> <span class="kn">import</span> <span class="n">EncryptionChModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.smt.invalidpropsearch</span> <span class="kn">import</span> <span class="n">InvalidPropFinder</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">speck</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">wrapped_ch_model</span> <span class="o">=</span> <span class="n">get_wrapped_chmodel</span><span class="p">(</span><span class="n">EncryptionChModel</span><span class="p">(</span><span class="n">Speck32</span><span class="p">,</span> <span class="n">LinearMask</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">invalid_prop_finder</span> <span class="o">=</span> <span class="n">InvalidPropFinder</span><span class="p">(</span><span class="n">wrapped_ch_model</span><span class="p">,</span> <span class="s2">&quot;z3&quot;</span><span class="p">,</span> <span class="n">solver_seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">invalid_prop_finder</span><span class="o">.</span><span class="n">formula_size</span><span class="p">()</span>
+<span class="go">133</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">invalid_prop_finder</span><span class="o">.</span><span class="n">hrepr</span><span class="p">(</span><span class="n">full_repr</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>  
+<span class="go">; characteristic model assertions</span>
+<span class="go">assert (_mx0 == (mx9_out :: mx7_out)) &amp;</span>
+<span class="go">    ((~((mx1 ^ (_mp0 &gt;&gt;&gt; 7)) | (mx1 ^ mp1__0)) | _tmp20affb7ca27930ce775156bcc0ecaf20) == 0xffff) &amp;</span>
+<span class="go">    ((_tmp20affb7ca27930ce775156bcc0ecaf20 ^ (_tmp20affb7ca27930ce775156bcc0ecaf20 &gt;&gt; 0x0001) ^</span>
+<span class="go">        ((mx1 ^ (_mp0 &gt;&gt;&gt; 7) ^ mp1__0) &gt;&gt; 0x0001)) == 0x0000) &amp;</span>
+<span class="go">    (mx1 == _mk0) &amp; (mx1 == mx2) &amp; (((_mp1 ^ mp1__0) &lt;&lt;&lt; 2) == mx2__0) &amp; (((_mp1 ^ mp1__0) &lt;&lt;&lt; 2) == mx4) &amp;</span>
+<span class="go">    ((~((mx6 ^ ((mx2 ^ mx2__0) &gt;&gt;&gt; 7)) | (mx6 ^ mx4__0)) | _tmp824d7e7c80d9889507eb4e5d5c7be280) == 0xffff) &amp;</span>
+<span class="go">    ((_tmp824d7e7c80d9889507eb4e5d5c7be280 ^ (_tmp824d7e7c80d9889507eb4e5d5c7be280 &gt;&gt; 0x0001) ^</span>
+<span class="go">        ((mx6 ^ ((mx2 ^ mx2__0) &gt;&gt;&gt; 7) ^ mx4__0) &gt;&gt; 0x0001)) == 0x0000) &amp;</span>
+<span class="go">    (mx6 == _mk1) &amp; (mx6 == mx7) &amp; (((mx4 ^ mx4__0) &lt;&lt;&lt; 2) == mx7__0) &amp;</span>
+<span class="go">    (((mx4 ^ mx4__0) &lt;&lt;&lt; 2) == mx9) &amp; ((mx7 ^ mx7__0) == mx7_out) &amp; (mx9 == mx9_out)</span>
+<span class="go">assert PropExtract_{·, 15, 0}(_mx0) == _mx1_out</span>
+<span class="go">assert PropExtract_{·, 31, 16}(_mx0) == _mx2_out</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># example of SMT problem of universally-invalid XorDiff-Characteristic of Speck32-KeySchedule</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.difference</span> <span class="kn">import</span> <span class="n">XorDiff</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.chmodel</span> <span class="kn">import</span> <span class="n">ChModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.smt.invalidpropsearch</span> <span class="kn">import</span> <span class="n">InvalidPropFinder</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">speck</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32_KS</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span><span class="o">.</span><span class="n">key_schedule</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32_KS</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model</span> <span class="o">=</span> <span class="n">ChModel</span><span class="p">(</span><span class="n">Speck32_KS</span><span class="p">,</span> <span class="n">XorDiff</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;mk0&quot;</span><span class="p">,</span> <span class="s2">&quot;mk1&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">invalid_prop_finder</span> <span class="o">=</span> <span class="n">InvalidPropFinder</span><span class="p">(</span><span class="n">ch_model</span><span class="p">,</span> <span class="s2">&quot;z3&quot;</span><span class="p">,</span> <span class="n">solver_seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">invalid_prop_finder</span><span class="o">.</span><span class="n">formula_size</span><span class="p">()</span>
+<span class="go">42</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">invalid_prop_finder</span><span class="o">.</span><span class="n">hrepr</span><span class="p">(</span><span class="n">full_repr</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>  
+<span class="go">; characteristic model assertions</span>
+<span class="go">assert ((~((mk0 &gt;&gt;&gt; 7) &lt;&lt; 0x0001) ^ (mk1 &lt;&lt; 0x0001)) &amp; (~((mk0 &gt;&gt;&gt; 7) &lt;&lt; 0x0001) ^ (dx1 &lt;&lt; 0x0001)) &amp;</span>
+<span class="go">    ((mk0 &gt;&gt;&gt; 7) ^ mk1 ^ dx1 ^ ((mk0 &gt;&gt;&gt; 7) &lt;&lt; 0x0001))) == 0x0000</span>
+<span class="go">assert mk1 == mk1_out</span>
+<span class="go">assert ((mk1 &lt;&lt;&lt; 2) ^ dx1) == dx3_out</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.smt.invalidpropsearch.InvalidPropFinder.find_next_invalidprop_activebitmode">
+<span class="sig-name descname"><span class="pre">find_next_invalidprop_activebitmode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_num_active_bits</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_prop_activebitmode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_prop_activebitmode</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/smt/invalidpropsearch.html#InvalidPropFinder.find_next_invalidprop_activebitmode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.smt.invalidpropsearch.InvalidPropFinder.find_next_invalidprop_activebitmode" title="Permalink to this definition"></a></dt>
+<dd><p>Return an iterator that yields the universally-invalid characteristics found in the SMT-based search
+with given <a class="reference internal" href="#cascada.smt.invalidpropsearch.ActiveBitMode" title="cascada.smt.invalidpropsearch.ActiveBitMode"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ActiveBitMode</span></code></a>.</p>
+<p>This method searches for universally-invalid characteristic using SMT solvers by checking
+one-by-one all input and output properties with given <a class="reference internal" href="#cascada.smt.invalidpropsearch.ActiveBitMode" title="cascada.smt.invalidpropsearch.ActiveBitMode"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ActiveBitMode</span></code></a>.</p>
+<p>Given a particular input and output properties <span class="math notranslate nohighlight">\((\alpha, \beta)\)</span>,
+the main subroutine of this method (herein call the <em>check subroutine</em>)
+checks whether <span class="math notranslate nohighlight">\(\alpha\)</span>
+propagates to <span class="math notranslate nohighlight">\(\beta\)</span> with probability zero by checking
+with an SMT solver whether the SMT problem, of whether there exists
+a valid characteristic with input property <span class="math notranslate nohighlight">\(\alpha\)</span> and output property
+<span class="math notranslate nohighlight">\(\beta\)</span>, is unsatisfisable (UNSAT).
+If the problem is UNSAT, the universally-invalid
+<a class="reference internal" href="cascada.abstractproperty.characteristic.html#cascada.abstractproperty.characteristic.Characteristic" title="cascada.abstractproperty.characteristic.Characteristic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.characteristic.Characteristic</span></code></a> object with
+input and output properties <span class="math notranslate nohighlight">\((\alpha, \beta)\)</span>
+is created and <em>yielded</em>.</p>
+<p>The check subroutine is repeated for all input and output properties where
+the <a class="reference internal" href="#cascada.smt.invalidpropsearch.ActiveBitMode" title="cascada.smt.invalidpropsearch.ActiveBitMode"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ActiveBitMode</span></code></a> of each word in the input (resp. output) property is
+<code class="docutils literal notranslate"><span class="pre">input_prop_activebitmode</span></code> (resp. <code class="docutils literal notranslate"><span class="pre">output_prop_activebitmode</span></code>).
+The search starts considering input and output properties where
+the total number of active bits is <code class="docutils literal notranslate"><span class="pre">initial_num_active_bits</span></code>,
+and the total number of active bits is incremented when
+all the input and output properties are checked.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># example of search for universally-invalid LinearMask-EncryptionCharacteristic of (wrapped) Speck32</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.linear.mask</span> <span class="kn">import</span> <span class="n">LinearMask</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.linear.chmodel</span> <span class="kn">import</span> <span class="n">EncryptionChModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.smt.invalidpropsearch</span> <span class="kn">import</span> <span class="n">InvalidPropFinder</span><span class="p">,</span> <span class="n">ActiveBitMode</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">speck</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">wrapped_ch_model</span> <span class="o">=</span> <span class="n">get_wrapped_chmodel</span><span class="p">(</span><span class="n">EncryptionChModel</span><span class="p">(</span><span class="n">Speck32</span><span class="p">,</span> <span class="n">LinearMask</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">invalid_prop_finder</span> <span class="o">=</span> <span class="n">InvalidPropFinder</span><span class="p">(</span><span class="n">wrapped_ch_model</span><span class="p">,</span> <span class="s2">&quot;btor&quot;</span><span class="p">,</span> <span class="n">solver_seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">inab</span><span class="p">,</span> <span class="n">ipabm</span><span class="p">,</span> <span class="n">opabm</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ActiveBitMode</span><span class="o">.</span><span class="n">MSBit</span><span class="p">,</span> <span class="n">ActiveBitMode</span><span class="o">.</span><span class="n">MSBit</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">invalid_prop_finder</span><span class="o">.</span><span class="n">find_next_invalidprop_activebitmode</span><span class="p">(</span><span class="n">inab</span><span class="p">,</span> <span class="n">ipabm</span><span class="p">,</span> <span class="n">opabm</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">ch</span><span class="o">.</span><span class="n">srepr</span><span class="p">())</span>
+<span class="go">Ch(w=Infinity, id=8000 0000, od=8000 0000)</span>
+<span class="go">Ch(w=Infinity, id=8000 0000, od=0000 8000)</span>
+<span class="go">Ch(w=Infinity, id=0000 8000, od=8000 0000)</span>
+<span class="go">Ch(w=Infinity, id=0000 8000, od=0000 8000)</span>
+<span class="go">Ch(w=Infinity, id=8000 0000, od=8000 8000)</span>
+<span class="go">Ch(w=Infinity, id=0000 8000, od=8000 8000)</span>
+<span class="go">Ch(w=Infinity, id=8000 8000, od=8000 0000)</span>
+<span class="go">Ch(w=Infinity, id=8000 8000, od=0000 8000)</span>
+<span class="go">Ch(w=Infinity, id=8000 8000, od=8000 8000)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># example of SMT problem of universally-invalid XorDiff-Characteristic of Speck32-KeySchedule</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.difference</span> <span class="kn">import</span> <span class="n">XorDiff</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.chmodel</span> <span class="kn">import</span> <span class="n">ChModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32_KS</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span><span class="o">.</span><span class="n">key_schedule</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32_KS</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model</span> <span class="o">=</span> <span class="n">ChModel</span><span class="p">(</span><span class="n">Speck32_KS</span><span class="p">,</span> <span class="n">XorDiff</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;mk0&quot;</span><span class="p">,</span> <span class="s2">&quot;mk1&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">invalid_prop_finder</span> <span class="o">=</span> <span class="n">InvalidPropFinder</span><span class="p">(</span><span class="n">ch_model</span><span class="p">,</span> <span class="s2">&quot;btor&quot;</span><span class="p">,</span> <span class="n">solver_seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">inab</span><span class="p">,</span> <span class="n">ipabm</span><span class="p">,</span> <span class="n">opabm</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ActiveBitMode</span><span class="o">.</span><span class="n">SingleBit</span><span class="p">,</span> <span class="n">ActiveBitMode</span><span class="o">.</span><span class="n">SingleBit</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">invalid_prop_finder</span><span class="o">.</span><span class="n">find_next_invalidprop_activebitmode</span><span class="p">(</span><span class="n">inab</span><span class="p">,</span> <span class="n">ipabm</span><span class="p">,</span> <span class="n">opabm</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">ch</span><span class="p">)</span>  
+<span class="go">Characteristic(ch_weight=inf, assignment_weights=[inf, inf, 0],</span>
+<span class="go">    input_diff=[0x0001, 0x0000], output_diff=[0x0001, 0x0000],</span>
+<span class="go">    assign_outdiff_list=[0x0000, 0x0001, 0x0000])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.smt.invalidpropsearch.InvalidPropFinder.find_next_invalidprop_miss_in_the_middle">
+<span class="sig-name descname"><span class="pre">find_next_invalidprop_miss_in_the_middle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ch_model_E0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ch_model_E2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ch_model_E</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ch_model_external_E</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_zero_input_prop_E0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_zero_input_prop_E2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_zero_input_prop_external_E</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/smt/invalidpropsearch.html#InvalidPropFinder.find_next_invalidprop_miss_in_the_middle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.smt.invalidpropsearch.InvalidPropFinder.find_next_invalidprop_miss_in_the_middle" title="Permalink to this definition"></a></dt>
+<dd><p>Return an iterator that yields the universally-invalid characteristics found in the SMT+MitM-based search.</p>
+<p>This method searches for universally-invalid characteristic using SMT problems
+and the miss-in-the-middle approach.</p>
+<p>Let <span class="math notranslate nohighlight">\(E\)</span> be a function split into three functions
+<span class="math notranslate nohighlight">\(E = E_2 \circ E_1 \circ E_0\)</span>.
+Let <span class="math notranslate nohighlight">\(((p_0, p_1), (p_2, p_3))\)</span> denote a <em>partial</em> characteristic
+over <span class="math notranslate nohighlight">\(E\)</span>, that is, a characteristic over <span class="math notranslate nohighlight">\(E\)</span> where:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\((p_0, p_1)\)</span> are the non-zero input and output properties of a
+characteristic with probability 1 over <span class="math notranslate nohighlight">\(E_0\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\((p_2, p_3)\)</span> are the non-zero input and output properties of a
+characteristic with probability 1 over <span class="math notranslate nohighlight">\(E_2\)</span></p></li>
+<li><p>no relation is imposed between <span class="math notranslate nohighlight">\((p_1, p_2)\)</span>, the input and output
+properties of <span class="math notranslate nohighlight">\(E_1\)</span>.</p></li>
+</ul>
+<p>The underlying function of <code class="docutils literal notranslate"><span class="pre">self.ch_model</span></code> corresponds to <span class="math notranslate nohighlight">\(E_1\)</span>,
+the underlying function of the <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel" title="cascada.abstractproperty.chmodel.ChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.chmodel.ChModel</span></code></a>
+<code class="docutils literal notranslate"><span class="pre">ch_model_E0</span></code> corresponds to <span class="math notranslate nohighlight">\(E_0\)</span>,
+and the underlying function of the <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel" title="cascada.abstractproperty.chmodel.ChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.chmodel.ChModel</span></code></a>
+<code class="docutils literal notranslate"><span class="pre">ch_model_E2</span></code> corresponds to <span class="math notranslate nohighlight">\(E_2\)</span>.
+The underlying function of the <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel" title="cascada.abstractproperty.chmodel.ChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.chmodel.ChModel</span></code></a>
+<code class="docutils literal notranslate"><span class="pre">ch_model_E</span></code> corresponds to <span class="math notranslate nohighlight">\(E\)</span>,
+but this argument is optional (more on that later).</p>
+<p>By default the input properties of <code class="docutils literal notranslate"><span class="pre">ch_model_E0</span></code> and
+<code class="docutils literal notranslate"><span class="pre">ch_model_E2</span></code> are excluded to be zero, but this can be
+changed with the optional arguments <code class="docutils literal notranslate"><span class="pre">exclude_zero_input_prop_*</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This method requires that for any probability-one characteristic
+over <span class="math notranslate nohighlight">\(E_0\)</span> with input-output property <span class="math notranslate nohighlight">\((p_0, p_1)\)</span>,
+there is no other probability-one characteristic over <span class="math notranslate nohighlight">\(E_0\)</span>
+with input property <span class="math notranslate nohighlight">\(p_0\)</span> but output property <span class="math notranslate nohighlight">\(\neq p_1\)</span>.</p>
+<p>Similarly, for any probability-one characteristic
+over <span class="math notranslate nohighlight">\(E_2\)</span> with input-output property <span class="math notranslate nohighlight">\((p_2, p_3)\)</span>,
+there is no other probability-one characteristic over <span class="math notranslate nohighlight">\(E_2\)</span>
+with output property <span class="math notranslate nohighlight">\(p3\)</span> but input property <span class="math notranslate nohighlight">\(\neq p_2\)</span>.</p>
+<p>If <span class="math notranslate nohighlight">\(E_0\)</span> and <span class="math notranslate nohighlight">\(E_2\)</span> are permutations, then these two
+requirements are satisfied for <a class="reference internal" href="cascada.differential.difference.html#cascada.differential.difference.Difference" title="cascada.differential.difference.Difference"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Difference</span></code></a> and <a class="reference internal" href="cascada.linear.mask.html#cascada.linear.mask.LinearMask" title="cascada.linear.mask.LinearMask"><code class="xref any py py-class docutils literal notranslate"><span class="pre">LinearMask</span></code></a>
+properties.</p>
+</div>
+<p>If the optional argument <code class="docutils literal notranslate"><span class="pre">ch_model_external_E</span></code> is given as a
+<a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel" title="cascada.abstractproperty.chmodel.ChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.chmodel.ChModel</span></code></a> with input and output properties
+<span class="math notranslate nohighlight">\((q_0, q_1)\)</span>, the definition of a partial characteristic is
+extended to <span class="math notranslate nohighlight">\(((p_0, p_1), (p_2, p_3), (q_0, q_1)\)</span>
+such that <span class="math notranslate nohighlight">\((q_0, q_1)\)</span> are the input and output properties of a
+characteristic with probability 1 where <span class="math notranslate nohighlight">\(q_1\)</span> is the list of
+external variables of <span class="math notranslate nohighlight">\(E\)</span> (see <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.SSA" title="cascada.bitvector.ssa.SSA"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SSA</span></code></a>).
+If <code class="docutils literal notranslate"><span class="pre">ch_model_external_E</span></code> is given,
+the argument  <code class="docutils literal notranslate"><span class="pre">exclude_zero_input_prop_external_E</span></code>
+that determines whether to exclude non-zero <span class="math notranslate nohighlight">\(q_0\)</span>
+must also be given.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The functions <span class="math notranslate nohighlight">\((E_0, E_1, E_2)\)</span> can be easily obtained
+from a <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.RoundBasedFunction" title="cascada.bitvector.ssa.RoundBasedFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RoundBasedFunction</span></code></a> <span class="math notranslate nohighlight">\(E\)</span> that includes
+<a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.RoundBasedFunction.add_round_outputs" title="cascada.bitvector.ssa.RoundBasedFunction.add_round_outputs"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">add_round_outputs</span></code></a> calls in its <code class="docutils literal notranslate"><span class="pre">eval</span></code>.</p>
+<p>For example, obtaining <span class="math notranslate nohighlight">\(E_0\)</span> from the round <code class="docutils literal notranslate"><span class="pre">ns</span></code> to
+<code class="docutils literal notranslate"><span class="pre">ns+ne0</span></code> (<code class="docutils literal notranslate"><span class="pre">ns</span></code> denoting the initial number of skipped rounds),
+<span class="math notranslate nohighlight">\(E_1\)</span> as the next <code class="docutils literal notranslate"><span class="pre">ne1</span></code> rounds, and <span class="math notranslate nohighlight">\(E_2\)</span>
+as the next <code class="docutils literal notranslate"><span class="pre">ne2</span></code> rounds can be done as follows:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="o">...</span><span class="p">]</span>
+<span class="n">ns</span><span class="p">,</span> <span class="n">ne0</span><span class="p">,</span> <span class="n">ne1</span><span class="p">,</span> <span class="n">ne2</span> <span class="o">=</span> <span class="o">...</span>
+<span class="n">MyRoundBasedFunction</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="n">ns</span><span class="o">+</span><span class="n">ne0</span><span class="o">+</span><span class="n">ne1</span><span class="o">+</span><span class="n">ne2</span><span class="p">)</span>
+<span class="n">ch_model_E</span> <span class="o">=</span> <span class="n">ChModel</span><span class="p">(</span><span class="n">MyRoundBasedFunction</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+<span class="n">rs</span> <span class="o">=</span> <span class="n">ch_model</span><span class="o">.</span><span class="n">get_round_separators</span><span class="p">()</span>
+<span class="c1"># the end of the i-th round (i=1,2,...) is rs[i-1]</span>
+<span class="n">e0_rs</span><span class="p">,</span> <span class="n">e1_rs</span> <span class="o">=</span> <span class="n">rs</span><span class="p">[</span><span class="n">ns</span><span class="o">+</span><span class="n">ne0</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">rs</span><span class="p">[</span><span class="n">ns</span><span class="o">+</span><span class="n">ne0</span><span class="o">+</span><span class="n">ne1</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">ch_model_E0</span><span class="p">,</span> <span class="n">ch_model_E1</span><span class="p">,</span> <span class="n">ch_model_E2</span> <span class="o">=</span> <span class="n">ch_model_E</span><span class="o">.</span><span class="n">split</span><span class="p">([</span><span class="n">e0_rs</span><span class="p">,</span> <span class="n">e1_rs</span><span class="p">])</span>
+<span class="n">ch_model_E1</span> <span class="o">=</span> <span class="n">get_wrapped_chmodel</span><span class="p">(</span><span class="n">ch_model_E1</span><span class="p">)</span>  <span class="c1"># in case ch_model_E1 2+ non-trivial transitions</span>
+<span class="n">invalid_prop_finder</span> <span class="o">=</span> <span class="n">InvalidPropFinder</span><span class="p">(</span><span class="n">ch_model_E1</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+<span class="n">invalid_prop_finder</span><span class="o">.</span><span class="n">find_next_invalidprop_miss_in_the_middle</span><span class="p">(</span>
+    <span class="n">ch_model_E0</span><span class="o">=</span><span class="n">ch_model_E0</span><span class="p">,</span> <span class="n">ch_model_E2</span><span class="o">=</span><span class="n">ch_model_E2</span><span class="p">,</span> <span class="n">ch_model_E</span><span class="o">=</span><span class="n">ch_model_E</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Alternatively, one can use the function <a class="reference internal" href="#cascada.smt.invalidpropsearch.round_based_invalidprop_search" title="cascada.smt.invalidpropsearch.round_based_invalidprop_search"><code class="xref any py py-func docutils literal notranslate"><span class="pre">round_based_invalidprop_search</span></code></a>
+which automates the generation of <span class="math notranslate nohighlight">\((E_0, E_1, E_2)\)</span>
+and applies this method iteratively on the number of rounds.</p>
+</div>
+<p>This method finds universally-invalid characteristics by searching for all
+partial characteristics over <span class="math notranslate nohighlight">\(E\)</span> using <a class="reference internal" href="cascada.smt.chsearch.html#cascada.smt.chsearch.ChFinder.find_next_ch" title="cascada.smt.chsearch.ChFinder.find_next_ch"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">ChFinder.find_next_ch</span></code></a>,
+and for each partial characteristic we apply the <em>check subroutine</em>
+to check whether <span class="math notranslate nohighlight">\(p_1\)</span> propagates to <span class="math notranslate nohighlight">\(p_2\)</span> with
+zero probability over <span class="math notranslate nohighlight">\(E_1\)</span>.
+The check subroutine is explained in <a class="reference internal" href="#cascada.smt.invalidpropsearch.InvalidPropFinder.find_next_invalidprop_activebitmode" title="cascada.smt.invalidpropsearch.InvalidPropFinder.find_next_invalidprop_activebitmode"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">find_next_invalidprop_activebitmode</span></code></a>.</p>
+<p>For each partial characteristic <span class="math notranslate nohighlight">\(((p_0, p_1), (p_2, p_3))\)</span> found,
+if the check subroutine finds that <span class="math notranslate nohighlight">\(p_1\)</span> propagates to <span class="math notranslate nohighlight">\(p_2\)</span>
+with zero probability, a tuple of 3
+<a class="reference internal" href="cascada.abstractproperty.characteristic.html#cascada.abstractproperty.characteristic.Characteristic" title="cascada.abstractproperty.characteristic.Characteristic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.characteristic.Characteristic</span></code></a> is  <em>yielded</em>:</p>
+<ul class="simple">
+<li><p>the first characteristic corresponds to the characteristic with probability 1
+over <span class="math notranslate nohighlight">\(E_0\)</span> with input and output properties <span class="math notranslate nohighlight">\((p_0, p_1)\)</span></p></li>
+<li><p>the second characteristic corresponds to the universally-invalid characteristic over <span class="math notranslate nohighlight">\(E_1\)</span>
+with input and output properties <span class="math notranslate nohighlight">\((p_1, p_2)\)</span></p></li>
+<li><p>the third characteristic corresponds to the characteristic with probability 1
+over <span class="math notranslate nohighlight">\(E_2\)</span> with input and output properties <span class="math notranslate nohighlight">\((p_2, p_3)\)</span></p></li>
+</ul>
+<p>Since the first and third characteristics have probability one,
+the concatenation of these three characteristics is a universally-invalid
+characteristic over <span class="math notranslate nohighlight">\(E\)</span> (regardless of the external variables of <span class="math notranslate nohighlight">\(E\)</span>)</p>
+<p>If the optional argument <code class="docutils literal notranslate"><span class="pre">ch_model_external_E</span></code> is given,
+instead a tuple of 4 characteristic is yieled; the 4-th
+characteristic corresponds to the characteristic with probability 1
+with input and output properties <span class="math notranslate nohighlight">\((q_0, q_1)\)</span>.
+In this case, the concatenation of the first 3 characteristics is a universally-invalid
+characteristic over <span class="math notranslate nohighlight">\(E\)</span> <em>for</em> the external properties
+given by the outputs of the 4-th characteristic.</p>
+<p>If the initialization argument <code class="docutils literal notranslate"><span class="pre">check_universally_invalid_ch_found</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>,
+all universally-invalid characteristics found over <span class="math notranslate nohighlight">\(E_1\)</span> in the search
+are checked by searching for a valid characteristic with the same
+input and output property with <a class="reference internal" href="cascada.smt.chsearch.html#cascada.smt.chsearch.ChFinder.find_next_ch" title="cascada.smt.chsearch.ChFinder.find_next_ch"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">ChFinder.find_next_ch</span></code></a>.
+In addition, if the optional argument <code class="docutils literal notranslate"><span class="pre">ch_model_E</span></code> is given,
+then the universally-invalid characteristic over <span class="math notranslate nohighlight">\(E\)</span> (the concatenation
+of the characteristic founds over  <span class="math notranslate nohighlight">\(E_0\)</span>, <span class="math notranslate nohighlight">\(E_1\)</span>
+and <span class="math notranslate nohighlight">\(E_2\)</span>) is also checked in a similar way.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># example of search for universally-invalid LinearMask-EncryptionCharacteristic of (wrapped) Speck32</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.linear.mask</span> <span class="kn">import</span> <span class="n">LinearMask</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.linear.chmodel</span> <span class="kn">import</span> <span class="n">EncryptionChModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.smt.invalidpropsearch</span> <span class="kn">import</span> <span class="n">InvalidPropFinder</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">speck</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model_E</span> <span class="o">=</span> <span class="n">EncryptionChModel</span><span class="p">(</span><span class="n">Speck32</span><span class="p">,</span> <span class="n">LinearMask</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model_E0</span><span class="p">,</span> <span class="n">ch_model_E1</span><span class="p">,</span> <span class="n">ch_model_E2</span> <span class="o">=</span> <span class="n">ch_model_E</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">ch_model_E</span><span class="o">.</span><span class="n">get_round_separators</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model_E1</span> <span class="o">=</span> <span class="n">get_wrapped_chmodel</span><span class="p">(</span><span class="n">ch_model_E1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">invalid_prop_finder</span> <span class="o">=</span> <span class="n">InvalidPropFinder</span><span class="p">(</span><span class="n">ch_model_E1</span><span class="p">,</span> <span class="s2">&quot;btor&quot;</span><span class="p">,</span> <span class="n">solver_seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tuple_iterator</span> <span class="o">=</span> <span class="n">invalid_prop_finder</span><span class="o">.</span><span class="n">find_next_invalidprop_miss_in_the_middle</span><span class="p">(</span><span class="n">ch_model_E0</span><span class="p">,</span> <span class="n">ch_model_E2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">pr1_ch_E0</span><span class="p">,</span> <span class="n">uni_inv_ch_E1</span><span class="p">,</span> <span class="n">pr1_ch_E2</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tuple_iterator</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">pr1_ch_E0</span><span class="o">.</span><span class="n">srepr</span><span class="p">(),</span> <span class="n">uni_inv_ch_E1</span><span class="o">.</span><span class="n">srepr</span><span class="p">(),</span> <span class="n">pr1_ch_E2</span><span class="o">.</span><span class="n">srepr</span><span class="p">())</span>
+<span class="gp">... </span>    <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span> <span class="k">break</span>
+<span class="go">Ch(w=0, id=0000 0001, od=0004 0004) Ch(w=Infinity, id=0004 0004, od=0000 0001) Ch(w=0, id=0000 0001, od=0004 0004)</span>
+<span class="go">Ch(w=0, id=0000 0001, od=0004 0004) Ch(w=Infinity, id=0004 0004, od=0080 e001) Ch(w=0, id=0080 e001, od=8002 8003)</span>
+<span class="go">Ch(w=0, id=0000 0001, od=0004 0004) Ch(w=Infinity, id=0004 0004, od=0080 f001) Ch(w=0, id=0080 f001, od=c002 c003)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># example of SMT problem of universally-invalid XorDiff-Characteristic of Speck32-KeySchedule</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.difference</span> <span class="kn">import</span> <span class="n">XorDiff</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.chmodel</span> <span class="kn">import</span> <span class="n">ChModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32_KS</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span><span class="o">.</span><span class="n">key_schedule</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32_KS</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model_E</span> <span class="o">=</span> <span class="n">ChModel</span><span class="p">(</span><span class="n">Speck32_KS</span><span class="p">,</span> <span class="n">XorDiff</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;mk0&quot;</span><span class="p">,</span> <span class="s2">&quot;mk1&quot;</span><span class="p">,</span> <span class="s2">&quot;mk2&quot;</span><span class="p">,</span> <span class="s2">&quot;mk3&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model_E0</span><span class="p">,</span> <span class="n">ch_model_E1</span><span class="p">,</span> <span class="n">ch_model_E2</span> <span class="o">=</span> <span class="n">ch_model_E</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">ch_model_E</span><span class="o">.</span><span class="n">get_round_separators</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">invalid_prop_finder</span> <span class="o">=</span> <span class="n">InvalidPropFinder</span><span class="p">(</span><span class="n">ch_model_E1</span><span class="p">,</span> <span class="s2">&quot;btor&quot;</span><span class="p">,</span> <span class="n">solver_seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ti</span> <span class="o">=</span> <span class="n">invalid_prop_finder</span><span class="o">.</span><span class="n">find_next_invalidprop_miss_in_the_middle</span><span class="p">(</span><span class="n">ch_model_E0</span><span class="p">,</span> <span class="n">ch_model_E2</span><span class="p">,</span> <span class="n">ch_model_E</span><span class="o">=</span><span class="n">ch_model_E</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pr1_ch_E0</span><span class="p">,</span> <span class="n">uni_inv_ch_E1</span><span class="p">,</span> <span class="n">pr1_ch_E2</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">ti</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">pr1_ch_E0</span><span class="p">)</span>  
+<span class="go">Characteristic(ch_weight=0, assignment_weights=[0, 0, 0, 0, 0],</span>
+<span class="go">    input_diff=[0x0001, 0x0001, 0x0000, 0x0000], output_diff=[0x0001, 0x0000, 0x0001, 0x0000],</span>
+<span class="go">    assign_outdiff_list=[0x0000, 0x0001, 0x0000, 0x0001, 0x0000])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">uni_inv_ch_E1</span><span class="p">)</span>  
+<span class="go">Characteristic(ch_weight=inf, assignment_weights=[inf, inf, 0, inf, inf],</span>
+<span class="go">    input_diff=[0x0001, 0x0000, 0x0001, 0x0000], output_diff=[0x0000, 0x8000, 0x0001, 0x0001],</span>
+<span class="go">    assign_outdiff_list=[0x8000, 0x0000, 0x8000, 0x0001, 0x0001])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">pr1_ch_E2</span><span class="p">)</span>  
+<span class="go">Characteristic(ch_weight=0, assignment_weights=[0, 0, 0, 0, 0],</span>
+<span class="go">    input_diff=[0x0000, 0x8000, 0x0001, 0x0001], output_diff=[0x0001, 0x0001, 0x8000, 0x8002],</span>
+<span class="go">    assign_outdiff_list=[0x8000, 0x0001, 0x0001, 0x8000, 0x8002])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.smt.invalidpropsearch.InvalidPropFinder.find_next_invalidprop_quantified_logic">
+<span class="sig-name descname"><span class="pre">find_next_invalidprop_quantified_logic</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/smt/invalidpropsearch.html#InvalidPropFinder.find_next_invalidprop_quantified_logic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.smt.invalidpropsearch.InvalidPropFinder.find_next_invalidprop_quantified_logic" title="Permalink to this definition"></a></dt>
+<dd><p>Return an iterator that yields the universally-invalid characteristics found in the quantified SMT-based search.</p>
+<p>This method searches for universally-invalid characteristic using SMT problems
+in the quantified bit-vector logic (with the <em>ForAll</em> quantifier).</p>
+<p>Let <span class="math notranslate nohighlight">\(P(\alpha, \gamma_1, \dots, \gamma_t, \beta)\)</span> be the
+underlying bit-vector formula of the decision problem
+of whether there exists a characteristic following the
+characteristic model <code class="docutils literal notranslate"><span class="pre">ch_model</span></code> with non-zero probability,
+where <span class="math notranslate nohighlight">\((\alpha, \beta)\)</span> is the input and output properties
+and <span class="math notranslate nohighlight">\((\gamma_1, \dots, \gamma_t)\)</span> are the intermediate properties.</p>
+<p>First, this method creates the decision problem of whether there exists
+an assignment of the input and output properties <span class="math notranslate nohighlight">\((\alpha, \beta)\)</span>
+such that for all intermediate properties <span class="math notranslate nohighlight">\((\gamma_1, \dots, \gamma_t)\)</span>
+the negation of <span class="math notranslate nohighlight">\(P\)</span> is True; in other words, the decision problem
+given by the underlying quantified formula
+<span class="math notranslate nohighlight">\(\exists \alpha, \beta, \forall \gamma_1, \dots, \gamma_t : \  \neg
+P(\alpha, \gamma_1, \dots, \gamma_t, \beta)\)</span></p>
+<p>If the SMT solver finds the first problem satisfiable,
+an assignment of the input and output properties <span class="math notranslate nohighlight">\((\alpha, \beta)\)</span>
+that makes <span class="math notranslate nohighlight">\(\neg P(\alpha, \gamma_1, \dots, \gamma_t, \beta) = True\)</span> is
+obtained, and a universally-invalid <a class="reference internal" href="cascada.abstractproperty.characteristic.html#cascada.abstractproperty.characteristic.Characteristic" title="cascada.abstractproperty.characteristic.Characteristic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.characteristic.Characteristic</span></code></a>
+object is created and <em>yielded</em>.</p>
+<p>Afterwards, an additional constraint is added to the SMT problem
+to exclude the characteristic yielded and this procedure is repeated
+until all characteristics are found.</p>
+<p>This method requires that the SMT solver given in <code class="docutils literal notranslate"><span class="pre">solver_name</span></code>
+supports the bit-vector logic with quantifiers.
+Although the recent version of boolector supports the bit-vector logic
+with quantifiers, pySMT does not support yet this recent feature
+of boolector.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># example of search for universally-invalid XorDiff-EncryptionCharacteristic of (wrapped) Speck32</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.difference</span> <span class="kn">import</span> <span class="n">XorDiff</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.chmodel</span> <span class="kn">import</span> <span class="n">EncryptionChModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.smt.invalidpropsearch</span> <span class="kn">import</span> <span class="n">InvalidPropFinder</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">speck</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">wrapped_ch_model</span> <span class="o">=</span> <span class="n">get_wrapped_chmodel</span><span class="p">(</span><span class="n">EncryptionChModel</span><span class="p">(</span><span class="n">Speck32</span><span class="p">,</span> <span class="n">XorDiff</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">invalid_prop_finder</span> <span class="o">=</span> <span class="n">InvalidPropFinder</span><span class="p">(</span><span class="n">wrapped_ch_model</span><span class="p">,</span> <span class="s2">&quot;z3&quot;</span><span class="p">,</span> <span class="n">solver_seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ch</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">invalid_prop_finder</span><span class="o">.</span><span class="n">find_next_invalidprop_quantified_logic</span><span class="p">()):</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">ch</span><span class="o">.</span><span class="n">srepr</span><span class="p">())</span>
+<span class="gp">... </span>    <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span> <span class="k">break</span>  
+<span class="go">Ch(w=Infinity, id=..., od=...)</span>
+<span class="go">Ch(w=Infinity, id=..., od=...)</span>
+<span class="go">Ch(w=Infinity, id=..., od=...)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># example of SMT problem of universally-invalid RXDiff-Characteristic of Speck32-KeySchedule</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.difference</span> <span class="kn">import</span> <span class="n">RXDiff</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.chmodel</span> <span class="kn">import</span> <span class="n">ChModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32_KS</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span><span class="o">.</span><span class="n">key_schedule</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32_KS</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model</span> <span class="o">=</span> <span class="n">ChModel</span><span class="p">(</span><span class="n">Speck32_KS</span><span class="p">,</span> <span class="n">RXDiff</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;mk0&quot;</span><span class="p">,</span> <span class="s2">&quot;mk1&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">invalid_prop_finder</span> <span class="o">=</span> <span class="n">InvalidPropFinder</span><span class="p">(</span><span class="n">ch_model</span><span class="p">,</span> <span class="s2">&quot;z3&quot;</span><span class="p">,</span> <span class="n">solver_seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ch</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">invalid_prop_finder</span><span class="o">.</span><span class="n">find_next_invalidprop_quantified_logic</span><span class="p">()):</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">ch</span><span class="o">.</span><span class="n">srepr</span><span class="p">())</span>
+<span class="gp">... </span>    <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span> <span class="k">break</span>  
+<span class="go">Ch(w=Infinity, id=..., od=...)</span>
+<span class="go">Ch(w=Infinity, id=..., od=...)</span>
+<span class="go">Ch(w=Infinity, id=..., od=...)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.smt.invalidpropsearch.InvalidPropFinder.hrepr">
+<span class="sig-name descname"><span class="pre">hrepr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">full_repr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/smt/invalidpropsearch.html#InvalidPropFinder.hrepr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.smt.invalidpropsearch.InvalidPropFinder.hrepr" title="Permalink to this definition"></a></dt>
+<dd><p>Return a human-readable representation of the base SMT problem.</p>
+<p>The base SMT problem is the decision problem of whether there exists
+a valid characteristic for an input-output property pair.
+In other words, it contains the validity assertions
+of the underlying characteristic model.</p>
+<p>The methods <a class="reference internal" href="#cascada.smt.invalidpropsearch.InvalidPropFinder.find_next_invalidprop_activebitmode" title="cascada.smt.invalidpropsearch.InvalidPropFinder.find_next_invalidprop_activebitmode"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">InvalidPropFinder.find_next_invalidprop_activebitmode</span></code></a> and
+<a class="reference internal" href="#cascada.smt.invalidpropsearch.InvalidPropFinder.find_next_invalidprop_miss_in_the_middle" title="cascada.smt.invalidpropsearch.InvalidPropFinder.find_next_invalidprop_miss_in_the_middle"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">InvalidPropFinder.find_next_invalidprop_miss_in_the_middle</span></code></a> check
+for the unsatisfiability of this base SMT problem
+(with some additional constraints),
+while <a class="reference internal" href="#cascada.smt.invalidpropsearch.InvalidPropFinder.find_next_invalidprop_quantified_logic" title="cascada.smt.invalidpropsearch.InvalidPropFinder.find_next_invalidprop_quantified_logic"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">InvalidPropFinder.find_next_invalidprop_quantified_logic</span></code></a>
+uses this base SMT problem to create a quantified
+bit-vector formula.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">full_repr</span></code> is False, the short string representation srepr is used.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.smt.invalidpropsearch.InvalidCipherPropFinder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.smt.invalidpropsearch.</span></span><span class="sig-name descname"><span class="pre">InvalidCipherPropFinder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ch_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_universally_invalid_ch_found</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">printing_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">PrintingMode.Silent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/smt/invalidpropsearch.html#InvalidCipherPropFinder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.smt.invalidpropsearch.InvalidCipherPropFinder" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cascada.smt.invalidpropsearch.InvalidPropFinder" title="cascada.smt.invalidpropsearch.InvalidPropFinder"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.smt.invalidpropsearch.InvalidPropFinder</span></code></a></p>
+<p>Search for invalid properties of ciphers by modeling the search as a sequence of SMT problems.</p>
+<p>Given a characteristic model of a <a class="reference internal" href="cascada.primitives.blockcipher.html#cascada.primitives.blockcipher.Cipher" title="cascada.primitives.blockcipher.Cipher"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Cipher</span></code></a>
+(<a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.CipherChModel" title="cascada.abstractproperty.chmodel.CipherChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.chmodel.CipherChModel</span></code></a>)
+defined for a particular <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> (e.g., <a class="reference internal" href="cascada.differential.difference.html#cascada.differential.difference.XorDiff" title="cascada.differential.difference.XorDiff"><code class="xref any py py-class docutils literal notranslate"><span class="pre">XorDiff</span></code></a> or <a class="reference internal" href="cascada.differential.difference.html#cascada.differential.difference.RXDiff" title="cascada.differential.difference.RXDiff"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RXDiff</span></code></a>),
+this class finds <em>universally-invalid</em> cipher characteristics
+(<a class="reference internal" href="cascada.abstractproperty.characteristic.html#cascada.abstractproperty.characteristic.CipherCharacteristic" title="cascada.abstractproperty.characteristic.CipherCharacteristic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.characteristic.CipherCharacteristic</span></code></a>)
+following the characteristic model by modelling the search
+as a sequence of SMT problems in the bit-vector theory.</p>
+<p>Given a cipher characteristic, let <span class="math notranslate nohighlight">\(\alpha_{KS}\)</span> be the input
+property of the underlying key-schedule characteristic
+and <span class="math notranslate nohighlight">\((\alpha_{ENC}, \beta_{ENC})\)</span> be the input and output
+properties of the underlying encryption characteristic.
+A universally-invalid characteristic
+over a cipher is a characteristic where
+<span class="math notranslate nohighlight">\((\alpha_{KS}, \alpha_{ENC})\)</span> propagates to <span class="math notranslate nohighlight">\(\beta_{ENC}\)</span>
+with probability zero regardless of the intermediate properties.
+In other words, the input-output property pair
+<span class="math notranslate nohighlight">\(((\alpha_{KS}, \alpha_{ENC}), \beta_{ENC})\)</span>
+has zero propagation probability.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For the <a class="reference internal" href="cascada.differential.difference.html#cascada.differential.difference.Difference" title="cascada.differential.difference.Difference"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Difference</span></code></a> property,
+a universally-invalid characteristic over a cipher is actually a
+related-key impossible differential.</p>
+</div>
+<p>To initialize an <a class="reference internal" href="#cascada.smt.invalidpropsearch.InvalidCipherPropFinder" title="cascada.smt.invalidpropsearch.InvalidCipherPropFinder"><code class="xref any py py-class docutils literal notranslate"><span class="pre">InvalidCipherPropFinder</span></code></a> object, first two auxiliary
+instances of <a class="reference internal" href="#cascada.smt.invalidpropsearch.InvalidPropFinder" title="cascada.smt.invalidpropsearch.InvalidPropFinder"><code class="xref any py py-class docutils literal notranslate"><span class="pre">InvalidPropFinder</span></code></a> are created:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ks_finder</span></code> an <a class="reference internal" href="#cascada.smt.invalidpropsearch.InvalidPropFinder" title="cascada.smt.invalidpropsearch.InvalidPropFinder"><code class="xref any py py-class docutils literal notranslate"><span class="pre">InvalidPropFinder</span></code></a> with characteristic model
+<code class="docutils literal notranslate"><span class="pre">ch_model.ks_ch_model</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">enc_finder</span></code> an <a class="reference internal" href="#cascada.smt.invalidpropsearch.InvalidPropFinder" title="cascada.smt.invalidpropsearch.InvalidPropFinder"><code class="xref any py py-class docutils literal notranslate"><span class="pre">InvalidPropFinder</span></code></a> with characteristic model
+<code class="docutils literal notranslate"><span class="pre">ch_model.enc_ch_model</span></code></p></li>
+</ul>
+<p>Both <code class="docutils literal notranslate"><span class="pre">ks_finder</span></code> and <code class="docutils literal notranslate"><span class="pre">enc_finder</span></code> (together with the
+<a class="reference internal" href="#cascada.smt.invalidpropsearch.InvalidCipherPropFinder" title="cascada.smt.invalidpropsearch.InvalidCipherPropFinder"><code class="xref any py py-class docutils literal notranslate"><span class="pre">InvalidCipherPropFinder</span></code></a> object) share the arguments <a class="reference internal" href="cascada.smt.chsearch.html#cascada.smt.chsearch.ChFinder.solver_name" title="cascada.smt.chsearch.ChFinder.solver_name"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">solver_name</span></code></a>,
+<a class="reference internal" href="cascada.smt.chsearch.html#cascada.smt.chsearch.ChFinder.printing_mode" title="cascada.smt.chsearch.ChFinder.printing_mode"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">printing_mode</span></code></a>, <a class="reference internal" href="cascada.smt.chsearch.html#cascada.smt.chsearch.ChFinder.filename" title="cascada.smt.chsearch.ChFinder.filename"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">filename</span></code></a>,  <a class="reference internal" href="cascada.smt.chsearch.html#cascada.smt.chsearch.ChFinder.solver_seed" title="cascada.smt.chsearch.ChFinder.solver_seed"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">solver_seed</span></code></a> and <a class="reference internal" href="cascada.smt.chsearch.html#cascada.smt.chsearch.ChFinder.env" title="cascada.smt.chsearch.ChFinder.env"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">env</span></code></a>.</p>
+<p>Then, these two auxiliary <a class="reference internal" href="#cascada.smt.invalidpropsearch.InvalidPropFinder" title="cascada.smt.invalidpropsearch.InvalidPropFinder"><code class="xref any py py-class docutils literal notranslate"><span class="pre">InvalidPropFinder</span></code></a> objects are merged into an
+<a class="reference internal" href="#cascada.smt.invalidpropsearch.InvalidCipherPropFinder" title="cascada.smt.invalidpropsearch.InvalidCipherPropFinder"><code class="xref any py py-class docutils literal notranslate"><span class="pre">InvalidCipherPropFinder</span></code></a> (which is also an instance of <a class="reference internal" href="#cascada.smt.invalidpropsearch.InvalidPropFinder" title="cascada.smt.invalidpropsearch.InvalidPropFinder"><code class="xref any py py-class docutils literal notranslate"><span class="pre">InvalidPropFinder</span></code></a>)
+as follows:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">solver_name</span></code>, <code class="docutils literal notranslate"><span class="pre">printing_mode</span></code>, <code class="docutils literal notranslate"><span class="pre">filename</span></code>,  <code class="docutils literal notranslate"><span class="pre">solver_seed</span></code>
+<code class="docutils literal notranslate"><span class="pre">env</span></code> are the same as the ones from <code class="docutils literal notranslate"><span class="pre">ks_finder</span></code> and <code class="docutils literal notranslate"><span class="pre">enc_finder</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ch_model</span></code> is set to the characteristic model of the cipher
+(a subclass of <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.CipherChModel" title="cascada.abstractproperty.chmodel.CipherChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.chmodel.CipherChModel</span></code></a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">chmodel_asserts</span></code> is the union of <a class="reference internal" href="cascada.smt.chsearch.html#cascada.smt.chsearch.ChFinder.chmodel_asserts" title="cascada.smt.chsearch.ChFinder.chmodel_asserts"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">chmodel_asserts</span></code></a> of
+<code class="docutils literal notranslate"><span class="pre">ks_finder</span></code> and <code class="docutils literal notranslate"><span class="pre">enc_finder</span></code></p></li>
+</ul>
+<p>See also <a class="reference internal" href="cascada.smt.chsearch.html#cascada.smt.chsearch.ChFinder" title="cascada.smt.chsearch.ChFinder"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChFinder</span></code></a>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.difference</span> <span class="kn">import</span> <span class="n">XorDiff</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.chmodel</span> <span class="kn">import</span> <span class="n">CipherChModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.smt.invalidpropsearch</span> <span class="kn">import</span> <span class="n">InvalidCipherPropFinder</span><span class="p">,</span> <span class="n">get_wrapped_cipher_chmodel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">speck</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model</span> <span class="o">=</span> <span class="n">get_wrapped_cipher_chmodel</span><span class="p">(</span><span class="n">CipherChModel</span><span class="p">(</span><span class="n">Speck32</span><span class="p">,</span> <span class="n">XorDiff</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">invalid_prop_finder</span> <span class="o">=</span> <span class="n">InvalidCipherPropFinder</span><span class="p">(</span><span class="n">ch_model</span><span class="p">,</span> <span class="s2">&quot;btor&quot;</span><span class="p">,</span> <span class="n">solver_seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">invalid_prop_finder</span><span class="o">.</span><span class="n">formula_size</span><span class="p">()</span>
+<span class="go">177</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">invalid_prop_finder</span><span class="o">.</span><span class="n">hrepr</span><span class="p">(</span><span class="n">full_repr</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>  
+<span class="go">; characteristic model assertions</span>
+<span class="go">assert (_dk0 == (dk3_out :: dmk1_out)) &amp; ((... &amp; ... &amp; (... ^ ...)) == 0x0000) &amp;</span>
+<span class="go">    (_dmk1 == dmk1_out) &amp; (((_dmk1 &lt;&lt;&lt; 2) ^ dk1) == dk3_out)</span>
+<span class="go">assert PropExtract_{·, 15, 0}(_dk0) == _dk1_out</span>
+<span class="go">assert PropExtract_{·, 31, 16}(_dk0) == _dk2_out</span>
+<span class="go">assert (_dx0 == (dx9_out :: dx7_out)) &amp; ((... &amp; ...) == 0x0000) &amp; ((... &amp; ...) == 0x0000) &amp;</span>
+<span class="go">    ((dx6 ^ _dk2_out) == dx7_out) &amp; ((((... ^ ...) &lt;&lt;&lt; 2) ^ dx6 ^ _dk2_out) == dx9_out)</span>
+<span class="go">assert PropExtract_{·, 15, 0}(_dx0) == _dx1_out</span>
+<span class="go">assert PropExtract_{·, 31, 16}(_dx0) == _dx2_out</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.smt.invalidpropsearch.InvalidCipherPropFinder.find_next_invalidprop_activebitmode">
+<span class="sig-name descname"><span class="pre">find_next_invalidprop_activebitmode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_num_active_bits</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_prop_activebitmode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_prop_activebitmode</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/smt/invalidpropsearch.html#InvalidCipherPropFinder.find_next_invalidprop_activebitmode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.smt.invalidpropsearch.InvalidCipherPropFinder.find_next_invalidprop_activebitmode" title="Permalink to this definition"></a></dt>
+<dd><p>Return an iterator that yields the universally-invalid characteristics found in the SMT-based search
+with given <a class="reference internal" href="#cascada.smt.invalidpropsearch.ActiveBitMode" title="cascada.smt.invalidpropsearch.ActiveBitMode"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ActiveBitMode</span></code></a>.</p>
+<p>This method is similar to <a class="reference internal" href="#cascada.smt.invalidpropsearch.InvalidPropFinder.find_next_invalidprop_activebitmode" title="cascada.smt.invalidpropsearch.InvalidPropFinder.find_next_invalidprop_activebitmode"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">InvalidPropFinder.find_next_invalidprop_activebitmode</span></code></a>;
+the only difference is that the input property considered by this method
+is the concatenation of the input property of the underlying key-schedule
+characteristic and the input property of the underlying encryption
+characteristic, and the output property considered by this method
+is the output property of the encryption characteristic.
+In other words, <code class="docutils literal notranslate"><span class="pre">output_prop_activebitmode</span></code> only affects
+to the output property of the encryption characteristic
+and not to the output property of the key-schedule characteristic.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.difference</span> <span class="kn">import</span> <span class="n">XorDiff</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.chmodel</span> <span class="kn">import</span> <span class="n">CipherChModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.smt.invalidpropsearch</span> <span class="kn">import</span> <span class="n">InvalidCipherPropFinder</span><span class="p">,</span> <span class="n">ActiveBitMode</span><span class="p">,</span> <span class="n">get_wrapped_cipher_chmodel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">speck</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model</span> <span class="o">=</span> <span class="n">get_wrapped_cipher_chmodel</span><span class="p">(</span><span class="n">CipherChModel</span><span class="p">(</span><span class="n">Speck32</span><span class="p">,</span> <span class="n">XorDiff</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">invalid_prop_finder</span> <span class="o">=</span> <span class="n">InvalidCipherPropFinder</span><span class="p">(</span><span class="n">ch_model</span><span class="p">,</span> <span class="s2">&quot;btor&quot;</span><span class="p">,</span> <span class="n">solver_seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">inab</span><span class="p">,</span> <span class="n">ipabm</span><span class="p">,</span> <span class="n">opabm</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ActiveBitMode</span><span class="o">.</span><span class="n">MSBit</span><span class="p">,</span> <span class="n">ActiveBitMode</span><span class="o">.</span><span class="n">Zero</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">invalid_prop_finder</span><span class="o">.</span><span class="n">find_next_invalidprop_activebitmode</span><span class="p">(</span><span class="n">inab</span><span class="p">,</span> <span class="n">ipabm</span><span class="p">,</span> <span class="n">opabm</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">ch</span><span class="o">.</span><span class="n">srepr</span><span class="p">())</span>
+<span class="go">Ch(ks_ch=Ch(w=Infinity, id=8000 0000, od=0000 0000), enc_ch=Ch(w=0, id=0000 0000, od=0000 0000))</span>
+<span class="go">Ch(ks_ch=Ch(w=Infinity, id=0000 8000, od=0000 0000), enc_ch=Ch(w=0, id=0000 0000, od=0000 0000))</span>
+<span class="go">Ch(ks_ch=Ch(w=0, id=0000 0000, od=0000 0000), enc_ch=Ch(w=Infinity, id=8000 0000, od=0000 0000))</span>
+<span class="go">Ch(ks_ch=Ch(w=0, id=0000 0000, od=0000 0000), enc_ch=Ch(w=Infinity, id=0000 8000, od=0000 0000))</span>
+<span class="go">Ch(ks_ch=Ch(w=Infinity, id=8000 8000, od=0000 0000), enc_ch=Ch(w=0, id=0000 0000, od=0000 0000))</span>
+<span class="go">Ch(ks_ch=Ch(w=Infinity, id=8000 0000, od=0000 0000), enc_ch=Ch(w=Infinity, id=8000 0000, od=0000 0000))</span>
+<span class="go">Ch(ks_ch=Ch(w=Infinity, id=8000 0000, od=0000 0000), enc_ch=Ch(w=Infinity, id=0000 8000, od=0000 0000))</span>
+<span class="go">Ch(ks_ch=Ch(w=0, id=0000 8000, od=8000 8002), enc_ch=Ch(w=Infinity, id=8000 0000, od=0000 0000))</span>
+<span class="go">Ch(ks_ch=Ch(w=0, id=0000 8000, od=8000 8002), enc_ch=Ch(w=Infinity, id=0000 8000, od=0000 0000))</span>
+<span class="go">Ch(ks_ch=Ch(w=0, id=0000 0000, od=0000 0000), enc_ch=Ch(w=Infinity, id=8000 8000, od=0000 0000))</span>
+<span class="go">Ch(ks_ch=Ch(w=Infinity, id=8000 8000, od=0000 0000), enc_ch=Ch(w=Infinity, id=8000 0000, od=0000 0000))</span>
+<span class="go">Ch(ks_ch=Ch(w=Infinity, id=8000 8000, od=0000 0000), enc_ch=Ch(w=Infinity, id=0000 8000, od=0000 0000))</span>
+<span class="go">Ch(ks_ch=Ch(w=Infinity, id=8000 0000, od=0000 0000), enc_ch=Ch(w=Infinity, id=8000 8000, od=0000 0000))</span>
+<span class="go">Ch(ks_ch=Ch(w=0, id=0000 8000, od=8000 8002), enc_ch=Ch(w=Infinity, id=8000 8000, od=0000 0000))</span>
+<span class="go">Ch(ks_ch=Ch(w=Infinity, id=8000 8000, od=0000 0000), enc_ch=Ch(w=Infinity, id=8000 8000, od=0000 0000))</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.smt.invalidpropsearch.InvalidCipherPropFinder.find_next_invalidprop_miss_in_the_middle">
+<span class="sig-name descname"><span class="pre">find_next_invalidprop_miss_in_the_middle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/smt/invalidpropsearch.html#InvalidCipherPropFinder.find_next_invalidprop_miss_in_the_middle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.smt.invalidpropsearch.InvalidCipherPropFinder.find_next_invalidprop_miss_in_the_middle" title="Permalink to this definition"></a></dt>
+<dd><p>This method is disabled, see <a class="reference internal" href="#cascada.smt.invalidpropsearch.round_based_invalidcipherprop_search" title="cascada.smt.invalidpropsearch.round_based_invalidcipherprop_search"><code class="xref any py py-func docutils literal notranslate"><span class="pre">round_based_invalidcipherprop_search</span></code></a> for an alternative.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.smt.invalidpropsearch.InvalidCipherPropFinder.find_next_invalidprop_quantified_logic">
+<span class="sig-name descname"><span class="pre">find_next_invalidprop_quantified_logic</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/smt/invalidpropsearch.html#InvalidCipherPropFinder.find_next_invalidprop_quantified_logic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.smt.invalidpropsearch.InvalidCipherPropFinder.find_next_invalidprop_quantified_logic" title="Permalink to this definition"></a></dt>
+<dd><p>Return an iterator that yields the universally-invalid characteristics found in the quantified SMT-based search.</p>
+<p>See also <a class="reference internal" href="#cascada.smt.invalidpropsearch.InvalidPropFinder.find_next_invalidprop_quantified_logic" title="cascada.smt.invalidpropsearch.InvalidPropFinder.find_next_invalidprop_quantified_logic"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">InvalidPropFinder.find_next_invalidprop_quantified_logic</span></code></a>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.difference</span> <span class="kn">import</span> <span class="n">RXDiff</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.chmodel</span> <span class="kn">import</span> <span class="n">CipherChModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.smt.invalidpropsearch</span> <span class="kn">import</span> <span class="n">InvalidCipherPropFinder</span><span class="p">,</span> <span class="n">get_wrapped_cipher_chmodel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">speck</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model</span> <span class="o">=</span> <span class="n">get_wrapped_cipher_chmodel</span><span class="p">(</span><span class="n">CipherChModel</span><span class="p">(</span><span class="n">Speck32</span><span class="p">,</span> <span class="n">RXDiff</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">invalid_prop_finder</span> <span class="o">=</span> <span class="n">InvalidCipherPropFinder</span><span class="p">(</span><span class="n">ch_model</span><span class="p">,</span> <span class="s2">&quot;z3&quot;</span><span class="p">,</span> <span class="n">solver_seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">uni_inv_ch</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">invalid_prop_finder</span><span class="o">.</span><span class="n">find_next_invalidprop_quantified_logic</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">uni_inv_ch</span><span class="p">)</span>  
+<span class="go">CipherCharacteristic(ks_characteristic=Characteristic(ch_weight=...,</span>
+<span class="go">    assignment_weights=[..., ..., ...],</span>
+<span class="go">    input_diff=[..., ...], output_diff=[..., ...],</span>
+<span class="go">    assign_outdiff_list=[..., ..., ...]),</span>
+<span class="go">enc_characteristic=Characteristic(ch_weight=...,</span>
+<span class="go">    assignment_weights=[..., ..., ...],</span>
+<span class="go">    input_diff=[..., ...], output_diff=[..., ...], external_diffs=[..., ...],</span>
+<span class="go">    assign_outdiff_list=[..., ..., ...]))</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cascada.smt.invalidpropsearch.round_based_invalidprop_search">
+<span class="sig-prename descclassname"><span class="pre">cascada.smt.invalidpropsearch.</span></span><span class="sig-name descname"><span class="pre">round_based_invalidprop_search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_num_rounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_num_rounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_skipped_rounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_num_E0_rounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_num_E2_rounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_chmodel_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_invalidpropfinder_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_zero_input_prop_E0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_zero_input_prop_E2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/smt/invalidpropsearch.html#round_based_invalidprop_search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.smt.invalidpropsearch.round_based_invalidprop_search" title="Permalink to this definition"></a></dt>
+<dd><p>Search for zero-probability (invalid) property pairs of round-based functions over multiple number of rounds.</p>
+<p>This function searches for universally-invalid characteristics
+(leading to invalid properties, see <a class="reference internal" href="#cascada.smt.invalidpropsearch.InvalidPropFinder" title="cascada.smt.invalidpropsearch.InvalidPropFinder"><code class="xref any py py-class docutils literal notranslate"><span class="pre">InvalidPropFinder</span></code></a>)
+of a <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.RoundBasedFunction" title="cascada.bitvector.ssa.RoundBasedFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RoundBasedFunction</span></code></a> <code class="docutils literal notranslate"><span class="pre">func</span></code>
+by modelling the search as a sequence of SMT problems
+(using <a class="reference internal" href="#cascada.smt.invalidpropsearch.InvalidPropFinder.find_next_invalidprop_miss_in_the_middle" title="cascada.smt.invalidpropsearch.InvalidPropFinder.find_next_invalidprop_miss_in_the_middle"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">InvalidPropFinder.find_next_invalidprop_miss_in_the_middle</span></code></a>),
+but the search is perfomed iteratively over the number of rounds of <code class="docutils literal notranslate"><span class="pre">func</span></code>.
+That is, first universally-invalid characteristics covering <code class="docutils literal notranslate"><span class="pre">initial_num_rounds</span></code> rounds
+are searched, then <code class="docutils literal notranslate"><span class="pre">initial_num_rounds</span> <span class="pre">+</span> <span class="pre">1</span></code>, until <code class="docutils literal notranslate"><span class="pre">final_num_rounds</span></code>.
+See also <a class="reference internal" href="cascada.smt.chsearch.html#cascada.smt.chsearch.round_based_ch_search" title="cascada.smt.chsearch.round_based_ch_search"><code class="xref any py py-func docutils literal notranslate"><span class="pre">round_based_ch_search</span></code></a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.RoundBasedFunction" title="cascada.bitvector.ssa.RoundBasedFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RoundBasedFunction</span></code></a> <code class="docutils literal notranslate"><span class="pre">func</span></code> must include <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.RoundBasedFunction.add_round_outputs" title="cascada.bitvector.ssa.RoundBasedFunction.add_round_outputs"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">add_round_outputs</span></code></a>
+calls in its <code class="docutils literal notranslate"><span class="pre">eval</span></code>.</p>
+<p>While <a class="reference internal" href="#cascada.smt.invalidpropsearch.InvalidPropFinder" title="cascada.smt.invalidpropsearch.InvalidPropFinder"><code class="xref any py py-class docutils literal notranslate"><span class="pre">InvalidPropFinder</span></code></a> requires wrapping the characteristic model
+if it has more than one non-trivial transition, this method does
+require the function <code class="docutils literal notranslate"><span class="pre">func</span></code> to be not wrapped.</p>
+<p>This method also requires that for all the round functions <span class="math notranslate nohighlight">\(f_i\)</span>
+of <code class="docutils literal notranslate"><span class="pre">func</span></code> (generated through <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.SSA.split" title="cascada.bitvector.ssa.SSA.split"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">SSA.split</span></code></a> with
+<a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.SSA.get_round_separators" title="cascada.bitvector.ssa.SSA.get_round_separators"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">SSA.get_round_separators</span></code></a>), given any probability-one
+characteristic over <span class="math notranslate nohighlight">\(f\)</span> with input-output property
+<span class="math notranslate nohighlight">\((\alpha, \beta)\)</span>,  then there is no other probability-one
+characteristic with input property  <span class="math notranslate nohighlight">\(\alpha\)</span>
+(resp. output property <span class="math notranslate nohighlight">\(\beta\)</span>) but output property
+<span class="math notranslate nohighlight">\(\neq \beta\)</span> (resp. input property <span class="math notranslate nohighlight">\(\neq \alpha\)</span>).
+If all the round functions are permutations, then this is satisfied
+for <a class="reference internal" href="cascada.differential.difference.html#cascada.differential.difference.Difference" title="cascada.differential.difference.Difference"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Difference</span></code></a> and <a class="reference internal" href="cascada.linear.mask.html#cascada.linear.mask.LinearMask" title="cascada.linear.mask.LinearMask"><code class="xref any py py-class docutils literal notranslate"><span class="pre">LinearMask</span></code></a> properties.
+See also <a class="reference internal" href="#cascada.smt.invalidpropsearch.InvalidPropFinder.find_next_invalidprop_miss_in_the_middle" title="cascada.smt.invalidpropsearch.InvalidPropFinder.find_next_invalidprop_miss_in_the_middle"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">InvalidPropFinder.find_next_invalidprop_miss_in_the_middle</span></code></a>.</p>
+</div>
+<p>This function proceed as follows:</p>
+<ol class="arabic simple">
+<li><p>Set the current number of rounds of the universally-invalid characteristics to search
+for to <code class="docutils literal notranslate"><span class="pre">initial_num_rounds</span></code>.</p></li>
+<li><p>Set the current number of initial rounds to skip  to <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p></li>
+<li><p>Set the number of rounds of <code class="docutils literal notranslate"><span class="pre">func</span></code> to the sum of the number of rounds
+of step 1 and step 2, and split <code class="docutils literal notranslate"><span class="pre">func</span></code> into <span class="math notranslate nohighlight">\(E \circ S\)</span>
+(<span class="math notranslate nohighlight">\(S\)</span> denotes the skipped rounds and <span class="math notranslate nohighlight">\(E\)</span> the target function
+of the universally-invalid characteristics to search for).</p></li>
+<li><p>Create a <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel" title="cascada.abstractproperty.chmodel.ChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.chmodel.ChModel</span></code></a>
+(resp. <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.EncryptionChModel" title="cascada.abstractproperty.chmodel.EncryptionChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.chmodel.EncryptionChModel</span></code></a>) object
+of <span class="math notranslate nohighlight">\(E\)</span> using as arguments <code class="docutils literal notranslate"><span class="pre">prop_type</span></code> and <code class="docutils literal notranslate"><span class="pre">extra_chmodel_args</span></code>.</p></li>
+<li><p>Split <span class="math notranslate nohighlight">\(E\)</span> into <span class="math notranslate nohighlight">\(E = E_2 \circ E_1 \circ E_0\)</span>
+taking into account <code class="docutils literal notranslate"><span class="pre">min_num_E0_rounds,</span> <span class="pre">min_num_E2_rounds</span></code>
+and generate the  characteristic models of <span class="math notranslate nohighlight">\((E_0, E_1, E_2)\)</span>
+using <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel.get_round_separators" title="cascada.abstractproperty.chmodel.ChModel.get_round_separators"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">abstractproperty.chmodel.ChModel.get_round_separators</span></code></a>
+and <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel.split" title="cascada.abstractproperty.chmodel.ChModel.split"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">abstractproperty.chmodel.ChModel.split</span></code></a>.
+See <a class="reference internal" href="#cascada.smt.invalidpropsearch.InvalidPropFinder.find_next_invalidprop_miss_in_the_middle" title="cascada.smt.invalidpropsearch.InvalidPropFinder.find_next_invalidprop_miss_in_the_middle"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">InvalidPropFinder.find_next_invalidprop_miss_in_the_middle</span></code></a>
+for more details about <span class="math notranslate nohighlight">\((E_0, E_1, E_2)\)</span>.</p></li>
+<li><p>Create an <a class="reference internal" href="#cascada.smt.invalidpropsearch.InvalidPropFinder" title="cascada.smt.invalidpropsearch.InvalidPropFinder"><code class="xref any py py-class docutils literal notranslate"><span class="pre">InvalidPropFinder</span></code></a> object with arguments
+the characteristic model over <span class="math notranslate nohighlight">\(E_1\)</span>,
+<code class="docutils literal notranslate"><span class="pre">solver_name</span></code> and <code class="docutils literal notranslate"><span class="pre">extra_invalidpropfinder_args</span></code>.</p></li>
+<li><p>Loop over the generator <a class="reference internal" href="#cascada.smt.invalidpropsearch.InvalidPropFinder.find_next_invalidprop_miss_in_the_middle" title="cascada.smt.invalidpropsearch.InvalidPropFinder.find_next_invalidprop_miss_in_the_middle"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">InvalidPropFinder.find_next_invalidprop_miss_in_the_middle</span></code></a>
+(with arguments <code class="docutils literal notranslate"><span class="pre">exclude_zero_input_prop_E0</span></code>
+and <code class="docutils literal notranslate"><span class="pre">exclude_zero_input_prop_E2</span></code>)
+and yield all the 3-length tuples of characteristics from the
+generator (together with the current number of rounds).</p></li>
+<li><p>After the generator is exhausted, go to step 5 but splitting <span class="math notranslate nohighlight">\(E\)</span>
+into antoher another partition <span class="math notranslate nohighlight">\((E_0, E_1, E_2)\)</span>.</p>
+<ol class="loweralpha simple">
+<li><p>If all partitions has been exhausted,
+instead increase the current number of initial rounds to skip
+(up to <code class="docutils literal notranslate"><span class="pre">max_num_skipped_rounds</span></code>) and go to step 3.</p></li>
+<li><p>If the current number of skipped rounds was <code class="docutils literal notranslate"><span class="pre">max_num_skipped_rounds</span></code>,
+instead increase the current number of rounds of
+the universally-invalid characteristics to search for and go to step 2.</p></li>
+<li><p>If this number was <code class="docutils literal notranslate"><span class="pre">final_num_rounds</span></code>, instead the search is finished.</p></li>
+</ol>
+</li>
+</ol>
+<p>This function is a Python <a class="reference external" href="https://docs.python.org/3/glossary.html#term-generator" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">generator</span></code></a> function
+(see <a class="reference internal" href="#cascada.smt.invalidpropsearch.InvalidPropFinder" title="cascada.smt.invalidpropsearch.InvalidPropFinder"><code class="xref any py py-class docutils literal notranslate"><span class="pre">InvalidPropFinder</span></code></a>), returning an <a class="reference external" href="https://docs.python.org/3/glossary.html#term-iterator" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">iterator</span></code></a> that yields
+2-length tuples:</p>
+<ul class="simple">
+<li><p>The first element in the tuple is a 4-length tuple containing
+the number of initial skipped rounds, the number of rounds
+of <span class="math notranslate nohighlight">\(E_0\)</span>, the number of rounds of <span class="math notranslate nohighlight">\(E_1\)</span>
+and the number of rounds of <span class="math notranslate nohighlight">\(E_2\)</span>.</p></li>
+<li><p>The second element in the tuple is a 3-length tuple containing
+the characteristics over <span class="math notranslate nohighlight">\(E_0\)</span>, <span class="math notranslate nohighlight">\(E_1\)</span> and <span class="math notranslate nohighlight">\(E_2\)</span>
+respectively (i.e., the outputs of
+<a class="reference internal" href="#cascada.smt.invalidpropsearch.InvalidPropFinder.find_next_invalidprop_miss_in_the_middle" title="cascada.smt.invalidpropsearch.InvalidPropFinder.find_next_invalidprop_miss_in_the_middle"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">InvalidPropFinder.find_next_invalidprop_miss_in_the_middle</span></code></a>).
+Note that these characteristics are
+<a class="reference internal" href="cascada.abstractproperty.characteristic.html#cascada.abstractproperty.characteristic.Characteristic" title="cascada.abstractproperty.characteristic.Characteristic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.characteristic.Characteristic</span></code></a> objects
+if <code class="docutils literal notranslate"><span class="pre">func</span></code> is a <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.RoundBasedFunction" title="cascada.bitvector.ssa.RoundBasedFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RoundBasedFunction</span></code></a> object, or
+<a class="reference internal" href="cascada.abstractproperty.characteristic.html#cascada.abstractproperty.characteristic.EncryptionCharacteristic" title="cascada.abstractproperty.characteristic.EncryptionCharacteristic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.characteristic.EncryptionCharacteristic</span></code></a> objects
+if <code class="docutils literal notranslate"><span class="pre">func</span></code> is a <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.RoundBasedFunction" title="cascada.bitvector.ssa.RoundBasedFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RoundBasedFunction</span></code></a>-encryption function of a <a class="reference internal" href="cascada.primitives.blockcipher.html#cascada.primitives.blockcipher.Cipher" title="cascada.primitives.blockcipher.Cipher"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Cipher</span></code></a>.</p></li>
+</ul>
+<p>The argument <code class="docutils literal notranslate"><span class="pre">prop_type</span></code> is a particular <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> such as <a class="reference internal" href="cascada.differential.difference.html#cascada.differential.difference.XorDiff" title="cascada.differential.difference.XorDiff"><code class="xref any py py-class docutils literal notranslate"><span class="pre">XorDiff</span></code></a>
+or <a class="reference internal" href="cascada.linear.mask.html#cascada.linear.mask.LinearMask" title="cascada.linear.mask.LinearMask"><code class="xref any py py-class docutils literal notranslate"><span class="pre">LinearMask</span></code></a>. For <code class="docutils literal notranslate"><span class="pre">solver_name</span></code>, see <a class="reference internal" href="#cascada.smt.invalidpropsearch.InvalidPropFinder" title="cascada.smt.invalidpropsearch.InvalidPropFinder"><code class="xref any py py-class docutils literal notranslate"><span class="pre">InvalidPropFinder</span></code></a>.
+The optional arguments <code class="docutils literal notranslate"><span class="pre">extra_chmodel_args</span></code> and <code class="docutils literal notranslate"><span class="pre">extra_invalidpropfinder_args</span></code>
+can be given as dictionaries (in the form of <code class="docutils literal notranslate"><span class="pre">**kwargs</span></code>) containing
+additional arguments for <code class="docutils literal notranslate"><span class="pre">ChModel/EncryptionChModel</span></code> and <a class="reference internal" href="#cascada.smt.invalidpropsearch.InvalidPropFinder" title="cascada.smt.invalidpropsearch.InvalidPropFinder"><code class="xref any py py-class docutils literal notranslate"><span class="pre">InvalidPropFinder</span></code></a>
+respectively.</p>
+<p>It is possible to abort the current search for the current number of rounds
+and start the search with one more round by passing the
+value <a class="reference internal" href="cascada.smt.chsearch.html#cascada.smt.chsearch.INCREMENT_NUM_ROUNDS" title="cascada.smt.chsearch.INCREMENT_NUM_ROUNDS"><code class="xref any py py-data docutils literal notranslate"><span class="pre">INCREMENT_NUM_ROUNDS</span></code></a>
+to the generator iterator with <a class="reference external" href="https://docs.python.org/3/reference/expressions.html#generator.send" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">generator.send</span></code></a>
+(see <a class="reference internal" href="cascada.smt.chsearch.html#cascada.smt.chsearch.round_based_ch_search" title="cascada.smt.chsearch.round_based_ch_search"><code class="xref any py py-func docutils literal notranslate"><span class="pre">round_based_ch_search</span></code></a>).</p>
+<p>This function reuses information from previous partitions <span class="math notranslate nohighlight">\((E_0', E_1', E_2')\)</span>
+to directly avoid some new partitions <span class="math notranslate nohighlight">\((E_0, E_1, E_2)\)</span> that don’t contain
+universally-invalid characteristics.
+Assume that no universally-invalid characteristic was found for the partition
+<span class="math notranslate nohighlight">\((E_0', E_1', E_2')\)</span>,
+where <span class="math notranslate nohighlight">\(E_0'\)</span> covers from the <span class="math notranslate nohighlight">\(a'\)</span>-th round to the <span class="math notranslate nohighlight">\(b'\)</span>-th
+round (i.e., <code class="docutils literal notranslate"><span class="pre">a'-›b'</span></code>) and <span class="math notranslate nohighlight">\(E_2'\)</span> covers <code class="docutils literal notranslate"><span class="pre">c'-›d'</span></code>.
+Then it holds that no universally-invalid characteristic can be found
+using <a class="reference internal" href="#cascada.smt.invalidpropsearch.InvalidPropFinder.find_next_invalidprop_miss_in_the_middle" title="cascada.smt.invalidpropsearch.InvalidPropFinder.find_next_invalidprop_miss_in_the_middle"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">InvalidPropFinder.find_next_invalidprop_miss_in_the_middle</span></code></a> from any partition
+<span class="math notranslate nohighlight">\((E_0, E_1, E_2)\)</span> where <span class="math notranslate nohighlight">\(E_0\)</span> covers <code class="docutils literal notranslate"><span class="pre">a-›a'-›b'-›b</span></code> and
+<span class="math notranslate nohighlight">\(E_2\)</span> covers <code class="docutils literal notranslate"><span class="pre">c-›c'-›d'-›d</span></code>, that is,
+from any partition <span class="math notranslate nohighlight">\((E_0, E_1, E_2)\)</span>
+where <span class="math notranslate nohighlight">\(E_0\)</span> covers <code class="docutils literal notranslate"><span class="pre">a-›b</span></code> and <span class="math notranslate nohighlight">\(E_2\)</span> covers <code class="docutils literal notranslate"><span class="pre">c-›d</span></code>
+such that <span class="math notranslate nohighlight">\(a \le a', b' \le b, c \le c\)</span> and <span class="math notranslate nohighlight">\(d' \le d\)</span>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Note that <a class="reference internal" href="#cascada.smt.invalidpropsearch.InvalidPropFinder" title="cascada.smt.invalidpropsearch.InvalidPropFinder"><code class="xref any py py-class docutils literal notranslate"><span class="pre">InvalidPropFinder</span></code></a> contains other methods to search
+for universally-invalid characteristics (e.g.,
+<a class="reference internal" href="#cascada.smt.invalidpropsearch.InvalidPropFinder.find_next_invalidprop_activebitmode" title="cascada.smt.invalidpropsearch.InvalidPropFinder.find_next_invalidprop_activebitmode"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">InvalidPropFinder.find_next_invalidprop_activebitmode</span></code></a> or
+<a class="reference internal" href="#cascada.smt.invalidpropsearch.InvalidPropFinder.find_next_invalidprop_quantified_logic" title="cascada.smt.invalidpropsearch.InvalidPropFinder.find_next_invalidprop_quantified_logic"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">InvalidPropFinder.find_next_invalidprop_quantified_logic</span></code></a>)
+which might find universally-invalid characteristics faster.</p>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># example of searching for XorDiff universally-invalid Characteristic over a BvFunction</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.difference</span> <span class="kn">import</span> <span class="n">XorDiff</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.smt.invalidpropsearch</span> <span class="kn">import</span> <span class="n">round_based_invalidprop_search</span><span class="p">,</span> <span class="n">INCREMENT_NUM_ROUNDS</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">speck</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32_ks</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span><span class="o">.</span><span class="n">key_schedule</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">iterator</span> <span class="o">=</span> <span class="n">round_based_invalidprop_search</span><span class="p">(</span><span class="n">Speck32_ks</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">XorDiff</span><span class="p">,</span> <span class="s2">&quot;btor&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">extra_invalidpropfinder_args</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;solver_seed&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">tuple_rounds</span><span class="p">,</span> <span class="n">tuple_chs</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">iterator</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">tuple_rounds</span><span class="p">,</span> <span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">ch</span><span class="o">.</span><span class="n">srepr</span><span class="p">()</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">tuple_chs</span><span class="p">]))</span>
+<span class="gp">... </span>    <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span> <span class="k">break</span>  
+<span class="go">(0, 1, 1, 1) : Ch(w=0, id=..., od=...), Ch(w=Infinity, id=..., od=...), Ch(w=0, id=..., od=...)</span>
+<span class="go">(0, 1, 1, 1) : Ch(w=0, id=..., od=...), Ch(w=Infinity, id=..., od=...), Ch(w=0, id=..., od=...)</span>
+<span class="go">(0, 1, 1, 1) : Ch(w=0, id=..., od=...), Ch(w=Infinity, id=..., od=...), Ch(w=0, id=..., od=...)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># example of searching for LinearMask universally-invalid EncryptionCharacteristic over a Cipher</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.linear.mask</span> <span class="kn">import</span> <span class="n">LinearMask</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">iterator</span> <span class="o">=</span> <span class="n">round_based_invalidprop_search</span><span class="p">(</span><span class="n">Speck32</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">LinearMask</span><span class="p">,</span> <span class="s2">&quot;btor&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">min_num_E0_rounds</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">extra_invalidpropfinder_args</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;solver_seed&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tuple_rounds</span><span class="p">,</span> <span class="n">tuple_chs</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">iterator</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">tuple_rounds</span><span class="p">,</span> <span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">ch</span><span class="o">.</span><span class="n">srepr</span><span class="p">()</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">tuple_chs</span><span class="p">]))</span>
+<span class="go">(0, 2, 1, 1) : Ch(w=0, id=0080 4021, od=0201 0200), Ch(w=Infinity, id=0201 0200, od=0000 0001), Ch(w=0, id=0000 0001, od=0004 0004)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tuple_rounds</span><span class="p">,</span> <span class="n">tuple_chs</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">iterator</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">tuple_rounds</span><span class="p">,</span> <span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">ch</span><span class="o">.</span><span class="n">srepr</span><span class="p">()</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">tuple_chs</span><span class="p">]))</span>
+<span class="go">(0, 2, 1, 1) : Ch(w=0, id=0080 4021, od=0201 0200), Ch(w=Infinity, id=0201 0200, od=0080 e001), Ch(w=0, id=0080 e001, od=8002 8003)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">iterator</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">INCREMENT_NUM_ROUNDS</span><span class="p">)</span>  <span class="c1"># stop current num_rounds and increment by 1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tuple_rounds</span><span class="p">,</span> <span class="n">tuple_chs</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">iterator</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">tuple_rounds</span><span class="p">,</span> <span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">ch</span><span class="o">.</span><span class="n">srepr</span><span class="p">()</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">tuple_chs</span><span class="p">]))</span>
+<span class="go">(0, 2, 1, 2) : Ch(w=0, id=0080 4021, od=0201 0200), Ch(w=Infinity, id=0201 0200, od=0080 4021), Ch(w=0, id=0080 4021, od=0201 0200)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cascada.smt.invalidpropsearch.round_based_invalidcipherprop_search">
+<span class="sig-prename descclassname"><span class="pre">cascada.smt.invalidpropsearch.</span></span><span class="sig-name descname"><span class="pre">round_based_invalidcipherprop_search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cipher</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_num_rounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_num_rounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num_skipped_rounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_num_E0_rounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_num_E2_rounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_cipherchmodel_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_invalidcipherpropfinder_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_zero_input_prop_E0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_zero_input_prop_E2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_zero_input_prop_external_E</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/smt/invalidpropsearch.html#round_based_invalidcipherprop_search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.smt.invalidpropsearch.round_based_invalidcipherprop_search" title="Permalink to this definition"></a></dt>
+<dd><p>Search for zero-probability (invalid) properties of iterated ciphers over multiple number of rounds.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <a class="reference internal" href="cascada.primitives.blockcipher.html#cascada.primitives.blockcipher.Cipher.encryption" title="cascada.primitives.blockcipher.Cipher.encryption"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">Cipher.encryption</span></code></a> of <code class="docutils literal notranslate"><span class="pre">cipher</span></code> must be a
+<a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.RoundBasedFunction" title="cascada.bitvector.ssa.RoundBasedFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RoundBasedFunction</span></code></a> including <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.RoundBasedFunction.add_round_outputs" title="cascada.bitvector.ssa.RoundBasedFunction.add_round_outputs"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">add_round_outputs</span></code></a>
+calls in its <code class="docutils literal notranslate"><span class="pre">eval</span></code>.</p>
+</div>
+<p>This function is similar to <a class="reference internal" href="#cascada.smt.invalidpropsearch.round_based_invalidprop_search" title="cascada.smt.invalidpropsearch.round_based_invalidprop_search"><code class="xref any py py-func docutils literal notranslate"><span class="pre">round_based_invalidprop_search</span></code></a>.
+The only differences are:</p>
+<ul class="simple">
+<li><p>The function <code class="docutils literal notranslate"><span class="pre">func</span></code> (i.e., <span class="math notranslate nohighlight">\(E \circ S\)</span>) is the
+<a class="reference internal" href="cascada.primitives.blockcipher.html#cascada.primitives.blockcipher.Cipher.encryption" title="cascada.primitives.blockcipher.Cipher.encryption"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">Cipher.encryption</span></code></a> of the given <code class="docutils literal notranslate"><span class="pre">cipher</span></code>.
+Thus, <span class="math notranslate nohighlight">\(S\)</span> denote the skipped rounds of the encryption function.</p></li>
+<li><p>Let <span class="math notranslate nohighlight">\(K\)</span> denote the <a class="reference internal" href="cascada.primitives.blockcipher.html#cascada.primitives.blockcipher.Cipher.key_schedule" title="cascada.primitives.blockcipher.Cipher.key_schedule"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">Cipher.key_schedule</span></code></a> of <code class="docutils literal notranslate"><span class="pre">cipher</span></code>, that is,
+the function whose outputs are the round keys used in <span class="math notranslate nohighlight">\(E \circ S\)</span>.
+The generator <a class="reference internal" href="#cascada.smt.invalidpropsearch.InvalidPropFinder.find_next_invalidprop_miss_in_the_middle" title="cascada.smt.invalidpropsearch.InvalidPropFinder.find_next_invalidprop_miss_in_the_middle"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">InvalidPropFinder.find_next_invalidprop_miss_in_the_middle</span></code></a>
+is called with the argument <code class="docutils literal notranslate"><span class="pre">ch_model_external_E</span></code> given as the
+characteristic model over <span class="math notranslate nohighlight">\(K\)</span> and with the argument
+<code class="docutils literal notranslate"><span class="pre">exclude_zero_input_prop_external_E</span></code>.</p></li>
+<li><p>This function yields 2-length tuples where the 2nd element is a
+4-length tuple; the last characteristic is the characteristic
+with probability 1 over <span class="math notranslate nohighlight">\(K\)</span>.
+Thus, the concatenation of the first 3 characteristics is a universally-invalid
+characteristic over <span class="math notranslate nohighlight">\(E\)</span> where the round key properties
+are given by the outputs of the probability-one characteristic
+over <span class="math notranslate nohighlight">\(K\)</span>.</p></li>
+</ul>
+<p>Note that initial rounds are only skipped in the encryption function
+and not in the key-schedule function.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Let <code class="docutils literal notranslate"><span class="pre">(tuple_nr,</span> <span class="pre">tuple_ch)</span></code> be an element
+yielded by <a class="reference internal" href="#cascada.smt.invalidpropsearch.round_based_invalidcipherprop_search" title="cascada.smt.invalidpropsearch.round_based_invalidcipherprop_search"><code class="xref any py py-func docutils literal notranslate"><span class="pre">round_based_invalidcipherprop_search</span></code></a>.</p>
+<p>Let <span class="math notranslate nohighlight">\(\alpha_{K}\)</span> be the input property of the
+4-th characteristic  in <code class="docutils literal notranslate"><span class="pre">tuple_ch</span></code>,
+and let <span class="math notranslate nohighlight">\((\alpha_{E}, \beta_{E})\)</span> be the input-output
+property pair of the concatenation of the first three characteristic
+in <code class="docutils literal notranslate"><span class="pre">tuple_ch</span></code>.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">tuple_nr[0]</span></code> is 0, no initial rounds are skipped,
+and <span class="math notranslate nohighlight">\((\alpha_{K}, \alpha_{E}) \mapsto \beta_{E}\)</span>
+is a universally-invalid cipher characteristic
+(as defined in <a class="reference internal" href="#cascada.smt.invalidpropsearch.InvalidCipherPropFinder" title="cascada.smt.invalidpropsearch.InvalidCipherPropFinder"><code class="xref any py py-class docutils literal notranslate"><span class="pre">InvalidCipherPropFinder</span></code></a>) of
+<code class="docutils literal notranslate"><span class="pre">cipher.set_num_rounds_and_return(tuple_nr[1]+tuple_nr[2]+tuple_nr[3])</span></code>,
+that is, the <code class="docutils literal notranslate"><span class="pre">cipher</span></code> with number of rounds
+<code class="docutils literal notranslate"><span class="pre">tuple_nr[1]+tuple_nr[2]+tuple_nr[3]</span></code>.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">tuple_nr[0]</span></code> is not zero then a universally-invalid cipher characteristic
+is also obtained but the underlying cipher is more difficult
+to generate due to the skipped initial rounds.</p>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.difference</span> <span class="kn">import</span> <span class="n">XorDiff</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.smt.invalidpropsearch</span> <span class="kn">import</span> <span class="n">round_based_invalidcipherprop_search</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">speck</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">iterator</span> <span class="o">=</span> <span class="n">round_based_invalidcipherprop_search</span><span class="p">(</span><span class="n">Speck32</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">XorDiff</span><span class="p">,</span> <span class="s2">&quot;btor&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">extra_invalidcipherpropfinder_args</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;solver_seed&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">tuple_rounds</span><span class="p">,</span> <span class="n">tuple_chs</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">iterator</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">tuple_rounds</span><span class="p">,</span> <span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">ch</span><span class="o">.</span><span class="n">srepr</span><span class="p">()</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">tuple_chs</span><span class="p">]))</span>
+<span class="gp">... </span>    <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span> <span class="k">break</span>  
+<span class="go">(0, 1, 1, 1) : Ch(w=0, id=0000 8000, od=8000 8002),</span>
+<span class="go">               Ch(w=Infinity, id=8000 8002, od=0000 8000),</span>
+<span class="go">               Ch(w=0, id=0000 8000, od=0002 0000),</span>
+<span class="go">               Ch(w=0, id=0000 0040 0000, od=0000 8000 8002)</span>
+<span class="go">(0, 1, 1, 1) : Ch(w=0, id=0000 8000, od=8000 8002),</span>
+<span class="go">               Ch(w=Infinity, id=8000 8002, od=0040 8000),</span>
+<span class="go">               Ch(w=0, id=0040 8000, od=8002 8000),</span>
+<span class="go">               Ch(w=0, id=0000 0040 0000, od=0000 8000 8002)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cascada.smt.chsearch.html" class="btn btn-neutral float-left" title="cascada.smt.chsearch module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cascada.smt.wrappedchmodel.html" class="btn btn-neutral float-right" title="cascada.smt.wrappedchmodel module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Adrián Ranea.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

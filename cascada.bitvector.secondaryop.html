@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cascada.bitvector.secondaryop module &mdash; CASCADA 1.0.rc0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="cascada.bitvector.operation module" href="cascada.bitvector.operation.html" />
+    <link rel="prev" title="cascada.bitvector.core module" href="cascada.bitvector.core.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> CASCADA
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">CASCADA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="primitives_implemented.html">Primitives implemented</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="cascada.html">API reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="cascada.bitvector.html">cascada.bitvector module</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="cascada.bitvector.context.html">cascada.bitvector.context module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.bitvector.core.html">cascada.bitvector.core module</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">cascada.bitvector.secondaryop module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.bitvector.operation.html">cascada.bitvector.operation module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.bitvector.printing.html">cascada.bitvector.printing module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cascada.bitvector.ssa.html">cascada.bitvector.ssa module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.primitives.html">cascada.primitives module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.abstractproperty.html">cascada.abstractproperty module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.differential.html">cascada.differential module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.linear.html">cascada.linear module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.algebraic.html">cascada.algebraic module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.smt.html">cascada.smt module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">CASCADA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="cascada.html">API reference</a> &raquo;</li>
+          <li><a href="cascada.bitvector.html">cascada.bitvector module</a> &raquo;</li>
+      <li>cascada.bitvector.secondaryop module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/cascada.bitvector.secondaryop.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-cascada.bitvector.secondaryop">
+<span id="cascada-bitvector-secondaryop-module"></span><h1>cascada.bitvector.secondaryop module<a class="headerlink" href="#module-cascada.bitvector.secondaryop" title="Permalink to this headline"></a></h1>
+<p>Provide additional (secondary) bit-vector operators.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.bitvector.secondaryop.BvMaj">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.bitvector.secondaryop.</span></span><span class="sig-name descname"><span class="pre">BvMaj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/secondaryop.html#BvMaj"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.secondaryop.BvMaj" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.SecondaryOperation" title="cascada.bitvector.operation.SecondaryOperation"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.bitvector.operation.SecondaryOperation</span></code></a></p>
+<p>The bit-wise majority function.</p>
+<p>The bit-wise majority function <code class="docutils literal notranslate"><span class="pre">BvMaj(x,</span> <span class="pre">y,</span> <span class="pre">z)</span></code>
+is defined for each bit <code class="docutils literal notranslate"><span class="pre">i</span></code> as the most common
+bit in <code class="docutils literal notranslate"><span class="pre">[x[i],</span> <span class="pre">y[i],</span> <span class="pre">z[i]]</span></code>.</p>
+<p>Since <a class="reference internal" href="#cascada.bitvector.secondaryop.BvMaj" title="cascada.bitvector.secondaryop.BvMaj"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvMaj</span></code></a> is a <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.SecondaryOperation" title="cascada.bitvector.operation.SecondaryOperation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SecondaryOperation</span></code></a>, by default it is fully evaluated
+(i.e., <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.Operation.eval" title="cascada.bitvector.operation.Operation.eval"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">Operation.eval</span></code></a> is used) when all the inputs are constants (see also
+<a class="reference internal" href="cascada.bitvector.context.html#cascada.bitvector.context.SecondaryOperationEvaluation" title="cascada.bitvector.context.SecondaryOperationEvaluation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">context.SecondaryOperationEvaluation</span></code></a>). On the other hand, <a class="reference internal" href="#cascada.bitvector.secondaryop.BvMaj.pre_eval" title="cascada.bitvector.secondaryop.BvMaj.pre_eval"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">pre_eval</span></code></a>
+is always called in the evaluation (even with symbolic inputs).</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span><span class="p">,</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.secondaryop</span> <span class="kn">import</span> <span class="n">BvMaj</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">BvMaj</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="mb">0b000</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">Constant</span><span class="p">(</span><span class="mb">0b001</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">Constant</span><span class="p">(</span><span class="mb">0b011</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="go">0b001</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">BvMaj</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="go">BvMaj(x, y, z)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">BvMaj</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="go">x</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">BvMaj</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span><span class="o">.</span><span class="n">doit</span><span class="p">()</span>
+<span class="go">(x &amp; y) | (x &amp; z) | (y &amp; z)</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.secondaryop.BvMaj.condition">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">condition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/secondaryop.html#BvMaj.condition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.secondaryop.BvMaj.condition" title="Permalink to this definition"></a></dt>
+<dd><p>Check if the operands verify the restrictions of the operator.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.secondaryop.BvMaj.output_width">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">output_width</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/secondaryop.html#BvMaj.output_width"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.secondaryop.BvMaj.output_width" title="Permalink to this definition"></a></dt>
+<dd><p>Return the bit-width of the resulting bit-vector.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.secondaryop.BvMaj.pre_eval">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pre_eval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/secondaryop.html#BvMaj.pre_eval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.secondaryop.BvMaj.pre_eval" title="Permalink to this definition"></a></dt>
+<dd><p>Evaluate the operator before <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.Operation.eval" title="cascada.bitvector.operation.Operation.eval"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">Operation.eval</span></code></a>.</p>
+<p>This is an internal method that assumes the list <code class="docutils literal notranslate"><span class="pre">args</span></code> has been parsed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.secondaryop.BvMaj.eval">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">eval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/secondaryop.html#BvMaj.eval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.secondaryop.BvMaj.eval" title="Permalink to this definition"></a></dt>
+<dd><p>Evaluate the operator with given operands.</p>
+<p>This is an internal method that assumes the list <code class="docutils literal notranslate"><span class="pre">args</span></code> has been parsed.
+To evaluate a bit-vector operation, instantiate a new object with
+the operands as the object arguments (i.e., use the Python operator <code class="docutils literal notranslate"><span class="pre">()</span></code>).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.bitvector.secondaryop.BvIf">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.bitvector.secondaryop.</span></span><span class="sig-name descname"><span class="pre">BvIf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/secondaryop.html#BvIf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.secondaryop.BvIf" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.SecondaryOperation" title="cascada.bitvector.operation.SecondaryOperation"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.bitvector.operation.SecondaryOperation</span></code></a></p>
+<p>The bit-wise conditional (If) function.</p>
+<p>The bit-wise conditional function <code class="docutils literal notranslate"><span class="pre">BvIf(x,</span> <span class="pre">y,</span> <span class="pre">z)</span></code>
+is defined for each bit <code class="docutils literal notranslate"><span class="pre">i</span></code> as <code class="docutils literal notranslate"><span class="pre">y[i]</span></code> if <code class="docutils literal notranslate"><span class="pre">x[i]=1</span></code>
+otherwise <code class="docutils literal notranslate"><span class="pre">z[i]</span></code>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span><span class="p">,</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.secondaryop</span> <span class="kn">import</span> <span class="n">BvIf</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">BvIf</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="mb">0b01</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">Constant</span><span class="p">(</span><span class="mb">0b00</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">Constant</span><span class="p">(</span><span class="mb">0b11</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="go">0b10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">BvIf</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="go">BvIf(x, y, z)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">BvIf</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="go">z</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">BvIf</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span><span class="o">.</span><span class="n">doit</span><span class="p">()</span>
+<span class="go">(x &amp; y) | (~x &amp; z)</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.secondaryop.BvIf.condition">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">condition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/secondaryop.html#BvIf.condition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.secondaryop.BvIf.condition" title="Permalink to this definition"></a></dt>
+<dd><p>Check if the operands verify the restrictions of the operator.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.secondaryop.BvIf.output_width">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">output_width</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/secondaryop.html#BvIf.output_width"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.secondaryop.BvIf.output_width" title="Permalink to this definition"></a></dt>
+<dd><p>Return the bit-width of the resulting bit-vector.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.secondaryop.BvIf.pre_eval">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pre_eval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/secondaryop.html#BvIf.pre_eval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.secondaryop.BvIf.pre_eval" title="Permalink to this definition"></a></dt>
+<dd><p>Evaluate the operator before <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.Operation.eval" title="cascada.bitvector.operation.Operation.eval"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">Operation.eval</span></code></a>.</p>
+<p>This is an internal method that assumes the list <code class="docutils literal notranslate"><span class="pre">args</span></code> has been parsed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.secondaryop.BvIf.eval">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">eval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/secondaryop.html#BvIf.eval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.secondaryop.BvIf.eval" title="Permalink to this definition"></a></dt>
+<dd><p>Evaluate the operator with given operands.</p>
+<p>This is an internal method that assumes the list <code class="docutils literal notranslate"><span class="pre">args</span></code> has been parsed.
+To evaluate a bit-vector operation, instantiate a new object with
+the operands as the object arguments (i.e., use the Python operator <code class="docutils literal notranslate"><span class="pre">()</span></code>).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.bitvector.secondaryop.PopCount">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.bitvector.secondaryop.</span></span><span class="sig-name descname"><span class="pre">PopCount</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/secondaryop.html#PopCount"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.secondaryop.PopCount" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.SecondaryOperation" title="cascada.bitvector.operation.SecondaryOperation"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.bitvector.operation.SecondaryOperation</span></code></a></p>
+<p>Count the number of 1’s in the bit-vector.</p>
+<p>This operation is also known as the hamming weight of a bit-vector.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span><span class="p">,</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.secondaryop</span> <span class="kn">import</span> <span class="n">PopCount</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">PopCount</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="mb">0b1010</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="go">0b010</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">PopCount</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="mb">0b101</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="go">0b10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">PopCount</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span><span class="o">.</span><span class="n">doit</span><span class="p">()</span>
+<span class="go">(((x - ((x &gt;&gt; 0x1) &amp; 0x5)) &amp; 0x3) + (((x - ((x &gt;&gt; 0x1) &amp; 0x5)) &gt;&gt; 0x2) &amp; 0x3))[2:]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">PopCount</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">doit</span><span class="p">()</span>
+<span class="go">(0b0 :: (x[0])) + (0b0 :: (x[1])) + (0b0 :: (x[2]))</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.secondaryop.PopCount.output_width">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">output_width</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/secondaryop.html#PopCount.output_width"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.secondaryop.PopCount.output_width" title="Permalink to this definition"></a></dt>
+<dd><p>Return the bit-width of the resulting bit-vector.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.secondaryop.PopCount.eval">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">eval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bv</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/secondaryop.html#PopCount.eval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.secondaryop.PopCount.eval" title="Permalink to this definition"></a></dt>
+<dd><p>Evaluate the operator with given operands.</p>
+<p>This is an internal method that assumes the list <code class="docutils literal notranslate"><span class="pre">args</span></code> has been parsed.
+To evaluate a bit-vector operation, instantiate a new object with
+the operands as the object arguments (i.e., use the Python operator <code class="docutils literal notranslate"><span class="pre">()</span></code>).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.bitvector.secondaryop.Reverse">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.bitvector.secondaryop.</span></span><span class="sig-name descname"><span class="pre">Reverse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/secondaryop.html#Reverse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.secondaryop.Reverse" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.SecondaryOperation" title="cascada.bitvector.operation.SecondaryOperation"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.bitvector.operation.SecondaryOperation</span></code></a></p>
+<p>Reverse the bit-vector.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span><span class="p">,</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.secondaryop</span> <span class="kn">import</span> <span class="n">PopCount</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Reverse</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="mb">0b1010</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="go">0x5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Reverse</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="mb">0b001</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="go">0b100</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Reverse</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span><span class="o">.</span><span class="n">doit</span><span class="p">()</span>  
+<span class="go">(((((x &amp; 0x5) &lt;&lt; 0x1) | ((x &gt;&gt; 0x1) &amp; 0x5)) &amp; 0x3) &lt;&lt; 0x2) |</span>
+<span class="go">(((((x &amp; 0x5) &lt;&lt; 0x1) | ((x &gt;&gt; 0x1) &amp; 0x5)) &gt;&gt; 0x2) &amp; 0x3)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Reverse</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">doit</span><span class="p">()</span>
+<span class="go">(x[0]) :: (x[1]) :: (x[2])</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.secondaryop.Reverse.output_width">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">output_width</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/secondaryop.html#Reverse.output_width"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.secondaryop.Reverse.output_width" title="Permalink to this definition"></a></dt>
+<dd><p>Return the bit-width of the resulting bit-vector.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.secondaryop.Reverse.eval">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">eval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bv</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/secondaryop.html#Reverse.eval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.secondaryop.Reverse.eval" title="Permalink to this definition"></a></dt>
+<dd><p>Evaluate the operator with given operands.</p>
+<p>This is an internal method that assumes the list <code class="docutils literal notranslate"><span class="pre">args</span></code> has been parsed.
+To evaluate a bit-vector operation, instantiate a new object with
+the operands as the object arguments (i.e., use the Python operator <code class="docutils literal notranslate"><span class="pre">()</span></code>).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.bitvector.secondaryop.PopCountSum2">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.bitvector.secondaryop.</span></span><span class="sig-name descname"><span class="pre">PopCountSum2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/secondaryop.html#PopCountSum2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.secondaryop.PopCountSum2" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.SecondaryOperation" title="cascada.bitvector.operation.SecondaryOperation"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.bitvector.operation.SecondaryOperation</span></code></a></p>
+<p>Count the number of 1’s of two bit-vectors.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span><span class="p">,</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.secondaryop</span> <span class="kn">import</span> <span class="n">PopCountSum2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">PopCountSum2</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="mb">0b000</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">Constant</span><span class="p">(</span><span class="mb">0b001</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="go">0b001</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">PopCountSum2</span><span class="p">(</span><span class="o">~</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">15</span><span class="p">),</span> <span class="o">~</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">15</span><span class="p">))</span>
+<span class="go">0b11110</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">PopCountSum2</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span><span class="o">.</span><span class="n">doit</span><span class="p">()</span>  
+<span class="go">((x - ((x &gt;&gt; 0x1) &amp; 0x5)) &amp; 0x3) + (((x - ((x &gt;&gt; 0x1) &amp; 0x5)) &gt;&gt; 0x2) &amp; 0x3) +</span>
+<span class="go">((y - ((y &gt;&gt; 0x1) &amp; 0x5)) &amp; 0x3) + (((y - ((y &gt;&gt; 0x1) &amp; 0x5)) &gt;&gt; 0x2) &amp; 0x3)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">PopCountSum2</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">doit</span><span class="p">()</span>  
+<span class="go">(0b0 :: ((0b0 :: (x[0])) + (0b0 :: (x[1])) + (0b0 :: (x[2])))) +</span>
+<span class="go">(0b0 :: ((0b0 :: (y[0])) + (0b0 :: (y[1])) + (0b0 :: (y[2]))))</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.secondaryop.PopCountSum2.condition">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">condition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/secondaryop.html#PopCountSum2.condition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.secondaryop.PopCountSum2.condition" title="Permalink to this definition"></a></dt>
+<dd><p>Check if the operands verify the restrictions of the operator.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.secondaryop.PopCountSum2.output_width">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">output_width</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/secondaryop.html#PopCountSum2.output_width"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.secondaryop.PopCountSum2.output_width" title="Permalink to this definition"></a></dt>
+<dd><p>Return the bit-width of the resulting bit-vector.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.secondaryop.PopCountSum2.eval">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">eval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/secondaryop.html#PopCountSum2.eval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.secondaryop.PopCountSum2.eval" title="Permalink to this definition"></a></dt>
+<dd><p>Evaluate the operator with given operands.</p>
+<p>This is an internal method that assumes the list <code class="docutils literal notranslate"><span class="pre">args</span></code> has been parsed.
+To evaluate a bit-vector operation, instantiate a new object with
+the operands as the object arguments (i.e., use the Python operator <code class="docutils literal notranslate"><span class="pre">()</span></code>).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.bitvector.secondaryop.PopCountSum3">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.bitvector.secondaryop.</span></span><span class="sig-name descname"><span class="pre">PopCountSum3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/secondaryop.html#PopCountSum3"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.secondaryop.PopCountSum3" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.SecondaryOperation" title="cascada.bitvector.operation.SecondaryOperation"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.bitvector.operation.SecondaryOperation</span></code></a></p>
+<p>Count the number of 1’s of three bit-vectors.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span><span class="p">,</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.secondaryop</span> <span class="kn">import</span> <span class="n">PopCountSum3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">PopCountSum3</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="mb">0b000</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">Constant</span><span class="p">(</span><span class="mb">0b001</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">Constant</span><span class="p">(</span><span class="mb">0b011</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="go">0x3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">PopCountSum3</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span><span class="o">.</span><span class="n">doit</span><span class="p">()</span>  
+<span class="go">((x - ((x &gt;&gt; 0x1) &amp; 0x5)) &amp; 0x3) + (((x - ((x &gt;&gt; 0x1) &amp; 0x5)) &gt;&gt; 0x2) &amp; 0x3) +</span>
+<span class="go">((y - ((y &gt;&gt; 0x1) &amp; 0x5)) &amp; 0x3) + (((y - ((y &gt;&gt; 0x1) &amp; 0x5)) &gt;&gt; 0x2) &amp; 0x3) +</span>
+<span class="go">((z - ((z &gt;&gt; 0x1) &amp; 0x5)) &amp; 0x3) + (((z - ((z &gt;&gt; 0x1) &amp; 0x5)) &gt;&gt; 0x2) &amp; 0x3)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">PopCountSum3</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">doit</span><span class="p">()</span>  
+<span class="go">(0b00 :: ((0b0 :: (x[0])) + (0b0 :: (x[1])) + (0b0 :: (x[2])))) +</span>
+<span class="go">(0b00 :: ((0b0 :: (y[0])) + (0b0 :: (y[1])) + (0b0 :: (y[2]))))</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.secondaryop.PopCountSum3.condition">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">condition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/secondaryop.html#PopCountSum3.condition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.secondaryop.PopCountSum3.condition" title="Permalink to this definition"></a></dt>
+<dd><p>Check if the operands verify the restrictions of the operator.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.secondaryop.PopCountSum3.output_width">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">output_width</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/secondaryop.html#PopCountSum3.output_width"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.secondaryop.PopCountSum3.output_width" title="Permalink to this definition"></a></dt>
+<dd><p>Return the bit-width of the resulting bit-vector.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.secondaryop.PopCountSum3.eval">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">eval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/secondaryop.html#PopCountSum3.eval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.secondaryop.PopCountSum3.eval" title="Permalink to this definition"></a></dt>
+<dd><p>Evaluate the operator with given operands.</p>
+<p>This is an internal method that assumes the list <code class="docutils literal notranslate"><span class="pre">args</span></code> has been parsed.
+To evaluate a bit-vector operation, instantiate a new object with
+the operands as the object arguments (i.e., use the Python operator <code class="docutils literal notranslate"><span class="pre">()</span></code>).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.bitvector.secondaryop.PopCountDiff">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.bitvector.secondaryop.</span></span><span class="sig-name descname"><span class="pre">PopCountDiff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/secondaryop.html#PopCountDiff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.secondaryop.PopCountDiff" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.SecondaryOperation" title="cascada.bitvector.operation.SecondaryOperation"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.bitvector.operation.SecondaryOperation</span></code></a></p>
+<p>Compute the difference of the hamming weight of two words.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span><span class="p">,</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.secondaryop</span> <span class="kn">import</span> <span class="n">PopCountDiff</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">PopCountDiff</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="mb">0b011</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">Constant</span><span class="p">(</span><span class="mb">0b100</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="go">0b01</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">PopCountDiff</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span><span class="o">.</span><span class="n">doit</span><span class="p">()</span>  
+<span class="go">((((x - ((x &gt;&gt; 0x1) &amp; 0x5)) &amp; 0x3) + (((x - ((x &gt;&gt; 0x1) &amp; 0x5)) &gt;&gt; 0x2) &amp; 0x3) +</span>
+<span class="go">((~y - ((~y &gt;&gt; 0x1) &amp; 0x5)) &amp; 0x3) + (((~y - ((~y &gt;&gt; 0x1) &amp; 0x5)) &gt;&gt; 0x2) &amp; 0x3)) - 0x4)[2:]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">PopCountDiff</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">doit</span><span class="p">()</span>  
+<span class="go">((0b0 :: (x[0])) + (0b0 :: (x[1])) + (0b0 :: (x[2]))) -</span>
+<span class="go">((0b0 :: (y[0])) + (0b0 :: (y[1])) + (0b0 :: (y[2])))</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.secondaryop.PopCountDiff.condition">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">condition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/secondaryop.html#PopCountDiff.condition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.secondaryop.PopCountDiff.condition" title="Permalink to this definition"></a></dt>
+<dd><p>Check if the operands verify the restrictions of the operator.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.secondaryop.PopCountDiff.output_width">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">output_width</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/secondaryop.html#PopCountDiff.output_width"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.secondaryop.PopCountDiff.output_width" title="Permalink to this definition"></a></dt>
+<dd><p>Return the bit-width of the resulting bit-vector.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.secondaryop.PopCountDiff.eval">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">eval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/secondaryop.html#PopCountDiff.eval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.secondaryop.PopCountDiff.eval" title="Permalink to this definition"></a></dt>
+<dd><p>Evaluate the operator with given operands.</p>
+<p>This is an internal method that assumes the list <code class="docutils literal notranslate"><span class="pre">args</span></code> has been parsed.
+To evaluate a bit-vector operation, instantiate a new object with
+the operands as the object arguments (i.e., use the Python operator <code class="docutils literal notranslate"><span class="pre">()</span></code>).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.bitvector.secondaryop.LeadingZeros">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.bitvector.secondaryop.</span></span><span class="sig-name descname"><span class="pre">LeadingZeros</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/secondaryop.html#LeadingZeros"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.secondaryop.LeadingZeros" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.SecondaryOperation" title="cascada.bitvector.operation.SecondaryOperation"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.bitvector.operation.SecondaryOperation</span></code></a></p>
+<p>Return a bit-vector with the leading zeros set to one and the rest to zero.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span><span class="p">,</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.secondaryop</span> <span class="kn">import</span> <span class="n">PopCount</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">LeadingZeros</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="mb">0b11111</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="go">0b00000</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">LeadingZeros</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="mb">0b001</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="go">0b110</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">LeadingZeros</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span><span class="o">.</span><span class="n">doit</span><span class="p">()</span>
+<span class="go">~(x | (x &gt;&gt; 0x1) | ((x | (x &gt;&gt; 0x1)) &gt;&gt; 0x2))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">LeadingZeros</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">doit</span><span class="p">()</span>
+<span class="go">~(((0b0 :: x) | ((0b0 :: x) &gt;&gt; 0x1) | (((0b0 :: x) | ((0b0 :: x) &gt;&gt; 0x1)) &gt;&gt; 0x2))[2:])</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.secondaryop.LeadingZeros.output_width">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">output_width</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/secondaryop.html#LeadingZeros.output_width"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.secondaryop.LeadingZeros.output_width" title="Permalink to this definition"></a></dt>
+<dd><p>Return the bit-width of the resulting bit-vector.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.secondaryop.LeadingZeros.eval">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">eval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bv</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/secondaryop.html#LeadingZeros.eval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.secondaryop.LeadingZeros.eval" title="Permalink to this definition"></a></dt>
+<dd><p>Evaluate the operator with given operands.</p>
+<p>This is an internal method that assumes the list <code class="docutils literal notranslate"><span class="pre">args</span></code> has been parsed.
+To evaluate a bit-vector operation, instantiate a new object with
+the operands as the object arguments (i.e., use the Python operator <code class="docutils literal notranslate"><span class="pre">()</span></code>).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.bitvector.secondaryop.LutOperation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.bitvector.secondaryop.</span></span><span class="sig-name descname"><span class="pre">LutOperation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/secondaryop.html#LutOperation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.secondaryop.LutOperation" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.SecondaryOperation" title="cascada.bitvector.operation.SecondaryOperation"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.bitvector.operation.SecondaryOperation</span></code></a></p>
+<p>Base class for LUT-based operations.</p>
+<p>Given a LUT (look-up table) <code class="docutils literal notranslate"><span class="pre">T</span></code> with <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Constant" title="cascada.bitvector.core.Constant"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a> elements,
+the (bit-vector) LUT-based operation <code class="docutils literal notranslate"><span class="pre">T(x)</span></code>
+(with bit-vector input <code class="docutils literal notranslate"><span class="pre">x</span></code>) returns the bit-vector of <code class="docutils literal notranslate"><span class="pre">T</span></code>
+in the position given by the integer value of <code class="docutils literal notranslate"><span class="pre">x</span></code>.</p>
+<p>Since <a class="reference internal" href="#cascada.bitvector.secondaryop.LutOperation" title="cascada.bitvector.secondaryop.LutOperation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">LutOperation</span></code></a> is a <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.SecondaryOperation" title="cascada.bitvector.operation.SecondaryOperation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SecondaryOperation</span></code></a>, it is only evaluated
+by default when the input is a constant value
+(see also <a class="reference internal" href="cascada.bitvector.context.html#cascada.bitvector.context.SecondaryOperationEvaluation" title="cascada.bitvector.context.SecondaryOperationEvaluation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">context.SecondaryOperationEvaluation</span></code></a>).</p>
+<p>This class is not meant to be instantiated but to provide a base
+class for LUT-based operations. To define a LUT-based operation,
+subclass <a class="reference internal" href="#cascada.bitvector.secondaryop.LutOperation" title="cascada.bitvector.secondaryop.LutOperation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">LutOperation</span></code></a> and provide the class attribute <a class="reference internal" href="#cascada.bitvector.secondaryop.LutOperation.lut" title="cascada.bitvector.secondaryop.LutOperation.lut"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">lut</span></code></a>.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.bitvector.secondaryop.LutOperation.lut">
+<span class="sig-name descname"><span class="pre">lut</span></span><a class="headerlink" href="#cascada.bitvector.secondaryop.LutOperation.lut" title="Permalink to this definition"></a></dt>
+<dd><p>the table that defines the LUT-based operation given as a
+list of <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Constant" title="cascada.bitvector.core.Constant"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a> objects.</p>
+</dd></dl>
+
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span><span class="p">,</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.secondaryop</span> <span class="kn">import</span> <span class="n">LutOperation</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">MyInvertibleLut</span><span class="p">(</span><span class="n">LutOperation</span><span class="p">):</span> <span class="n">lut</span> <span class="o">=</span> <span class="p">[</span><span class="n">Constant</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="mi">2</span><span class="p">))]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">MyInvertibleLut</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="go">0b11</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">MyInvertibleLut</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="n">doit</span><span class="p">()</span>
+<span class="go">Ite(a == 0b00, 0b11, Ite(a == 0b01, 0b10, Ite(a == 0b10, 0b01, 0b00)))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">MyNonInvLut</span><span class="p">(</span><span class="n">LutOperation</span><span class="p">):</span> <span class="n">lut</span> <span class="o">=</span> <span class="p">[</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="o">~</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">8</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">MyNonInvLut</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">doit</span><span class="p">()</span>
+<span class="go">Ite(a == 0b0, 0x00, 0xff)</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.secondaryop.LutOperation.condition">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">condition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/secondaryop.html#LutOperation.condition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.secondaryop.LutOperation.condition" title="Permalink to this definition"></a></dt>
+<dd><p>Check if the operands verify the restrictions of the operator.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.secondaryop.LutOperation.output_width">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">output_width</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/secondaryop.html#LutOperation.output_width"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.secondaryop.LutOperation.output_width" title="Permalink to this definition"></a></dt>
+<dd><p>Return the bit-width of the resulting bit-vector.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.secondaryop.LutOperation.eval">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">eval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/secondaryop.html#LutOperation.eval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.secondaryop.LutOperation.eval" title="Permalink to this definition"></a></dt>
+<dd><p>Evaluate the operator with given operands.</p>
+<p>This is an internal method that assumes the list <code class="docutils literal notranslate"><span class="pre">args</span></code> has been parsed.
+To evaluate a bit-vector operation, instantiate a new object with
+the operands as the object arguments (i.e., use the Python operator <code class="docutils literal notranslate"><span class="pre">()</span></code>).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.bitvector.secondaryop.MatrixOperation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.bitvector.secondaryop.</span></span><span class="sig-name descname"><span class="pre">MatrixOperation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/secondaryop.html#MatrixOperation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.secondaryop.MatrixOperation" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.SecondaryOperation" title="cascada.bitvector.operation.SecondaryOperation"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.bitvector.operation.SecondaryOperation</span></code></a></p>
+<p>Base class for matrix-vector products.</p>
+<p>Given a binary matrix as a 2-dimensional list <code class="docutils literal notranslate"><span class="pre">M</span></code> with 1-bit <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Constant" title="cascada.bitvector.core.Constant"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a>
+elements (<code class="docutils literal notranslate"><span class="pre">M[i][j]</span></code> is the j-th column element in the i-th row),
+the (bit-vector) matrix-vector product <code class="docutils literal notranslate"><span class="pre">M(x)</span></code>
+(with bit-vector input <code class="docutils literal notranslate"><span class="pre">x</span></code>) returns the bit-vector of <code class="docutils literal notranslate"><span class="pre">y</span></code>
+such the i-th bit of <code class="docutils literal notranslate"><span class="pre">y</span></code> is given by
+<code class="docutils literal notranslate"><span class="pre">y[i]</span> <span class="pre">=</span> <span class="pre">(M[i][0]</span> <span class="pre">&amp;</span> <span class="pre">x[0])</span> <span class="pre">^</span> <span class="pre">(M[i][1]</span> <span class="pre">&amp;</span> <span class="pre">x[1])</span> <span class="pre">^</span> <span class="pre">...</span> <span class="pre">^</span> <span class="pre">(M[i][n-1]</span> <span class="pre">&amp;</span> <span class="pre">x[n-1])</span></code>
+where <code class="docutils literal notranslate"><span class="pre">n</span></code> is the number of columns and the width of <code class="docutils literal notranslate"><span class="pre">x</span></code>.</p>
+<p>Since <a class="reference internal" href="#cascada.bitvector.secondaryop.MatrixOperation" title="cascada.bitvector.secondaryop.MatrixOperation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">MatrixOperation</span></code></a> is a <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.SecondaryOperation" title="cascada.bitvector.operation.SecondaryOperation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SecondaryOperation</span></code></a>, it is only evaluated
+by default when the input is a constant value
+(see also <a class="reference internal" href="cascada.bitvector.context.html#cascada.bitvector.context.SecondaryOperationEvaluation" title="cascada.bitvector.context.SecondaryOperationEvaluation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">context.SecondaryOperationEvaluation</span></code></a>).</p>
+<p>This class is not meant to be instantiated but to provide a base
+class for matrix-vector products. To define a matrix-vector product,
+subclass <a class="reference internal" href="#cascada.bitvector.secondaryop.MatrixOperation" title="cascada.bitvector.secondaryop.MatrixOperation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">MatrixOperation</span></code></a> and provide the class attribute <a class="reference internal" href="#cascada.bitvector.secondaryop.MatrixOperation.matrix" title="cascada.bitvector.secondaryop.MatrixOperation.matrix"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">matrix</span></code></a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>By default, a <a class="reference internal" href="#cascada.bitvector.secondaryop.MatrixOperation" title="cascada.bitvector.secondaryop.MatrixOperation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">MatrixOperation</span></code></a> subclass takes 1 input operand <code class="docutils literal notranslate"><span class="pre">x</span></code>,
+but <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.Operation.arity" title="cascada.bitvector.operation.Operation.arity"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">arity</span></code></a> can be changed to support multiple operands.
+In this case, the list of inputs <code class="docutils literal notranslate"><span class="pre">(x_1,</span> <span class="pre">...,</span> <span class="pre">x_n)</span></code> are concatenated
+into <code class="docutils literal notranslate"><span class="pre">x</span></code> as <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">=</span> <span class="pre">x_n</span> <span class="pre">::</span> <span class="pre">...</span> <span class="pre">::</span> <span class="pre">x_1</span></code>
+(<code class="docutils literal notranslate"><span class="pre">x_1</span></code> denoting the least-significant part and <code class="docutils literal notranslate"><span class="pre">x_n</span></code>
+denoting the most-significant part).</p>
+<p>In other words, a <a class="reference internal" href="#cascada.bitvector.secondaryop.MatrixOperation" title="cascada.bitvector.secondaryop.MatrixOperation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">MatrixOperation</span></code></a> subclass with <code class="docutils literal notranslate"><span class="pre">arity</span> <span class="pre">==</span> <span class="pre">[n,</span> <span class="pre">0]</span></code>
+and input <code class="docutils literal notranslate"><span class="pre">(x_1,</span> <span class="pre">...,</span> <span class="pre">x_n)</span></code> computes <code class="docutils literal notranslate"><span class="pre">M(x_n</span> <span class="pre">::</span> <span class="pre">...</span> <span class="pre">::</span> <span class="pre">x_1)</span></code>.</p>
+</div>
+<p>Alternatively, binary matrices can be implemented as a
+sequence of <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.BvXor" title="cascada.bitvector.operation.BvXor"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvXor</span></code></a> operations
+(e.g., <a class="reference external" href="https://eprint.iacr.org/2021/1400">https://eprint.iacr.org/2021/1400</a>).</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.bitvector.secondaryop.MatrixOperation.matrix">
+<span class="sig-name descname"><span class="pre">matrix</span></span><a class="headerlink" href="#cascada.bitvector.secondaryop.MatrixOperation.matrix" title="Permalink to this definition"></a></dt>
+<dd><p>the binary matrix as a 2D list of 1-bit <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Constant" title="cascada.bitvector.core.Constant"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a> objects.</p>
+</dd></dl>
+
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span><span class="p">,</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.secondaryop</span> <span class="kn">import</span> <span class="n">MatrixOperation</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">matrix</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]</span>  <span class="c1"># reverse</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">matrix</span> <span class="o">=</span> <span class="p">[[</span><span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">row</span><span class="p">]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">matrix</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">MySquareMatrix</span><span class="p">(</span><span class="n">MatrixOperation</span><span class="p">):</span> <span class="n">matrix</span> <span class="o">=</span> <span class="n">matrix</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">MySquareMatrix</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="go">0b00</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">MySquareMatrix</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="n">doit</span><span class="p">()</span>
+<span class="go">(a[0]) :: (a[1])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">matrix</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]</span>  <span class="c1"># 2 bit to 4 bit</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">matrix</span> <span class="o">=</span> <span class="p">[[</span><span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">row</span><span class="p">]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">matrix</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">MyNonSqMatrix</span><span class="p">(</span><span class="n">MatrixOperation</span><span class="p">):</span> <span class="n">arity</span><span class="p">,</span> <span class="n">matrix</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">matrix</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">MyNonSqMatrix</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;a0&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;a1&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">doit</span><span class="p">()</span>
+<span class="go">a1 :: a0 :: a1 :: a0</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.secondaryop.MatrixOperation.condition">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">condition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/secondaryop.html#MatrixOperation.condition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.secondaryop.MatrixOperation.condition" title="Permalink to this definition"></a></dt>
+<dd><p>Check if the operands verify the restrictions of the operator.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.secondaryop.MatrixOperation.output_width">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">output_width</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/secondaryop.html#MatrixOperation.output_width"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.secondaryop.MatrixOperation.output_width" title="Permalink to this definition"></a></dt>
+<dd><p>Return the bit-width of the resulting bit-vector.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.bitvector.secondaryop.MatrixOperation.eval">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">eval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/secondaryop.html#MatrixOperation.eval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.secondaryop.MatrixOperation.eval" title="Permalink to this definition"></a></dt>
+<dd><p>Evaluate the operator with given operands.</p>
+<p>This is an internal method that assumes the list <code class="docutils literal notranslate"><span class="pre">args</span></code> has been parsed.
+To evaluate a bit-vector operation, instantiate a new object with
+the operands as the object arguments (i.e., use the Python operator <code class="docutils literal notranslate"><span class="pre">()</span></code>).</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cascada.bitvector.core.html" class="btn btn-neutral float-left" title="cascada.bitvector.core module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cascada.bitvector.operation.html" class="btn btn-neutral float-right" title="cascada.bitvector.operation module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Adrián Ranea.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

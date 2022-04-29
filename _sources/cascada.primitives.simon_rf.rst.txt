@@ -1,0 +1,6 @@
+cascada.primitives.simon_rf module
+==================================
+
+.. automodule:: cascada.primitives.simon_rf
+   :members:
+   :show-inheritance:

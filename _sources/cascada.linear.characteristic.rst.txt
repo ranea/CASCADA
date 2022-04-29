@@ -1,0 +1,6 @@
+cascada.linear.characteristic module
+====================================
+
+.. automodule:: cascada.linear.characteristic
+   :members:
+   :show-inheritance:
