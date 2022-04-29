@@ -7,7 +7,7 @@ is a Python 3 library to evaluate the security of cryptographic primitives,
 specially block ciphers, against distinguishing attacks with bit-vector SMT solvers.
 
 A detailed introduction of CASCADA can be found in the paper
-`CASCADA: Characteristic Automated Search of Cryptographic Algorithms for Distinguishing Attacks <...>`_.
+*CASCADA: Characteristic Automated Search of Cryptographic Algorithms for Distinguishing Attacks*.
 
 CASCADA implements several SMT-based automated search methods to search for
 characteristics and zero-probability properties to evaluate the security of ciphers against:
@@ -21,7 +21,7 @@ characteristics and zero-probability properties to evaluate the security of ciph
 - linear cryptanalysis
 - zero-correlation cryptanalysis
 
-The online documentation of CASCADA can be found `here <...>`_.
+The online documentation of CASCADA can be found `here <https://github.com/ranea/CASCADA.git>`_.
 
 
 Installation
