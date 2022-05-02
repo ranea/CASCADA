@@ -72,11 +72,12 @@
              
   <section id="cascada">
 <h1>CASCADA<a class="headerlink" href="#cascada" title="Permalink to this headline"></a></h1>
+<a class="reference external image-reference" href="https://zenodo.org/badge/latestdoi/449991648"><img alt="https://zenodo.org/badge/449991648.svg" src="https://zenodo.org/badge/449991648.svg" /></a>
 <p>CASCADA (Characteristic Automated Search of Cryptographic Algorithms for Distinguishing Attacks)
 is a Python 3 library to evaluate the security of cryptographic primitives,
 specially block ciphers, against distinguishing attacks with bit-vector SMT solvers.</p>
 <p>A detailed introduction of CASCADA can be found in the paper
-<i>CASCADA: Characteristic Automated Search of Cryptographic Algorithms for Distinguishing Attacks</i>.</p>
+<a class="reference external" href="https://eprint.iacr.org/2022/513">CASCADA: Characteristic Automated Search of Cryptographic Algorithms for Distinguishing Attacks</a>.</p>
 <p>CASCADA implements several SMT-based automated search methods to search for
 characteristics and zero-probability properties to evaluate the security of ciphers against:</p>
 <ul class="simple">
@@ -112,6 +113,19 @@ For example, the SMT solver boolector can be installed through pySMT by</p>
 </div>
 <p>Optionally, hypothesis can be installed to run the tests,
 and sphinx and sphinx-rtd-theme to build the documentation.</p>
+</section>
+<section id="citation">
+<h2>Citation<a class="headerlink" href="#citation" title="Permalink to this headline"></a></h2>
+<p>If you use CASCADA, please consider citing the <a class="reference external" href="https://eprint.iacr.org/2022/513">paper</a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@misc</span><span class="p">{</span><span class="n">cryptoeprint</span><span class="p">:</span><span class="mi">2022</span><span class="p">:</span><span class="mi">513</span><span class="p">,</span>
+    <span class="n">author</span>       <span class="o">=</span> <span class="p">{</span><span class="n">Adrián</span> <span class="n">Ranea</span> <span class="ow">and</span> <span class="n">Vincent</span> <span class="n">Rijmen</span><span class="p">},</span>
+    <span class="n">title</span>        <span class="o">=</span> <span class="p">{{</span><span class="n">CASCADA</span><span class="p">}:</span> <span class="n">Characteristic</span> <span class="n">Automated</span> <span class="n">Search</span> <span class="n">of</span> <span class="n">Cryptographic</span> <span class="n">Algorithms</span> <span class="k">for</span> <span class="n">Distinguishing</span> <span class="n">Attacks</span><span class="p">},</span>
+    <span class="n">howpublished</span> <span class="o">=</span> <span class="p">{</span><span class="n">Cryptology</span> <span class="n">ePrint</span> <span class="n">Archive</span><span class="p">,</span> <span class="n">Report</span> <span class="mi">2022</span><span class="o">/</span><span class="mi">513</span><span class="p">},</span>
+    <span class="n">year</span>         <span class="o">=</span> <span class="p">{</span><span class="mi">2022</span><span class="p">},</span>
+    <span class="n">note</span>         <span class="o">=</span> <span class="p">{</span>\<span class="n">url</span><span class="p">{</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">ia</span><span class="o">.</span><span class="n">cr</span><span class="o">/</span><span class="mi">2022</span><span class="o">/</span><span class="mi">513</span><span class="p">}},</span>
+<span class="p">}</span>
+</pre></div>
+</div>
 <div class="toctree-wrapper compound">
 </div>
 </section>
