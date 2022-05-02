@@ -2,12 +2,15 @@
 CASCADA
 =======
 
+.. image:: https://zenodo.org/badge/449991648.svg
+   :target: https://zenodo.org/badge/latestdoi/449991648
+
 CASCADA (Characteristic Automated Search of Cryptographic Algorithms for Distinguishing Attacks)
 is a Python 3 library to evaluate the security of cryptographic primitives,
 specially block ciphers, against distinguishing attacks with bit-vector SMT solvers.
 
 A detailed introduction of CASCADA can be found in the paper
-*CASCADA: Characteristic Automated Search of Cryptographic Algorithms for Distinguishing Attacks*.
+`CASCADA: Characteristic Automated Search of Cryptographic Algorithms for Distinguishing Attacks <https://eprint.iacr.org/2022/513>`_.
 
 CASCADA implements several SMT-based automated search methods to search for
 characteristics and zero-probability properties to evaluate the security of ciphers against:
@@ -48,3 +51,19 @@ For example, the SMT solver boolector can be installed through pySMT by ::
 
 Optionally, hypothesis can be installed to run the tests,
 and sphinx and sphinx-rtd-theme to build the documentation.
+
+
+Citation
+========
+
+If you use CASCADA, please consider citing the `paper <https://eprint.iacr.org/2022/513>`_:
+
+::
+
+    @misc{cryptoeprint:2022:513,
+        author       = {Adrián Ranea and Vincent Rijmen},
+        title        = {{CASCADA}: Characteristic Automated Search of Cryptographic Algorithms for Distinguishing Attacks},
+        howpublished = {Cryptology ePrint Archive, Report 2022/513},
+        year         = {2022},
+        note         = {\url{https://ia.cr/2022/513}},
+    }
