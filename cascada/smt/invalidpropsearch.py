@@ -149,7 +149,7 @@ class InvalidPropFinder(chsearch.ChFinder):
     (and where the intermediate properties are not specified).
     The main idea of the SMT-based search is that one can check whether
     :math:`\\alpha` propagates to :math:`\\beta` with probability zero
-    by checking whether :math:`\Omega` is unsatisfisable (UNSAT).
+    by checking whether :math:`\Omega` is unsatisfiable (UNSAT).
     Note that only the validity constraints are needed to build :math:`\Omega`;
     the weight constraints are ignored when searching for universally-invalid characteristics.
 
@@ -438,7 +438,7 @@ class InvalidPropFinder(chsearch.ChFinder):
         propagates to :math:`\\beta` with probability zero by checking
         with an SMT solver whether the SMT problem, of whether there exists
         a valid characteristic with input property :math:`\\alpha` and output property
-        :math:`\\beta`, is unsatisfisable (UNSAT).
+        :math:`\\beta`, is unsatisfiable (UNSAT).
         If the problem is UNSAT, the universally-invalid
         `abstractproperty.characteristic.Characteristic` object with
         input and output properties :math:`(\\alpha, \\beta)`

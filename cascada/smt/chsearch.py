@@ -20,6 +20,12 @@ from cascada.primitives import blockcipher
 from cascada.smt import pysmttypes
 
 
+zip = functools.partial(zip, strict=True)
+CurrentSignatureType = abstractproperty.chmodel.ChModelSigType.Unique
+INCREMENT_NUM_ROUNDS = "increment_num_rounds"
+"""Message to increase the current number of rounds by one (see `round_based_ch_search`)"""
+
+
 def _get_time():
     now = datetime.datetime.now()
     return "{}-{}:{}".format(now.day, now.hour, now.minute)
@@ -41,10 +47,9 @@ def _get_smart_print(filename=None):
     return smart_print
 
 
-zip = functools.partial(zip, strict=True)
-CurrentSignatureType = abstractproperty.chmodel.ChModelSigType.Unique
-INCREMENT_NUM_ROUNDS = "increment_num_rounds"
-"""Message to increase the current number of rounds by one (see `round_based_ch_search`)"""
+def _merge_weights(w0, w1):
+    sum_pr = (decimal.Decimal(2) ** (-w0)) + (decimal.Decimal(2) ** (-w1))
+    return min(- abstractproperty.opmodel.log2_decimal(sum_pr), w0, w1)  # avoid rounding errors
 
 
 class ChModelAssertType(enum.Enum):
@@ -105,7 +110,7 @@ class ChFinder(object):
     satisfying the characteristic model by modelling the search as a sequence
     of SMT problems in the bit-vector theory.
 
-    Depending on ``assert_type``, the SMT problems contains the validity,
+    Depending on ``assert_type``, the SMT problems contain the validity,
     probability-one and/or weight assertions from the
     `abstractproperty.chmodel.ChModel`.
     They might also contain a constraint fixing the
@@ -171,9 +176,10 @@ class ChFinder(object):
     .. _Boolector: https://boolector.github.io
     .. _documentation: https://github.com/pysmt/pysmt
 
-    This class provides two methods to search for characteristics:
-    `find_next_ch` and `find_next_ch_increasing_weight`.
-    Both methods are Python `generator` functions, returning an `iterator` that
+    This class provides three methods to search for characteristics:
+    `find_next_ch`, `find_next_ch_increasing_weight`
+    and `find_next_ch_increasing_weight_fixed_in_out`.
+    These methods are Python `generator` functions, returning an `iterator` that
     yields the `abstractproperty.characteristic.Characteristic` objects
     found in the search (see also this_).
     The characteristics returned are defined for
@@ -400,6 +406,7 @@ class ChFinder(object):
         self._awvs = awvs
         self._error = error
         self._vars_in_constraints = vars_in_constraints
+        self._raise_exception_missing_var = raise_exception_missing_var
 
     @property
     def env(self):
@@ -779,7 +786,7 @@ class ChFinder(object):
 
         The SMT problems are provided to the SMT solver,
         which checks their satisfiability in increasing weight order.
-        When the SMT solver finds the first problem satisfisable,
+        When the SMT solver finds the first satisfiable problem,
         an assignment of the variables that makes the problem satisfiable is
         obtained, and a `abstractproperty.characteristic.Characteristic`
         object is created and *yielded*.
@@ -1014,6 +1021,130 @@ class ChFinder(object):
 
         solver.exit()
 
+    def find_next_ch_increasing_weight_fixed_in_out(
+            self, input_prop, output_prop, initial_weight,
+            final_weight=None, empirical_weight_options=None,
+            use_empirical_weight=False,
+    ):
+        """Return an iterator that yields the characteristics found in the SMT-based search
+        with increasing weight order and with fixed input and output properties.
+
+        This method is similar as `find_next_ch_increasing_weight` with three differences:
+
+         - This method only finds characteristics with input and output properties
+           (`Characteristic.input_prop` and `Characteristic.output_prop`) equal
+           to the input and output properties given by ``input_prop`` and ``output_prop``
+           (lists containing `Constant` objects or constant `Property` objects).
+         - When the SMT solver finds a satisfiable problem, a tuple of
+           two elements is yielded: the first element is the cumulative weight
+           and the second element is the characteristic found
+           (as a `abstractproperty.characteristic.Characteristic` object).
+           The cumulative weight is the weight (-log2) of the sum of the
+           probabilities of all characteristics found in the search
+           (including the characteristic just found).
+         - After all these characteristics have been yielded,
+           the optimal characteristic is NOT yielded again.
+
+        By default, the cumulative weight is computed by taking the decimal weights
+        (see `Characteristic.ch_weight`) of the found characteristic, transforming the
+        decimal weights into probabitlies, then summing these probabilities
+        and finally transforming the probability sum into a weight.
+        However, if the argument ``empirical_weight_options`` is given
+        (see `find_next_ch_increasing_weight`) and the argument ``use_empirical_weight``
+        is ``True``, then the empirical weights are used instead of the decimal weights.
+
+        .. note::
+
+            For the `Difference`/`LinearMask` property types,
+            the cumulative weight estimates the weight of the probability
+            of the differential/hull with the given input and output
+            differences/masks.
+
+        ::
+
+            >>> # example of search for XorDiff-EncryptionCharacteristic of Speck32 with fixed input/output difference
+            >>> from cascada.bitvector.core import Constant
+            >>> from cascada.differential.difference import XorDiff
+            >>> from cascada.differential.chmodel import EncryptionChModel
+            >>> from cascada.smt.chsearch import ChFinder, ChModelAssertType
+            >>> from cascada.primitives import speck
+            >>> Speck32 = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64)
+            >>> Speck32.set_num_rounds(4)
+            >>> ch_model = EncryptionChModel(Speck32, XorDiff)
+            >>> assert_type = ChModelAssertType.ValidityAndWeight
+            >>> ch_finder = ChFinder(ch_model, assert_type, "btor", solver_seed=0)
+            >>> best_ch = next(ch_finder.find_next_ch_increasing_weight(1))
+            >>> best_ch  # doctest: +NORMALIZE_WHITESPACE
+            EncryptionCharacteristic(ch_weight=5, assignment_weights=[2, 0, 1, 2, 0, 0],
+                input_diff=[0x2800, 0x0010], output_diff=[0x8000, 0x840a], external_diffs=[0x0000, 0x0000, 0x0000, 0x0000],
+                assign_outdiff_list=[0x0040, 0x8000, 0x8100, 0x8000, 0x8000, 0x840a])
+            >>> iterator = ch_finder.find_next_ch_increasing_weight_fixed_in_out
+            >>> # using the input and output differences of the best 5-round characteristic
+            >>> for w, ch in iterator(best_ch.input_prop, best_ch.output_prop, 0): print(w, "|", ch)  # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
+            5 | EncryptionCharacteristic(ch_weight=5, assignment_weights=[2, 0, 1, 2, 0, 0],
+                input_diff=[0x2800, 0x0010], output_diff=[0x8000, 0x840a], external_diffs=[0x0000, 0x0000, 0x0000, 0x0000],
+                assign_outdiff_list=[0x0040, 0x8000, 0x8100, 0x8000, 0x8000, 0x840a])
+            4.999999999916024096260838242 | EncryptionCharacteristic(ch_weight=39, assignment_weights=[6, 13, 11, 9, 0, 0],
+                input_diff=[0x2800, 0x0010], output_diff=[0x8000, 0x840a], external_diffs=[0x0000, 0x0000, 0x0000, 0x0000],
+                assign_outdiff_list=[0x03a0, 0x4f1f, 0x837f, 0x8000, 0x8000, 0x840a])
+            ...
+            4.999999999894210043141894841 | EncryptionCharacteristic(ch_weight=49, assignment_weights=[10, 15, 10, 14, 0, 0],
+                input_diff=[0x2800, 0x0010], output_diff=[0x8000, 0x840a], external_diffs=[0x0000, 0x0000, 0x0000, 0x0000],
+                assign_outdiff_list=[0x3fa0, 0xa00f, 0xff3f, 0x8000, 0x8000, 0x840a])
+            >>> print(w)  # weight of differential
+            4.999999999894210043141894841
+
+        """
+        if use_empirical_weight:
+            assert empirical_weight_options is not None
+
+        old_var_prop2ct_prop = self._var_prop2ct_prop.copy()
+        old_initial_constraints = self.initial_constraints[:]
+
+        # no need to use _get_ch_weight or _get_empirical_ch_weight
+
+        for var_prop, ct_prop in itertools.chain(
+                zip(self.ch_model.input_prop, input_prop),
+                zip(self.ch_model.output_prop, output_prop),
+        ):
+            if not isinstance(ct_prop, self.ch_model.prop_type):
+                assert isinstance(ct_prop, core.Constant)
+                ct_prop = self.ch_model.prop_type(ct_prop)
+            self._var_prop2ct_prop[var_prop] = ct_prop
+            self.initial_constraints.append(operation.BvComp(var_prop.val, ct_prop.val))
+
+        self._check_initial_constraints(
+            self.ch_model, self.initial_constraints, self.chmodel_asserts,
+            self._exclude_zero_input_prop, self._var_prop2ct_prop,
+            self._vars_in_constraints, self._raise_exception_missing_var
+        )
+
+        cumulative_w = None
+
+        for yielded_weight, ch_found in self.find_next_ch_increasing_weight(
+            initial_weight, final_weight=final_weight,
+            empirical_weight_options=empirical_weight_options,
+            stop_after_optimal=False, yield_weight=True
+        ):
+            if yielded_weight is None:  # second time optimal ch is yielded
+                assert cumulative_w is not None
+                continue
+
+            if use_empirical_weight:
+                next_weight = ch_found.empirical_ch_weight
+            else:
+                next_weight = ch_found.ch_weight
+
+            if cumulative_w is None:
+                cumulative_w = next_weight
+            else:
+                cumulative_w = _merge_weights(next_weight, cumulative_w)
+
+            yield cumulative_w, ch_found
+
+        self._var_prop2ct_prop = old_var_prop2ct_prop
+        self.initial_constraints = old_initial_constraints
+
     def formula_size(self, measure=None):
         """Return the size of the underlying SMT problem.
 
@@ -1038,7 +1169,9 @@ class ChFinder(object):
         and the additional constraints from `initial_constraints`,
         but excluding constraints created during the search such as
         the constraints fixing the characteristic weight variable to a
-        constant value in `find_next_ch_increasing_weight`.
+        constant value in `find_next_ch_increasing_weight` or
+        the constraints fixing the input and output properties
+        in `find_next_ch_increasing_weight_fixed_in_out`.
 
         If ``full_repr`` is False, the short string representation srepr is used.
         """
@@ -1566,6 +1699,7 @@ class CipherChFinder(ChFinder):
 
         See also `ChFinder.find_next_ch_increasing_weight`.
 
+            >>> # example of search for RXDiff-CipherCharacteristic of Speck32
             >>> from cascada.differential.difference import RXDiff
             >>> from cascada.differential.chmodel import CipherChModel
             >>> from cascada.smt.chsearch import CipherChFinder, ChModelAssertType
@@ -1590,6 +1724,160 @@ class CipherChFinder(ChFinder):
             (initial_weight, final_weight=final_weight,
              empirical_weight_options=empirical_weight_options,
              stop_after_optimal=stop_after_optimal, yield_weight=yield_weight)
+
+    def find_next_ch_increasing_weight_fixed_in_out(
+            self, ks_input_prop, enc_input_prop, enc_output_prop, initial_weight, final_weight=None,
+            ks_empirical_weight_options=None, enc_empirical_weight_options=None, use_empirical_weight=False,
+    ):
+        """Return an iterator that yields the characteristics found in the SMT-based search
+        with increasing weight order and with fixed input and output properties.
+
+        .. note::
+          This method requires that both``ks_assert_type`` and ``enc_assert_type``
+          are `ValidityAndWeight`.
+
+        This method is similar to `ChFinder.find_next_ch_increasing_weight_fixed_in_out`,
+        but internally `CipherChFinder.find_next_ch_increasing_weight` is used
+        instead of `ChFinder.find_next_ch_increasing_weight`.
+
+        In particular, this method finds cipher characteristics with the key-schedule
+        input property, the encryption input property and the encryption output property
+        equal to the properties given by ``ks_input_prop``, ``enc_input_prop`` and
+        ``enc_output_prop`` (lists containing `Constant` objects or constant `Property` objects).
+
+        Note that the cumulative weight is the weight (-log2) of the sum of the
+        probabilities of all cipher characteristics found in the search
+        (including the characteristic just found),
+        where the probability of a cipher characteristic here considered is the
+        product of the probabilities of the key-schedule and encryption
+        characteristics.
+        In other words, the cumulative weight is computed as in
+        `ChFinder.find_next_ch_increasing_weight_fixed_in_out`, but
+        the decimal weight of a cipher characteristic is taken
+        as the sum of the decimal weights of the key-schedule
+        and the encryption characteristics.
+
+        .. note::
+
+            For the `Difference` property types, the cumulative weight estimates
+            the weight of the probability of the related-key differential
+            with given masterkey difference, plaintext difference and
+            ciphertext difference.
+
+        ::
+
+            >>> # example of search for RXDiff-CipherCharacteristic of Speck32 with fixed input/output difference
+            >>> from cascada.differential.difference import RXDiff
+            >>> from cascada.differential.chmodel import CipherChModel
+            >>> from cascada.smt.chsearch import CipherChFinder, ChModelAssertType
+            >>> from cascada.primitives import speck
+            >>> Speck32 = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64)
+            >>> Speck32.set_num_rounds(2)
+            >>> ch_model = CipherChModel(Speck32, RXDiff)
+            >>> assert_type = ChModelAssertType.ValidityAndWeight
+            >>> ch_finder = CipherChFinder(ch_model, assert_type, assert_type, "btor", solver_seed=0)
+            >>> best_ch = next(ch_finder.find_next_ch_increasing_weight(1))
+            >>> best_ch.ks_characteristic.ch_weight + best_ch.enc_characteristic.ch_weight
+            Decimal('4.244980417176049505485850841')
+            >>> best_ch  # doctest: +NORMALIZE_WHITESPACE
+            CipherCharacteristic(ks_characteristic=Characteristic(ch_weight=1.414993472392016501828616947,
+                assignment_weights=[1.414993472392016501828616947, 0, 0],
+                input_diff=[0x0000, 0x0000], output_diff=[0x0000, 0x0000],
+                assign_outdiff_list=[0x0000, 0x0000, 0x0000]),
+            enc_characteristic=Characteristic(ch_weight=2.829986944784033003657233894,
+                assignment_weights=[1.414993472392016501828616947, 1.414993472392016501828616947, 0, 0],
+                input_diff=[0x0000, 0x0000], output_diff=[0x0000, 0x0000], external_diffs=[0x0000, 0x0000],
+                assign_outdiff_list=[0x0000, 0x0000, 0x0000, 0x0000]))
+            >>> iterator = ch_finder.find_next_ch_increasing_weight_fixed_in_out
+            >>> # using the input and output differences of the best 2-round characteristic
+            >>> ks_ip = best_ch.ks_characteristic.input_prop
+            >>> enc_ip, enc_op = best_ch.enc_characteristic.input_prop, best_ch.enc_characteristic.output_prop
+            >>> for w, ch in iterator(ks_ip, enc_ip, enc_op, 1): print(w, "|", ch)  # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
+            4.244980417176049505485850841 | CipherCharacteristic(ks_characteristic=Characteristic(ch_weight=1.414993472392016501828616947,
+                    assignment_weights=[1.414993472392016501828616947, 0, 0],
+                    input_diff=[0x0000, 0x0000], output_diff=[0x0000, 0x0000],
+                    assign_outdiff_list=[0x0000, 0x0000, 0x0000]),
+                enc_characteristic=Characteristic(ch_weight=2.829986944784033003657233894,
+                    assignment_weights=[1.414993472392016501828616947, 1.414993472392016501828616947, 0, 0],
+                    input_diff=[0x0000, 0x0000], output_diff=[0x0000, 0x0000], external_diffs=[0x0000, 0x0000],
+                    assign_outdiff_list=[0x0000, 0x0000, 0x0000, 0x0000]))
+            3.244980417176049505485850840 | CipherCharacteristic(ks_characteristic=Characteristic(ch_weight=1.414993472392016501828616947,
+                    assignment_weights=[1.414993472392016501828616947, 0, 0],
+                    input_diff=[0x0000, 0x0000], output_diff=[0x0000, 0x0001],
+                    assign_outdiff_list=[0x0001, 0x0000, 0x0001]),
+                enc_characteristic=Characteristic(ch_weight=2.829986944784033003657233894,
+                    assignment_weights=[1.414993472392016501828616947, 1.414993472392016501828616947, 0, 0],
+                    input_diff=[0x0000, 0x0000], output_diff=[0x0000, 0x0000], external_diffs=[0x0000, 0x0001],
+                    assign_outdiff_list=[0x0000, 0x0001, 0x0000, 0x0000]))
+            ...
+            3.192516141583136911276041810 | CipherCharacteristic(ks_characteristic=Characteristic(ch_weight=17,
+                    assignment_weights=[17, 0, 0],
+                    input_diff=[0x0000, 0x0000], output_diff=[0x0000, 0x7fff],
+                    assign_outdiff_list=[0x7fff, 0x0000, 0x7fff]),
+                enc_characteristic=Characteristic(ch_weight=18.41499347239201650182861695,
+                    assignment_weights=[1.414993472392016501828616947, 17, 0, 0],
+                    input_diff=[0x0000, 0x0000], output_diff=[0x0000, 0x0000], external_diffs=[0x0000, 0x7fff],
+                    assign_outdiff_list=[0x0000, 0x7fff, 0x0000, 0x0000]))
+            >>> print(w)  # weight (sum of the key and encryption weights) of the related-key differential
+            3.192516141583136911276041810
+
+        See also `ChFinder.find_next_ch_increasing_weight_fixed_in_out`.
+        """
+        assert self.ks_finder.assert_type == ChModelAssertType.ValidityAndWeight
+        assert self.enc_finder.assert_type == ChModelAssertType.ValidityAndWeight
+        if use_empirical_weight:
+            assert ks_empirical_weight_options is not None and enc_empirical_weight_options is not None
+
+        old_var_prop2ct_prop = self._var_prop2ct_prop.copy()
+        old_initial_constraints = self.initial_constraints[:]
+
+        for var_prop, ct_prop in itertools.chain(
+                zip(self.ch_model.ks_ch_model.input_prop, ks_input_prop),
+                zip(self.ch_model.enc_ch_model.input_prop, enc_input_prop),
+                zip(self.ch_model.enc_ch_model.output_prop, enc_output_prop),
+        ):
+            if not isinstance(ct_prop, self.ch_model.prop_type):
+                assert isinstance(ct_prop, core.Constant)
+                ct_prop = self.ch_model.prop_type(ct_prop)
+            self._var_prop2ct_prop[var_prop] = ct_prop
+            self.initial_constraints.append(operation.BvComp(var_prop.val, ct_prop.val))
+
+        for aux_finder in [self.ks_finder, self.enc_finder]:
+            ChFinder._check_initial_constraints(
+                aux_finder.ch_model, self.initial_constraints, self.chmodel_asserts,
+                aux_finder._exclude_zero_input_prop, self._var_prop2ct_prop,
+                self._vars_in_constraints, aux_finder._raise_exception_missing_var
+            )
+
+        cumulative_w = None
+
+        for yielded_weight, ch_found in self.find_next_ch_increasing_weight(
+            initial_weight, final_weight=final_weight,
+            ks_empirical_weight_options=ks_empirical_weight_options,
+            enc_empirical_weight_options=enc_empirical_weight_options,
+            stop_after_optimal=False, yield_weight=True
+        ):
+            if yielded_weight is None:  # second time optimal ch is yielded
+                assert cumulative_w is not None
+                continue
+
+            if use_empirical_weight:
+                next_weight = ch_found.ks_characteristic.empirical_ch_weight + \
+                              ch_found.enc_characteristic.empirical_ch_weight
+            else:
+                next_weight = ch_found.ks_characteristic.ch_weight + \
+                                 ch_found.enc_characteristic.ch_weight
+
+            if cumulative_w is None:
+                cumulative_w = next_weight
+            else:
+                assert cumulative_w is not None
+                cumulative_w = _merge_weights(next_weight, cumulative_w)
+
+            yield cumulative_w, ch_found
+
+        self._var_prop2ct_prop = old_var_prop2ct_prop
+        self.initial_constraints = old_initial_constraints
 
 
 def round_based_ch_search(
