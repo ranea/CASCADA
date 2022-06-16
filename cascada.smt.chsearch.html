@@ -44,6 +44,7 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="index.html">CASCADA</a></li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="adding_primitive.html">Adding a primitive</a></li>
 <li class="toctree-l1"><a class="reference internal" href="primitives_implemented.html">Primitives implemented</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="cascada.html">API reference</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="cascada.bitvector.html">cascada.bitvector module</a></li>
@@ -184,7 +185,7 @@ this class finds characteristics
 o <a class="reference internal" href="cascada.abstractproperty.characteristic.html#cascada.abstractproperty.characteristic.EncryptionCharacteristic" title="cascada.abstractproperty.characteristic.EncryptionCharacteristic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.characteristic.EncryptionCharacteristic</span></code></a>)
 satisfying the characteristic model by modelling the search as a sequence
 of SMT problems in the bit-vector theory.</p>
-<p>Depending on <code class="docutils literal notranslate"><span class="pre">assert_type</span></code>, the SMT problems contains the validity,
+<p>Depending on <code class="docutils literal notranslate"><span class="pre">assert_type</span></code>, the SMT problems contain the validity,
 probability-one and/or weight assertions from the
 <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel" title="cascada.abstractproperty.chmodel.ChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.chmodel.ChModel</span></code></a>.
 They might also contain a constraint fixing the
@@ -241,9 +242,10 @@ the given plaintext to the given ciphertext.</p>
 off-the-shelf SMT solver supported by pySMT given by <code class="docutils literal notranslate"><span class="pre">solver_name</span></code>
 (e.g., <code class="docutils literal notranslate"><span class="pre">solver_name='btor'</span></code> sets <a class="reference external" href="https://boolector.github.io">Boolector</a> as the SMT solver).
 The pySMT <a class="reference external" href="https://github.com/pysmt/pysmt">documentation</a> explains how to install an SMT solver.</p>
-<p>This class provides two methods to search for characteristics:
-<a class="reference internal" href="#cascada.smt.chsearch.ChFinder.find_next_ch" title="cascada.smt.chsearch.ChFinder.find_next_ch"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">find_next_ch</span></code></a> and <a class="reference internal" href="#cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight" title="cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">find_next_ch_increasing_weight</span></code></a>.
-Both methods are Python <a class="reference external" href="https://docs.python.org/3/glossary.html#term-generator" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">generator</span></code></a> functions, returning an <a class="reference external" href="https://docs.python.org/3/glossary.html#term-iterator" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">iterator</span></code></a> that
+<p>This class provides three methods to search for characteristics:
+<a class="reference internal" href="#cascada.smt.chsearch.ChFinder.find_next_ch" title="cascada.smt.chsearch.ChFinder.find_next_ch"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">find_next_ch</span></code></a>, <a class="reference internal" href="#cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight" title="cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">find_next_ch_increasing_weight</span></code></a>
+and <a class="reference internal" href="#cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight_fixed_in_out" title="cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight_fixed_in_out"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">find_next_ch_increasing_weight_fixed_in_out</span></code></a>.
+These methods are Python <a class="reference external" href="https://docs.python.org/3/glossary.html#term-generator" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">generator</span></code></a> functions, returning an <a class="reference external" href="https://docs.python.org/3/glossary.html#term-iterator" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">iterator</span></code></a> that
 yields the <a class="reference internal" href="cascada.abstractproperty.characteristic.html#cascada.abstractproperty.characteristic.Characteristic" title="cascada.abstractproperty.characteristic.Characteristic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.characteristic.Characteristic</span></code></a> objects
 found in the search (see also <a class="reference external" href="https://docs.python.org/3/howto/functional.html?highlight=generator#generators">this</a>).
 The characteristics returned are defined for
@@ -485,7 +487,7 @@ the characteristic probability and weight considered here.</p>
 </div>
 <p>The SMT problems are provided to the SMT solver,
 which checks their satisfiability in increasing weight order.
-When the SMT solver finds the first problem satisfisable,
+When the SMT solver finds the first satisfiable problem,
 an assignment of the variables that makes the problem satisfiable is
 obtained, and a <a class="reference internal" href="cascada.abstractproperty.characteristic.html#cascada.abstractproperty.characteristic.Characteristic" title="cascada.abstractproperty.characteristic.Characteristic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.characteristic.Characteristic</span></code></a>
 object is created and <em>yielded</em>.</p>
@@ -595,6 +597,78 @@ is also yielded (default <code class="docutils literal notranslate"><span class=
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight_fixed_in_out">
+<span class="sig-name descname"><span class="pre">find_next_ch_increasing_weight_fixed_in_out</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_prop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_prop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">empirical_weight_options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_empirical_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/smt/chsearch.html#ChFinder.find_next_ch_increasing_weight_fixed_in_out"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight_fixed_in_out" title="Permalink to this definition"></a></dt>
+<dd><p>Return an iterator that yields the characteristics found in the SMT-based search
+with increasing weight order and with fixed input and output properties.</p>
+<p>This method is similar as <a class="reference internal" href="#cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight" title="cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">find_next_ch_increasing_weight</span></code></a> with three differences:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>This method only finds characteristics with input and output properties
+(<a class="reference internal" href="cascada.abstractproperty.characteristic.html#cascada.abstractproperty.characteristic.Characteristic.input_prop" title="cascada.abstractproperty.characteristic.Characteristic.input_prop"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">Characteristic.input_prop</span></code></a> and <a class="reference internal" href="cascada.abstractproperty.characteristic.html#cascada.abstractproperty.characteristic.Characteristic.output_prop" title="cascada.abstractproperty.characteristic.Characteristic.output_prop"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">Characteristic.output_prop</span></code></a>) equal
+to the input and output properties given by <code class="docutils literal notranslate"><span class="pre">input_prop</span></code> and <code class="docutils literal notranslate"><span class="pre">output_prop</span></code>
+(lists containing <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Constant" title="cascada.bitvector.core.Constant"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a> objects or constant <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> objects).</p></li>
+<li><p>When the SMT solver finds a satisfiable problem, a tuple of
+two elements is yielded: the first element is the cumulative weight
+and the second element is the characteristic found
+(as a <a class="reference internal" href="cascada.abstractproperty.characteristic.html#cascada.abstractproperty.characteristic.Characteristic" title="cascada.abstractproperty.characteristic.Characteristic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.characteristic.Characteristic</span></code></a> object).
+The cumulative weight is the weight (-log2) of the sum of the
+probabilities of all characteristics found in the search
+(including the characteristic just found).</p></li>
+<li><p>After all these characteristics have been yielded,
+the optimal characteristic is NOT yielded again.</p></li>
+</ul>
+</div></blockquote>
+<p>By default, the cumulative weight is computed by taking the decimal weights
+(see <a class="reference internal" href="cascada.abstractproperty.characteristic.html#cascada.abstractproperty.characteristic.Characteristic.ch_weight" title="cascada.abstractproperty.characteristic.Characteristic.ch_weight"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">Characteristic.ch_weight</span></code></a>) of the found characteristic, transforming the
+decimal weights into probabitlies, then summing these probabilities
+and finally transforming the probability sum into a weight.
+However, if the argument <code class="docutils literal notranslate"><span class="pre">empirical_weight_options</span></code> is given
+(see <a class="reference internal" href="#cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight" title="cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">find_next_ch_increasing_weight</span></code></a>) and the argument <code class="docutils literal notranslate"><span class="pre">use_empirical_weight</span></code>
+is <code class="docutils literal notranslate"><span class="pre">True</span></code>, then the empirical weights are used instead of the decimal weights.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For the <a class="reference internal" href="cascada.differential.difference.html#cascada.differential.difference.Difference" title="cascada.differential.difference.Difference"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Difference</span></code></a>/<a class="reference internal" href="cascada.linear.mask.html#cascada.linear.mask.LinearMask" title="cascada.linear.mask.LinearMask"><code class="xref any py py-class docutils literal notranslate"><span class="pre">LinearMask</span></code></a> property types,
+the cumulative weight estimates the weight of the probability
+of the differential/hull with the given input and output
+differences/masks.</p>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># example of search for XorDiff-EncryptionCharacteristic of Speck32 with fixed input/output difference</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.difference</span> <span class="kn">import</span> <span class="n">XorDiff</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.chmodel</span> <span class="kn">import</span> <span class="n">EncryptionChModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.smt.chsearch</span> <span class="kn">import</span> <span class="n">ChFinder</span><span class="p">,</span> <span class="n">ChModelAssertType</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">speck</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model</span> <span class="o">=</span> <span class="n">EncryptionChModel</span><span class="p">(</span><span class="n">Speck32</span><span class="p">,</span> <span class="n">XorDiff</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">assert_type</span> <span class="o">=</span> <span class="n">ChModelAssertType</span><span class="o">.</span><span class="n">ValidityAndWeight</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_finder</span> <span class="o">=</span> <span class="n">ChFinder</span><span class="p">(</span><span class="n">ch_model</span><span class="p">,</span> <span class="n">assert_type</span><span class="p">,</span> <span class="s2">&quot;btor&quot;</span><span class="p">,</span> <span class="n">solver_seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">best_ch</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">ch_finder</span><span class="o">.</span><span class="n">find_next_ch_increasing_weight</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">best_ch</span>  
+<span class="go">EncryptionCharacteristic(ch_weight=5, assignment_weights=[2, 0, 1, 2, 0, 0],</span>
+<span class="go">    input_diff=[0x2800, 0x0010], output_diff=[0x8000, 0x840a], external_diffs=[0x0000, 0x0000, 0x0000, 0x0000],</span>
+<span class="go">    assign_outdiff_list=[0x0040, 0x8000, 0x8100, 0x8000, 0x8000, 0x840a])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">iterator</span> <span class="o">=</span> <span class="n">ch_finder</span><span class="o">.</span><span class="n">find_next_ch_increasing_weight_fixed_in_out</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># using the input and output differences of the best 5-round characteristic</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">w</span><span class="p">,</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">iterator</span><span class="p">(</span><span class="n">best_ch</span><span class="o">.</span><span class="n">input_prop</span><span class="p">,</span> <span class="n">best_ch</span><span class="o">.</span><span class="n">output_prop</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="nb">print</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="s2">&quot;|&quot;</span><span class="p">,</span> <span class="n">ch</span><span class="p">)</span>  
+<span class="go">5 | EncryptionCharacteristic(ch_weight=5, assignment_weights=[2, 0, 1, 2, 0, 0],</span>
+<span class="go">    input_diff=[0x2800, 0x0010], output_diff=[0x8000, 0x840a], external_diffs=[0x0000, 0x0000, 0x0000, 0x0000],</span>
+<span class="go">    assign_outdiff_list=[0x0040, 0x8000, 0x8100, 0x8000, 0x8000, 0x840a])</span>
+<span class="go">4.999999999916024096260838242 | EncryptionCharacteristic(ch_weight=39, assignment_weights=[6, 13, 11, 9, 0, 0],</span>
+<span class="go">    input_diff=[0x2800, 0x0010], output_diff=[0x8000, 0x840a], external_diffs=[0x0000, 0x0000, 0x0000, 0x0000],</span>
+<span class="go">    assign_outdiff_list=[0x03a0, 0x4f1f, 0x837f, 0x8000, 0x8000, 0x840a])</span>
+<span class="gp">...</span>
+<span class="go">4.999999999894210043141894841 | EncryptionCharacteristic(ch_weight=49, assignment_weights=[10, 15, 10, 14, 0, 0],</span>
+<span class="go">    input_diff=[0x2800, 0x0010], output_diff=[0x8000, 0x840a], external_diffs=[0x0000, 0x0000, 0x0000, 0x0000],</span>
+<span class="go">    assign_outdiff_list=[0x3fa0, 0xa00f, 0xff3f, 0x8000, 0x8000, 0x840a])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>  <span class="c1"># weight of differential</span>
+<span class="go">4.999999999894210043141894841</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="cascada.smt.chsearch.ChFinder.formula_size">
 <span class="sig-name descname"><span class="pre">formula_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">measure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/smt/chsearch.html#ChFinder.formula_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.smt.chsearch.ChFinder.formula_size" title="Permalink to this definition"></a></dt>
 <dd><p>Return the size of the underlying SMT problem.</p>
@@ -610,7 +684,9 @@ probability-one and/or weight assertions (depending on <code class="docutils lit
 and the additional constraints from <a class="reference internal" href="#cascada.smt.chsearch.ChFinder.initial_constraints" title="cascada.smt.chsearch.ChFinder.initial_constraints"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">initial_constraints</span></code></a>,
 but excluding constraints created during the search such as
 the constraints fixing the characteristic weight variable to a
-constant value in <a class="reference internal" href="#cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight" title="cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">find_next_ch_increasing_weight</span></code></a>.</p>
+constant value in <a class="reference internal" href="#cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight" title="cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">find_next_ch_increasing_weight</span></code></a> or
+the constraints fixing the input and output properties
+in <a class="reference internal" href="#cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight_fixed_in_out" title="cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight_fixed_in_out"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">find_next_ch_increasing_weight_fixed_in_out</span></code></a>.</p>
 <p>If <code class="docutils literal notranslate"><span class="pre">full_repr</span></code> is False, the short string representation srepr is used.</p>
 </dd></dl>
 
@@ -779,7 +855,8 @@ for the computation of the empirical weight over the key-schedule
 weights is computed and used to determine whether to yield
 the characteristic found.</p>
 <p>See also <a class="reference internal" href="#cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight" title="cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">ChFinder.find_next_ch_increasing_weight</span></code></a>.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.difference</span> <span class="kn">import</span> <span class="n">RXDiff</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># example of search for RXDiff-CipherCharacteristic of Speck32</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.difference</span> <span class="kn">import</span> <span class="n">RXDiff</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.chmodel</span> <span class="kn">import</span> <span class="n">CipherChModel</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.smt.chsearch</span> <span class="kn">import</span> <span class="n">CipherChFinder</span><span class="p">,</span> <span class="n">ChModelAssertType</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">speck</span>
@@ -795,6 +872,100 @@ the characteristic found.</p>
 <span class="go">Ch(ks_ch=Ch(w=1.415, id=0000 8000, od=8000 8002), enc_ch=Ch(w=2.830, id=0040 0000, od=8003 8003))</span>
 </pre></div>
 </div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.smt.chsearch.CipherChFinder.find_next_ch_increasing_weight_fixed_in_out">
+<span class="sig-name descname"><span class="pre">find_next_ch_increasing_weight_fixed_in_out</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ks_input_prop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enc_input_prop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enc_output_prop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ks_empirical_weight_options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enc_empirical_weight_options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_empirical_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/smt/chsearch.html#CipherChFinder.find_next_ch_increasing_weight_fixed_in_out"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.smt.chsearch.CipherChFinder.find_next_ch_increasing_weight_fixed_in_out" title="Permalink to this definition"></a></dt>
+<dd><p>Return an iterator that yields the characteristics found in the SMT-based search
+with increasing weight order and with fixed input and output properties.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This method requires that both``ks_assert_type`` and <code class="docutils literal notranslate"><span class="pre">enc_assert_type</span></code>
+are <a class="reference internal" href="#cascada.smt.chsearch.ChModelAssertType.ValidityAndWeight" title="cascada.smt.chsearch.ChModelAssertType.ValidityAndWeight"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">ValidityAndWeight</span></code></a>.</p>
+</div>
+<p>This method is similar to <a class="reference internal" href="#cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight_fixed_in_out" title="cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight_fixed_in_out"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">ChFinder.find_next_ch_increasing_weight_fixed_in_out</span></code></a>,
+but internally <a class="reference internal" href="#cascada.smt.chsearch.CipherChFinder.find_next_ch_increasing_weight" title="cascada.smt.chsearch.CipherChFinder.find_next_ch_increasing_weight"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">CipherChFinder.find_next_ch_increasing_weight</span></code></a> is used
+instead of <a class="reference internal" href="#cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight" title="cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">ChFinder.find_next_ch_increasing_weight</span></code></a>.</p>
+<p>In particular, this method finds cipher characteristics with the key-schedule
+input property, the encryption input property and the encryption output property
+equal to the properties given by <code class="docutils literal notranslate"><span class="pre">ks_input_prop</span></code>, <code class="docutils literal notranslate"><span class="pre">enc_input_prop</span></code> and
+<code class="docutils literal notranslate"><span class="pre">enc_output_prop</span></code> (lists containing <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Constant" title="cascada.bitvector.core.Constant"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a> objects or constant <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> objects).</p>
+<p>Note that the cumulative weight is the weight (-log2) of the sum of the
+probabilities of all cipher characteristics found in the search
+(including the characteristic just found),
+where the probability of a cipher characteristic here considered is the
+product of the probabilities of the key-schedule and encryption
+characteristics.
+In other words, the cumulative weight is computed as in
+<a class="reference internal" href="#cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight_fixed_in_out" title="cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight_fixed_in_out"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">ChFinder.find_next_ch_increasing_weight_fixed_in_out</span></code></a>, but
+the decimal weight of a cipher characteristic is taken
+as the sum of the decimal weights of the key-schedule
+and the encryption characteristics.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For the <a class="reference internal" href="cascada.differential.difference.html#cascada.differential.difference.Difference" title="cascada.differential.difference.Difference"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Difference</span></code></a> property types, the cumulative weight estimates
+the weight of the probability of the related-key differential
+with given masterkey difference, plaintext difference and
+ciphertext difference.</p>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># example of search for RXDiff-CipherCharacteristic of Speck32 with fixed input/output difference</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.difference</span> <span class="kn">import</span> <span class="n">RXDiff</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.chmodel</span> <span class="kn">import</span> <span class="n">CipherChModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.smt.chsearch</span> <span class="kn">import</span> <span class="n">CipherChFinder</span><span class="p">,</span> <span class="n">ChModelAssertType</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">speck</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model</span> <span class="o">=</span> <span class="n">CipherChModel</span><span class="p">(</span><span class="n">Speck32</span><span class="p">,</span> <span class="n">RXDiff</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">assert_type</span> <span class="o">=</span> <span class="n">ChModelAssertType</span><span class="o">.</span><span class="n">ValidityAndWeight</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_finder</span> <span class="o">=</span> <span class="n">CipherChFinder</span><span class="p">(</span><span class="n">ch_model</span><span class="p">,</span> <span class="n">assert_type</span><span class="p">,</span> <span class="n">assert_type</span><span class="p">,</span> <span class="s2">&quot;btor&quot;</span><span class="p">,</span> <span class="n">solver_seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">best_ch</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">ch_finder</span><span class="o">.</span><span class="n">find_next_ch_increasing_weight</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">best_ch</span><span class="o">.</span><span class="n">ks_characteristic</span><span class="o">.</span><span class="n">ch_weight</span> <span class="o">+</span> <span class="n">best_ch</span><span class="o">.</span><span class="n">enc_characteristic</span><span class="o">.</span><span class="n">ch_weight</span>
+<span class="go">Decimal(&#39;4.244980417176049505485850841&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">best_ch</span>  
+<span class="go">CipherCharacteristic(ks_characteristic=Characteristic(ch_weight=1.414993472392016501828616947,</span>
+<span class="go">    assignment_weights=[1.414993472392016501828616947, 0, 0],</span>
+<span class="go">    input_diff=[0x0000, 0x0000], output_diff=[0x0000, 0x0000],</span>
+<span class="go">    assign_outdiff_list=[0x0000, 0x0000, 0x0000]),</span>
+<span class="go">enc_characteristic=Characteristic(ch_weight=2.829986944784033003657233894,</span>
+<span class="go">    assignment_weights=[1.414993472392016501828616947, 1.414993472392016501828616947, 0, 0],</span>
+<span class="go">    input_diff=[0x0000, 0x0000], output_diff=[0x0000, 0x0000], external_diffs=[0x0000, 0x0000],</span>
+<span class="go">    assign_outdiff_list=[0x0000, 0x0000, 0x0000, 0x0000]))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">iterator</span> <span class="o">=</span> <span class="n">ch_finder</span><span class="o">.</span><span class="n">find_next_ch_increasing_weight_fixed_in_out</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># using the input and output differences of the best 2-round characteristic</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ks_ip</span> <span class="o">=</span> <span class="n">best_ch</span><span class="o">.</span><span class="n">ks_characteristic</span><span class="o">.</span><span class="n">input_prop</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">enc_ip</span><span class="p">,</span> <span class="n">enc_op</span> <span class="o">=</span> <span class="n">best_ch</span><span class="o">.</span><span class="n">enc_characteristic</span><span class="o">.</span><span class="n">input_prop</span><span class="p">,</span> <span class="n">best_ch</span><span class="o">.</span><span class="n">enc_characteristic</span><span class="o">.</span><span class="n">output_prop</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">w</span><span class="p">,</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">iterator</span><span class="p">(</span><span class="n">ks_ip</span><span class="p">,</span> <span class="n">enc_ip</span><span class="p">,</span> <span class="n">enc_op</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="nb">print</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="s2">&quot;|&quot;</span><span class="p">,</span> <span class="n">ch</span><span class="p">)</span>  
+<span class="go">4.244980417176049505485850841 | CipherCharacteristic(ks_characteristic=Characteristic(ch_weight=1.414993472392016501828616947,</span>
+<span class="go">        assignment_weights=[1.414993472392016501828616947, 0, 0],</span>
+<span class="go">        input_diff=[0x0000, 0x0000], output_diff=[0x0000, 0x0000],</span>
+<span class="go">        assign_outdiff_list=[0x0000, 0x0000, 0x0000]),</span>
+<span class="go">    enc_characteristic=Characteristic(ch_weight=2.829986944784033003657233894,</span>
+<span class="go">        assignment_weights=[1.414993472392016501828616947, 1.414993472392016501828616947, 0, 0],</span>
+<span class="go">        input_diff=[0x0000, 0x0000], output_diff=[0x0000, 0x0000], external_diffs=[0x0000, 0x0000],</span>
+<span class="go">        assign_outdiff_list=[0x0000, 0x0000, 0x0000, 0x0000]))</span>
+<span class="go">3.244980417176049505485850840 | CipherCharacteristic(ks_characteristic=Characteristic(ch_weight=1.414993472392016501828616947,</span>
+<span class="go">        assignment_weights=[1.414993472392016501828616947, 0, 0],</span>
+<span class="go">        input_diff=[0x0000, 0x0000], output_diff=[0x0000, 0x0001],</span>
+<span class="go">        assign_outdiff_list=[0x0001, 0x0000, 0x0001]),</span>
+<span class="go">    enc_characteristic=Characteristic(ch_weight=2.829986944784033003657233894,</span>
+<span class="go">        assignment_weights=[1.414993472392016501828616947, 1.414993472392016501828616947, 0, 0],</span>
+<span class="go">        input_diff=[0x0000, 0x0000], output_diff=[0x0000, 0x0000], external_diffs=[0x0000, 0x0001],</span>
+<span class="go">        assign_outdiff_list=[0x0000, 0x0001, 0x0000, 0x0000]))</span>
+<span class="gp">...</span>
+<span class="go">3.192516141583136911276041810 | CipherCharacteristic(ks_characteristic=Characteristic(ch_weight=17,</span>
+<span class="go">        assignment_weights=[17, 0, 0],</span>
+<span class="go">        input_diff=[0x0000, 0x0000], output_diff=[0x0000, 0x7fff],</span>
+<span class="go">        assign_outdiff_list=[0x7fff, 0x0000, 0x7fff]),</span>
+<span class="go">    enc_characteristic=Characteristic(ch_weight=18.41499347239201650182861695,</span>
+<span class="go">        assignment_weights=[1.414993472392016501828616947, 17, 0, 0],</span>
+<span class="go">        input_diff=[0x0000, 0x0000], output_diff=[0x0000, 0x0000], external_diffs=[0x0000, 0x7fff],</span>
+<span class="go">        assign_outdiff_list=[0x0000, 0x7fff, 0x0000, 0x0000]))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>  <span class="c1"># weight (sum of the key and encryption weights) of the related-key differential</span>
+<span class="go">3.192516141583136911276041810</span>
+</pre></div>
+</div>
+<p>See also <a class="reference internal" href="#cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight_fixed_in_out" title="cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight_fixed_in_out"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">ChFinder.find_next_ch_increasing_weight_fixed_in_out</span></code></a>.</p>
 </dd></dl>
 
 </dd></dl>

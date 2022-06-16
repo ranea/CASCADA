@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Adding a primitive &mdash; CASCADA 1.0.rc0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Primitives implemented" href="primitives_implemented.html" />
+    <link rel="prev" title="Usage" href="usage.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> CASCADA
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">CASCADA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Adding a primitive</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#description-of-speck">Description of Speck</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#implementing-the-round-function">Implementing the round function</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#implementing-the-key-schedule-and-the-encryption-functions">Implementing the key-schedule and the encryption functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#wrapping-the-key-schedule-function">Wrapping the key-schedule function</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#wrapping-the-encryption-function">Wrapping the encryption function</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#wrapping-everything-as-a-cipher-subclass">Wrapping everything as a Cipher subclass</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="primitives_implemented.html">Primitives implemented</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cascada.html">API reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">CASCADA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Adding a primitive</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/adding_primitive.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="adding-a-primitive">
+<h1>Adding a primitive<a class="headerlink" href="#adding-a-primitive" title="Permalink to this headline"></a></h1>
+<p>To implement a new primitive, the easiest way is to take a similar primitive
+already implemented and adapt it to the new primitive
+(see also <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.BvFunction" title="cascada.bitvector.ssa.BvFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvFunction</span></code></a> and <a class="reference internal" href="cascada.primitives.blockcipher.html#module-cascada.primitives.blockcipher" title="cascada.primitives.blockcipher"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">blockcipher</span></code></a>).
+If the new primitive contains a bit-vector operation
+with no associated property model (see <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel" title="cascada.abstractproperty.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.opmodel.OpModel</span></code></a>),
+you need to implement the property model (as in <a class="reference internal" href="cascada.primitives.simon.html#module-cascada.primitives.simon" title="cascada.primitives.simon"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">simon</span></code></a> and <a class="reference internal" href="cascada.primitives.simon_rf.html#module-cascada.primitives.simon_rf" title="cascada.primitives.simon_rf"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">simon_rf</span></code></a>)
+or use a <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.WeakModel" title="cascada.abstractproperty.opmodel.WeakModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">WeakModel</span></code></a>, <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.BranchNumberModel" title="cascada.abstractproperty.opmodel.BranchNumberModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BranchNumberModel</span></code></a> or <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.WDTModel" title="cascada.abstractproperty.opmodel.WDTModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">WDTModel</span></code></a> (as in <a class="reference internal" href="cascada.primitives.aes.html#module-cascada.primitives.aes" title="cascada.primitives.aes"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">aes</span></code></a>
+or <a class="reference internal" href="cascada.primitives.skinny64.html#module-cascada.primitives.skinny64" title="cascada.primitives.skinny64"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">skinny64</span></code></a>).</p>
+<p>We will now describe step-by-step how to add a new primitive
+from scratch using Speck32/64 as example.</p>
+<section id="description-of-speck">
+<h2>Description of Speck<a class="headerlink" href="#description-of-speck" title="Permalink to this headline"></a></h2>
+<p>Speck is a family of lightweight block ciphers. A member of the family is denoted by Speck <span class="math notranslate nohighlight">\(2n/m·n\)</span>,
+where the block size is <span class="math notranslate nohighlight">\(2n\)</span> bits for <span class="math notranslate nohighlight">\(n\in \{16,24,32,48,64\}\)</span>,
+and the key size is <span class="math notranslate nohighlight">\(m·n\)</span> bits for <span class="math notranslate nohighlight">\(m \in \{2,3,4\}\)</span>, depending on the desired security level.</p>
+<p>The round function of Speck <span class="math notranslate nohighlight">\(f(x, y, k) = (x', y')\)</span>
+receives two words <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(y\)</span>, and a round key <span class="math notranslate nohighlight">\(k\)</span>,
+all of size <span class="math notranslate nohighlight">\(n\)</span>, and outputs two words of bitsize <span class="math notranslate nohighlight">\(n\)</span>, <span class="math notranslate nohighlight">\(x'\)</span> and <span class="math notranslate nohighlight">\(y'\)</span>, such that</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(x' = (x \ggg \alpha)\boxplus y)\oplus k\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(y' = x' \oplus (y \lll \beta))\)</span></p></li>
+</ul>
+<p>The Speck key-schedule algorithm uses the same round function to generate the round keys.
+Let <span class="math notranslate nohighlight">\(K = (l_{m-2},...,l_0,k_0)\)</span> be a master key for Speck <span class="math notranslate nohighlight">\(2n/m·n\)</span>, where <span class="math notranslate nohighlight">\(l_i, k_0\)</span>
+are <span class="math notranslate nohighlight">\(n\)</span>-bit words. The sequence of round keys <span class="math notranslate nohighlight">\(k_i\)</span> (with <span class="math notranslate nohighlight">\(i\)</span> starting from 0) is generated as</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(l_{i+m-1} =  (l_i \ggg \alpha)\boxplus k_i)\oplus i\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(k_{i+1} = l_{i+m-1} \oplus (k_i\lll \beta)\)</span></p></li>
+</ul>
+<p>The rotation offset <span class="math notranslate nohighlight">\((\alpha, \beta)\)</span> is <span class="math notranslate nohighlight">\((7,2)\)</span> for Speck32/64, and <span class="math notranslate nohighlight">\((8,3)\)</span> for the larger versions.</p>
+</section>
+<section id="implementing-the-round-function">
+<h2>Implementing the round function<a class="headerlink" href="#implementing-the-round-function" title="Permalink to this headline"></a></h2>
+<p>First, we will implement the round function <span class="math notranslate nohighlight">\(f(x, y, k) = (x', y')\)</span> using the <a class="reference internal" href="cascada.bitvector.html#module-cascada.bitvector" title="cascada.bitvector"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">bitvector</span></code></a> module.
+To implement <span class="math notranslate nohighlight">\(f\)</span>, we search in <a class="reference internal" href="cascada.bitvector.operation.html#module-cascada.bitvector.operation" title="cascada.bitvector.operation"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">bitvector.operation</span></code></a> and <a class="reference internal" href="cascada.bitvector.secondaryop.html#module-cascada.bitvector.secondaryop" title="cascada.bitvector.secondaryop"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">bitvector.secondaryop</span></code></a> the classes
+corresponding to the bit-vector operations used in <span class="math notranslate nohighlight">\(f\)</span>.
+In particular, <span class="math notranslate nohighlight">\(f\)</span> uses the modular addition (corresponding to the class <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.BvAdd" title="cascada.bitvector.operation.BvAdd"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvAdd</span></code></a>),
+the left and right rotations (<a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.RotateLeft" title="cascada.bitvector.operation.RotateLeft"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RotateLeft</span></code></a> and <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.RotateRight" title="cascada.bitvector.operation.RotateRight"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RotateRight</span></code></a>),  and the XOR (<a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.BvXor" title="cascada.bitvector.operation.BvXor"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvXor</span></code></a>).
+Thus, we can implement <span class="math notranslate nohighlight">\(f\)</span> with the following Python function</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cascada.bitvector.operation</span> <span class="kn">import</span> <span class="n">BvXor</span><span class="p">,</span> <span class="n">BvAdd</span><span class="p">,</span> <span class="n">RotateRight</span><span class="p">,</span> <span class="n">RotateLeft</span>
+<span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">BvXor</span><span class="p">(</span><span class="n">BvAdd</span><span class="p">(</span><span class="n">RotateRight</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span> <span class="n">y</span><span class="p">),</span> <span class="n">k</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">BvXor</span><span class="p">(</span><span class="n">RotateLeft</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">x</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span>
+</pre></div>
+</div>
+<p>In the unlikely case that <span class="math notranslate nohighlight">\(f\)</span> would contain an operation not included in the <a class="reference internal" href="cascada.bitvector.html#module-cascada.bitvector" title="cascada.bitvector"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">bitvector</span></code></a> module
+or in the case that we would want to group some operations together to treat them as an atomic operation,
+new operations can be defined as subclasses of <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.SecondaryOperation" title="cascada.bitvector.operation.SecondaryOperation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SecondaryOperation</span></code></a>
+(see for example <a class="reference internal" href="cascada.primitives.simon_rf.html#module-cascada.primitives.simon_rf" title="cascada.primitives.simon_rf"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">simon_rf</span></code></a>).</p>
+<p>We can test <span class="math notranslate nohighlight">\(f\)</span> by evaluating it with symbolic and constant bit-vectors
+(corresponding to the classes <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Variable" title="cascada.bitvector.core.Variable"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Variable</span></code></a> and <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Constant" title="cascada.bitvector.core.Constant"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Constant</span></code></a>).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span><span class="p">,</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="mi">16</span><span class="p">))</span>
+<span class="go">(((x &gt;&gt;&gt; 7) + y) ^ z, (y &lt;&lt;&lt; 2) ^ ((x &gt;&gt;&gt; 7) + y) ^ z)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span> <span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span> <span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">16</span><span class="p">))</span>
+<span class="go">(0x0000, 0x0000)</span>
+</pre></div>
+</div>
+<p>Since <span class="math notranslate nohighlight">\(f\)</span> is only meant to be used with bit-vector inputs (<a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term" title="cascada.bitvector.core.Term"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Term</span></code></a> objects), we can use
+the Python operators <code class="docutils literal notranslate"><span class="pre">+,</span> <span class="pre">^</span></code> which are overloaded for <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term" title="cascada.bitvector.core.Term"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Term</span></code></a> objects with
+the classes <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.BvAdd" title="cascada.bitvector.operation.BvAdd"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvAdd</span></code></a> and <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.BvXor" title="cascada.bitvector.operation.BvXor"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvXor</span></code></a> respectively. In other words, we can also implement
+<span class="math notranslate nohighlight">\(f\)</span> with the following Python function</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">RotateRight</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span> <span class="o">+</span> <span class="n">y</span> <span class="o">^</span> <span class="n">k</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">RotateLeft</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">^</span> <span class="n">x</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span>
+</pre></div>
+</div>
+</section>
+<section id="implementing-the-key-schedule-and-the-encryption-functions">
+<h2>Implementing the key-schedule and the encryption functions<a class="headerlink" href="#implementing-the-key-schedule-and-the-encryption-functions" title="Permalink to this headline"></a></h2>
+<p>We will now implement the key-schedule and the encryption functions of Speck32/64
+using two Python functions and bit-vector operations.
+To do so, we will implement the key-schedule as a function taking the
+key words and returning the list of round keys, and the
+encryption as a function taking the plaintext words and the round keys
+and returning the ciphertext words.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cascada.bitvector.operation</span> <span class="kn">import</span> <span class="n">RotateRight</span><span class="p">,</span> <span class="n">RotateLeft</span>
+
+<span class="n">num_rounds</span> <span class="o">=</span> <span class="mi">22</span>
+
+<span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">RotateRight</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span> <span class="o">+</span> <span class="n">y</span> <span class="o">^</span> <span class="n">k</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">RotateLeft</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">^</span> <span class="n">x</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span>
+
+<span class="k">def</span> <span class="nf">key_schedule</span><span class="p">(</span><span class="n">l2</span><span class="p">,</span> <span class="n">l1</span><span class="p">,</span> <span class="n">l0</span><span class="p">,</span> <span class="n">k0</span><span class="p">):</span>
+    <span class="n">l</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_rounds</span> <span class="o">+</span> <span class="mi">3</span><span class="p">)]</span>
+    <span class="n">round_keys</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_rounds</span><span class="p">)]</span>
+    <span class="n">round_keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">k0</span>
+    <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">l0</span><span class="p">,</span> <span class="n">l1</span><span class="p">,</span> <span class="n">l2</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_rounds</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">l</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">3</span><span class="p">],</span> <span class="n">round_keys</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">round_keys</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">Constant</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">16</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">round_keys</span>
+
+<span class="k">def</span> <span class="nf">encryption</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">round_keys</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_rounds</span><span class="p">):</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">round_keys</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span>
+</pre></div>
+</div>
+<p>There are many ways to implement these key-schedule and encryption functions;
+our only restriction is that the output of these two functions are list of
+bit-vectors (<a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term" title="cascada.bitvector.core.Term"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Term</span></code></a> objects) assuming that the inputs are <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term" title="cascada.bitvector.core.Term"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Term</span></code></a> objects.
+We can test these two Python functions with the following Speck32/64 test vector</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>plaintext = (0x6574, 0x694c)</p></li>
+<li><p>key = (0x1918, 0x1110, 0x0908, 0x0100)</p></li>
+<li><p>ciphertext = (0xa868, 0x42f2)</p></li>
+</ul>
+</div></blockquote>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">l2</span><span class="p">,</span> <span class="n">l1</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="mh">0x1918</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span> <span class="n">Constant</span><span class="p">(</span><span class="mh">0x1110</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">l0</span><span class="p">,</span> <span class="n">k0</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="mh">0x0908</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span> <span class="n">Constant</span><span class="p">(</span><span class="mh">0x0100</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">round_keys</span> <span class="o">=</span> <span class="n">key_schedule</span><span class="p">(</span><span class="n">l2</span><span class="p">,</span> <span class="n">l1</span><span class="p">,</span> <span class="n">l0</span><span class="p">,</span> <span class="n">k0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="mh">0x6574</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span> <span class="n">Constant</span><span class="p">(</span><span class="mh">0x694c</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ciphertext</span> <span class="o">=</span> <span class="n">encryption</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">round_keys</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ciphertext</span>
+<span class="go">(0xa868, 0x42f2)</span>
+</pre></div>
+</div>
+</section>
+<section id="wrapping-the-key-schedule-function">
+<h2>Wrapping the key-schedule function<a class="headerlink" href="#wrapping-the-key-schedule-function" title="Permalink to this headline"></a></h2>
+<p>To implement Speck32/64 as a primitive supported by CASCADA
+(i.e., as a <a class="reference internal" href="cascada.primitives.blockcipher.html#cascada.primitives.blockcipher.Cipher" title="cascada.primitives.blockcipher.Cipher"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Cipher</span></code></a> subclass), we need to wrap the key-schedule
+into a <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.RoundBasedFunction" title="cascada.bitvector.ssa.RoundBasedFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RoundBasedFunction</span></code></a> subclass.</p>
+<p>To do so, we need to set some attributes (<code class="docutils literal notranslate"><span class="pre">input_widths</span></code>,
+<code class="docutils literal notranslate"><span class="pre">output_widths</span></code>, <code class="docutils literal notranslate"><span class="pre">num_rounds</span></code>) and implement the methods
+<code class="docutils literal notranslate"><span class="pre">eval</span></code> and <code class="docutils literal notranslate"><span class="pre">set_num_rounds</span></code> (see <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.BvFunction" title="cascada.bitvector.ssa.BvFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvFunction</span></code></a> and <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.RoundBasedFunction" title="cascada.bitvector.ssa.RoundBasedFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RoundBasedFunction</span></code></a>)
+as follows</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cascada.bitvector.ssa</span> <span class="kn">import</span> <span class="n">RoundBasedFunction</span>
+<span class="kn">from</span> <span class="nn">cascada.bitvector.operation</span> <span class="kn">import</span> <span class="n">RotateRight</span><span class="p">,</span> <span class="n">RotateLeft</span>
+
+<span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">RotateRight</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span> <span class="o">+</span> <span class="n">y</span> <span class="o">^</span> <span class="n">k</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">RotateLeft</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">^</span> <span class="n">x</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span>
+
+<span class="k">class</span> <span class="nc">SpeckKeySchedule</span><span class="p">(</span><span class="n">RoundBasedFunction</span><span class="p">):</span>
+    <span class="n">input_widths</span> <span class="o">=</span> <span class="p">[</span><span class="mi">16</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">16</span><span class="p">]</span>
+    <span class="n">output_widths</span> <span class="o">=</span> <span class="p">[</span><span class="mi">16</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">22</span><span class="p">)]</span>
+    <span class="n">num_rounds</span> <span class="o">=</span> <span class="mi">22</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">l2</span><span class="p">,</span> <span class="n">l1</span><span class="p">,</span> <span class="n">l0</span><span class="p">,</span> <span class="n">k0</span><span class="p">):</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span> <span class="o">+</span> <span class="mi">3</span><span class="p">)]</span>
+        <span class="n">round_keys</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span><span class="p">)]</span>
+        <span class="n">round_keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">k0</span>
+        <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">l0</span><span class="p">,</span> <span class="n">l1</span><span class="p">,</span> <span class="n">l2</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">l</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">3</span><span class="p">],</span> <span class="n">round_keys</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">round_keys</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">Constant</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">16</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">round_keys</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">set_num_rounds</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">new_num_rounds</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span> <span class="o">=</span> <span class="n">new_num_rounds</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">output_widths</span> <span class="o">=</span> <span class="p">[</span><span class="mi">16</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">new_num_rounds</span><span class="p">)]</span>
+</pre></div>
+</div>
+<p>To implement the <code class="docutils literal notranslate"><span class="pre">eval</span></code> method, we took the previous Python function <code class="docutils literal notranslate"><span class="pre">key_schedule</span></code> working
+on bit-vectors, but using the class attribute <code class="docutils literal notranslate"><span class="pre">cls.num_rounds</span></code> so that
+we can change the current number of rounds with the method <code class="docutils literal notranslate"><span class="pre">set_num_rounds</span></code>.</p>
+<p>Similar as before, we can test <code class="docutils literal notranslate"><span class="pre">SpeckKeySchedule</span></code> by evaluating it with symbolic and constant bit-vectors.
+To avoid long outputs, we will reduce the number of rounds for the test:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span><span class="p">,</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SpeckKeySchedule</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">masterkey</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;l2&quot;</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;l1&quot;</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;l0&quot;</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;k0&quot;</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SpeckKeySchedule</span><span class="p">(</span><span class="o">*</span><span class="n">masterkey</span><span class="p">,</span> <span class="n">symbolic_inputs</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">(k0, (k0 &lt;&lt;&lt; 2) ^ ((l0 &gt;&gt;&gt; 7) + k0), (((k0 &lt;&lt;&lt; 2) ^ ((l0 &gt;&gt;&gt; 7) + k0)) &lt;&lt;&lt; 2) ^ ((l1 &gt;&gt;&gt; 7) + ((k0 &lt;&lt;&lt; 2) ^ ((l0 &gt;&gt;&gt; 7) + k0))) ^ 0x0001)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">masterkey</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span> <span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span> <span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span> <span class="n">Constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SpeckKeySchedule</span><span class="p">(</span><span class="o">*</span><span class="n">masterkey</span><span class="p">)</span>
+<span class="go">(0x0000, 0x0000, 0x0001)</span>
+</pre></div>
+</div>
+<p>By default evaluating <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.RoundBasedFunction" title="cascada.bitvector.ssa.RoundBasedFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RoundBasedFunction</span></code></a> with symbolic inputs is not allowed,
+but this can be enabled by passing the optional argument <code class="docutils literal notranslate"><span class="pre">symbolic_inputs=True</span></code>.</p>
+<p>Note that we can also use the method <code class="docutils literal notranslate"><span class="pre">add_round_outputs</span></code> within the <code class="docutils literal notranslate"><span class="pre">eval</span></code>
+to delimit the end of the rounds (as in <a class="reference internal" href="cascada.primitives.speck.html#module-cascada.primitives.speck" title="cascada.primitives.speck"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">speck</span></code></a>), but this is optional and
+we will not use it in this tutorial.</p>
+</section>
+<section id="wrapping-the-encryption-function">
+<h2>Wrapping the encryption function<a class="headerlink" href="#wrapping-the-encryption-function" title="Permalink to this headline"></a></h2>
+<p>To implement Speck32/64 as a <a class="reference internal" href="cascada.primitives.blockcipher.html#cascada.primitives.blockcipher.Cipher" title="cascada.primitives.blockcipher.Cipher"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Cipher</span></code></a> subclass, we also need to wrap the encryption
+function into a <a class="reference internal" href="cascada.primitives.blockcipher.html#cascada.primitives.blockcipher.Encryption" title="cascada.primitives.blockcipher.Encryption"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Encryption</span></code></a>/<a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.RoundBasedFunction" title="cascada.bitvector.ssa.RoundBasedFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RoundBasedFunction</span></code></a> subclass.</p>
+<p>To do so, we need to set some attributes (<code class="docutils literal notranslate"><span class="pre">input_widths</span></code>,
+<code class="docutils literal notranslate"><span class="pre">output_widths</span></code>, <code class="docutils literal notranslate"><span class="pre">num_rounds</span></code>) and implement the methods
+<code class="docutils literal notranslate"><span class="pre">eval</span></code> and <code class="docutils literal notranslate"><span class="pre">set_num_rounds</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cascada.bitvector.ssa</span> <span class="kn">import</span> <span class="n">RoundBasedFunction</span>
+<span class="kn">from</span> <span class="nn">cascada.bitvector.operation</span> <span class="kn">import</span> <span class="n">RotateRight</span><span class="p">,</span> <span class="n">RotateLeft</span>
+<span class="kn">from</span> <span class="nn">cascada.primitives.blockcipher</span> <span class="kn">import</span> <span class="n">Encryption</span>
+
+<span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">RotateRight</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span> <span class="o">+</span> <span class="n">y</span> <span class="o">^</span> <span class="n">k</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">RotateLeft</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">^</span> <span class="n">x</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span>
+
+<span class="k">class</span> <span class="nc">SpeckEncryption</span><span class="p">(</span><span class="n">Encryption</span><span class="p">,</span> <span class="n">RoundBasedFunction</span><span class="p">):</span>
+    <span class="n">input_widths</span> <span class="o">=</span> <span class="p">[</span><span class="mi">16</span><span class="p">,</span> <span class="mi">16</span><span class="p">]</span>
+    <span class="n">output_widths</span> <span class="o">=</span> <span class="p">[</span><span class="mi">16</span><span class="p">,</span> <span class="mi">16</span><span class="p">]</span>
+    <span class="n">num_rounds</span> <span class="o">=</span> <span class="mi">22</span>
+    <span class="n">round_keys</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span><span class="p">):</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">round_keys</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">set_num_rounds</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">new_num_rounds</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span> <span class="o">=</span> <span class="n">new_num_rounds</span>
+</pre></div>
+</div>
+<p>Similar as before, we took the previous Python function <code class="docutils literal notranslate"><span class="pre">encryption</span></code> working
+on bit-vectors, but using the class attribute <code class="docutils literal notranslate"><span class="pre">cls.num_rounds</span></code> so that
+we can change the current number of rounds with the method <code class="docutils literal notranslate"><span class="pre">set_num_rounds</span></code>.</p>
+<p>For the <code class="docutils literal notranslate"><span class="pre">eval</span></code> method of the encryption in particular, the round keys are obtained
+from the class attribute <code class="docutils literal notranslate"><span class="pre">cls.round_keys</span></code> (later after we link
+<code class="docutils literal notranslate"><span class="pre">SpeckKeySchedule</span></code> and <code class="docutils literal notranslate"><span class="pre">SpeckEncryption</span></code>, the class attribute <code class="docutils literal notranslate"><span class="pre">cls.round_keys</span></code>
+will be automatically set to the output of <code class="docutils literal notranslate"><span class="pre">SpeckKeySchedule</span></code>).</p>
+<p>We can test <code class="docutils literal notranslate"><span class="pre">SpeckEncryption</span></code> by evaluating it with symbolic and constant bit-vectors,
+but we need to set the round keys manually for testing it individually.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span><span class="p">,</span> <span class="n">Variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">num_rounds</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">round_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;k&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="mi">16</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_rounds</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SpeckEncryption</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="n">num_rounds</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SpeckEncryption</span><span class="o">.</span><span class="n">round_keys</span> <span class="o">=</span> <span class="n">round_keys</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plaintext</span> <span class="o">=</span> <span class="p">[</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span> <span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="mi">16</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SpeckEncryption</span><span class="p">(</span><span class="o">*</span><span class="n">plaintext</span><span class="p">,</span> <span class="n">symbolic_inputs</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">((((((x &gt;&gt;&gt; 7) + y) ^ k0) &gt;&gt;&gt; 7) + ((y &lt;&lt;&lt; 2) ^ ((x &gt;&gt;&gt; 7) + y) ^ k0)) ^ k1,</span>
+<span class="go">(((y &lt;&lt;&lt; 2) ^ ((x &gt;&gt;&gt; 7) + y) ^ k0) &lt;&lt;&lt; 2) ^ (((((x &gt;&gt;&gt; 7) + y) ^ k0) &gt;&gt;&gt; 7) + ((y &lt;&lt;&lt; 2) ^ ((x &gt;&gt;&gt; 7) + y) ^ k0)) ^ k1)</span>
+</pre></div>
+</div>
+<p>Alternatively, we can also check it by computing its <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.SSA" title="cascada.bitvector.ssa.SSA"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SSA</span></code></a>
+(a list of simple instructions representing the bit-vector function)</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">num_rounds</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">round_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;k&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="mi">16</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_rounds</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SpeckEncryption</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="n">num_rounds</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SpeckEncryption</span><span class="o">.</span><span class="n">round_keys</span> <span class="o">=</span> <span class="n">round_keys</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SpeckEncryption</span><span class="o">.</span><span class="n">to_ssa</span><span class="p">([</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">],</span> <span class="s2">&quot;z&quot;</span><span class="p">)</span>
+<span class="go">SSA(input_vars=[x, y], output_vars=[z7_out, z9_out], external_vars=[k0, k1],</span>
+<span class="go">    assignments=[</span>
+<span class="go">        (z0, x &gt;&gt;&gt; 7), (z1, z0 + y), (z2, z1 ^ k0), (z3, y &lt;&lt;&lt; 2), (z4, z3 ^ z2),</span>
+<span class="go">        (z5, z2 &gt;&gt;&gt; 7), (z6, z5 + z4), (z7, z6 ^ k1), (z8, z4 &lt;&lt;&lt; 2), (z9, z8 ^ z7),</span>
+<span class="go">        (z7_out, Id(z7)), (z9_out, Id(z9))])</span>
+</pre></div>
+</div>
+</section>
+<section id="wrapping-everything-as-a-cipher-subclass">
+<h2>Wrapping everything as a Cipher subclass<a class="headerlink" href="#wrapping-everything-as-a-cipher-subclass" title="Permalink to this headline"></a></h2>
+<p>Finally,  we can implement Speck32/64 as a <a class="reference internal" href="cascada.primitives.blockcipher.html#cascada.primitives.blockcipher.Cipher" title="cascada.primitives.blockcipher.Cipher"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Cipher</span></code></a> subclass
+using <code class="docutils literal notranslate"><span class="pre">SpeckKeySchedule</span></code>, <code class="docutils literal notranslate"><span class="pre">SpeckEncryption</span></code> and setting
+some attributes:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cascada.bitvector.ssa</span> <span class="kn">import</span> <span class="n">RoundBasedFunction</span>
+<span class="kn">from</span> <span class="nn">cascada.bitvector.operation</span> <span class="kn">import</span> <span class="n">RotateRight</span><span class="p">,</span> <span class="n">RotateLeft</span>
+<span class="kn">from</span> <span class="nn">cascada.primitives.blockcipher</span> <span class="kn">import</span> <span class="n">Encryption</span>
+
+<span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">RotateRight</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span> <span class="o">+</span> <span class="n">y</span> <span class="o">^</span> <span class="n">k</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">RotateLeft</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">^</span> <span class="n">x</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span>
+
+<span class="k">class</span> <span class="nc">SpeckKeySchedule</span><span class="p">(</span><span class="n">RoundBasedFunction</span><span class="p">):</span>
+    <span class="n">input_widths</span> <span class="o">=</span> <span class="p">[</span><span class="mi">16</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">16</span><span class="p">]</span>
+    <span class="n">output_widths</span> <span class="o">=</span> <span class="p">[</span><span class="mi">16</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">22</span><span class="p">)]</span>
+    <span class="n">num_rounds</span> <span class="o">=</span> <span class="mi">22</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">l2</span><span class="p">,</span> <span class="n">l1</span><span class="p">,</span> <span class="n">l0</span><span class="p">,</span> <span class="n">k0</span><span class="p">):</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span> <span class="o">+</span> <span class="mi">3</span><span class="p">)]</span>
+        <span class="n">round_keys</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span><span class="p">)]</span>
+        <span class="n">round_keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">k0</span>
+        <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">l0</span><span class="p">,</span> <span class="n">l1</span><span class="p">,</span> <span class="n">l2</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">l</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">3</span><span class="p">],</span> <span class="n">round_keys</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">round_keys</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">Constant</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">16</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">round_keys</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">set_num_rounds</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">new_num_rounds</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span> <span class="o">=</span> <span class="n">new_num_rounds</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">output_widths</span> <span class="o">=</span> <span class="p">[</span><span class="mi">16</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">new_num_rounds</span><span class="p">)]</span>
+
+<span class="k">class</span> <span class="nc">SpeckEncryption</span><span class="p">(</span><span class="n">Encryption</span><span class="p">,</span> <span class="n">RoundBasedFunction</span><span class="p">):</span>
+    <span class="n">input_widths</span> <span class="o">=</span> <span class="p">[</span><span class="mi">16</span><span class="p">,</span> <span class="mi">16</span><span class="p">]</span>
+    <span class="n">output_widths</span> <span class="o">=</span> <span class="p">[</span><span class="mi">16</span><span class="p">,</span> <span class="mi">16</span><span class="p">]</span>
+    <span class="n">num_rounds</span> <span class="o">=</span> <span class="mi">22</span>
+    <span class="n">round_keys</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span><span class="p">):</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">round_keys</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">set_num_rounds</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">new_num_rounds</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">num_rounds</span> <span class="o">=</span> <span class="n">new_num_rounds</span>
+
+<span class="k">class</span> <span class="nc">SpeckCipher</span><span class="p">(</span><span class="n">Cipher</span><span class="p">):</span>
+    <span class="n">key_schedule</span> <span class="o">=</span> <span class="n">SpeckKeySchedule</span>
+    <span class="n">encryption</span> <span class="o">=</span> <span class="n">SpeckEncryption</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">set_num_rounds</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">new_num_rounds</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">key_schedule</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="n">new_num_rounds</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">encryption</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="n">new_num_rounds</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The subclass <code class="docutils literal notranslate"><span class="pre">SpeckCipher</span></code> is now a primitive that can be used in the automated methods
+implemented by CASCADA (see <a class="reference internal" href="usage.html"><span class="doc">Usage</span></a>).</p>
+<p>Since the <a class="reference internal" href="cascada.differential.html#module-cascada.differential" title="cascada.differential"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">differential</span></code></a>, <a class="reference internal" href="cascada.linear.html#module-cascada.linear" title="cascada.linear"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">linear</span></code></a> and <a class="reference internal" href="cascada.algebraic.html#module-cascada.algebraic" title="cascada.algebraic"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">algebraic</span></code></a> models are implemented
+for <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.BvAdd" title="cascada.bitvector.operation.BvAdd"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvAdd</span></code></a>, <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.BvXor" title="cascada.bitvector.operation.BvXor"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvXor</span></code></a>, <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.RotateLeft" title="cascada.bitvector.operation.RotateLeft"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RotateLeft</span></code></a> and <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.RotateRight" title="cascada.bitvector.operation.RotateRight"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RotateRight</span></code></a> (the operations of Speck),
+<code class="docutils literal notranslate"><span class="pre">SpeckCipher</span></code> can be used directly in the automated methods of CASCADA
+(e.g., <a class="reference internal" href="cascada.smt.chsearch.html#cascada.smt.chsearch.round_based_ch_search" title="cascada.smt.chsearch.round_based_ch_search"><code class="xref any py py-func docutils literal notranslate"><span class="pre">round_based_ch_search</span></code></a>).</p>
+<p>However, if we implement a primitive containing an operation whose property model
+is not implemented, then we need to implement it in order to search for characteristics
+over this primitive. For example, if the primitive contains S-boxes (<a class="reference internal" href="cascada.bitvector.secondaryop.html#cascada.bitvector.secondaryop.LutOperation" title="cascada.bitvector.secondaryop.LutOperation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">LutOperation</span></code></a>)
+or binary matrix-vector operations (<a class="reference internal" href="cascada.bitvector.secondaryop.html#cascada.bitvector.secondaryop.MatrixOperation" title="cascada.bitvector.secondaryop.MatrixOperation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">MatrixOperation</span></code></a>), no default property models
+are assigned for these operations, but the generic models <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.WeakModel" title="cascada.abstractproperty.opmodel.WeakModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">WeakModel</span></code></a>,
+<a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.BranchNumberModel" title="cascada.abstractproperty.opmodel.BranchNumberModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BranchNumberModel</span></code></a> and <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.WDTModel" title="cascada.abstractproperty.opmodel.WDTModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">WDTModel</span></code></a> can be used (as in <a class="reference internal" href="cascada.primitives.aes.html#module-cascada.primitives.aes" title="cascada.primitives.aes"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">aes</span></code></a> or <a class="reference internal" href="cascada.primitives.skinny64.html#module-cascada.primitives.skinny64" title="cascada.primitives.skinny64"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">skinny64</span></code></a>).</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="usage.html" class="btn btn-neutral float-left" title="Usage" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="primitives_implemented.html" class="btn btn-neutral float-right" title="Primitives implemented" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Adrián Ranea.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

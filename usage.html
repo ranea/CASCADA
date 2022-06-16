@@ -18,7 +18,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Primitives implemented" href="primitives_implemented.html" />
+    <link rel="next" title="Adding a primitive" href="adding_primitive.html" />
     <link rel="prev" title="CASCADA" href="index.html" /> 
 </head>
 
@@ -47,6 +47,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#searching-for-zero-probability-properties">Searching for zero-probability properties</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="adding_primitive.html">Adding a primitive</a></li>
 <li class="toctree-l1"><a class="reference internal" href="primitives_implemented.html">Primitives implemented</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cascada.html">API reference</a></li>
 </ul>
@@ -83,13 +84,8 @@ over a primitive, the primitive needs to be implemented following the CASCADA in
 There are several primitives already implemented,
 such as AES, CHAM, Chaskey, FEAL, HIGHT, LEA, MULTI2, π-cipher, SHACAL-1, SHACAL-2,
 Simeck, Simon, Speck, SKINNY, TEA, or XTEA (see <a class="reference internal" href="primitives_implemented.html"><span class="doc">Primitives implemented</span></a>).</p>
-<p>To implement a new primitive, the easiest way is to take a similar primitive
-already implemented and adapt it to the new primitive
-(see also <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.BvFunction" title="cascada.bitvector.ssa.BvFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvFunction</span></code></a> and <a class="reference internal" href="cascada.primitives.blockcipher.html#module-cascada.primitives.blockcipher" title="cascada.primitives.blockcipher"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">blockcipher</span></code></a>).
-If the new primitive contains a bit-vector operation
-with no associated property model (see <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.OpModel" title="cascada.abstractproperty.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.opmodel.OpModel</span></code></a>),
-you need to implement the property model (as in <a class="reference internal" href="cascada.primitives.simon.html#module-cascada.primitives.simon" title="cascada.primitives.simon"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">simon</span></code></a> and <a class="reference internal" href="cascada.primitives.simon_rf.html#module-cascada.primitives.simon_rf" title="cascada.primitives.simon_rf"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">simon_rf</span></code></a>)
-or use a <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.WeakModel" title="cascada.abstractproperty.opmodel.WeakModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">WeakModel</span></code></a>, <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.BranchNumberModel" title="cascada.abstractproperty.opmodel.BranchNumberModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BranchNumberModel</span></code></a> or <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.WDTModel" title="cascada.abstractproperty.opmodel.WDTModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">WDTModel</span></code></a> (as in <a class="reference internal" href="cascada.primitives.aes.html#module-cascada.primitives.aes" title="cascada.primitives.aes"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">aes</span></code></a>).</p>
+<p>You can find a step-by-step tutorial about implement a new primitive
+in <a class="reference internal" href="adding_primitive.html"><span class="doc">Adding a primitive</span></a>.</p>
 <section id="searching-for-characteristics">
 <h2>Searching for characteristics<a class="headerlink" href="#searching-for-characteristics" title="Permalink to this headline"></a></h2>
 <p>Searching for characteristics can be easily done with <a class="reference internal" href="cascada.smt.chsearch.html#cascada.smt.chsearch.round_based_ch_search" title="cascada.smt.chsearch.round_based_ch_search"><code class="xref any py py-func docutils literal notranslate"><span class="pre">round_based_ch_search</span></code></a>
@@ -171,7 +167,7 @@ using quantified SMT problems over 3-round <a class="reference internal" href="c
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="index.html" class="btn btn-neutral float-left" title="CASCADA" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="primitives_implemented.html" class="btn btn-neutral float-right" title="Primitives implemented" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="adding_primitive.html" class="btn btn-neutral float-right" title="Adding a primitive" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

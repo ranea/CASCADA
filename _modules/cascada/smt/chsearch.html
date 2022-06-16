@@ -40,6 +40,7 @@
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../index.html">CASCADA</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../adding_primitive.html">Adding a primitive</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../primitives_implemented.html">Primitives implemented</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../cascada.html">API reference</a></li>
 </ul>
@@ -91,6 +92,12 @@
 <span class="kn">from</span> <span class="nn">cascada.smt</span> <span class="kn">import</span> <span class="n">pysmttypes</span>
 
 
+<span class="nb">zip</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="nb">zip</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">CurrentSignatureType</span> <span class="o">=</span> <span class="n">abstractproperty</span><span class="o">.</span><span class="n">chmodel</span><span class="o">.</span><span class="n">ChModelSigType</span><span class="o">.</span><span class="n">Unique</span>
+<span class="n">INCREMENT_NUM_ROUNDS</span> <span class="o">=</span> <span class="s2">&quot;increment_num_rounds&quot;</span>
+<span class="sd">&quot;&quot;&quot;Message to increase the current number of rounds by one (see `round_based_ch_search`)&quot;&quot;&quot;</span>
+
+
 <span class="k">def</span> <span class="nf">_get_time</span><span class="p">():</span>
     <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
     <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">-</span><span class="si">{}</span><span class="s2">:</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">now</span><span class="o">.</span><span class="n">day</span><span class="p">,</span> <span class="n">now</span><span class="o">.</span><span class="n">hour</span><span class="p">,</span> <span class="n">now</span><span class="o">.</span><span class="n">minute</span><span class="p">)</span>
@@ -112,10 +119,9 @@
     <span class="k">return</span> <span class="n">smart_print</span>
 
 
-<span class="nb">zip</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="nb">zip</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">CurrentSignatureType</span> <span class="o">=</span> <span class="n">abstractproperty</span><span class="o">.</span><span class="n">chmodel</span><span class="o">.</span><span class="n">ChModelSigType</span><span class="o">.</span><span class="n">Unique</span>
-<span class="n">INCREMENT_NUM_ROUNDS</span> <span class="o">=</span> <span class="s2">&quot;increment_num_rounds&quot;</span>
-<span class="sd">&quot;&quot;&quot;Message to increase the current number of rounds by one (see `round_based_ch_search`)&quot;&quot;&quot;</span>
+<span class="k">def</span> <span class="nf">_merge_weights</span><span class="p">(</span><span class="n">w0</span><span class="p">,</span> <span class="n">w1</span><span class="p">):</span>
+    <span class="n">sum_pr</span> <span class="o">=</span> <span class="p">(</span><span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="n">w0</span><span class="p">))</span> <span class="o">+</span> <span class="p">(</span><span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="n">w1</span><span class="p">))</span>
+    <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="o">-</span> <span class="n">abstractproperty</span><span class="o">.</span><span class="n">opmodel</span><span class="o">.</span><span class="n">log2_decimal</span><span class="p">(</span><span class="n">sum_pr</span><span class="p">),</span> <span class="n">w0</span><span class="p">,</span> <span class="n">w1</span><span class="p">)</span>  <span class="c1"># avoid rounding errors</span>
 
 
 <div class="viewcode-block" id="ChModelAssertType"><a class="viewcode-back" href="../../../cascada.smt.chsearch.html#cascada.smt.chsearch.ChModelAssertType">[docs]</a><span class="k">class</span> <span class="nc">ChModelAssertType</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
@@ -176,7 +182,7 @@
 <span class="sd">    satisfying the characteristic model by modelling the search as a sequence</span>
 <span class="sd">    of SMT problems in the bit-vector theory.</span>
 
-<span class="sd">    Depending on ``assert_type``, the SMT problems contains the validity,</span>
+<span class="sd">    Depending on ``assert_type``, the SMT problems contain the validity,</span>
 <span class="sd">    probability-one and/or weight assertions from the</span>
 <span class="sd">    `abstractproperty.chmodel.ChModel`.</span>
 <span class="sd">    They might also contain a constraint fixing the</span>
@@ -242,9 +248,10 @@
 <span class="sd">    .. _Boolector: https://boolector.github.io</span>
 <span class="sd">    .. _documentation: https://github.com/pysmt/pysmt</span>
 
-<span class="sd">    This class provides two methods to search for characteristics:</span>
-<span class="sd">    `find_next_ch` and `find_next_ch_increasing_weight`.</span>
-<span class="sd">    Both methods are Python `generator` functions, returning an `iterator` that</span>
+<span class="sd">    This class provides three methods to search for characteristics:</span>
+<span class="sd">    `find_next_ch`, `find_next_ch_increasing_weight`</span>
+<span class="sd">    and `find_next_ch_increasing_weight_fixed_in_out`.</span>
+<span class="sd">    These methods are Python `generator` functions, returning an `iterator` that</span>
 <span class="sd">    yields the `abstractproperty.characteristic.Characteristic` objects</span>
 <span class="sd">    found in the search (see also this_).</span>
 <span class="sd">    The characteristics returned are defined for</span>
@@ -471,6 +478,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_awvs</span> <span class="o">=</span> <span class="n">awvs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_error</span> <span class="o">=</span> <span class="n">error</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_vars_in_constraints</span> <span class="o">=</span> <span class="n">vars_in_constraints</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_raise_exception_missing_var</span> <span class="o">=</span> <span class="n">raise_exception_missing_var</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">env</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -850,7 +858,7 @@
 
 <span class="sd">        The SMT problems are provided to the SMT solver,</span>
 <span class="sd">        which checks their satisfiability in increasing weight order.</span>
-<span class="sd">        When the SMT solver finds the first problem satisfisable,</span>
+<span class="sd">        When the SMT solver finds the first satisfiable problem,</span>
 <span class="sd">        an assignment of the variables that makes the problem satisfiable is</span>
 <span class="sd">        obtained, and a `abstractproperty.characteristic.Characteristic`</span>
 <span class="sd">        object is created and *yielded*.</span>
@@ -1085,6 +1093,130 @@
 
         <span class="n">solver</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span></div>
 
+<div class="viewcode-block" id="ChFinder.find_next_ch_increasing_weight_fixed_in_out"><a class="viewcode-back" href="../../../cascada.smt.chsearch.html#cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight_fixed_in_out">[docs]</a>    <span class="k">def</span> <span class="nf">find_next_ch_increasing_weight_fixed_in_out</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">input_prop</span><span class="p">,</span> <span class="n">output_prop</span><span class="p">,</span> <span class="n">initial_weight</span><span class="p">,</span>
+            <span class="n">final_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">empirical_weight_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">use_empirical_weight</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return an iterator that yields the characteristics found in the SMT-based search</span>
+<span class="sd">        with increasing weight order and with fixed input and output properties.</span>
+
+<span class="sd">        This method is similar as `find_next_ch_increasing_weight` with three differences:</span>
+
+<span class="sd">         - This method only finds characteristics with input and output properties</span>
+<span class="sd">           (`Characteristic.input_prop` and `Characteristic.output_prop`) equal</span>
+<span class="sd">           to the input and output properties given by ``input_prop`` and ``output_prop``</span>
+<span class="sd">           (lists containing `Constant` objects or constant `Property` objects).</span>
+<span class="sd">         - When the SMT solver finds a satisfiable problem, a tuple of</span>
+<span class="sd">           two elements is yielded: the first element is the cumulative weight</span>
+<span class="sd">           and the second element is the characteristic found</span>
+<span class="sd">           (as a `abstractproperty.characteristic.Characteristic` object).</span>
+<span class="sd">           The cumulative weight is the weight (-log2) of the sum of the</span>
+<span class="sd">           probabilities of all characteristics found in the search</span>
+<span class="sd">           (including the characteristic just found).</span>
+<span class="sd">         - After all these characteristics have been yielded,</span>
+<span class="sd">           the optimal characteristic is NOT yielded again.</span>
+
+<span class="sd">        By default, the cumulative weight is computed by taking the decimal weights</span>
+<span class="sd">        (see `Characteristic.ch_weight`) of the found characteristic, transforming the</span>
+<span class="sd">        decimal weights into probabitlies, then summing these probabilities</span>
+<span class="sd">        and finally transforming the probability sum into a weight.</span>
+<span class="sd">        However, if the argument ``empirical_weight_options`` is given</span>
+<span class="sd">        (see `find_next_ch_increasing_weight`) and the argument ``use_empirical_weight``</span>
+<span class="sd">        is ``True``, then the empirical weights are used instead of the decimal weights.</span>
+
+<span class="sd">        .. note::</span>
+
+<span class="sd">            For the `Difference`/`LinearMask` property types,</span>
+<span class="sd">            the cumulative weight estimates the weight of the probability</span>
+<span class="sd">            of the differential/hull with the given input and output</span>
+<span class="sd">            differences/masks.</span>
+
+<span class="sd">        ::</span>
+
+<span class="sd">            &gt;&gt;&gt; # example of search for XorDiff-EncryptionCharacteristic of Speck32 with fixed input/output difference</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.bitvector.core import Constant</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.difference import XorDiff</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.chmodel import EncryptionChModel</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.smt.chsearch import ChFinder, ChModelAssertType</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">            &gt;&gt;&gt; Speck32 = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64)</span>
+<span class="sd">            &gt;&gt;&gt; Speck32.set_num_rounds(4)</span>
+<span class="sd">            &gt;&gt;&gt; ch_model = EncryptionChModel(Speck32, XorDiff)</span>
+<span class="sd">            &gt;&gt;&gt; assert_type = ChModelAssertType.ValidityAndWeight</span>
+<span class="sd">            &gt;&gt;&gt; ch_finder = ChFinder(ch_model, assert_type, &quot;btor&quot;, solver_seed=0)</span>
+<span class="sd">            &gt;&gt;&gt; best_ch = next(ch_finder.find_next_ch_increasing_weight(1))</span>
+<span class="sd">            &gt;&gt;&gt; best_ch  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">            EncryptionCharacteristic(ch_weight=5, assignment_weights=[2, 0, 1, 2, 0, 0],</span>
+<span class="sd">                input_diff=[0x2800, 0x0010], output_diff=[0x8000, 0x840a], external_diffs=[0x0000, 0x0000, 0x0000, 0x0000],</span>
+<span class="sd">                assign_outdiff_list=[0x0040, 0x8000, 0x8100, 0x8000, 0x8000, 0x840a])</span>
+<span class="sd">            &gt;&gt;&gt; iterator = ch_finder.find_next_ch_increasing_weight_fixed_in_out</span>
+<span class="sd">            &gt;&gt;&gt; # using the input and output differences of the best 5-round characteristic</span>
+<span class="sd">            &gt;&gt;&gt; for w, ch in iterator(best_ch.input_prop, best_ch.output_prop, 0): print(w, &quot;|&quot;, ch)  # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS</span>
+<span class="sd">            5 | EncryptionCharacteristic(ch_weight=5, assignment_weights=[2, 0, 1, 2, 0, 0],</span>
+<span class="sd">                input_diff=[0x2800, 0x0010], output_diff=[0x8000, 0x840a], external_diffs=[0x0000, 0x0000, 0x0000, 0x0000],</span>
+<span class="sd">                assign_outdiff_list=[0x0040, 0x8000, 0x8100, 0x8000, 0x8000, 0x840a])</span>
+<span class="sd">            4.999999999916024096260838242 | EncryptionCharacteristic(ch_weight=39, assignment_weights=[6, 13, 11, 9, 0, 0],</span>
+<span class="sd">                input_diff=[0x2800, 0x0010], output_diff=[0x8000, 0x840a], external_diffs=[0x0000, 0x0000, 0x0000, 0x0000],</span>
+<span class="sd">                assign_outdiff_list=[0x03a0, 0x4f1f, 0x837f, 0x8000, 0x8000, 0x840a])</span>
+<span class="sd">            ...</span>
+<span class="sd">            4.999999999894210043141894841 | EncryptionCharacteristic(ch_weight=49, assignment_weights=[10, 15, 10, 14, 0, 0],</span>
+<span class="sd">                input_diff=[0x2800, 0x0010], output_diff=[0x8000, 0x840a], external_diffs=[0x0000, 0x0000, 0x0000, 0x0000],</span>
+<span class="sd">                assign_outdiff_list=[0x3fa0, 0xa00f, 0xff3f, 0x8000, 0x8000, 0x840a])</span>
+<span class="sd">            &gt;&gt;&gt; print(w)  # weight of differential</span>
+<span class="sd">            4.999999999894210043141894841</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">use_empirical_weight</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">empirical_weight_options</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
+        <span class="n">old_var_prop2ct_prop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_var_prop2ct_prop</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">old_initial_constraints</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">initial_constraints</span><span class="p">[:]</span>
+
+        <span class="c1"># no need to use _get_ch_weight or _get_empirical_ch_weight</span>
+
+        <span class="k">for</span> <span class="n">var_prop</span><span class="p">,</span> <span class="n">ct_prop</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="p">(</span>
+                <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">input_prop</span><span class="p">,</span> <span class="n">input_prop</span><span class="p">),</span>
+                <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">output_prop</span><span class="p">,</span> <span class="n">output_prop</span><span class="p">),</span>
+        <span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ct_prop</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">prop_type</span><span class="p">):</span>
+                <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ct_prop</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">)</span>
+                <span class="n">ct_prop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">prop_type</span><span class="p">(</span><span class="n">ct_prop</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_var_prop2ct_prop</span><span class="p">[</span><span class="n">var_prop</span><span class="p">]</span> <span class="o">=</span> <span class="n">ct_prop</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">initial_constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">operation</span><span class="o">.</span><span class="n">BvComp</span><span class="p">(</span><span class="n">var_prop</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="n">ct_prop</span><span class="o">.</span><span class="n">val</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_initial_constraints</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ch_model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">initial_constraints</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">chmodel_asserts</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_exclude_zero_input_prop</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_var_prop2ct_prop</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_vars_in_constraints</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raise_exception_missing_var</span>
+        <span class="p">)</span>
+
+        <span class="n">cumulative_w</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">for</span> <span class="n">yielded_weight</span><span class="p">,</span> <span class="n">ch_found</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_next_ch_increasing_weight</span><span class="p">(</span>
+            <span class="n">initial_weight</span><span class="p">,</span> <span class="n">final_weight</span><span class="o">=</span><span class="n">final_weight</span><span class="p">,</span>
+            <span class="n">empirical_weight_options</span><span class="o">=</span><span class="n">empirical_weight_options</span><span class="p">,</span>
+            <span class="n">stop_after_optimal</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">yield_weight</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">):</span>
+            <span class="k">if</span> <span class="n">yielded_weight</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># second time optimal ch is yielded</span>
+                <span class="k">assert</span> <span class="n">cumulative_w</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                <span class="k">continue</span>
+
+            <span class="k">if</span> <span class="n">use_empirical_weight</span><span class="p">:</span>
+                <span class="n">next_weight</span> <span class="o">=</span> <span class="n">ch_found</span><span class="o">.</span><span class="n">empirical_ch_weight</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">next_weight</span> <span class="o">=</span> <span class="n">ch_found</span><span class="o">.</span><span class="n">ch_weight</span>
+
+            <span class="k">if</span> <span class="n">cumulative_w</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">cumulative_w</span> <span class="o">=</span> <span class="n">next_weight</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">cumulative_w</span> <span class="o">=</span> <span class="n">_merge_weights</span><span class="p">(</span><span class="n">next_weight</span><span class="p">,</span> <span class="n">cumulative_w</span><span class="p">)</span>
+
+            <span class="k">yield</span> <span class="n">cumulative_w</span><span class="p">,</span> <span class="n">ch_found</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_var_prop2ct_prop</span> <span class="o">=</span> <span class="n">old_var_prop2ct_prop</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initial_constraints</span> <span class="o">=</span> <span class="n">old_initial_constraints</span></div>
+
 <div class="viewcode-block" id="ChFinder.formula_size"><a class="viewcode-back" href="../../../cascada.smt.chsearch.html#cascada.smt.chsearch.ChFinder.formula_size">[docs]</a>    <span class="k">def</span> <span class="nf">formula_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">measure</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return the size of the underlying SMT problem.</span>
 
@@ -1109,7 +1241,9 @@
 <span class="sd">        and the additional constraints from `initial_constraints`,</span>
 <span class="sd">        but excluding constraints created during the search such as</span>
 <span class="sd">        the constraints fixing the characteristic weight variable to a</span>
-<span class="sd">        constant value in `find_next_ch_increasing_weight`.</span>
+<span class="sd">        constant value in `find_next_ch_increasing_weight` or</span>
+<span class="sd">        the constraints fixing the input and output properties</span>
+<span class="sd">        in `find_next_ch_increasing_weight_fixed_in_out`.</span>
 
 <span class="sd">        If ``full_repr`` is False, the short string representation srepr is used.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1637,6 +1771,7 @@
 
 <span class="sd">        See also `ChFinder.find_next_ch_increasing_weight`.</span>
 
+<span class="sd">            &gt;&gt;&gt; # example of search for RXDiff-CipherCharacteristic of Speck32</span>
 <span class="sd">            &gt;&gt;&gt; from cascada.differential.difference import RXDiff</span>
 <span class="sd">            &gt;&gt;&gt; from cascada.differential.chmodel import CipherChModel</span>
 <span class="sd">            &gt;&gt;&gt; from cascada.smt.chsearch import CipherChFinder, ChModelAssertType</span>
@@ -1660,7 +1795,161 @@
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">find_next_ch_increasing_weight</span>\
             <span class="p">(</span><span class="n">initial_weight</span><span class="p">,</span> <span class="n">final_weight</span><span class="o">=</span><span class="n">final_weight</span><span class="p">,</span>
              <span class="n">empirical_weight_options</span><span class="o">=</span><span class="n">empirical_weight_options</span><span class="p">,</span>
-             <span class="n">stop_after_optimal</span><span class="o">=</span><span class="n">stop_after_optimal</span><span class="p">,</span> <span class="n">yield_weight</span><span class="o">=</span><span class="n">yield_weight</span><span class="p">)</span></div></div>
+             <span class="n">stop_after_optimal</span><span class="o">=</span><span class="n">stop_after_optimal</span><span class="p">,</span> <span class="n">yield_weight</span><span class="o">=</span><span class="n">yield_weight</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CipherChFinder.find_next_ch_increasing_weight_fixed_in_out"><a class="viewcode-back" href="../../../cascada.smt.chsearch.html#cascada.smt.chsearch.CipherChFinder.find_next_ch_increasing_weight_fixed_in_out">[docs]</a>    <span class="k">def</span> <span class="nf">find_next_ch_increasing_weight_fixed_in_out</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">ks_input_prop</span><span class="p">,</span> <span class="n">enc_input_prop</span><span class="p">,</span> <span class="n">enc_output_prop</span><span class="p">,</span> <span class="n">initial_weight</span><span class="p">,</span> <span class="n">final_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">ks_empirical_weight_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">enc_empirical_weight_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">use_empirical_weight</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return an iterator that yields the characteristics found in the SMT-based search</span>
+<span class="sd">        with increasing weight order and with fixed input and output properties.</span>
+
+<span class="sd">        .. note::</span>
+<span class="sd">          This method requires that both``ks_assert_type`` and ``enc_assert_type``</span>
+<span class="sd">          are `ValidityAndWeight`.</span>
+
+<span class="sd">        This method is similar to `ChFinder.find_next_ch_increasing_weight_fixed_in_out`,</span>
+<span class="sd">        but internally `CipherChFinder.find_next_ch_increasing_weight` is used</span>
+<span class="sd">        instead of `ChFinder.find_next_ch_increasing_weight`.</span>
+
+<span class="sd">        In particular, this method finds cipher characteristics with the key-schedule</span>
+<span class="sd">        input property, the encryption input property and the encryption output property</span>
+<span class="sd">        equal to the properties given by ``ks_input_prop``, ``enc_input_prop`` and</span>
+<span class="sd">        ``enc_output_prop`` (lists containing `Constant` objects or constant `Property` objects).</span>
+
+<span class="sd">        Note that the cumulative weight is the weight (-log2) of the sum of the</span>
+<span class="sd">        probabilities of all cipher characteristics found in the search</span>
+<span class="sd">        (including the characteristic just found),</span>
+<span class="sd">        where the probability of a cipher characteristic here considered is the</span>
+<span class="sd">        product of the probabilities of the key-schedule and encryption</span>
+<span class="sd">        characteristics.</span>
+<span class="sd">        In other words, the cumulative weight is computed as in</span>
+<span class="sd">        `ChFinder.find_next_ch_increasing_weight_fixed_in_out`, but</span>
+<span class="sd">        the decimal weight of a cipher characteristic is taken</span>
+<span class="sd">        as the sum of the decimal weights of the key-schedule</span>
+<span class="sd">        and the encryption characteristics.</span>
+
+<span class="sd">        .. note::</span>
+
+<span class="sd">            For the `Difference` property types, the cumulative weight estimates</span>
+<span class="sd">            the weight of the probability of the related-key differential</span>
+<span class="sd">            with given masterkey difference, plaintext difference and</span>
+<span class="sd">            ciphertext difference.</span>
+
+<span class="sd">        ::</span>
+
+<span class="sd">            &gt;&gt;&gt; # example of search for RXDiff-CipherCharacteristic of Speck32 with fixed input/output difference</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.difference import RXDiff</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.differential.chmodel import CipherChModel</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.smt.chsearch import CipherChFinder, ChModelAssertType</span>
+<span class="sd">            &gt;&gt;&gt; from cascada.primitives import speck</span>
+<span class="sd">            &gt;&gt;&gt; Speck32 = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64)</span>
+<span class="sd">            &gt;&gt;&gt; Speck32.set_num_rounds(2)</span>
+<span class="sd">            &gt;&gt;&gt; ch_model = CipherChModel(Speck32, RXDiff)</span>
+<span class="sd">            &gt;&gt;&gt; assert_type = ChModelAssertType.ValidityAndWeight</span>
+<span class="sd">            &gt;&gt;&gt; ch_finder = CipherChFinder(ch_model, assert_type, assert_type, &quot;btor&quot;, solver_seed=0)</span>
+<span class="sd">            &gt;&gt;&gt; best_ch = next(ch_finder.find_next_ch_increasing_weight(1))</span>
+<span class="sd">            &gt;&gt;&gt; best_ch.ks_characteristic.ch_weight + best_ch.enc_characteristic.ch_weight</span>
+<span class="sd">            Decimal(&#39;4.244980417176049505485850841&#39;)</span>
+<span class="sd">            &gt;&gt;&gt; best_ch  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">            CipherCharacteristic(ks_characteristic=Characteristic(ch_weight=1.414993472392016501828616947,</span>
+<span class="sd">                assignment_weights=[1.414993472392016501828616947, 0, 0],</span>
+<span class="sd">                input_diff=[0x0000, 0x0000], output_diff=[0x0000, 0x0000],</span>
+<span class="sd">                assign_outdiff_list=[0x0000, 0x0000, 0x0000]),</span>
+<span class="sd">            enc_characteristic=Characteristic(ch_weight=2.829986944784033003657233894,</span>
+<span class="sd">                assignment_weights=[1.414993472392016501828616947, 1.414993472392016501828616947, 0, 0],</span>
+<span class="sd">                input_diff=[0x0000, 0x0000], output_diff=[0x0000, 0x0000], external_diffs=[0x0000, 0x0000],</span>
+<span class="sd">                assign_outdiff_list=[0x0000, 0x0000, 0x0000, 0x0000]))</span>
+<span class="sd">            &gt;&gt;&gt; iterator = ch_finder.find_next_ch_increasing_weight_fixed_in_out</span>
+<span class="sd">            &gt;&gt;&gt; # using the input and output differences of the best 2-round characteristic</span>
+<span class="sd">            &gt;&gt;&gt; ks_ip = best_ch.ks_characteristic.input_prop</span>
+<span class="sd">            &gt;&gt;&gt; enc_ip, enc_op = best_ch.enc_characteristic.input_prop, best_ch.enc_characteristic.output_prop</span>
+<span class="sd">            &gt;&gt;&gt; for w, ch in iterator(ks_ip, enc_ip, enc_op, 1): print(w, &quot;|&quot;, ch)  # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS</span>
+<span class="sd">            4.244980417176049505485850841 | CipherCharacteristic(ks_characteristic=Characteristic(ch_weight=1.414993472392016501828616947,</span>
+<span class="sd">                    assignment_weights=[1.414993472392016501828616947, 0, 0],</span>
+<span class="sd">                    input_diff=[0x0000, 0x0000], output_diff=[0x0000, 0x0000],</span>
+<span class="sd">                    assign_outdiff_list=[0x0000, 0x0000, 0x0000]),</span>
+<span class="sd">                enc_characteristic=Characteristic(ch_weight=2.829986944784033003657233894,</span>
+<span class="sd">                    assignment_weights=[1.414993472392016501828616947, 1.414993472392016501828616947, 0, 0],</span>
+<span class="sd">                    input_diff=[0x0000, 0x0000], output_diff=[0x0000, 0x0000], external_diffs=[0x0000, 0x0000],</span>
+<span class="sd">                    assign_outdiff_list=[0x0000, 0x0000, 0x0000, 0x0000]))</span>
+<span class="sd">            3.244980417176049505485850840 | CipherCharacteristic(ks_characteristic=Characteristic(ch_weight=1.414993472392016501828616947,</span>
+<span class="sd">                    assignment_weights=[1.414993472392016501828616947, 0, 0],</span>
+<span class="sd">                    input_diff=[0x0000, 0x0000], output_diff=[0x0000, 0x0001],</span>
+<span class="sd">                    assign_outdiff_list=[0x0001, 0x0000, 0x0001]),</span>
+<span class="sd">                enc_characteristic=Characteristic(ch_weight=2.829986944784033003657233894,</span>
+<span class="sd">                    assignment_weights=[1.414993472392016501828616947, 1.414993472392016501828616947, 0, 0],</span>
+<span class="sd">                    input_diff=[0x0000, 0x0000], output_diff=[0x0000, 0x0000], external_diffs=[0x0000, 0x0001],</span>
+<span class="sd">                    assign_outdiff_list=[0x0000, 0x0001, 0x0000, 0x0000]))</span>
+<span class="sd">            ...</span>
+<span class="sd">            3.192516141583136911276041810 | CipherCharacteristic(ks_characteristic=Characteristic(ch_weight=17,</span>
+<span class="sd">                    assignment_weights=[17, 0, 0],</span>
+<span class="sd">                    input_diff=[0x0000, 0x0000], output_diff=[0x0000, 0x7fff],</span>
+<span class="sd">                    assign_outdiff_list=[0x7fff, 0x0000, 0x7fff]),</span>
+<span class="sd">                enc_characteristic=Characteristic(ch_weight=18.41499347239201650182861695,</span>
+<span class="sd">                    assignment_weights=[1.414993472392016501828616947, 17, 0, 0],</span>
+<span class="sd">                    input_diff=[0x0000, 0x0000], output_diff=[0x0000, 0x0000], external_diffs=[0x0000, 0x7fff],</span>
+<span class="sd">                    assign_outdiff_list=[0x0000, 0x7fff, 0x0000, 0x0000]))</span>
+<span class="sd">            &gt;&gt;&gt; print(w)  # weight (sum of the key and encryption weights) of the related-key differential</span>
+<span class="sd">            3.192516141583136911276041810</span>
+
+<span class="sd">        See also `ChFinder.find_next_ch_increasing_weight_fixed_in_out`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">ks_finder</span><span class="o">.</span><span class="n">assert_type</span> <span class="o">==</span> <span class="n">ChModelAssertType</span><span class="o">.</span><span class="n">ValidityAndWeight</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">enc_finder</span><span class="o">.</span><span class="n">assert_type</span> <span class="o">==</span> <span class="n">ChModelAssertType</span><span class="o">.</span><span class="n">ValidityAndWeight</span>
+        <span class="k">if</span> <span class="n">use_empirical_weight</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">ks_empirical_weight_options</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">enc_empirical_weight_options</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
+        <span class="n">old_var_prop2ct_prop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_var_prop2ct_prop</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">old_initial_constraints</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">initial_constraints</span><span class="p">[:]</span>
+
+        <span class="k">for</span> <span class="n">var_prop</span><span class="p">,</span> <span class="n">ct_prop</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="p">(</span>
+                <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">ks_ch_model</span><span class="o">.</span><span class="n">input_prop</span><span class="p">,</span> <span class="n">ks_input_prop</span><span class="p">),</span>
+                <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">enc_ch_model</span><span class="o">.</span><span class="n">input_prop</span><span class="p">,</span> <span class="n">enc_input_prop</span><span class="p">),</span>
+                <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">enc_ch_model</span><span class="o">.</span><span class="n">output_prop</span><span class="p">,</span> <span class="n">enc_output_prop</span><span class="p">),</span>
+        <span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ct_prop</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">prop_type</span><span class="p">):</span>
+                <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ct_prop</span><span class="p">,</span> <span class="n">core</span><span class="o">.</span><span class="n">Constant</span><span class="p">)</span>
+                <span class="n">ct_prop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ch_model</span><span class="o">.</span><span class="n">prop_type</span><span class="p">(</span><span class="n">ct_prop</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_var_prop2ct_prop</span><span class="p">[</span><span class="n">var_prop</span><span class="p">]</span> <span class="o">=</span> <span class="n">ct_prop</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">initial_constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">operation</span><span class="o">.</span><span class="n">BvComp</span><span class="p">(</span><span class="n">var_prop</span><span class="o">.</span><span class="n">val</span><span class="p">,</span> <span class="n">ct_prop</span><span class="o">.</span><span class="n">val</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">aux_finder</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">ks_finder</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">enc_finder</span><span class="p">]:</span>
+            <span class="n">ChFinder</span><span class="o">.</span><span class="n">_check_initial_constraints</span><span class="p">(</span>
+                <span class="n">aux_finder</span><span class="o">.</span><span class="n">ch_model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">initial_constraints</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">chmodel_asserts</span><span class="p">,</span>
+                <span class="n">aux_finder</span><span class="o">.</span><span class="n">_exclude_zero_input_prop</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_var_prop2ct_prop</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_vars_in_constraints</span><span class="p">,</span> <span class="n">aux_finder</span><span class="o">.</span><span class="n">_raise_exception_missing_var</span>
+            <span class="p">)</span>
+
+        <span class="n">cumulative_w</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">for</span> <span class="n">yielded_weight</span><span class="p">,</span> <span class="n">ch_found</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_next_ch_increasing_weight</span><span class="p">(</span>
+            <span class="n">initial_weight</span><span class="p">,</span> <span class="n">final_weight</span><span class="o">=</span><span class="n">final_weight</span><span class="p">,</span>
+            <span class="n">ks_empirical_weight_options</span><span class="o">=</span><span class="n">ks_empirical_weight_options</span><span class="p">,</span>
+            <span class="n">enc_empirical_weight_options</span><span class="o">=</span><span class="n">enc_empirical_weight_options</span><span class="p">,</span>
+            <span class="n">stop_after_optimal</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">yield_weight</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">):</span>
+            <span class="k">if</span> <span class="n">yielded_weight</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># second time optimal ch is yielded</span>
+                <span class="k">assert</span> <span class="n">cumulative_w</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                <span class="k">continue</span>
+
+            <span class="k">if</span> <span class="n">use_empirical_weight</span><span class="p">:</span>
+                <span class="n">next_weight</span> <span class="o">=</span> <span class="n">ch_found</span><span class="o">.</span><span class="n">ks_characteristic</span><span class="o">.</span><span class="n">empirical_ch_weight</span> <span class="o">+</span> \
+                              <span class="n">ch_found</span><span class="o">.</span><span class="n">enc_characteristic</span><span class="o">.</span><span class="n">empirical_ch_weight</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">next_weight</span> <span class="o">=</span> <span class="n">ch_found</span><span class="o">.</span><span class="n">ks_characteristic</span><span class="o">.</span><span class="n">ch_weight</span> <span class="o">+</span> \
+                                 <span class="n">ch_found</span><span class="o">.</span><span class="n">enc_characteristic</span><span class="o">.</span><span class="n">ch_weight</span>
+
+            <span class="k">if</span> <span class="n">cumulative_w</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">cumulative_w</span> <span class="o">=</span> <span class="n">next_weight</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">cumulative_w</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                <span class="n">cumulative_w</span> <span class="o">=</span> <span class="n">_merge_weights</span><span class="p">(</span><span class="n">next_weight</span><span class="p">,</span> <span class="n">cumulative_w</span><span class="p">)</span>
+
+            <span class="k">yield</span> <span class="n">cumulative_w</span><span class="p">,</span> <span class="n">ch_found</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_var_prop2ct_prop</span> <span class="o">=</span> <span class="n">old_var_prop2ct_prop</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initial_constraints</span> <span class="o">=</span> <span class="n">old_initial_constraints</span></div></div>
 
 
 <div class="viewcode-block" id="round_based_ch_search"><a class="viewcode-back" href="../../../cascada.smt.chsearch.html#cascada.smt.chsearch.round_based_ch_search">[docs]</a><span class="k">def</span> <span class="nf">round_based_ch_search</span><span class="p">(</span>

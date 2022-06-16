@@ -44,6 +44,7 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="index.html">CASCADA</a></li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="adding_primitive.html">Adding a primitive</a></li>
 <li class="toctree-l1"><a class="reference internal" href="primitives_implemented.html">Primitives implemented</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="cascada.html">API reference</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="cascada.bitvector.html">cascada.bitvector module</a></li>
@@ -156,7 +157,7 @@ and constant output property <span class="math notranslate nohighlight">\(\beta\
 (and where the intermediate properties are not specified).
 The main idea of the SMT-based search is that one can check whether
 <span class="math notranslate nohighlight">\(\alpha\)</span> propagates to <span class="math notranslate nohighlight">\(\beta\)</span> with probability zero
-by checking whether <span class="math notranslate nohighlight">\(\Omega\)</span> is unsatisfisable (UNSAT).
+by checking whether <span class="math notranslate nohighlight">\(\Omega\)</span> is unsatisfiable (UNSAT).
 Note that only the validity constraints are needed to build <span class="math notranslate nohighlight">\(\Omega\)</span>;
 the weight constraints are ignored when searching for universally-invalid characteristics.</p>
 <p>The initialization argument <code class="docutils literal notranslate"><span class="pre">ch_model</span></code> must be a subclass of
@@ -243,7 +244,7 @@ checks whether <span class="math notranslate nohighlight">\(\alpha\)</span>
 propagates to <span class="math notranslate nohighlight">\(\beta\)</span> with probability zero by checking
 with an SMT solver whether the SMT problem, of whether there exists
 a valid characteristic with input property <span class="math notranslate nohighlight">\(\alpha\)</span> and output property
-<span class="math notranslate nohighlight">\(\beta\)</span>, is unsatisfisable (UNSAT).
+<span class="math notranslate nohighlight">\(\beta\)</span>, is unsatisfiable (UNSAT).
 If the problem is UNSAT, the universally-invalid
 <a class="reference internal" href="cascada.abstractproperty.characteristic.html#cascada.abstractproperty.characteristic.Characteristic" title="cascada.abstractproperty.characteristic.Characteristic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.characteristic.Characteristic</span></code></a> object with
 input and output properties <span class="math notranslate nohighlight">\((\alpha, \beta)\)</span>

@@ -6,5 +6,6 @@
 
    self
    usage
+   adding_primitive
    primitives_implemented
    cascada
