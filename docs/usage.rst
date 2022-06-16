@@ -8,13 +8,8 @@ There are several primitives already implemented,
 such as AES, CHAM, Chaskey, FEAL, HIGHT, LEA, MULTI2, π-cipher, SHACAL-1, SHACAL-2,
 Simeck, Simon, Speck, SKINNY, TEA, or XTEA (see `primitives_implemented`).
 
-To implement a new primitive, the easiest way is to take a similar primitive
-already implemented and adapt it to the new primitive
-(see also `BvFunction` and `blockcipher`).
-If the new primitive contains a bit-vector operation
-with no associated property model (see `abstractproperty.opmodel.OpModel`),
-you need to implement the property model (as in `simon` and `simon_rf`)
-or use a `WeakModel`, `BranchNumberModel` or `WDTModel` (as in `aes`).
+You can find a step-by-step tutorial about implement a new primitive
+in :doc:`adding_primitive`.
 
 
 Searching for characteristics
