@@ -1,1 +1,0 @@
-"""Represent symmetric primitives such as block ciphers or hash functions."""
