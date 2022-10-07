@@ -56,14 +56,19 @@ and sphinx and sphinx-rtd-theme to build the documentation.
 Citation
 ========
 
-If you use CASCADA, please consider citing the `paper <https://eprint.iacr.org/2022/513>`_:
+If you use CASCADA, please consider citing the `paper <https://doi.org/10.1049/ise2.12077>`_:
 
 ::
 
-    @misc{cryptoeprint:2022:513,
-        author       = {Adrián Ranea and Vincent Rijmen},
-        title        = {{CASCADA}: Characteristic Automated Search of Cryptographic Algorithms for Distinguishing Attacks},
-        howpublished = {Cryptology ePrint Archive, Report 2022/513},
-        year         = {2022},
-        note         = {\url{https://ia.cr/2022/513}},
-    }
+   @article{DBLP:journals/iet-ifs/RaneaR22,
+     author     = {Adri{\'{a}}n and Vincent Rijmen},
+     title      = {Characteristic automated search of cryptographic algorithms 
+                   for distinguishing attacks ({CASCADA})},
+     journal    = {{IET} Inf. Secur.},
+     volume     = {16},
+     number     = {6},
+     pages      = {470--481},
+     year       = {2022},
+     doi        = {https://doi.org/10.1049/ise2.12077},
+   }
+
