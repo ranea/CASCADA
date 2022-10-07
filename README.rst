@@ -61,7 +61,7 @@ If you use CASCADA, please consider citing the `paper <https://doi.org/10.1049/i
 ::
 
    @article{DBLP:journals/iet-ifs/RaneaR22,
-     author     = {Adri{\'{a}}n and Vincent Rijmen},
+     author     = {Adri{\'{a}}n Ranea and Vincent Rijmen},
      title      = {Characteristic automated search of cryptographic algorithms 
                    for distinguishing attacks ({CASCADA})},
      journal    = {{IET} Inf. Secur.},
@@ -69,6 +69,6 @@ If you use CASCADA, please consider citing the `paper <https://doi.org/10.1049/i
      number     = {6},
      pages      = {470--481},
      year       = {2022},
-     doi        = {https://doi.org/10.1049/ise2.12077},
+     doi        = {https://doi.org/10.1049/ise2.12077}
    }
 
