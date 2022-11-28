@@ -10,6 +10,7 @@ Primitives implemented
    cascada.primitives.hight
    cascada.primitives.lea
    cascada.primitives.multi2
+   cascada.primitives.noekeon
    cascada.primitives.picipher
    cascada.primitives.shacal1
    cascada.primitives.shacal2

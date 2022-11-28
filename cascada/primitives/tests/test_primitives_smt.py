@@ -28,6 +28,7 @@ from cascada.primitives import feal
 from cascada.primitives import hight
 from cascada.primitives import lea
 from cascada.primitives import multi2
+from cascada.primitives import noekeon
 from cascada.primitives import picipher
 from cascada.primitives import shacal1
 from cascada.primitives import shacal2
@@ -62,9 +63,9 @@ Simon32 = simon.get_Simon_instance(simon.SimonInstance.simon_32_64)
 SearchParameters = collections.namedtuple(
     'SearchParameters', ['function', 'xor_nr', 'rk_nr', 'linear_nr',
                          'cipher_xor_nr', 'cipher_rx_nr',
-                         'ignore_cipher_xor_invalid', 'ignore_cipher_rx_invalid',
-                         'ignore_bitvalue'],
-    defaults=[None, None, None, None, None, None, None, None]  # all except function
+                         'ignore_cipher_xor_invalid', 'ignore_cipher_rx_invalid', 'ignore_linear_invalid',
+                         'ignore_bitvalue', 'ignore_wordvalue'],
+    defaults=[None, None, None, None, None, None, None, None, None, None]  # all except function
 )
 
 
@@ -82,6 +83,9 @@ ListSearchParameters = [
     SearchParameters(lea.LEACipher.key_schedule, xor_nr=2, rk_nr=None, linear_nr=None),  # BvAddCt, xor_nr slow, rk discards many ch due to EW
     SearchParameters(multi2.MULTI2Cipher, xor_nr=2, rk_nr=None, linear_nr=3, cipher_xor_nr=2, cipher_rx_nr=False),
     SearchParameters(multi2.MULTI2Cipher.key_schedule, xor_nr=True, rk_nr=False, linear_nr=None),  # BvAddCt
+    SearchParameters(noekeon.NOEKEONDirectCipher, xor_nr=False, linear_nr=False, cipher_xor_nr=1, cipher_rx_nr=None, ignore_linear_invalid=True, ignore_bitvalue=True),  # cipher_rx_nr=2 but 10+min,
+    SearchParameters(noekeon.NOEKEONIndirectCipher, xor_nr=False, rk_nr=None, linear_nr=False, cipher_xor_nr=False, cipher_rx_nr=None, ignore_linear_invalid=True, ignore_bitvalue=True),  # cipher_rx_nr=1 but 10min,
+    SearchParameters(noekeon.NOEKEONIndirectCipher.key_schedule, xor_nr=False, rk_nr=1, linear_nr=False, ignore_bitvalue=True),
     SearchParameters(picipher.PiPermutation, xor_nr=False, rk_nr=None, linear_nr=None),  #   # weight rk > 200, BvAddCt
     SearchParameters(shacal1.SHACAL1Cipher, xor_nr=False, cipher_xor_nr=True),  # xor 1r but mnr=4, BvIf, cipher_xor 16r but slow, rk discards many ch due to EW
     SearchParameters(shacal1.SHACAL1Cipher.key_schedule, xor_nr=True, rk_nr=False, linear_nr=None),  # BvAddCt, xor 19r but slow
@@ -154,6 +158,8 @@ class TestPrimitivesSearch(unittest.TestCase):
                     if prop_type in [BitValue, WordValue] and at == ChModelAssertType.ValidityAndWeight:
                         continue
                     if prop_type == BitValue and sp.ignore_bitvalue is True:
+                        continue
+                    if prop_type == WordValue and sp.ignore_wordvalue is True:
                         continue
 
                     msg = f"\n## {f.__name__}, nr: {nr}, prop_type: {prop_type.__name__}, at: {at}"
@@ -248,6 +254,8 @@ class TestPrimitivesSearch(unittest.TestCase):
                         continue
                     if prop_type == BitValue and sp.ignore_bitvalue is True:
                         continue
+                    if prop_type == WordValue and sp.ignore_wordvalue is True:
+                        continue
 
                     msg = f"\n## {f.__name__}, nr: {nr}, prop_type: {prop_type.__name__}, at: {at}"
                     if PRINTING_MODE != PrintingMode.Silent:
@@ -328,7 +336,7 @@ class TestPrimitivesSearch(unittest.TestCase):
             for prop_type in [XorDiff, RXDiff, LinearMask]:
                 if issubclass(f, blockcipher.Cipher) and prop_type == RXDiff:
                     continue  # RXDiff not supported by EncryptionChModel
-                if prop_type == LinearMask and sp.linear_nr is None:
+                if prop_type == LinearMask and (sp.linear_nr is None or sp.ignore_linear_invalid is True):
                     continue  # most probably due to BvAddCt
 
                 msg = f"\n## {f.__name__}, min_nr: {min_nr}, prop_type: {prop_type.__name__}"

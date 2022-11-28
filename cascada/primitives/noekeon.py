@@ -1,6 +1,6 @@
 """NOEKEON cipher."""
 from cascada.bitvector.core import Constant
-from cascada.bitvector.operation import RotateLeft, RotateRight
+from cascada.bitvector.operation import RotateLeft, RotateRight, BvIdentity
 
 from cascada.bitvector.ssa import BvFunction, RoundBasedFunction
 from cascada.primitives.blockcipher import Encryption, Cipher
@@ -21,6 +21,13 @@ def theta(x, k):
     t ^= RotateLeft(t, 8) ^ RotateRight(t, 8)
     x[0] ^= t
     x[2] ^= t
+
+    # force the creation of new intermediate properties for the output of theta
+    # (to speed up the generation of characteristics)
+    x[0] = BvIdentity(x[0])
+    x[1] = BvIdentity(x[1])
+    x[2] = BvIdentity(x[2])
+    x[3] = BvIdentity(x[3])
 
 
 def gamma(x):

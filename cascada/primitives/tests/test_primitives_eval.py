@@ -10,6 +10,7 @@ from cascada.primitives import feal
 from cascada.primitives import hight
 from cascada.primitives import lea
 from cascada.primitives import multi2
+from cascada.primitives import noekeon
 from cascada.primitives import picipher
 from cascada.primitives import shacal1
 from cascada.primitives import shacal2
@@ -36,6 +37,8 @@ LIST_PRIMITIVES = [
     hight.HightCipher,
     lea.LEACipher,
     multi2.MULTI2Cipher,
+    noekeon.NOEKEONDirectCipher,
+    noekeon.NOEKEONIndirectCipher,
     picipher.PiPermutation,
     shacal1.SHACAL1Cipher,
     shacal2.SHACAL2Cipher,
