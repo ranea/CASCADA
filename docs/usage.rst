@@ -5,7 +5,7 @@ To search for characteristics (e.g., differential or linear characteristics)
 or zero-probability properties (e.g., impossible differentials or zero-correlation approximations)
 over a primitive, the primitive needs to be implemented following the CASCADA interface.
 There are several primitives already implemented,
-such as AES, CHAM, Chaskey, FEAL, HIGHT, LEA, MULTI2, NOEKEON, π-cipher, SHACAL-1, SHACAL-2,
+such as AES, CHAM, Chaskey, FEAL, HIGHT, LEA, MULTI2, NOEKEON, π-cipher, RECTANGLE, SHACAL-1, SHACAL-2,
 Simeck, Simon, Speck, SKINNY, TEA, or XTEA (see `primitives_implemented`).
 
 You can find a step-by-step tutorial about implement a new primitive

@@ -12,6 +12,7 @@ Primitives implemented
    cascada.primitives.multi2
    cascada.primitives.noekeon
    cascada.primitives.picipher
+   cascada.primitives.rectangle
    cascada.primitives.shacal1
    cascada.primitives.shacal2
    cascada.primitives.simeck
