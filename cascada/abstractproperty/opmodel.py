@@ -19,7 +19,11 @@ def _tuplify(seq):
 
 
 def log2_decimal(my_decimal):
-    return my_decimal.ln() / decimal.Decimal(2).ln()
+    first_try = math.log2(my_decimal)
+    if first_try.is_integer():
+        return decimal.Decimal(first_try)
+    else:
+        return my_decimal.ln() / decimal.Decimal(2).ln()
 
 
 class InvalidOpModelError(Exception):
@@ -506,6 +510,8 @@ class WeakModel(object):
                 found_frac_bits = True
                 if not isinstance(w, decimal.Decimal):
                     raise ValueError(f"non-integer {name} = {w} is not a Decimal object")
+                if math.isclose(w, math.ceil(w)):
+                    warnings.warn(f"using {name} = {w} that might get approx. to {math.ceil(w)-1} instead of {math.ceil(w)}")
             if 0 != w != math.inf and int(w * (2 ** cls.precision)) == 0:
                 raise ValueError(f"{name} {w} is 0 with precision {cls.precision}")
         if not found_frac_bits and cls.precision != 0:
@@ -835,6 +841,10 @@ class WDTModel(object):
                     if not isinstance(weight, decimal.Decimal):
                         raise ValueError(f"non-integer weight {weight} in weight_distribution_table is"
                                          f" not a Decimal object")
+                    if math.isclose(weight, math.ceil(weight)):
+                        warnings.warn(
+                            f"using weight with value {weight} that might get approx. to "
+                            f"{math.ceil(weight) - 1} instead of {math.ceil(weight)}")
                 if 0 != weight != math.inf and int(weight * (2 ** precision)) == 0:
                     raise ValueError(f"non-zero weight {weight} in weight_distribution_table is"
                                      f" 0 with precision {precision}")
