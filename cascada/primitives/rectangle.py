@@ -1,6 +1,6 @@
 """RECTANGLE cipher."""
 from cascada.bitvector.core import Constant
-from cascada.bitvector.operation import RotateLeft
+from cascada.bitvector.operation import RotateLeft, Extract, Concat
 
 from cascada.bitvector.ssa import RoundBasedFunction
 from cascada.primitives.blockcipher import Encryption, Cipher
@@ -90,10 +90,10 @@ class RECTANGLE80KeySchedule(RoundBasedFunction):
         for i in range(cls.num_rounds):
             t = x[0:4]
             sub_column(t)
-            x[0] = (x[0] & 0xFFF0) | (t[0] & 0x000F)
-            x[1] = (x[1] & 0xFFF0) | (t[1] & 0x000F)
-            x[2] = (x[2] & 0xFFF0) | (t[2] & 0x000F)
-            x[3] = (x[3] & 0xFFF0) | (t[3] & 0x000F)
+            x[0] = Concat(Extract(x[0], 15, 4), Extract(t[0], 3, 0))
+            x[1] = Concat(Extract(x[1], 15, 4), Extract(t[1], 3, 0))
+            x[2] = Concat(Extract(x[2], 15, 4), Extract(t[2], 3, 0))
+            x[3] = Concat(Extract(x[3], 15, 4), Extract(t[3], 3, 0))
 
             t = x[0]
             x[0] = RotateLeft(x[0], 8) ^ x[1]
@@ -116,7 +116,7 @@ class RECTANGLE128KeySchedule(RoundBasedFunction):
     """RECTANGLE-128 key schedule function."""
 
     num_rounds = 25
-    input_widths = [16, 16, 16, 16, 16, 16, 16, 16]
+    input_widths = [32, 32, 32, 32]
     output_widths = [16 for _ in range(4 * num_rounds + 4)]
 
     @classmethod
@@ -131,36 +131,30 @@ class RECTANGLE128KeySchedule(RoundBasedFunction):
         round_keys = []
 
         for i in range(cls.num_rounds):
-            round_keys.append(x[1])
-            round_keys.append(x[3])
-            round_keys.append(x[5])
-            round_keys.append(x[7])
+            round_keys.append(Extract(x[0], 15, 0))
+            round_keys.append(Extract(x[1], 15, 0))
+            round_keys.append(Extract(x[2], 15, 0))
+            round_keys.append(Extract(x[3], 15, 0))
 
-            t = [x[1], x[3], x[5], x[7]]
+            t = list(x)
             sub_column(t)
-            x[1] = (x[1] & 0xFF00) | (t[0] & 0x00FF)
-            x[3] = (x[3] & 0xFF00) | (t[1] & 0x00FF)
-            x[5] = (x[5] & 0xFF00) | (t[2] & 0x00FF)
-            x[7] = (x[7] & 0xFF00) | (t[3] & 0x00FF)
+            x[0] = Concat(Extract(x[0], 31, 8), Extract(t[0], 7, 0))
+            x[1] = Concat(Extract(x[1], 31, 8), Extract(t[1], 7, 0))
+            x[2] = Concat(Extract(x[2], 31, 8), Extract(t[2], 7, 0))
+            x[3] = Concat(Extract(x[3], 31, 8), Extract(t[3], 7, 0))
 
-            t0 = x[0]
-            t1 = x[1]
-            x[0] = ((t0 << 8) | (t1 >> 8)) ^ x[2]
-            x[1] = ((t1 << 8) | (t0 >> 8)) ^ x[3]
-            x[2] = x[4]
-            x[3] = x[5]
-            x[4], x[5] = x[5], x[4]
-            x[4] ^= x[6]
-            x[5] ^= x[7]
-            x[6] = t0
-            x[7] = t1
+            t = x[0]
+            x[0] = RotateLeft(x[0], 8) ^ x[1]
+            x[1] = x[2]
+            x[2] = RotateLeft(x[2], 16) ^ x[3]
+            x[3] = t
 
-            x[1] ^= Constant(RC[i], 16)
+            x[0] ^= Constant(RC[i], 32)
 
-        round_keys.append(x[1])
-        round_keys.append(x[3])
-        round_keys.append(x[5])
-        round_keys.append(x[7])
+        round_keys.append(Extract(x[0], 15, 0))
+        round_keys.append(Extract(x[1], 15, 0))
+        round_keys.append(Extract(x[2], 15, 0))
+        round_keys.append(Extract(x[3], 15, 0))
 
         return round_keys
 
@@ -209,11 +203,11 @@ class RECTANGLE128Cipher(Cipher):
         cls.set_num_rounds(25)
 
         plaintext = (0x0000, 0x0000, 0x0000, 0x0000)
-        key = (0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000)
+        key = (0x00000000, 0x00000000, 0x00000000, 0x00000000)
         assert cls(plaintext, key) == (0xAEE6, 0x3613, 0x44A4, 0x99EE)
 
         plaintext = (0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF)
-        key = (0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF)
+        key = (0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF)
         assert cls(plaintext, key) == (0xE83E, 0xEFEE, 0x4A15, 0x7A46)
 
         cls.set_num_rounds(old_num_rounds)
