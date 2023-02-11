@@ -1,26 +1,80 @@
 """RECTANGLE cipher."""
-from cascada.bitvector.core import Constant
-from cascada.bitvector.operation import RotateLeft, Extract, Concat
+from decimal import Decimal
+from math import inf
 
+from cascada.bitvector.core import Constant
+from cascada.bitvector.operation import RotateLeft, Concat
+from cascada.bitvector.secondaryop import LutOperation
+from cascada.abstractproperty.opmodel import log2_decimal
+from cascada.differential.difference import XorDiff
+from cascada.differential.opmodel import get_wdt_model as get_differential_wdt_model
+from cascada.linear.opmodel import get_wdt_model as get_linear_wdt_model
 from cascada.bitvector.ssa import RoundBasedFunction
 from cascada.primitives.blockcipher import Encryption, Cipher
 
+class SboxLut(LutOperation):
+    """The 4-bit S-box of RECTANGLE."""
+    lut = [Constant(x, 4) for x in (6, 5, 12, 10, 1, 14, 7, 9, 11, 0, 3, 13, 8, 15, 4, 2)]
+
+
+ddt = (
+    (16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+    (0, 0, 0, 2, 0, 0, 4, 2, 0, 0, 0, 2, 0, 0, 4, 2),
+    (0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 2, 0, 2, 4, 0, 2),
+    (0, 0, 0, 2, 0, 0, 2, 0, 2, 4, 2, 2, 2, 0, 0, 0),
+    (0, 0, 0, 4, 0, 0, 0, 4, 0, 0, 0, 4, 0, 0, 0, 4),
+    (0, 2, 0, 0, 4, 2, 0, 0, 4, 2, 0, 0, 0, 2, 0, 0),
+    (0, 2, 4, 0, 2, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 2),
+    (0, 0, 4, 0, 2, 2, 0, 0, 0, 2, 0, 2, 2, 0, 0, 2),
+    (0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2),
+    (0, 2, 0, 0, 0, 2, 4, 0, 0, 2, 0, 0, 0, 2, 4, 0),
+    (0, 0, 0, 0, 0, 4, 2, 2, 2, 0, 2, 0, 2, 0, 0, 2),
+    (0, 4, 0, 2, 0, 0, 2, 0, 2, 0, 2, 2, 2, 0, 0, 0),
+    (0, 0, 0, 0, 4, 0, 0, 0, 4, 0, 4, 0, 0, 0, 4, 0),
+    (0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 4, 0, 0, 2, 4, 0),
+    (0, 0, 4, 2, 2, 2, 0, 2, 0, 2, 0, 0, 2, 0, 0, 0),
+    (0, 2, 4, 2, 2, 0, 0, 2, 0, 0, 0, 0, 2, 2, 0, 0)
+)
+lat = (
+    (1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+    (0, 0, 0,  0.25, 0, -0.25, 0, 0,  0.5, -0.5, -0.5, -0.5, -0.5, -0.5,  0.5, -0.5),
+    (0, 0, 0, 0, 0, 0,  0.25,  0.25, 0, 0,  0.25, -0.25, 0, 0, 0, 0),
+    (0, 0, 0, -0.25,  0.25, 0, 0, 0, -0.5,  0.5, -0.5, -0.5, -0.5, -0.5,  0.5, -0.5),
+    (0, 0, 0, 0, 0, 0, -0.25,  0.25, 0, 0, 0, 0, 0, 0,  0.25,  0.25),
+    (0, 0, -0.25, 0, 0, -0.25, 0, 0, -0.5,  0.5, -0.5, -0.5,  0.5,  0.5, -0.5,  0.5),
+    (0, 0, 0, 0, 0, 0, 0, 0,  0.25,  0.25, 0, 0, -0.25,  0.25, 0, 0),
+    (0, 0, -0.25, 0, -0.25, 0, 0, 0, -0.5,  0.5,  0.5,  0.5, -0.5, -0.5,  0.5, -0.5),
+    (0, 0, 0, -0.25, -0.5, -0.5,  0.5, -0.5, 0, -0.25, 0, 0, -0.5,  0.5,  0.5,  0.5),
+    (0, 0, 0, 0, -0.5,  0.5,  0.5, -0.5,  0.5,  0.5, -0.5, -0.5,  0.25, 0,  0.25, 0),
+    (0, 0, 0, -0.25, -0.5, -0.5, -0.5,  0.5,  0.25, 0, 0, 0,  0.5, -0.5, -0.5, -0.5),
+    (0, 0, 0, 0,  0.5, -0.5,  0.5, -0.5,  0.5,  0.5,  0.5,  0.5, 0, -0.25, 0,  0.25),
+    (0,  0.25, 0, 0, -0.5,  0.5, -0.5, -0.5, 0, 0, 0, -0.25, -0.5, -0.5, -0.5,  0.5),
+    (0,  0.25,  0.25, 0, -0.5, -0.5,  0.5,  0.5, -0.5,  0.5, -0.5,  0.5, 0, 0, 0, 0),
+    (0, -0.25, 0, 0, -0.5,  0.5,  0.5,  0.5, 0, 0, -0.25, 0, -0.5, -0.5, -0.5,  0.5),
+    (0,  0.25, -0.25, 0,  0.5,  0.5,  0.5,  0.5,  0.5, -0.5, -0.5,  0.5, 0, 0, 0, 0)
+)
+
+
+SboxLut.xor_model = get_differential_wdt_model(
+    SboxLut, XorDiff, tuple([tuple(inf if x == 0 else -log2_decimal(x / Decimal(2 ** 4)) for x in row) for row in ddt]))
+SboxLut.linear_model = get_linear_wdt_model(
+    SboxLut, tuple([tuple(inf if x == 0 else -log2_decimal(Decimal(abs(x))) for x in row) for row in lat]))
+
 
 def sub_column(x):
-    t0 = x[2]
-    x[2] ^= x[1]
-    x[1] = ~x[1]
-    t1 = x[0]
-    x[0] &= x[1]
-    x[1] |= x[3]
-    x[3] ^= t0
-    x[0] ^= x[3]
-    x[1] ^= t1
-    x[3] &= x[1]
-    x[3] ^= x[2]
-    x[2] |= x[0]
-    x[2] ^= x[1]
-    x[1] ^= t0
+    bits = x[0].width
+
+    for i in range(bits):
+        s = Concat(Concat(Concat(x[3][i], x[2][i]), x[1][i]), x[0][i])
+        s = SboxLut(s)
+
+        for j in range(4):
+            if i == 0:
+                x[j] = Concat(x[j][:1], s[j])
+            elif i == bits - 1:
+                x[j] = Concat(s[j], x[j][bits - 2:])
+            else:
+                x[j] = Concat(Concat(x[j][:i + 1], s[j]), x[j][i - 1:])
 
 
 def shift_row(x):
@@ -85,15 +139,13 @@ class RECTANGLE80KeySchedule(RoundBasedFunction):
     @classmethod
     def eval(cls, *master_key):
         x = list(master_key)
-        round_keys = x[0:4]
+        round_keys = x[:4]
 
         for i in range(cls.num_rounds):
-            t = x[0:4]
+            t = [x[0][3:], x[1][3:], x[2][3:], x[3][3:]]
             sub_column(t)
-            x[0] = Concat(Extract(x[0], 15, 4), Extract(t[0], 3, 0))
-            x[1] = Concat(Extract(x[1], 15, 4), Extract(t[1], 3, 0))
-            x[2] = Concat(Extract(x[2], 15, 4), Extract(t[2], 3, 0))
-            x[3] = Concat(Extract(x[3], 15, 4), Extract(t[3], 3, 0))
+            for j in range(4):
+                x[j] = Concat(x[j][:4], t[j])
 
             t = x[0]
             x[0] = RotateLeft(x[0], 8) ^ x[1]
@@ -104,10 +156,7 @@ class RECTANGLE80KeySchedule(RoundBasedFunction):
 
             x[0] ^= Constant(RC[i], 16)
 
-            round_keys.append(x[0])
-            round_keys.append(x[1])
-            round_keys.append(x[2])
-            round_keys.append(x[3])
+            round_keys.extend(x[:4])
 
         return round_keys
 
@@ -128,20 +177,13 @@ class RECTANGLE128KeySchedule(RoundBasedFunction):
     @classmethod
     def eval(cls, *master_key):
         x = list(master_key)
-        round_keys = []
+        round_keys = [w[15:] for w in x]
 
         for i in range(cls.num_rounds):
-            round_keys.append(Extract(x[0], 15, 0))
-            round_keys.append(Extract(x[1], 15, 0))
-            round_keys.append(Extract(x[2], 15, 0))
-            round_keys.append(Extract(x[3], 15, 0))
-
-            t = list(x)
+            t = [w[7:] for w in x]
             sub_column(t)
-            x[0] = Concat(Extract(x[0], 31, 8), Extract(t[0], 7, 0))
-            x[1] = Concat(Extract(x[1], 31, 8), Extract(t[1], 7, 0))
-            x[2] = Concat(Extract(x[2], 31, 8), Extract(t[2], 7, 0))
-            x[3] = Concat(Extract(x[3], 31, 8), Extract(t[3], 7, 0))
+            for j in range(4):
+                x[j] = Concat(x[j][:8], t[j])
 
             t = x[0]
             x[0] = RotateLeft(x[0], 8) ^ x[1]
@@ -151,10 +193,7 @@ class RECTANGLE128KeySchedule(RoundBasedFunction):
 
             x[0] ^= Constant(RC[i], 32)
 
-        round_keys.append(Extract(x[0], 15, 0))
-        round_keys.append(Extract(x[1], 15, 0))
-        round_keys.append(Extract(x[2], 15, 0))
-        round_keys.append(Extract(x[3], 15, 0))
+            round_keys.extend([w[15:] for w in x])
 
         return round_keys
 
