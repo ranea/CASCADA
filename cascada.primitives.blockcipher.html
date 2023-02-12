@@ -18,8 +18,8 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="cascada.primitives.aes module" href="cascada.primitives.aes.html" />
-    <link rel="prev" title="cascada.primitives module" href="cascada.primitives.html" /> 
+    <link rel="next" title="cascada.primitives.cham module" href="cascada.primitives.cham.html" />
+    <link rel="prev" title="cascada.primitives.aes_masked module" href="cascada.primitives.aes_masked.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -44,38 +44,44 @@
 <li class="toctree-l1"><a class="reference internal" href="index.html">CASCADA</a></li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="adding_primitive.html">Adding a primitive</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced_usage.html">Advanced Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="primitives_implemented.html">Primitives implemented</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="cascada.html">API reference</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="cascada.bitvector.html">cascada.bitvector module</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="cascada.primitives.html">cascada.primitives module</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#">cascada.primitives.blockcipher module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.primitives.aes.html">cascada.primitives.aes module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.primitives.aes_like.html">cascada.primitives.aes_like module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.primitives.aes_masked.html">cascada.primitives.aes_masked module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.primitives.cham.html">cascada.primitives.cham module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.primitives.chaskey.html">cascada.primitives.chaskey module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.primitives.feal.html">cascada.primitives.feal module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.primitives.hight.html">cascada.primitives.hight module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.primitives.lea.html">cascada.primitives.lea module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.primitives.multi2.html">cascada.primitives.multi2 module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.primitives.picipher.html">cascada.primitives.picipher module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.primitives.shacal1.html">cascada.primitives.shacal1 module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.primitives.shacal2.html">cascada.primitives.shacal2 module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.primitives.simeck.html">cascada.primitives.simeck module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.primitives.simon.html">cascada.primitives.simon module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.primitives.simon_rf.html">cascada.primitives.simon_rf module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.primitives.speck.html">cascada.primitives.speck module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.primitives.skinny64.html">cascada.primitives.skinny64 module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.primitives.skinny128.html">cascada.primitives.skinny128 module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.primitives.tea.html">cascada.primitives.tea module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.primitives.xtea.html">cascada.primitives.xtea module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.bitvector.html">cascada.bitvector package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="cascada.primitives.html">cascada.primitives package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="cascada.primitives.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="cascada.primitives.aes.html">cascada.primitives.aes module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.primitives.aes_like.html">cascada.primitives.aes_like module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.primitives.aes_masked.html">cascada.primitives.aes_masked module</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">cascada.primitives.blockcipher module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.primitives.cham.html">cascada.primitives.cham module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.primitives.chaskey.html">cascada.primitives.chaskey module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.primitives.feal.html">cascada.primitives.feal module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.primitives.hight.html">cascada.primitives.hight module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.primitives.lea.html">cascada.primitives.lea module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.primitives.multi2.html">cascada.primitives.multi2 module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.primitives.noekeon.html">cascada.primitives.noekeon module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.primitives.picipher.html">cascada.primitives.picipher module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.primitives.rectangle.html">cascada.primitives.rectangle module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.primitives.shacal1.html">cascada.primitives.shacal1 module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.primitives.shacal2.html">cascada.primitives.shacal2 module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.primitives.simeck.html">cascada.primitives.simeck module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.primitives.simon.html">cascada.primitives.simon module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.primitives.simon_rf.html">cascada.primitives.simon_rf module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.primitives.skinny128.html">cascada.primitives.skinny128 module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.primitives.skinny64.html">cascada.primitives.skinny64 module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.primitives.speck.html">cascada.primitives.speck module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.primitives.tea.html">cascada.primitives.tea module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.primitives.xtea.html">cascada.primitives.xtea module</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.abstractproperty.html">cascada.abstractproperty module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.differential.html">cascada.differential module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.linear.html">cascada.linear module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.algebraic.html">cascada.algebraic module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.smt.html">cascada.smt module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.abstractproperty.html">cascada.abstractproperty package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.differential.html">cascada.differential package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.linear.html">cascada.linear package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.algebraic.html">cascada.algebraic package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.smt.html">cascada.smt package</a></li>
 </ul>
 </li>
 </ul>
@@ -95,7 +101,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="cascada.html">API reference</a> &raquo;</li>
-          <li><a href="cascada.primitives.html">cascada.primitives module</a> &raquo;</li>
+          <li><a href="cascada.primitives.html">cascada.primitives package</a> &raquo;</li>
       <li>cascada.primitives.blockcipher module</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/cascada.primitives.blockcipher.rst.txt" rel="nofollow"> View page source</a>
@@ -109,10 +115,27 @@
   <section id="module-cascada.primitives.blockcipher">
 <span id="cascada-primitives-blockcipher-module"></span><h1>cascada.primitives.blockcipher module<a class="headerlink" href="#module-cascada.primitives.blockcipher" title="Permalink to this headline"></a></h1>
 <p>Represent encryption functions and block ciphers.</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cascada.primitives.blockcipher.Encryption" title="cascada.primitives.blockcipher.Encryption"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Encryption</span></code></a></p></td>
+<td><p>Represent encryption functions of block ciphers.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cascada.primitives.blockcipher.Cipher" title="cascada.primitives.blockcipher.Cipher"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cipher</span></code></a></p></td>
+<td><p>Represent block ciphers.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cascada.primitives.blockcipher.get_random_cipher" title="cascada.primitives.blockcipher.get_random_cipher"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_random_cipher</span></code></a></p></td>
+<td><p>Return a random <a class="reference internal" href="#cascada.primitives.blockcipher.Cipher" title="cascada.primitives.blockcipher.Cipher"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Cipher</span></code></a> with given shape.</p></td>
+</tr>
+</tbody>
+</table>
 <dl class="py class">
 <dt class="sig sig-object py" id="cascada.primitives.blockcipher.Encryption">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.primitives.blockcipher.</span></span><span class="sig-name descname"><span class="pre">Encryption</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/primitives/blockcipher.html#Encryption"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.primitives.blockcipher.Encryption" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Represent encryption functions of block ciphers.</p>
 <p>An encryption function is a bit-vector function (see <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.BvFunction" title="cascada.bitvector.ssa.BvFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvFunction</span></code></a>) that takes
 the plaintext as input and returns the ciphertext for some fixed master key.</p>
@@ -154,7 +177,7 @@ the <a class="reference internal" href="#cascada.primitives.blockcipher.Encrypti
 <dl class="py class">
 <dt class="sig sig-object py" id="cascada.primitives.blockcipher.Cipher">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.primitives.blockcipher.</span></span><span class="sig-name descname"><span class="pre">Cipher</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plaintext</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">masterkey</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/primitives/blockcipher.html#Cipher"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.primitives.blockcipher.Cipher" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Represent block ciphers.</p>
 <p>A block cipher is a pair of bit-vector functions (see <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.BvFunction" title="cascada.bitvector.ssa.BvFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvFunction</span></code></a>):
 the key schedule that computes the round keys from a master key, and
@@ -308,7 +331,7 @@ prefix name <code class="docutils literal notranslate"><span class="pre">symboli
 <li><p><strong>operation_set_index</strong> – four set of operations to choose indexed by 0, 1, 2 and 3</p></li>
 <li><p><strong>num_rounds</strong> – if not <code class="docutils literal notranslate"><span class="pre">None</span></code>, sample the key-schedule and the encryption
 functions as random <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.RoundBasedFunction" title="cascada.bitvector.ssa.RoundBasedFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RoundBasedFunction</span></code></a> objects with the given number of rounds</p></li>
-<li><p><strong>extra_operations</strong> – an optional <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">tuple</span></code></a> containing <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.Operation" title="cascada.bitvector.operation.Operation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Operation</span></code></a> subclasses
+<li><p><strong>extra_operations</strong> – an optional <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.11)"><code class="xref any docutils literal notranslate"><span class="pre">tuple</span></code></a> containing <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.Operation" title="cascada.bitvector.operation.Operation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Operation</span></code></a> subclasses
 to add to the list of operations to choose</p></li>
 </ul>
 </dd>
@@ -333,8 +356,8 @@ to add to the list of operations to choose</p></li>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="cascada.primitives.html" class="btn btn-neutral float-left" title="cascada.primitives module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="cascada.primitives.aes.html" class="btn btn-neutral float-right" title="cascada.primitives.aes module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="cascada.primitives.aes_masked.html" class="btn btn-neutral float-left" title="cascada.primitives.aes_masked module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cascada.primitives.cham.html" class="btn btn-neutral float-right" title="cascada.primitives.cham module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

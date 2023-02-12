@@ -1,6 +1,0 @@
-cascada.abstractproperty.tests.test_opmodel module
-==================================================
-
-.. automodule:: cascada.abstractproperty.tests.test_opmodel
-   :members:
-   :show-inheritance:

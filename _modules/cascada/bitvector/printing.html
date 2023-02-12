@@ -41,6 +41,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../index.html">CASCADA</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../adding_primitive.html">Adding a primitive</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced_usage.html">Advanced Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../primitives_implemented.html">Primitives implemented</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../cascada.html">API reference</a></li>
 </ul>
@@ -70,7 +71,18 @@
            <div itemprop="articleBody">
              
   <h1>Source code for cascada.bitvector.printing</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Manage the representation of bit-vector expressions.&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;Manage the representation of bit-vector expressions.</span>
+
+<span class="sd">.. autosummary::</span>
+<span class="sd">   :nosignatures:</span>
+
+<span class="sd">    BvStrPrinter</span>
+<span class="sd">    BvShortPrinter</span>
+<span class="sd">    BvReprPrinter</span>
+<span class="sd">    BvWrapPrinter</span>
+<span class="sd">    BvCCodePrinter</span>
+<span class="sd">    dotprinting</span>
+<span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">sympy.printing</span> <span class="kn">import</span> <span class="nb">repr</span> <span class="k">as</span> <span class="n">sympy_repr</span>
 <span class="kn">from</span> <span class="nn">sympy.printing</span> <span class="kn">import</span> <span class="nb">str</span> <span class="k">as</span> <span class="n">sympy_str</span>
 

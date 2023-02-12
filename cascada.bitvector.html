@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cascada.bitvector module &mdash; CASCADA 1.0.rc0 documentation</title>
+  <title>cascada.bitvector package &mdash; CASCADA 1.0.rc0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -44,23 +44,27 @@
 <li class="toctree-l1"><a class="reference internal" href="index.html">CASCADA</a></li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="adding_primitive.html">Adding a primitive</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced_usage.html">Advanced Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="primitives_implemented.html">Primitives implemented</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="cascada.html">API reference</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">cascada.bitvector module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="cascada.bitvector.context.html">cascada.bitvector.context module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.bitvector.core.html">cascada.bitvector.core module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.bitvector.secondaryop.html">cascada.bitvector.secondaryop module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.bitvector.operation.html">cascada.bitvector.operation module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.bitvector.printing.html">cascada.bitvector.printing module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.bitvector.ssa.html">cascada.bitvector.ssa module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">cascada.bitvector package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cascada.bitvector.context.html">cascada.bitvector.context module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.bitvector.core.html">cascada.bitvector.core module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.bitvector.operation.html">cascada.bitvector.operation module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.bitvector.printing.html">cascada.bitvector.printing module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.bitvector.secondaryop.html">cascada.bitvector.secondaryop module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.bitvector.ssa.html">cascada.bitvector.ssa module</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.primitives.html">cascada.primitives module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.abstractproperty.html">cascada.abstractproperty module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.differential.html">cascada.differential module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.linear.html">cascada.linear module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.algebraic.html">cascada.algebraic module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.smt.html">cascada.smt module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.primitives.html">cascada.primitives package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.abstractproperty.html">cascada.abstractproperty package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.differential.html">cascada.differential package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.linear.html">cascada.linear package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.algebraic.html">cascada.algebraic package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.smt.html">cascada.smt package</a></li>
 </ul>
 </li>
 </ul>
@@ -80,7 +84,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="cascada.html">API reference</a> &raquo;</li>
-      <li>cascada.bitvector module</li>
+      <li>cascada.bitvector package</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/cascada.bitvector.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -91,23 +95,26 @@
            <div itemprop="articleBody">
              
   <section id="module-cascada.bitvector">
-<span id="cascada-bitvector-module"></span><h1>cascada.bitvector module<a class="headerlink" href="#module-cascada.bitvector" title="Permalink to this headline"></a></h1>
+<span id="cascada-bitvector-package"></span><h1>cascada.bitvector package<a class="headerlink" href="#module-cascada.bitvector" title="Permalink to this headline"></a></h1>
 <p>Manipulate bit-vector expressions.</p>
 <p>This module manipulate bit-vector expressions in a numeric and
 symbolic way. It implements many bit-vector operations
 and follows the syntax and semantics of the bit-vector theory of
 the <a class="reference external" href="http://smtlib.cs.uiowa.edu/theories-FixedSizeBitVectors.shtml">SMT_LIBv2</a>
 format.</p>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="cascada.bitvector.context.html">cascada.bitvector.context module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cascada.bitvector.core.html">cascada.bitvector.core module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cascada.bitvector.secondaryop.html">cascada.bitvector.secondaryop module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cascada.bitvector.operation.html">cascada.bitvector.operation module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cascada.bitvector.printing.html">cascada.bitvector.printing module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cascada.bitvector.secondaryop.html">cascada.bitvector.secondaryop module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cascada.bitvector.ssa.html">cascada.bitvector.ssa module</a></li>
 </ul>
 </div>
+</section>
 </section>
 
 

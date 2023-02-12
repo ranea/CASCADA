@@ -18,8 +18,8 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="cascada.bitvector.operation module" href="cascada.bitvector.operation.html" />
-    <link rel="prev" title="cascada.bitvector.core module" href="cascada.bitvector.core.html" /> 
+    <link rel="next" title="cascada.bitvector.ssa module" href="cascada.bitvector.ssa.html" />
+    <link rel="prev" title="cascada.bitvector.printing module" href="cascada.bitvector.printing.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -44,23 +44,27 @@
 <li class="toctree-l1"><a class="reference internal" href="index.html">CASCADA</a></li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="adding_primitive.html">Adding a primitive</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced_usage.html">Advanced Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="primitives_implemented.html">Primitives implemented</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="cascada.html">API reference</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="cascada.bitvector.html">cascada.bitvector module</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="cascada.bitvector.context.html">cascada.bitvector.context module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.bitvector.core.html">cascada.bitvector.core module</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">cascada.bitvector.secondaryop module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.bitvector.operation.html">cascada.bitvector.operation module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.bitvector.printing.html">cascada.bitvector.printing module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.bitvector.ssa.html">cascada.bitvector.ssa module</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="cascada.bitvector.html">cascada.bitvector package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="cascada.bitvector.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="cascada.bitvector.context.html">cascada.bitvector.context module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.bitvector.core.html">cascada.bitvector.core module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.bitvector.operation.html">cascada.bitvector.operation module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.bitvector.printing.html">cascada.bitvector.printing module</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">cascada.bitvector.secondaryop module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.bitvector.ssa.html">cascada.bitvector.ssa module</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.primitives.html">cascada.primitives module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.abstractproperty.html">cascada.abstractproperty module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.differential.html">cascada.differential module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.linear.html">cascada.linear module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.algebraic.html">cascada.algebraic module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.smt.html">cascada.smt module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.primitives.html">cascada.primitives package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.abstractproperty.html">cascada.abstractproperty package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.differential.html">cascada.differential package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.linear.html">cascada.linear package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.algebraic.html">cascada.algebraic package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.smt.html">cascada.smt package</a></li>
 </ul>
 </li>
 </ul>
@@ -80,7 +84,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="cascada.html">API reference</a> &raquo;</li>
-          <li><a href="cascada.bitvector.html">cascada.bitvector module</a> &raquo;</li>
+          <li><a href="cascada.bitvector.html">cascada.bitvector package</a> &raquo;</li>
       <li>cascada.bitvector.secondaryop module</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/cascada.bitvector.secondaryop.rst.txt" rel="nofollow"> View page source</a>
@@ -94,6 +98,44 @@
   <section id="module-cascada.bitvector.secondaryop">
 <span id="cascada-bitvector-secondaryop-module"></span><h1>cascada.bitvector.secondaryop module<a class="headerlink" href="#module-cascada.bitvector.secondaryop" title="Permalink to this headline"></a></h1>
 <p>Provide additional (secondary) bit-vector operators.</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cascada.bitvector.secondaryop.BvMaj" title="cascada.bitvector.secondaryop.BvMaj"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BvMaj</span></code></a></p></td>
+<td><p>The bit-wise majority function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cascada.bitvector.secondaryop.BvIf" title="cascada.bitvector.secondaryop.BvIf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BvIf</span></code></a></p></td>
+<td><p>The bit-wise conditional (If) function.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cascada.bitvector.secondaryop.PopCount" title="cascada.bitvector.secondaryop.PopCount"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PopCount</span></code></a></p></td>
+<td><p>Count the number of 1's in the bit-vector.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cascada.bitvector.secondaryop.Reverse" title="cascada.bitvector.secondaryop.Reverse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Reverse</span></code></a></p></td>
+<td><p>Reverse the bit-vector.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cascada.bitvector.secondaryop.PopCountSum2" title="cascada.bitvector.secondaryop.PopCountSum2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PopCountSum2</span></code></a></p></td>
+<td><p>Count the number of 1's of two bit-vectors.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cascada.bitvector.secondaryop.PopCountSum3" title="cascada.bitvector.secondaryop.PopCountSum3"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PopCountSum3</span></code></a></p></td>
+<td><p>Count the number of 1's of three bit-vectors.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cascada.bitvector.secondaryop.PopCountDiff" title="cascada.bitvector.secondaryop.PopCountDiff"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PopCountDiff</span></code></a></p></td>
+<td><p>Compute the difference of the hamming weight of two words.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cascada.bitvector.secondaryop.LeadingZeros" title="cascada.bitvector.secondaryop.LeadingZeros"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LeadingZeros</span></code></a></p></td>
+<td><p>Return a bit-vector with the leading zeros set to one and the rest to zero.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cascada.bitvector.secondaryop.LutOperation" title="cascada.bitvector.secondaryop.LutOperation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LutOperation</span></code></a></p></td>
+<td><p>Base class for LUT-based operations.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cascada.bitvector.secondaryop.MatrixOperation" title="cascada.bitvector.secondaryop.MatrixOperation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MatrixOperation</span></code></a></p></td>
+<td><p>Base class for matrix-vector products.</p></td>
+</tr>
+</tbody>
+</table>
 <dl class="py class">
 <dt class="sig sig-object py" id="cascada.bitvector.secondaryop.BvMaj">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.bitvector.secondaryop.</span></span><span class="sig-name descname"><span class="pre">BvMaj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/secondaryop.html#BvMaj"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.secondaryop.BvMaj" title="Permalink to this definition"></a></dt>
@@ -565,8 +607,8 @@ the operands as the object arguments (i.e., use the Python operator <code class=
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="cascada.bitvector.core.html" class="btn btn-neutral float-left" title="cascada.bitvector.core module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="cascada.bitvector.operation.html" class="btn btn-neutral float-right" title="cascada.bitvector.operation module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="cascada.bitvector.printing.html" class="btn btn-neutral float-left" title="cascada.bitvector.printing module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cascada.bitvector.ssa.html" class="btn btn-neutral float-right" title="cascada.bitvector.ssa module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

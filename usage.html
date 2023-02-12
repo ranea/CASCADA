@@ -48,6 +48,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="adding_primitive.html">Adding a primitive</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced_usage.html">Advanced Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="primitives_implemented.html">Primitives implemented</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cascada.html">API reference</a></li>
 </ul>
@@ -78,14 +79,23 @@
              
   <section id="usage">
 <h1>Usage<a class="headerlink" href="#usage" title="Permalink to this headline"></a></h1>
-<p>To search for characteristics (e.g., differential or linear characteristics)
-or zero-probability properties (e.g., impossible differentials or zero-correlation approximations)
-over a primitive, the primitive needs to be implemented following the CASCADA interface.
+<p>In this tutorial you will see how to search for characteristics (e.g., differential or linear characteristics)
+or zero-probability properties (e.g., impossible differentials or zero-correlation approximations) with the
+all-in-one functions <a class="reference internal" href="cascada.smt.chsearch.html#cascada.smt.chsearch.round_based_ch_search" title="cascada.smt.chsearch.round_based_ch_search"><code class="xref any py py-func docutils literal notranslate"><span class="pre">round_based_ch_search</span></code></a>, <a class="reference internal" href="cascada.smt.chsearch.html#cascada.smt.chsearch.round_based_cipher_ch_search" title="cascada.smt.chsearch.round_based_cipher_ch_search"><code class="xref any py py-func docutils literal notranslate"><span class="pre">round_based_cipher_ch_search</span></code></a>,
+<a class="reference internal" href="cascada.smt.invalidpropsearch.html#cascada.smt.invalidpropsearch.round_based_invalidprop_search" title="cascada.smt.invalidpropsearch.round_based_invalidprop_search"><code class="xref any py py-func docutils literal notranslate"><span class="pre">round_based_invalidprop_search</span></code></a> and <a class="reference internal" href="cascada.smt.invalidpropsearch.html#cascada.smt.invalidpropsearch.round_based_invalidcipherprop_search" title="cascada.smt.invalidpropsearch.round_based_invalidcipherprop_search"><code class="xref any py py-func docutils literal notranslate"><span class="pre">round_based_invalidcipherprop_search</span></code></a>.</p>
+<p>To search for characteristics or zero-probability properties over a primitive,
+the primitive needs to be implemented following the CASCADA interface.
 There are several primitives already implemented,
-such as AES, CHAM, Chaskey, FEAL, HIGHT, LEA, MULTI2, π-cipher, SHACAL-1, SHACAL-2,
-Simeck, Simon, Speck, SKINNY, TEA, or XTEA (see <a class="reference internal" href="primitives_implemented.html"><span class="doc">Primitives implemented</span></a>).</p>
-<p>You can find a step-by-step tutorial about implement a new primitive
+such as AES, CHAM, Chaskey, FEAL, HIGHT, LEA, MULTI2, NOEKEON, π-cipher, RECTANGLE,
+SHACAL-1, SHACAL-2, Simeck, Simon, Speck, SKINNY, TEA, or XTEA (see <a class="reference internal" href="primitives_implemented.html"><span class="doc">Primitives implemented</span></a>).
+You can find a step-by-step tutorial about implement a new primitive
 in <a class="reference internal" href="adding_primitive.html"><span class="doc">Adding a primitive</span></a>.</p>
+<p>Note that searching for characteristics or zero-probability properties
+over a large number of rounds of a complex function such as a block cipher
+can take a lot of time (e.g., days). Thus, it is recommended to first
+run a fine-grained search over a small number of rounds and check the results
+as explained in <a class="reference internal" href="advanced_usage.html"><span class="doc">Advanced Usage</span></a>.</p>
+<p>More information on all the functions and classes of CASCADA can be found in <a class="reference internal" href="cascada.html"><span class="doc">API reference</span></a>.</p>
 <section id="searching-for-characteristics">
 <h2>Searching for characteristics<a class="headerlink" href="#searching-for-characteristics" title="Permalink to this headline"></a></h2>
 <p>Searching for characteristics can be easily done with <a class="reference internal" href="cascada.smt.chsearch.html#cascada.smt.chsearch.round_based_ch_search" title="cascada.smt.chsearch.round_based_ch_search"><code class="xref any py py-func docutils literal notranslate"><span class="pre">round_based_ch_search</span></code></a>
@@ -93,12 +103,12 @@ and <a class="reference internal" href="cascada.smt.chsearch.html#cascada.smt.ch
 optimal (i.e, lowest-weight) XOR differential characteristics
 covering 2, 3, and 4 rounds of <a class="reference internal" href="cascada.primitives.speck.html#cascada.primitives.speck.SpeckInstance.speck_32_64" title="cascada.primitives.speck.SpeckInstance.speck_32_64"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">speck_32_64</span></code></a> can be done as follows</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.difference</span> <span class="kn">import</span> <span class="n">XorDiff</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.smt.chsearch</span> <span class="kn">import</span> <span class="n">ChModelAssertType</span><span class="p">,</span> <span class="n">round_based_ch_search</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.smt.chsearch</span> <span class="kn">import</span> <span class="n">ChModelAssertType</span><span class="p">,</span> <span class="n">PrintingMode</span><span class="p">,</span> <span class="n">round_based_ch_search</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">speck</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">assert_type</span> <span class="o">=</span> <span class="n">ChModelAssertType</span><span class="o">.</span><span class="n">ValidityAndWeight</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">iterator</span> <span class="o">=</span> <span class="n">round_based_ch_search</span><span class="p">(</span><span class="n">Speck32</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">XorDiff</span><span class="p">,</span> <span class="n">assert_type</span><span class="p">,</span> <span class="s2">&quot;btor&quot;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">extra_chfinder_args</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;exclude_zero_input_prop&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="n">extra_chfinder_args</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;exclude_zero_input_prop&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;printing_mode&quot;</span><span class="p">:</span> <span class="n">PrintingMode</span><span class="o">.</span><span class="n">Silent</span><span class="p">},</span>
 <span class="gp">... </span>    <span class="n">extra_findnextchweight_args</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;initial_weight&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="p">(</span><span class="n">num_rounds</span><span class="p">,</span> <span class="n">ch</span><span class="p">)</span> <span class="ow">in</span> <span class="n">iterator</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">num_rounds</span><span class="p">,</span> <span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="n">ch</span><span class="o">.</span><span class="n">srepr</span><span class="p">())</span>
@@ -158,7 +168,6 @@ using quantified SMT problems over 3-round <a class="reference internal" href="c
 <span class="go">Ch(ks_ch=Ch(w=Infinity, id=c0a2 c0a2, od=0000 0000),  enc_ch=Ch(w=Infinity, id=c0a2 0000, od=c0a2 c0a2))</span>
 </pre></div>
 </div>
-<p>The <a class="reference internal" href="cascada.html"><span class="doc">API reference</span></a> provides more information for all the functions and classes of CASCADA.</p>
 </section>
 </section>
 

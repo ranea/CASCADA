@@ -19,8 +19,8 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="cascada.smt module" href="cascada.smt.html" />
-    <link rel="prev" title="cascada.algebraic.chmodel module" href="cascada.algebraic.chmodel.html" /> 
+    <link rel="next" title="cascada.algebraic.chmodel module" href="cascada.algebraic.chmodel.html" />
+    <link rel="prev" title="cascada.algebraic package" href="cascada.algebraic.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -45,21 +45,25 @@
 <li class="toctree-l1"><a class="reference internal" href="index.html">CASCADA</a></li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="adding_primitive.html">Adding a primitive</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced_usage.html">Advanced Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="primitives_implemented.html">Primitives implemented</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="cascada.html">API reference</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="cascada.bitvector.html">cascada.bitvector module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.primitives.html">cascada.primitives module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.abstractproperty.html">cascada.abstractproperty module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.differential.html">cascada.differential module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.linear.html">cascada.linear module</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="cascada.algebraic.html">cascada.algebraic module</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="cascada.algebraic.value.html">cascada.algebraic.value module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.algebraic.opmodel.html">cascada.algebraic.opmodel module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.algebraic.chmodel.html">cascada.algebraic.chmodel module</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">cascada.algebraic.characteristic module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.bitvector.html">cascada.bitvector package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.primitives.html">cascada.primitives package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.abstractproperty.html">cascada.abstractproperty package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.differential.html">cascada.differential package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.linear.html">cascada.linear package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="cascada.algebraic.html">cascada.algebraic package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="cascada.algebraic.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">cascada.algebraic.characteristic module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.algebraic.chmodel.html">cascada.algebraic.chmodel module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.algebraic.opmodel.html">cascada.algebraic.opmodel module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.algebraic.value.html">cascada.algebraic.value module</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.smt.html">cascada.smt module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.smt.html">cascada.smt package</a></li>
 </ul>
 </li>
 </ul>
@@ -79,7 +83,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="cascada.html">API reference</a> &raquo;</li>
-          <li><a href="cascada.algebraic.html">cascada.algebraic module</a> &raquo;</li>
+          <li><a href="cascada.algebraic.html">cascada.algebraic package</a> &raquo;</li>
       <li>cascada.algebraic.characteristic module</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/cascada.algebraic.characteristic.rst.txt" rel="nofollow"> View page source</a>
@@ -93,6 +97,23 @@
   <section id="module-cascada.algebraic.characteristic">
 <span id="cascada-algebraic-characteristic-module"></span><h1>cascada.algebraic.characteristic module<a class="headerlink" href="#module-cascada.algebraic.characteristic" title="Permalink to this headline"></a></h1>
 <p>Manipulate non-symbolic algebraic characteristics.</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cascada.algebraic.characteristic.Characteristic" title="cascada.algebraic.characteristic.Characteristic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Characteristic</span></code></a></p></td>
+<td><p>Represent algebraic characteristics over bit-vector functions.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cascada.algebraic.characteristic.EncryptionCharacteristic" title="cascada.algebraic.characteristic.EncryptionCharacteristic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EncryptionCharacteristic</span></code></a></p></td>
+<td><p>Represent algebraic characteristics over encryption functions.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cascada.algebraic.characteristic.CipherCharacteristic" title="cascada.algebraic.characteristic.CipherCharacteristic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CipherCharacteristic</span></code></a></p></td>
+<td><p>Represent algebraic characteristics over ciphers.</p></td>
+</tr>
+</tbody>
+</table>
 <dl class="py class">
 <dt class="sig sig-object py" id="cascada.algebraic.characteristic.Characteristic">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.algebraic.characteristic.</span></span><span class="sig-name descname"><span class="pre">Characteristic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_val</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_val</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assign_outval_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ch_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">external_vals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">free_vals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">empirical_ch_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">empirical_data_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_valid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/algebraic/characteristic.html#Characteristic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.algebraic.characteristic.Characteristic" title="Permalink to this definition"></a></dt>
@@ -441,8 +462,8 @@ are set to the output values of the key-schedule characteristic.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="cascada.algebraic.chmodel.html" class="btn btn-neutral float-left" title="cascada.algebraic.chmodel module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="cascada.smt.html" class="btn btn-neutral float-right" title="cascada.smt module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="cascada.algebraic.html" class="btn btn-neutral float-left" title="cascada.algebraic package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cascada.algebraic.chmodel.html" class="btn btn-neutral float-right" title="cascada.algebraic.chmodel module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

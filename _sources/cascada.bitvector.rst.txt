@@ -1,16 +1,19 @@
-cascada.bitvector module
-========================
+cascada.bitvector package
+=========================
 
 .. automodule:: cascada.bitvector
    :members:
    :show-inheritance:
+
+Submodules
+----------
 
 .. toctree::
    :maxdepth: 4
 
    cascada.bitvector.context
    cascada.bitvector.core
-   cascada.bitvector.secondaryop
    cascada.bitvector.operation
    cascada.bitvector.printing
+   cascada.bitvector.secondaryop
    cascada.bitvector.ssa

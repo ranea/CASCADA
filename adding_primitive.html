@@ -19,7 +19,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Primitives implemented" href="primitives_implemented.html" />
+    <link rel="next" title="Advanced Usage" href="advanced_usage.html" />
     <link rel="prev" title="Usage" href="usage.html" /> 
 </head>
 
@@ -53,6 +53,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#wrapping-everything-as-a-cipher-subclass">Wrapping everything as a Cipher subclass</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="advanced_usage.html">Advanced Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="primitives_implemented.html">Primitives implemented</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cascada.html">API reference</a></li>
 </ul>
@@ -161,7 +162,8 @@ To do so, we will implement the key-schedule as a function taking the
 key words and returning the list of round keys, and the
 encryption as a function taking the plaintext words and the round keys
 and returning the ciphertext words.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cascada.bitvector.operation</span> <span class="kn">import</span> <span class="n">RotateRight</span><span class="p">,</span> <span class="n">RotateLeft</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span>
+<span class="kn">from</span> <span class="nn">cascada.bitvector.operation</span> <span class="kn">import</span> <span class="n">RotateRight</span><span class="p">,</span> <span class="n">RotateLeft</span>
 
 <span class="n">num_rounds</span> <span class="o">=</span> <span class="mi">22</span>
 
@@ -216,7 +218,8 @@ into a <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bi
 <code class="docutils literal notranslate"><span class="pre">output_widths</span></code>, <code class="docutils literal notranslate"><span class="pre">num_rounds</span></code>) and implement the methods
 <code class="docutils literal notranslate"><span class="pre">eval</span></code> and <code class="docutils literal notranslate"><span class="pre">set_num_rounds</span></code> (see <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.BvFunction" title="cascada.bitvector.ssa.BvFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvFunction</span></code></a> and <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.RoundBasedFunction" title="cascada.bitvector.ssa.RoundBasedFunction"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RoundBasedFunction</span></code></a>)
 as follows</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cascada.bitvector.ssa</span> <span class="kn">import</span> <span class="n">RoundBasedFunction</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span>
+<span class="kn">from</span> <span class="nn">cascada.bitvector.ssa</span> <span class="kn">import</span> <span class="n">RoundBasedFunction</span>
 <span class="kn">from</span> <span class="nn">cascada.bitvector.operation</span> <span class="kn">import</span> <span class="n">RotateRight</span><span class="p">,</span> <span class="n">RotateLeft</span>
 
 <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
@@ -339,9 +342,10 @@ but we need to set the round keys manually for testing it individually.</p>
 <p>Finally,  we can implement Speck32/64 as a <a class="reference internal" href="cascada.primitives.blockcipher.html#cascada.primitives.blockcipher.Cipher" title="cascada.primitives.blockcipher.Cipher"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Cipher</span></code></a> subclass
 using <code class="docutils literal notranslate"><span class="pre">SpeckKeySchedule</span></code>, <code class="docutils literal notranslate"><span class="pre">SpeckEncryption</span></code> and setting
 some attributes:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cascada.bitvector.ssa</span> <span class="kn">import</span> <span class="n">RoundBasedFunction</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span>
+<span class="kn">from</span> <span class="nn">cascada.bitvector.ssa</span> <span class="kn">import</span> <span class="n">RoundBasedFunction</span>
 <span class="kn">from</span> <span class="nn">cascada.bitvector.operation</span> <span class="kn">import</span> <span class="n">RotateRight</span><span class="p">,</span> <span class="n">RotateLeft</span>
-<span class="kn">from</span> <span class="nn">cascada.primitives.blockcipher</span> <span class="kn">import</span> <span class="n">Encryption</span>
+<span class="kn">from</span> <span class="nn">cascada.primitives.blockcipher</span> <span class="kn">import</span> <span class="n">Encryption</span><span class="p">,</span> <span class="n">Cipher</span>
 
 <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">RotateRight</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span> <span class="o">+</span> <span class="n">y</span> <span class="o">^</span> <span class="n">k</span>
@@ -406,6 +410,12 @@ over this primitive. For example, if the primitive contains S-boxes (<a class="r
 or binary matrix-vector operations (<a class="reference internal" href="cascada.bitvector.secondaryop.html#cascada.bitvector.secondaryop.MatrixOperation" title="cascada.bitvector.secondaryop.MatrixOperation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">MatrixOperation</span></code></a>), no default property models
 are assigned for these operations, but the generic models <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.WeakModel" title="cascada.abstractproperty.opmodel.WeakModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">WeakModel</span></code></a>,
 <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.BranchNumberModel" title="cascada.abstractproperty.opmodel.BranchNumberModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BranchNumberModel</span></code></a> and <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.WDTModel" title="cascada.abstractproperty.opmodel.WDTModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">WDTModel</span></code></a> can be used (as in <a class="reference internal" href="cascada.primitives.aes.html#module-cascada.primitives.aes" title="cascada.primitives.aes"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">aes</span></code></a> or <a class="reference internal" href="cascada.primitives.skinny64.html#module-cascada.primitives.skinny64" title="cascada.primitives.skinny64"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">skinny64</span></code></a>).</p>
+<p>Note that the previous implementation of Speck32/64 is slightly different to the
+implementations of Speck in <a class="reference internal" href="cascada.primitives.speck.html#module-cascada.primitives.speck" title="cascada.primitives.speck"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">speck</span></code></a>. In particular,
+<a class="reference internal" href="cascada.primitives.speck.html#module-cascada.primitives.speck" title="cascada.primitives.speck"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">speck</span></code></a> includes <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.RoundBasedFunction.add_round_outputs" title="cascada.bitvector.ssa.RoundBasedFunction.add_round_outputs"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">add_round_outputs</span></code></a> calls to delimit the
+rounds and considers that a Speck cipher instance with <span class="math notranslate nohighlight">\(r\)</span> rounds contains
+<span class="math notranslate nohighlight">\(r\)</span> encryption rounds but <span class="math notranslate nohighlight">\((r-1)\)</span> key-schedule rounds
+(since the key-schedule does not perform any operation for the 1-round cipher).</p>
 </section>
 </section>
 
@@ -414,7 +424,7 @@ are assigned for these operations, but the generic models <a class="reference in
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="usage.html" class="btn btn-neutral float-left" title="Usage" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="primitives_implemented.html" class="btn btn-neutral float-right" title="Primitives implemented" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="advanced_usage.html" class="btn btn-neutral float-right" title="Advanced Usage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

@@ -1,15 +1,26 @@
 Usage
 =====
 
-To search for characteristics (e.g., differential or linear characteristics)
-or zero-probability properties (e.g., impossible differentials or zero-correlation approximations)
-over a primitive, the primitive needs to be implemented following the CASCADA interface.
-There are several primitives already implemented,
-such as AES, CHAM, Chaskey, FEAL, HIGHT, LEA, MULTI2, π-cipher, SHACAL-1, SHACAL-2,
-Simeck, Simon, Speck, SKINNY, TEA, or XTEA (see `primitives_implemented`).
+In this tutorial you will see how to search for characteristics (e.g., differential or linear characteristics)
+or zero-probability properties (e.g., impossible differentials or zero-correlation approximations) with the
+all-in-one functions `round_based_ch_search`, `round_based_cipher_ch_search`,
+`round_based_invalidprop_search` and `round_based_invalidcipherprop_search`.
 
+To search for characteristics or zero-probability properties over a primitive,
+the primitive needs to be implemented following the CASCADA interface.
+There are several primitives already implemented,
+such as AES, CHAM, Chaskey, FEAL, HIGHT, LEA, MULTI2, NOEKEON, π-cipher, RECTANGLE,
+SHACAL-1, SHACAL-2, Simeck, Simon, Speck, SKINNY, TEA, or XTEA (see `primitives_implemented`).
 You can find a step-by-step tutorial about implement a new primitive
 in :doc:`adding_primitive`.
+
+Note that searching for characteristics or zero-probability properties
+over a large number of rounds of a complex function such as a block cipher
+can take a lot of time (e.g., days). Thus, it is recommended to first
+run a fine-grained search over a small number of rounds and check the results
+as explained in :doc:`advanced_usage`.
+
+More information on all the functions and classes of CASCADA can be found in :doc:`cascada`.
 
 
 Searching for characteristics
@@ -23,12 +34,12 @@ covering 2, 3, and 4 rounds of `speck_32_64` can be done as follows
 .. code:: python
 
     >>> from cascada.differential.difference import XorDiff
-    >>> from cascada.smt.chsearch import ChModelAssertType, round_based_ch_search
+    >>> from cascada.smt.chsearch import ChModelAssertType, PrintingMode, round_based_ch_search
     >>> from cascada.primitives import speck
     >>> Speck32 = speck.get_Speck_instance(speck.SpeckInstance.speck_32_64)
     >>> assert_type = ChModelAssertType.ValidityAndWeight
     >>> iterator = round_based_ch_search(Speck32, 2, 3, XorDiff, assert_type, "btor",
-    ...     extra_chfinder_args={"exclude_zero_input_prop": True},
+    ...     extra_chfinder_args={"exclude_zero_input_prop": True, "printing_mode": PrintingMode.Silent},
     ...     extra_findnextchweight_args={"initial_weight": 0})
     >>> for (num_rounds, ch) in iterator:
     ...     print(num_rounds, ":", ch.srepr())
@@ -95,5 +106,3 @@ using quantified SMT problems over 3-round `speck_32_64` can be done as follows
     >>> uni_inv_ch = next(invalid_prop_finder.find_next_invalidprop_quantified_logic())
     >>> print(uni_inv_ch.srepr())
     Ch(ks_ch=Ch(w=Infinity, id=c0a2 c0a2, od=0000 0000),  enc_ch=Ch(w=Infinity, id=c0a2 0000, od=c0a2 c0a2))
-
-The :doc:`cascada` provides more information for all the functions and classes of CASCADA.

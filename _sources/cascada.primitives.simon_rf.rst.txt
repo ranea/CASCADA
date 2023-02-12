@@ -1,5 +1,5 @@
-cascada.primitives.simon_rf module
-==================================
+cascada.primitives.simon\_rf module
+===================================
 
 .. automodule:: cascada.primitives.simon_rf
    :members:

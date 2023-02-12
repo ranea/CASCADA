@@ -1,0 +1,6 @@
+cascada.primitives.rectangle module
+===================================
+
+.. automodule:: cascada.primitives.rectangle
+   :members:
+   :show-inheritance:

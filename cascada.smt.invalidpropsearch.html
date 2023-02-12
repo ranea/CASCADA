@@ -19,7 +19,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="cascada.smt.wrappedchmodel module" href="cascada.smt.wrappedchmodel.html" />
+    <link rel="next" title="cascada.smt.pysmttypes module" href="cascada.smt.pysmttypes.html" />
     <link rel="prev" title="cascada.smt.chsearch module" href="cascada.smt.chsearch.html" /> 
 </head>
 
@@ -45,19 +45,23 @@
 <li class="toctree-l1"><a class="reference internal" href="index.html">CASCADA</a></li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="adding_primitive.html">Adding a primitive</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced_usage.html">Advanced Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="primitives_implemented.html">Primitives implemented</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="cascada.html">API reference</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="cascada.bitvector.html">cascada.bitvector module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.primitives.html">cascada.primitives module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.abstractproperty.html">cascada.abstractproperty module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.differential.html">cascada.differential module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.linear.html">cascada.linear module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.algebraic.html">cascada.algebraic module</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="cascada.smt.html">cascada.smt module</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="cascada.smt.pysmttypes.html">cascada.smt.pysmttypes module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.smt.chsearch.html">cascada.smt.chsearch module</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">cascada.smt.invalidpropsearch module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.smt.wrappedchmodel.html">cascada.smt.wrappedchmodel module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.bitvector.html">cascada.bitvector package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.primitives.html">cascada.primitives package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.abstractproperty.html">cascada.abstractproperty package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.differential.html">cascada.differential package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.linear.html">cascada.linear package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.algebraic.html">cascada.algebraic package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="cascada.smt.html">cascada.smt package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="cascada.smt.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="cascada.smt.chsearch.html">cascada.smt.chsearch module</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">cascada.smt.invalidpropsearch module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.smt.pysmttypes.html">cascada.smt.pysmttypes module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.smt.wrappedchmodel.html">cascada.smt.wrappedchmodel module</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -79,7 +83,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="cascada.html">API reference</a> &raquo;</li>
-          <li><a href="cascada.smt.html">cascada.smt module</a> &raquo;</li>
+          <li><a href="cascada.smt.html">cascada.smt package</a> &raquo;</li>
       <li>cascada.smt.invalidpropsearch module</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/cascada.smt.invalidpropsearch.rst.txt" rel="nofollow"> View page source</a>
@@ -95,10 +99,33 @@
 <p>Search for zero-probability (invalid) properties
 (e.g., impossible differentials or zero-correlation hulls)
 by modeling the search as a sequence of SMT problems.</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cascada.smt.invalidpropsearch.ActiveBitMode" title="cascada.smt.invalidpropsearch.ActiveBitMode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ActiveBitMode</span></code></a></p></td>
+<td><p>Represent the subsets of bit-vectors available depending on which bits are activated (set to 1) for <code class="docutils literal notranslate"><span class="pre">find_next_invalidprop_activebitmode</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cascada.smt.invalidpropsearch.InvalidPropFinder" title="cascada.smt.invalidpropsearch.InvalidPropFinder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidPropFinder</span></code></a></p></td>
+<td><p>Search for zero-probability (invalid) property pairs by modeling the search as a sequence of SMT problems.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cascada.smt.invalidpropsearch.InvalidCipherPropFinder" title="cascada.smt.invalidpropsearch.InvalidCipherPropFinder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidCipherPropFinder</span></code></a></p></td>
+<td><p>Search for invalid properties of ciphers by modeling the search as a sequence of SMT problems.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cascada.smt.invalidpropsearch.round_based_invalidprop_search" title="cascada.smt.invalidpropsearch.round_based_invalidprop_search"><code class="xref py py-obj docutils literal notranslate"><span class="pre">round_based_invalidprop_search</span></code></a></p></td>
+<td><p>Search for zero-probability (invalid) property pairs of round-based functions over multiple number of rounds.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cascada.smt.invalidpropsearch.round_based_invalidcipherprop_search" title="cascada.smt.invalidpropsearch.round_based_invalidcipherprop_search"><code class="xref py py-obj docutils literal notranslate"><span class="pre">round_based_invalidcipherprop_search</span></code></a></p></td>
+<td><p>Search for zero-probability (invalid) properties of iterated ciphers over multiple number of rounds.</p></td>
+</tr>
+</tbody>
+</table>
 <dl class="py class">
 <dt class="sig sig-object py" id="cascada.smt.invalidpropsearch.ActiveBitMode">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.smt.invalidpropsearch.</span></span><span class="sig-name descname"><span class="pre">ActiveBitMode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/smt/invalidpropsearch.html#ActiveBitMode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.smt.invalidpropsearch.ActiveBitMode" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
 <p>Represent the subsets of bit-vectors available depending on
 which bits are activated (set to 1) for <code class="docutils literal notranslate"><span class="pre">find_next_invalidprop_activebitmode</span></code>.</p>
 <dl class="py attribute">
@@ -173,8 +200,8 @@ model into an equivalent characteristic model with one non-trivial transition.</
 <code class="docutils literal notranslate"><span class="pre">ch_model</span></code>,  <code class="docutils literal notranslate"><span class="pre">solver_name</span></code>, <code class="docutils literal notranslate"><span class="pre">printing_mode</span></code>, <code class="docutils literal notranslate"><span class="pre">filename</span></code>, <code class="docutils literal notranslate"><span class="pre">solver_seed</span></code>
 and <code class="docutils literal notranslate"><span class="pre">env=env</span></code>. See also <a class="reference internal" href="cascada.smt.chsearch.html#cascada.smt.chsearch.ChFinder" title="cascada.smt.chsearch.ChFinder"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChFinder</span></code></a>.</p>
 <p>Similar as <a class="reference internal" href="cascada.smt.chsearch.html#cascada.smt.chsearch.ChFinder" title="cascada.smt.chsearch.ChFinder"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ChFinder</span></code></a>,  the methods of <a class="reference internal" href="#cascada.smt.invalidpropsearch.InvalidPropFinder" title="cascada.smt.invalidpropsearch.InvalidPropFinder"><code class="xref any py py-class docutils literal notranslate"><span class="pre">InvalidPropFinder</span></code></a> that search for
-universally-invalid characteristics are Python <a class="reference external" href="https://docs.python.org/3/glossary.html#term-generator" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">generator</span></code></a> functions,
-returning an <a class="reference external" href="https://docs.python.org/3/glossary.html#term-iterator" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">iterator</span></code></a> that yields the universally-invalid characteristics
+universally-invalid characteristics are Python <a class="reference external" href="https://docs.python.org/3/glossary.html#term-generator" title="(in Python v3.11)"><code class="xref any docutils literal notranslate"><span class="pre">generator</span></code></a> functions,
+returning an <a class="reference external" href="https://docs.python.org/3/glossary.html#term-iterator" title="(in Python v3.11)"><code class="xref any docutils literal notranslate"><span class="pre">iterator</span></code></a> that yields the universally-invalid characteristics
 found in the search.
 If initialization argument <code class="docutils literal notranslate"><span class="pre">ch_model</span></code> is a <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.ChModel" title="cascada.abstractproperty.chmodel.ChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.chmodel.ChModel</span></code></a>
 (resp. <a class="reference internal" href="cascada.abstractproperty.chmodel.html#cascada.abstractproperty.chmodel.EncryptionChModel" title="cascada.abstractproperty.chmodel.EncryptionChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.chmodel.EncryptionChModel</span></code></a>),
@@ -764,8 +791,8 @@ the universally-invalid characteristics to search for and go to step 2.</p></li>
 </ol>
 </li>
 </ol>
-<p>This function is a Python <a class="reference external" href="https://docs.python.org/3/glossary.html#term-generator" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">generator</span></code></a> function
-(see <a class="reference internal" href="#cascada.smt.invalidpropsearch.InvalidPropFinder" title="cascada.smt.invalidpropsearch.InvalidPropFinder"><code class="xref any py py-class docutils literal notranslate"><span class="pre">InvalidPropFinder</span></code></a>), returning an <a class="reference external" href="https://docs.python.org/3/glossary.html#term-iterator" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">iterator</span></code></a> that yields
+<p>This function is a Python <a class="reference external" href="https://docs.python.org/3/glossary.html#term-generator" title="(in Python v3.11)"><code class="xref any docutils literal notranslate"><span class="pre">generator</span></code></a> function
+(see <a class="reference internal" href="#cascada.smt.invalidpropsearch.InvalidPropFinder" title="cascada.smt.invalidpropsearch.InvalidPropFinder"><code class="xref any py py-class docutils literal notranslate"><span class="pre">InvalidPropFinder</span></code></a>), returning an <a class="reference external" href="https://docs.python.org/3/glossary.html#term-iterator" title="(in Python v3.11)"><code class="xref any docutils literal notranslate"><span class="pre">iterator</span></code></a> that yields
 2-length tuples:</p>
 <ul class="simple">
 <li><p>The first element in the tuple is a 4-length tuple containing
@@ -791,7 +818,7 @@ respectively.</p>
 <p>It is possible to abort the current search for the current number of rounds
 and start the search with one more round by passing the
 value <a class="reference internal" href="cascada.smt.chsearch.html#cascada.smt.chsearch.INCREMENT_NUM_ROUNDS" title="cascada.smt.chsearch.INCREMENT_NUM_ROUNDS"><code class="xref any py py-data docutils literal notranslate"><span class="pre">INCREMENT_NUM_ROUNDS</span></code></a>
-to the generator iterator with <a class="reference external" href="https://docs.python.org/3/reference/expressions.html#generator.send" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">generator.send</span></code></a>
+to the generator iterator with <a class="reference external" href="https://docs.python.org/3/reference/expressions.html#generator.send" title="(in Python v3.11)"><code class="xref any docutils literal notranslate"><span class="pre">generator.send</span></code></a>
 (see <a class="reference internal" href="cascada.smt.chsearch.html#cascada.smt.chsearch.round_based_ch_search" title="cascada.smt.chsearch.round_based_ch_search"><code class="xref any py py-func docutils literal notranslate"><span class="pre">round_based_ch_search</span></code></a>).</p>
 <p>This function reuses information from previous partitions <span class="math notranslate nohighlight">\((E_0', E_1', E_2')\)</span>
 to directly avoid some new partitions <span class="math notranslate nohighlight">\((E_0, E_1, E_2)\)</span> that don’t contain
@@ -927,7 +954,7 @@ to generate due to the skipped initial rounds.</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="cascada.smt.chsearch.html" class="btn btn-neutral float-left" title="cascada.smt.chsearch module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="cascada.smt.wrappedchmodel.html" class="btn btn-neutral float-right" title="cascada.smt.wrappedchmodel module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="cascada.smt.pysmttypes.html" class="btn btn-neutral float-right" title="cascada.smt.pysmttypes module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

@@ -41,6 +41,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../index.html">CASCADA</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../adding_primitive.html">Adding a primitive</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced_usage.html">Advanced Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../primitives_implemented.html">Primitives implemented</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../cascada.html">API reference</a></li>
 </ul>
@@ -70,7 +71,29 @@
            <div itemprop="articleBody">
              
   <h1>Source code for cascada.linear.opmodel</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Manipulate linear models of bit-vector operations.&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;Manipulate linear models of bit-vector operations.</span>
+
+<span class="sd">.. autosummary::</span>
+<span class="sd">   :nosignatures:</span>
+
+<span class="sd">    OpModel</span>
+<span class="sd">    PartialOpModel</span>
+<span class="sd">    LinearModelId</span>
+<span class="sd">    LinearModelFreeBranch</span>
+<span class="sd">    LinearModelBvXor</span>
+<span class="sd">    LinearModelBvAnd</span>
+<span class="sd">    LinearModelBvOr</span>
+<span class="sd">    LinearModelBvAdd</span>
+<span class="sd">    LinearModelBvSub</span>
+<span class="sd">    LinearModelBvAndCt</span>
+<span class="sd">    LinearModelBvOrCt</span>
+<span class="sd">    LinearModelBvShlCt</span>
+<span class="sd">    LinearModelBvLshrCt</span>
+<span class="sd">    LinearModelExtractCt</span>
+<span class="sd">    get_weak_model</span>
+<span class="sd">    get_branch_number_model</span>
+<span class="sd">    get_wdt_model</span>
+<span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">functools</span>
 <span class="kn">import</span> <span class="nn">hashlib</span>
 <span class="kn">import</span> <span class="nn">math</span>

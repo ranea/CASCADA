@@ -41,6 +41,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../index.html">CASCADA</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../adding_primitive.html">Adding a primitive</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced_usage.html">Advanced Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../primitives_implemented.html">Primitives implemented</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../cascada.html">API reference</a></li>
 </ul>
@@ -70,7 +71,20 @@
            <div itemprop="articleBody">
              
   <h1>Source code for cascada.smt.chsearch</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Search for characteristics by modeling the search as a sequence of SMT problems.&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;Search for characteristics by modeling the search as a sequence of SMT problems.</span>
+
+<span class="sd">.. autosummary::</span>
+<span class="sd">   :nosignatures:</span>
+
+<span class="sd">    INCREMENT_NUM_ROUNDS</span>
+<span class="sd">    ChModelAssertType</span>
+<span class="sd">    PrintingMode</span>
+<span class="sd">    MissingVarWarning</span>
+<span class="sd">    ChFinder</span>
+<span class="sd">    CipherChFinder</span>
+<span class="sd">    round_based_ch_search</span>
+<span class="sd">    round_based_cipher_ch_search</span>
+<span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">collections</span>
 <span class="kn">import</span> <span class="nn">decimal</span>
 <span class="kn">import</span> <span class="nn">enum</span>
@@ -1089,7 +1103,7 @@
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">yield</span> <span class="n">best_ch_found</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="n">last_ch_found</span> <span class="ow">is</span> <span class="kc">None</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;no characteristic found with weight &lt;= </span><span class="si">{</span><span class="n">final_weight</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="n">solver</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span></div>
 

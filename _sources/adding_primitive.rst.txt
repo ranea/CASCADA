@@ -98,6 +98,7 @@ and returning the ciphertext words.
 
 .. code:: python
 
+    from cascada.bitvector.core import Constant
     from cascada.bitvector.operation import RotateRight, RotateLeft
 
     num_rounds = 22
@@ -156,6 +157,7 @@ as follows
 
 .. code:: python
 
+    from cascada.bitvector.core import Constant
     from cascada.bitvector.ssa import RoundBasedFunction
     from cascada.bitvector.operation import RotateRight, RotateLeft
 
@@ -292,9 +294,10 @@ some attributes:
 
 .. code:: python
 
+    from cascada.bitvector.core import Constant
     from cascada.bitvector.ssa import RoundBasedFunction
     from cascada.bitvector.operation import RotateRight, RotateLeft
-    from cascada.primitives.blockcipher import Encryption
+    from cascada.primitives.blockcipher import Encryption, Cipher
 
     def f(x, y, k):
         x = RotateRight(x, 7) + y ^ k
@@ -361,3 +364,10 @@ over this primitive. For example, if the primitive contains S-boxes (`LutOperati
 or binary matrix-vector operations (`MatrixOperation`), no default property models
 are assigned for these operations, but the generic models `WeakModel`,
 `BranchNumberModel` and `WDTModel` can be used (as in `aes` or `skinny64`).
+
+Note that the previous implementation of Speck32/64 is slightly different to the
+implementations of Speck in `speck`. In particular,
+`speck` includes `add_round_outputs` calls to delimit the
+rounds and considers that a Speck cipher instance with :math:`r` rounds contains
+:math:`r` encryption rounds but :math:`(r-1)` key-schedule rounds
+(since the key-schedule does not perform any operation for the 1-round cipher).

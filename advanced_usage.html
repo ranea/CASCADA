@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Advanced Usage &mdash; CASCADA 1.0.rc0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Primitives implemented" href="primitives_implemented.html" />
+    <link rel="prev" title="Adding a primitive" href="adding_primitive.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> CASCADA
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">CASCADA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="adding_primitive.html">Adding a primitive</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Advanced Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#checking-the-bit-vector-implementation-of-a-primitive">Checking the bit-vector implementation of a primitive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#checking-the-property-model-of-a-bit-vector-operation">Checking the property model of a bit-vector operation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#checking-a-characteristic-model">Checking a characteristic model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#checking-the-characteristics-found-in-the-search">Checking the characteristics found in the search</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="primitives_implemented.html">Primitives implemented</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cascada.html">API reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">CASCADA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Advanced Usage</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/advanced_usage.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="advanced-usage">
+<h1>Advanced Usage<a class="headerlink" href="#advanced-usage" title="Permalink to this headline"></a></h1>
+<p>Before searching for characteristics or zero-probability properties
+over a large number of rounds of a cryptographic primitive,
+CASCADA provides a set of tools to run a fine-grained search over
+a small number of rounds and check the results.
+Additionally, if you are implementing a new primitive or a new property model,
+CASCADA also includes several tests to check cipher implementations
+and property models.</p>
+<p>In this tutorial we will see how to check the bit-vector implementation of
+a primitive, the property models of a bit-vector operations, a characteristic model,
+and a characteristic obtained in the search.</p>
+<section id="checking-the-bit-vector-implementation-of-a-primitive">
+<h2>Checking the bit-vector implementation of a primitive<a class="headerlink" href="#checking-the-bit-vector-implementation-of-a-primitive" title="Permalink to this headline"></a></h2>
+<p>If you are using one of the primitives included in CASCADA (see <a class="reference internal" href="primitives_implemented.html"><span class="doc">Primitives implemented</span></a>)
+you can skip this section. Otherwise, you can check that the primitive is correct
+by evaluating it with some test vectors. For example, you can evaluate
+the cipher Speck32/64 with a test vector as follows:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">speck</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plaintext</span> <span class="o">=</span> <span class="p">(</span><span class="mh">0x6574</span><span class="p">,</span> <span class="mh">0x694c</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="mh">0x1918</span><span class="p">,</span> <span class="mh">0x1110</span><span class="p">,</span> <span class="mh">0x0908</span><span class="p">,</span> <span class="mh">0x0100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span><span class="p">(</span><span class="n">plaintext</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span> <span class="o">==</span> <span class="p">(</span><span class="mh">0xa868</span><span class="p">,</span> <span class="mh">0x42f2</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>For a round-based primitive including <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.RoundBasedFunction.add_round_outputs" title="cascada.bitvector.ssa.RoundBasedFunction.add_round_outputs"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">add_round_outputs</span></code></a> calls, you can also
+check the automatic round splitting of the <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.SSA" title="cascada.bitvector.ssa.SSA"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SSA</span></code></a> form:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">SpeckCipher</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SpeckCipher</span><span class="o">.</span><span class="n">set_round_keys</span><span class="p">(</span><span class="n">symbolic_prefix</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ssa_2rounds</span> <span class="o">=</span> <span class="n">SpeckCipher</span><span class="o">.</span><span class="n">encryption</span><span class="o">.</span><span class="n">to_ssa</span><span class="p">([</span><span class="s2">&quot;p0&quot;</span><span class="p">,</span> <span class="s2">&quot;p1&quot;</span><span class="p">],</span> <span class="s2">&quot;x&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ssa_2rounds</span>
+<span class="go">SSA(input_vars=[p0, p1], output_vars=[x7_out, x9_out], external_vars=[k0, k1],</span>
+<span class="go">    assignments=[(x0, p0 &gt;&gt;&gt; 7), (x1, x0 + p1), (x2, x1 ^ k0), (x3, p1 &lt;&lt;&lt; 2), (x4, x3 ^ x2),</span>
+<span class="go">        (x5, x2 &gt;&gt;&gt; 7), (x6, x5 + x4), (x7, x6 ^ k1), (x8, x4 &lt;&lt;&lt; 2), (x9, x8 ^ x7), (x7_out, Id(x7)), (x9_out, Id(x9))])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ssa_round1</span><span class="p">,</span> <span class="n">ssa_round2</span> <span class="o">=</span> <span class="n">ssa_2rounds</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">ssa_2rounds</span><span class="o">.</span><span class="n">get_round_separators</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ssa_round1</span>
+<span class="go">SSA(input_vars=[p0, p1], output_vars=[x2_out, x4_out], external_vars=[k0],</span>
+<span class="go">    assignments=[(x0, p0 &gt;&gt;&gt; 7), (x1, x0 + p1), (x2, x1 ^ k0), (x3, p1 &lt;&lt;&lt; 2), (x4, x3 ^ x2), (x2_out, Id(x2)), (x4_out, Id(x4))])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ssa_round2</span>
+<span class="go">SSA(input_vars=[x2, x4], output_vars=[x7_out, x9_out], external_vars=[k1],</span>
+<span class="go">    assignments=[(x5, x2 &gt;&gt;&gt; 7), (x6, x5 + x4), (x7, x6 ^ k1), (x8, x4 &lt;&lt;&lt; 2), (x9, x8 ^ x7), (x7_out, Id(x7)), (x9_out, Id(x9))])</span>
+</pre></div>
+</div>
+<p>Here we can see the SSA of each round corresponds exactly to a round of Speck,
+that the external variables are the round keys, and that the composition of
+<code class="docutils literal notranslate"><span class="pre">ssa_round1</span></code> and <code class="docutils literal notranslate"><span class="pre">ssa_round2</span></code> results in <code class="docutils literal notranslate"><span class="pre">ssa_2rounds</span></code>.
+Checking the SSA form of the cipher is beneficial as this is the main internal
+representation used by CASCADA. Moreover, the SSA form might differ from the original
+implementation (while still being functionally equivalent), as redundant assignments
+are removed and additional transformations might be performed (more on that later).</p>
+<p>Additionally, you can use the tests in <code class="docutils literal notranslate"><span class="pre">smt/tests/test_primitives_eval.py</span></code>
+(by adding your primitive to the list <code class="docutils literal notranslate"><span class="pre">LIST_PRIMITIVES</span></code>)
+or in <code class="docutils literal notranslate"><span class="pre">smt/tests/test_primitives_smt.py</span></code>, or read more about
+implementing primitives in <a class="reference internal" href="adding_primitive.html"><span class="doc">Adding a primitive</span></a>, <a class="reference internal" href="cascada.bitvector.ssa.html#module-cascada.bitvector.ssa" title="cascada.bitvector.ssa"><code class="xref py py-mod docutils literal notranslate"><span class="pre">cascada.bitvector.ssa</span></code></a>
+and <a class="reference internal" href="cascada.primitives.blockcipher.html#module-cascada.primitives.blockcipher" title="cascada.primitives.blockcipher"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">blockcipher</span></code></a>.</p>
+</section>
+<section id="checking-the-property-model-of-a-bit-vector-operation">
+<h2>Checking the property model of a bit-vector operation<a class="headerlink" href="#checking-the-property-model-of-a-bit-vector-operation" title="Permalink to this headline"></a></h2>
+<p>If you are using one the primitives included in CASCADA or only property
+models included in CASCADA, you can skip this section.</p>
+<p>If you implement a new property model from the generic models
+<a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.WeakModel" title="cascada.abstractproperty.opmodel.WeakModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">WeakModel</span></code></a>, <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.BranchNumberModel" title="cascada.abstractproperty.opmodel.BranchNumberModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BranchNumberModel</span></code></a> or <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.WDTModel" title="cascada.abstractproperty.opmodel.WDTModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">WDTModel</span></code></a>, then you can
+check the weights and the model error. For example, for a <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.WDTModel" title="cascada.abstractproperty.opmodel.WDTModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">WDTModel</span></code></a>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">decimal</span> <span class="kn">import</span> <span class="n">Decimal</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">inf</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Variable</span><span class="p">,</span> <span class="n">Constant</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.secondaryop</span> <span class="kn">import</span> <span class="n">LutOperation</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.difference</span> <span class="kn">import</span> <span class="n">XorDiff</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.opmodel</span> <span class="kn">import</span> <span class="n">log2_decimal</span><span class="p">,</span> <span class="n">get_wdt_model</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">Sbox3b</span><span class="p">(</span><span class="n">LutOperation</span><span class="p">):</span> <span class="n">lut</span> <span class="o">=</span> <span class="p">[</span><span class="n">Constant</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">5</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ddt</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">wdt_dec</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="nb">tuple</span><span class="p">(</span><span class="n">inf</span> <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="o">-</span><span class="n">log2_decimal</span><span class="p">(</span><span class="n">x</span><span class="o">/</span><span class="n">Decimal</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="mi">3</span><span class="p">))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">row</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">ddt</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">wdt_dec</span>
+<span class="go">((Decimal(&#39;0&#39;), inf, inf, inf, inf, inf, inf, inf),</span>
+<span class="go">(inf, Decimal(&#39;1&#39;), Decimal(&#39;1&#39;), inf, inf, inf, inf, inf),</span>
+<span class="go">(inf, inf, Decimal(&#39;1&#39;), Decimal(&#39;1&#39;), inf, inf, inf, inf),</span>
+<span class="go">(inf, Decimal(&#39;1&#39;), inf, Decimal(&#39;1&#39;), inf, inf, inf, inf),</span>
+<span class="go">(inf, inf, inf, inf, Decimal(&#39;2&#39;), Decimal(&#39;2&#39;), Decimal(&#39;2&#39;), Decimal(&#39;2&#39;)),</span>
+<span class="go">(inf, inf, inf, inf, Decimal(&#39;2&#39;), Decimal(&#39;2&#39;), Decimal(&#39;2&#39;), Decimal(&#39;2&#39;)),</span>
+<span class="go">(inf, inf, inf, inf, Decimal(&#39;2&#39;), Decimal(&#39;2&#39;), Decimal(&#39;2&#39;), Decimal(&#39;2&#39;)),</span>
+<span class="go">(inf, inf, inf, inf, Decimal(&#39;2&#39;), Decimal(&#39;2&#39;), Decimal(&#39;2&#39;), Decimal(&#39;2&#39;)))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">XorWDTModelSbox3b</span> <span class="o">=</span> <span class="n">get_wdt_model</span><span class="p">(</span><span class="n">Sbox3b</span><span class="p">,</span> <span class="n">XorDiff</span><span class="p">,</span> <span class="n">wdt_dec</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">XorWDTModelSbox3b</span><span class="p">(</span><span class="n">XorDiff</span><span class="p">(</span><span class="n">Variable</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)))</span><span class="o">.</span><span class="n">error</span><span class="p">()</span>
+<span class="go">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">wdt_bv</span> <span class="o">=</span> <span class="p">[[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="mi">3</span><span class="p">)]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="mi">3</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="mi">3</span><span class="p">):</span>
+<span class="gp">... </span>   <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="mi">3</span><span class="p">):</span>
+<span class="gp">... </span>       <span class="n">f</span> <span class="o">=</span> <span class="n">XorWDTModelSbox3b</span><span class="p">(</span><span class="n">XorDiff</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">3</span><span class="p">)))</span>
+<span class="gp">... </span>       <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">validity_constraint</span><span class="p">(</span><span class="n">XorDiff</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="mi">3</span><span class="p">))):</span>
+<span class="gp">... </span>           <span class="n">wdt_bv</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">bv_weight</span><span class="p">(</span><span class="n">XorDiff</span><span class="p">(</span><span class="n">Constant</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="mi">3</span><span class="p">)))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">wdt_bv</span>
+<span class="go">[[0b00, None, None, None, None, None, None, None],</span>
+<span class="go">[None, 0b01, 0b01, None, None, None, None, None],</span>
+<span class="go">[None, None, 0b01, 0b01, None, None, None, None],</span>
+<span class="go">[None, 0b01, None, 0b01, None, None, None, None],</span>
+<span class="go">[None, None, None, None, 0b10, 0b10, 0b10, 0b10],</span>
+<span class="go">[None, None, None, None, 0b10, 0b10, 0b10, 0b10],</span>
+<span class="go">[None, None, None, None, 0b10, 0b10, 0b10, 0b10],</span>
+<span class="go">[None, None, None, None, 0b10, 0b10, 0b10, 0b10]]</span>
+</pre></div>
+</div>
+<p>We can see that the error is 0 as the bit-vector weights from <code class="docutils literal notranslate"><span class="pre">wdt_bv</span></code>
+match the decimal weights from <code class="docutils literal notranslate"><span class="pre">wdt_dec</span></code>. However, if the decimal weights
+provided to <code class="docutils literal notranslate"><span class="pre">get_wdt_model</span></code> are not integers, you should check the error
+and the bit-vector weights to choose the best trade-off for the precision
+(more fractional bits give to less error but more complex models).</p>
+<p>If you implement a new property model (not derived from
+<a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.WeakModel" title="cascada.abstractproperty.opmodel.WeakModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">WeakModel</span></code></a>, <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.BranchNumberModel" title="cascada.abstractproperty.opmodel.BranchNumberModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BranchNumberModel</span></code></a> or <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.WDTModel" title="cascada.abstractproperty.opmodel.WDTModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">WDTModel</span></code></a>), then the CASCADA modules
+<code class="docutils literal notranslate"><span class="pre">differential.tests.test_opmodel</span></code> and <code class="docutils literal notranslate"><span class="pre">linear.tests.test_opmodel</span></code>
+provide the class <code class="docutils literal notranslate"><span class="pre">TestOpModelGeneric</span></code> to test the constraints of a differential
+or linear model by sampling all inputs of small wordsize.
+An example of how to use this class is the method <code class="docutils literal notranslate"><span class="pre">TestOpModelsSmallWidth.test_*_models_slow</span></code>
+from these modules, or the method <code class="docutils literal notranslate"><span class="pre">TestOpModelsSmallWidth.test_Xor_models_slow</span></code> from
+<code class="docutils literal notranslate"><span class="pre">smt/tests/test_simon_rf</span></code> (which might be easier to understand).
+Additionally, you can check the error and the symbolic expressions of the constraints
+of the model similar to the docstrings of <code class="docutils literal notranslate"><span class="pre">smt/tests/test_simon_rf</span></code>, <a class="reference internal" href="cascada.differential.opmodel.html#module-cascada.differential.opmodel" title="cascada.differential.opmodel"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">differential.opmodel</span></code></a> and
+<a class="reference internal" href="cascada.linear.opmodel.html#module-cascada.linear.opmodel" title="cascada.linear.opmodel"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">linear.opmodel</span></code></a>. You can read more about property models in
+<a class="reference internal" href="cascada.abstractproperty.opmodel.html#module-cascada.abstractproperty.opmodel" title="cascada.abstractproperty.opmodel"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">abstractproperty.opmodel</span></code></a>.</p>
+</section>
+<section id="checking-a-characteristic-model">
+<h2>Checking a characteristic model<a class="headerlink" href="#checking-a-characteristic-model" title="Permalink to this headline"></a></h2>
+<p>Before checking the characteristics found in the search, it is better to check first
+the representation of a characteristic model (i.e., the symbolic characteristic associated with
+any characteristics found) and its error.</p>
+<p>For a round-based primitive including <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.RoundBasedFunction.add_round_outputs" title="cascada.bitvector.ssa.RoundBasedFunction.add_round_outputs"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">add_round_outputs</span></code></a> calls, you can print
+for example the <a class="reference internal" href="cascada.differential.difference.html#cascada.differential.difference.XorDiff" title="cascada.differential.difference.XorDiff"><code class="xref any py py-class docutils literal notranslate"><span class="pre">XorDiff</span></code></a> <a class="reference internal" href="cascada.differential.chmodel.html#cascada.differential.chmodel.EncryptionChModel" title="cascada.differential.chmodel.EncryptionChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">differential.chmodel.EncryptionChModel</span></code></a> of each round and its underlying
+SSA form as follows:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.difference</span> <span class="kn">import</span> <span class="n">XorDiff</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.chmodel</span> <span class="kn">import</span> <span class="n">EncryptionChModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">speck</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model_2rounds</span> <span class="o">=</span> <span class="n">EncryptionChModel</span><span class="p">(</span><span class="n">Speck32</span><span class="p">,</span> <span class="n">XorDiff</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model_2rounds</span><span class="o">.</span><span class="n">error</span><span class="p">()</span>
+<span class="go">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model_round1</span><span class="p">,</span> <span class="n">ch_model_round2</span> <span class="o">=</span> <span class="n">ch_model_2rounds</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">ch_model_2rounds</span><span class="o">.</span><span class="n">get_round_separators</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model_round1</span><span class="o">.</span><span class="n">ssa</span>
+<span class="go">SSA(input_vars=[dp0, dp1], output_vars=[dx2_out, dx4_out], external_vars=[dk0],</span>
+<span class="go">    assignments=[(dx0, dp0 &gt;&gt;&gt; 7), (dx1, dx0 + dp1), (dx2, dx1 ^ dk0), (dx3, dp1 &lt;&lt;&lt; 2), (dx4, dx3 ^ dx2), (dx2_out, Id(dx2)), (dx4_out, Id(dx4))])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model_round1</span>
+<span class="go">ChModel(func=SpeckEncryption_2R_0S, input_diff=[XorDiff(dp0), XorDiff(dp1)],</span>
+<span class="go">    output_diff=[XorDiff(dx2_out), XorDiff(dx4_out)],</span>
+<span class="go">    external_var2diff=[(dk0, XorDiff(0x0000))],</span>
+<span class="go">    assign_outdiff2op_model=[(XorDiff(dx1), XorModelBvAdd([XorDiff(dp0 &gt;&gt;&gt; 7), XorDiff(dp1)])),</span>
+<span class="go">                             (XorDiff(dx2_out), XorModelId(XorDiff(dx1))),</span>
+<span class="go">                             (XorDiff(dx4_out), XorModelId(XorDiff((dp1 &lt;&lt;&lt; 2) ^ dx1)))])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model_round2</span><span class="o">.</span><span class="n">ssa</span>
+<span class="go">SSA(input_vars=[dx2, dx4], output_vars=[dx7_out, dx9_out], external_vars=[dk1],</span>
+<span class="go">    assignments=[(dx5, dx2 &gt;&gt;&gt; 7), (dx6, dx5 + dx4), (dx7, dx6 ^ dk1), (dx8, dx4 &lt;&lt;&lt; 2), (dx9, dx8 ^ dx7), (dx7_out, Id(dx7)), (dx9_out, Id(dx9))])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model_round2</span>
+<span class="go">ChModel(func=SpeckEncryption_2R_1S, input_diff=[XorDiff(dx2), XorDiff(dx4)],</span>
+<span class="go">    output_diff=[XorDiff(dx7_out), XorDiff(dx9_out)],</span>
+<span class="go">    external_var2diff=[(dk1, XorDiff(0x0000))],</span>
+<span class="go">    assign_outdiff2op_model=[(XorDiff(dx6), XorModelBvAdd([XorDiff(dx2 &gt;&gt;&gt; 7), XorDiff(dx4)])),</span>
+<span class="go">                             (XorDiff(dx7_out), XorModelId(XorDiff(dx6))),</span>
+<span class="go">                             (XorDiff(dx9_out), XorModelId(XorDiff((dx4 &lt;&lt;&lt; 2) ^ dx6)))])</span>
+</pre></div>
+</div>
+<p>Excluding the trivial transitions with <code class="docutils literal notranslate"><span class="pre">XorModelId</span></code>, we can check that there is only
+one non-trivial transition per round that corresponds to the propagation of the modular addition:
+<code class="docutils literal notranslate"><span class="pre">(XorDiff(dx1),</span> <span class="pre">XorModelBvAdd([XorDiff(dp0</span> <span class="pre">&gt;&gt;&gt;</span> <span class="pre">7),</span> <span class="pre">XorDiff(dp1)]))</span></code> in the first round,
+and <code class="docutils literal notranslate"><span class="pre">(XorDiff(dx6),</span> <span class="pre">XorModelBvAdd([XorDiff(dx2</span> <span class="pre">&gt;&gt;&gt;</span> <span class="pre">7),</span> <span class="pre">XorDiff(dx4)]))</span></code> in the second round.
+You can also check the difference associated to each intermediate variable from
+the attribute <code class="docutils literal notranslate"><span class="pre">var2diff</span></code> of the characteristic model.</p>
+<p>Checking the underlying SSA is particularly important for linear characteristics,
+as this SSA differs from the SSA of the original primitive; the underlying SSA
+is computed with the initialization argument <code class="docutils literal notranslate"><span class="pre">replace_multiuse_vars=True</span></code>.
+(see <a class="reference internal" href="cascada.linear.chmodel.html#cascada.linear.chmodel.ChModel" title="cascada.linear.chmodel.ChModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">linear.chmodel.ChModel</span></code></a>).</p>
+<p>We can also see here that the characteristic model of the two rounds
+<code class="docutils literal notranslate"><span class="pre">ch_model_2rounds</span></code> has error 0, as the model <a class="reference internal" href="cascada.differential.opmodel.html#cascada.differential.opmodel.XorModelBvAdd" title="cascada.differential.opmodel.XorModelBvAdd"><code class="xref any py py-class docutils literal notranslate"><span class="pre">XorModelBvAdd</span></code></a> has also error 0.
+This error is important as it will affect the optimality of the
+characteristics found in the search and the speed when computing the empirical weights.</p>
+<p>You can read more about characteristic models in <a class="reference internal" href="cascada.abstractproperty.chmodel.html#module-cascada.abstractproperty.chmodel" title="cascada.abstractproperty.chmodel"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">abstractproperty.chmodel</span></code></a>.</p>
+</section>
+<section id="checking-the-characteristics-found-in-the-search">
+<h2>Checking the characteristics found in the search<a class="headerlink" href="#checking-the-characteristics-found-in-the-search" title="Permalink to this headline"></a></h2>
+<p>If the hypothesis of stochastic equivalence does not hold for the target primitive,
+(i.e., if the intermediate propagations of properties within the characteristic are not independent),
+the actual weight of the characteristics obtained in the search might be different
+than the <code class="docutils literal notranslate"><span class="pre">ch_weight</span></code> (the weight of the characteristic computed as the sum of
+the <code class="docutils literal notranslate"><span class="pre">assignment_weights</span></code>, see <a class="reference internal" href="cascada.abstractproperty.characteristic.html#cascada.abstractproperty.characteristic.Characteristic" title="cascada.abstractproperty.characteristic.Characteristic"><code class="xref any py py-class docutils literal notranslate"><span class="pre">abstractproperty.characteristic.Characteristic</span></code></a>).</p>
+<p>To check the discrepancy between the <code class="docutils literal notranslate"><span class="pre">ch_weight</span></code> and the actual weight,
+you can compute the <code class="docutils literal notranslate"><span class="pre">empirical_ch_weight</span></code>, which is another approximation
+of the actual weight of the characteristic
+(see <a class="reference internal" href="cascada.abstractproperty.characteristic.html#cascada.abstractproperty.characteristic.Characteristic.compute_empirical_ch_weight" title="cascada.abstractproperty.characteristic.Characteristic.compute_empirical_ch_weight"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">abstractproperty.characteristic.Characteristic.compute_empirical_ch_weight</span></code></a> for
+more details about the empirical weight).</p>
+<p>In the following example, we use the method <a class="reference internal" href="cascada.smt.chsearch.html#cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight" title="cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">ChFinder.find_next_ch_increasing_weight</span></code></a>
+with the parameter <code class="docutils literal notranslate"><span class="pre">empirical_weight_options</span></code> to search for 2-round characteristics
+of Speck32/64.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.difference</span> <span class="kn">import</span> <span class="n">XorDiff</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.chmodel</span> <span class="kn">import</span> <span class="n">EncryptionChModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.smt.chsearch</span> <span class="kn">import</span> <span class="n">ChFinder</span><span class="p">,</span> <span class="n">ChModelAssertType</span><span class="p">,</span> <span class="n">PrintingMode</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">speck</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model</span> <span class="o">=</span> <span class="n">EncryptionChModel</span><span class="p">(</span><span class="n">Speck32</span><span class="p">,</span> <span class="n">XorDiff</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">assert_type</span> <span class="o">=</span> <span class="n">ChModelAssertType</span><span class="o">.</span><span class="n">ValidityAndWeight</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_finder</span> <span class="o">=</span> <span class="n">ChFinder</span><span class="p">(</span><span class="n">ch_model</span><span class="p">,</span> <span class="n">assert_type</span><span class="p">,</span> <span class="s2">&quot;btor&quot;</span><span class="p">,</span> <span class="n">solver_seed</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+<span class="gp">... </span>                     <span class="n">exclude_zero_input_prop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">printing_mode</span><span class="o">=</span><span class="n">PrintingMode</span><span class="o">.</span><span class="n">Debug</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ewo</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;seed&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;C_code&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_found</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">ch_finder</span><span class="o">.</span><span class="n">find_next_ch_increasing_weight</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">empirical_weight_options</span><span class="o">=</span><span class="n">ewo</span><span class="p">))</span>
+<span class="go">[...] | Solving for weight = 0</span>
+<span class="go">[...] | Solving for weight = 1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_found</span>
+<span class="go">EncryptionCharacteristic(ch_weight=1, empirical_ch_weight=1.037103994662739465661470304, assignment_weights=[1, 0, 0, 0],</span>
+<span class="go">    input_diff=[0x0010, 0x2000], output_diff=[0x8000, 0x8002], external_diffs=[0x0000, 0x0000], assign_outdiff_list=[0x0000, 0x8000, 0x8000, 0x8002])</span>
+</pre></div>
+</div>
+<p>We are using the method <a class="reference internal" href="cascada.smt.chsearch.html#cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight" title="cascada.smt.chsearch.ChFinder.find_next_ch_increasing_weight"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">ChFinder.find_next_ch_increasing_weight</span></code></a> instead of the function <a class="reference internal" href="cascada.smt.chsearch.html#cascada.smt.chsearch.round_based_ch_search" title="cascada.smt.chsearch.round_based_ch_search"><code class="xref any py py-func docutils literal notranslate"><span class="pre">round_based_ch_search</span></code></a>
+since we are searching for characteristics with a fix number of rounds (and the iterative speedup of <a class="reference internal" href="cascada.smt.chsearch.html#cascada.smt.chsearch.round_based_ch_search" title="cascada.smt.chsearch.round_based_ch_search"><code class="xref any py py-func docutils literal notranslate"><span class="pre">round_based_ch_search</span></code></a>
+is not needed) and to have more control over the characteristic model and the parameters of the search.</p>
+<p>From the previous example we can see that that the difference between <code class="docutils literal notranslate"><span class="pre">ch_weight</span></code> and <code class="docutils literal notranslate"><span class="pre">empirical_ch_weight</span></code>
+is small, which is a good sign. You can see more information about the empirical weight
+(such as the number of input samples used to compute it; see also  <a class="reference internal" href="cascada.abstractproperty.characteristic.html#cascada.abstractproperty.characteristic.EmpiricalWeightData" title="cascada.abstractproperty.characteristic.EmpiricalWeightData"><code class="xref any py py-class docutils literal notranslate"><span class="pre">EmpiricalWeightData</span></code></a>)
+from the attribute <code class="docutils literal notranslate"><span class="pre">empirical_data_list</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ch_found</span><span class="o">.</span><span class="n">empirical_data_list</span>
+<span class="go">[EmpiricalWeightData(weight_avg_aux_prs=1.037103994662739465661470304, num_aux_weights=32, num_inf_aux_weights=0, num_input_samples=64, seed=0, C_code=True)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_found</span><span class="o">.</span><span class="n">empirical_data_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">aux_weights</span>
+<span class="go">[Decimal(&#39;1.045803689613124791193876401&#39;), Decimal(&#39;1&#39;), Decimal(&#39;1&#39;), ..., Decimal(&#39;0.6424479953819163068340286924&#39;)]</span>
+</pre></div>
+</div>
+<p>The time to compute the empirical weight depends on the number of input samples.
+If the number of samples is not given, this number is taken as a function of
+the <code class="docutils literal notranslate"><span class="pre">ch_weight</span></code> and the error of the characteristic model.
+Thus, if you are implementing a <code class="docutils literal notranslate"><span class="pre">OpModel</span></code>, reducing its error will reduce the characteristic model error,
+which in turn will speed up the computation of the empirical weight.</p>
+<p>The empirical weight can be computed manually by calling the method <code class="docutils literal notranslate"><span class="pre">compute_empirical_ch_weight</span></code>
+after a characteristic is yielded (and this allows providing the
+number of input of samples dynamically).  On the other hand, if the empirical weight
+is computed within the method <code class="docutils literal notranslate"><span class="pre">find_next_ch_increasing_weight</span></code>, then this allows
+discarding characteristics with invalid empirical weights.
+This is the main use of the empirical weight: to provide a filter to discard invalid characteristics
+(rather than providing a better approximation of the actual weight).</p>
+<p>In the following example we try to search for a <a class="reference internal" href="cascada.differential.difference.html#cascada.differential.difference.RXDiff" title="cascada.differential.difference.RXDiff"><code class="xref any py py-class docutils literal notranslate"><span class="pre">RXDiff</span></code></a> characteristic over the key-schedule of <a class="reference internal" href="cascada.primitives.lea.html#module-cascada.primitives.lea" title="cascada.primitives.lea"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">lea</span></code></a>
+(for 1 round) with the condition that the  input and output RX-differences are
+<code class="docutils literal notranslate"><span class="pre">(0xc0781f3e,</span> <span class="pre">0x00f03e70,</span> <span class="pre">0x81e04bf8,</span> <span class="pre">0xa303d940)</span> <span class="pre">-&gt;</span> <span class="pre">(0x0870365c,</span> <span class="pre">0x4381b2cc,</span> <span class="pre">0x38186e64,</span> <span class="pre">0x4381b2cc,</span> <span class="pre">0x0fcf1c0c,</span> <span class="pre">0x4381b2cc)</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.bitvector.core</span> <span class="kn">import</span> <span class="n">Constant</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.difference</span> <span class="kn">import</span> <span class="n">RXDiff</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.chmodel</span> <span class="kn">import</span> <span class="n">ChModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.smt.chsearch</span> <span class="kn">import</span> <span class="n">ChFinder</span><span class="p">,</span> <span class="n">ChModelAssertType</span><span class="p">,</span> <span class="n">PrintingMode</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">lea</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lea</span><span class="o">.</span><span class="n">LEACipher</span><span class="o">.</span><span class="n">key_schedule</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model</span> <span class="o">=</span> <span class="n">ChModel</span><span class="p">(</span><span class="n">lea</span><span class="o">.</span><span class="n">LEACipher</span><span class="o">.</span><span class="n">key_schedule</span><span class="p">,</span> <span class="n">RXDiff</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;dmk0&quot;</span><span class="p">,</span> <span class="s2">&quot;dmk1&quot;</span><span class="p">,</span> <span class="s2">&quot;dmk2&quot;</span><span class="p">,</span> <span class="s2">&quot;dkm3&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">assert_type</span> <span class="o">=</span> <span class="n">ChModelAssertType</span><span class="o">.</span><span class="n">ValidityAndWeight</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v2c</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span> <span class="n">Constant</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">ch_model</span><span class="o">.</span><span class="n">input_diff</span><span class="p">,</span> <span class="p">[</span><span class="mh">0xc0781f3e</span><span class="p">,</span> <span class="mh">0x00f03e70</span><span class="p">,</span> <span class="mh">0x81e04bf8</span><span class="p">,</span> <span class="mh">0xa303d940</span><span class="p">])}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">v</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">ch_model</span><span class="o">.</span><span class="n">output_diff</span><span class="p">,</span> <span class="p">[</span><span class="mh">0x0870365c</span><span class="p">,</span> <span class="mh">0x4381b2cc</span><span class="p">,</span> <span class="mh">0x38186e64</span><span class="p">,</span> <span class="mh">0x4381b2cc</span><span class="p">,</span> <span class="mh">0x0fcf1c0c</span><span class="p">,</span> <span class="mh">0x4381b2cc</span><span class="p">]):</span> <span class="n">v2c</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="n">Constant</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_finder</span> <span class="o">=</span> <span class="n">ChFinder</span><span class="p">(</span><span class="n">ch_model</span><span class="p">,</span> <span class="n">assert_type</span><span class="p">,</span> <span class="s2">&quot;btor&quot;</span><span class="p">,</span> <span class="n">solver_seed</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">printing_mode</span><span class="o">=</span><span class="n">PrintingMode</span><span class="o">.</span><span class="n">WeightsAndVrepr</span><span class="p">,</span> <span class="n">var_prop2ct_prop</span><span class="o">=</span><span class="n">v2c</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ewo</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;seed&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;C_code&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;split_by_max_weight&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_found</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">ch_finder</span><span class="o">.</span><span class="n">find_next_ch_increasing_weight</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">empirical_weight_options</span><span class="o">=</span><span class="n">ewo</span><span class="p">))</span>
+<span class="go">[...] | Solving for weight = 0</span>
+<span class="go">[...]</span>
+<span class="go">[...] | Solving for weight = 43</span>
+<span class="go">[...] | Invalid characteristic found | Characteristic(input_diff=[Constant(0xc0781f3e, width=32), Constant(0x00f03e70, width=32), Constant(0x81e04bf8, width=32), Constant(0xa303d940, width=32)], output_diff=[Constant(0x0870365c, width=32), Constant(0x4381b2cc, width=32), Constant(0x38186e64, width=32), Constant(0x4381b2cc, width=32), Constant(0x0fcf1c0c, width=32), Constant(0x4381b2cc, width=32)], assign_outdiff_list=[Constant(0x04381b2e, width=32), Constant(0x88703659, width=32), Constant(0x90e061b9, width=32), Constant(0x8181f9e3, width=32), Constant(0x4381b2cc, width=32), Constant(0x4381b2cc, width=32), Constant(0x0870365c, width=32), Constant(0x4381b2cc, width=32), Constant(0x38186e64, width=32), Constant(0x4381b2cc, width=32), Constant(0x0fcf1c0c, width=32), Constant(0x4381b2cc, width=32)], ch_model=ChModel(func=LEAKeySchedule.set_num_rounds_and_return(1), diff_type=RXDiff, input_diff_names=[&#39;dmk0&#39;, &#39;dmk1&#39;, &#39;dmk2&#39;, &#39;dkm3&#39;], prefix=&#39;dx&#39;), empirical_ch_weight=inf, empirical_data_list=[EmpiricalWeightData(num_input_samples=724338, seed=0, C_code=True, aux_weights=[Decimal(&#39;16.14437544306481397560334771&#39;)]), EmpiricalWeightData(num_input_samples=1024735554, seed=0, C_code=True, aux_weights=[inf]), EmpiricalWeightData(num_input_samples=0, seed=0, C_code=True, aux_weights=[inf])])</span>
+<span class="go">[...] | Solving for weight = 44</span>
+<span class="go">[...]</span>
+<span class="go">[...] | Solving for weight = 254</span>
+<span class="go">ValueError: no characteristic found with weight &lt;= 255</span>
+</pre></div>
+</div>
+<p>A single characteristic with weight 43 was found during the search, but it was discarded since <code class="docutils literal notranslate"><span class="pre">empirical_ch_weight=inf</span></code>.
+By using the parameter <code class="docutils literal notranslate"><span class="pre">printing_mode=PrintingMode.WeightsAndVrepr</span></code>, we can find the attribute <code class="docutils literal notranslate"><span class="pre">empirical_data_list</span></code>
+in the invalid characteristic and obtain more information:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">empirical_data_list</span><span class="o">=</span><span class="p">[</span>
+    <span class="n">EmpiricalWeightData</span><span class="p">(</span><span class="n">num_input_samples</span><span class="o">=</span><span class="mi">724338</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">C_code</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">aux_weights</span><span class="o">=</span><span class="p">[</span><span class="n">Decimal</span><span class="p">(</span><span class="s1">&#39;16.14437544306481397560334771&#39;</span><span class="p">)]),</span>
+    <span class="n">EmpiricalWeightData</span><span class="p">(</span><span class="n">num_input_samples</span><span class="o">=</span><span class="mi">1024735554</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">C_code</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">aux_weights</span><span class="o">=</span><span class="p">[</span><span class="n">inf</span><span class="p">]),</span>
+    <span class="n">EmpiricalWeightData</span><span class="p">(</span><span class="n">num_input_samples</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">C_code</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">aux_weights</span><span class="o">=</span><span class="p">[</span><span class="n">inf</span><span class="p">])])</span>
+</pre></div>
+</div>
+<p>As we can see, the characteristic was split into three sub-characteristics (following <code class="docutils literal notranslate"><span class="pre">&quot;split_by_max_weight&quot;:</span> <span class="pre">20</span></code>),
+and the second sub-characteristic turned out to be infinity (and thus the computation of the empirical weight stopped,
+and the third sub-characteristic was ignored).</p>
+<p>Apart from checking the hypothesis of stochastic equivalence and the empirical weight,
+we can also debug a characteristic by printing additional information such as
+the value of all its intermediate properties.
+In the following example, we search for a 2-round characteristic
+of Speck32/64, then we split it into the sub-characteristic of each round,
+and for each sub-characteristic we are printing the list of propagations
+(<code class="docutils literal notranslate"><span class="pre">tuple_assign_outdiff2op_model</span></code>) and the value of each difference
+(<code class="docutils literal notranslate"><span class="pre">var_diff2ct_diff</span></code>).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.difference</span> <span class="kn">import</span> <span class="n">XorDiff</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.differential.chmodel</span> <span class="kn">import</span> <span class="n">EncryptionChModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.smt.chsearch</span> <span class="kn">import</span> <span class="n">ChFinder</span><span class="p">,</span> <span class="n">ChModelAssertType</span><span class="p">,</span> <span class="n">PrintingMode</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cascada.primitives</span> <span class="kn">import</span> <span class="n">speck</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span> <span class="o">=</span> <span class="n">speck</span><span class="o">.</span><span class="n">get_Speck_instance</span><span class="p">(</span><span class="n">speck</span><span class="o">.</span><span class="n">SpeckInstance</span><span class="o">.</span><span class="n">speck_32_64</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Speck32</span><span class="o">.</span><span class="n">set_num_rounds</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_model</span> <span class="o">=</span> <span class="n">EncryptionChModel</span><span class="p">(</span><span class="n">Speck32</span><span class="p">,</span> <span class="n">XorDiff</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">assert_type</span> <span class="o">=</span> <span class="n">ChModelAssertType</span><span class="o">.</span><span class="n">ValidityAndWeight</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_finder</span> <span class="o">=</span> <span class="n">ChFinder</span><span class="p">(</span><span class="n">ch_model</span><span class="p">,</span> <span class="n">assert_type</span><span class="p">,</span> <span class="s2">&quot;btor&quot;</span><span class="p">,</span> <span class="n">solver_seed</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">exclude_zero_input_prop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ch_found</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">ch_finder</span><span class="o">.</span><span class="n">find_next_ch_increasing_weight</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">sub_ch</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ch_found</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">ch_found</span><span class="o">.</span><span class="n">get_round_separators</span><span class="p">())):</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Round </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">sub_ch</span><span class="o">.</span><span class="n">srepr</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">sub_ch</span><span class="o">.</span><span class="n">assignment_weights</span><span class="p">,</span> <span class="n">sub_ch</span><span class="o">.</span><span class="n">tuple_assign_outdiff2op_model</span><span class="p">)))</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">sub_ch</span><span class="o">.</span><span class="n">var_diff2ct_diff</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">()</span>
+<span class="go">Round 0: Ch(w=1, id=0010 2000, od=0000 8000)</span>
+<span class="go">[(Decimal(&#39;1&#39;), (XorDiff(0x0000), XorModelBvAdd([XorDiff(0x2000), XorDiff(0x2000)]))),</span>
+<span class="go"> (Decimal(&#39;0&#39;), (XorDiff(0x0000), XorModelId(XorDiff(0x0000)))),</span>
+<span class="go"> (Decimal(&#39;0&#39;), (XorDiff(0x8000), XorModelId(XorDiff(0x8000))))]</span>
+<span class="go">OrderedDict([(XorDiff(dp0), XorDiff(0x0010)), (XorDiff(dp1), XorDiff(0x2000)), (XorDiff(dk0), XorDiff(0x0000)), (XorDiff(dx0), XorDiff(0x2000)), (XorDiff(dx1), XorDiff(0x0000)), (XorDiff(dx2), XorDiff(0x0000)), (XorDiff(dx3), XorDiff(0x8000)), (XorDiff(dx4), XorDiff(0x8000)), (XorDiff(dx2_out), XorDiff(0x0000)), (XorDiff(dx4_out), XorDiff(0x8000))])</span>
+
+<span class="go">Round 1: Ch(w=0, id=0000 8000, od=8000 8002)</span>
+<span class="go">[(Decimal(&#39;0&#39;), (XorDiff(0x8000), XorModelBvAdd([XorDiff(0x0000), XorDiff(0x8000)]))),</span>
+<span class="go"> (Decimal(&#39;0&#39;), (XorDiff(0x8000), XorModelId(XorDiff(0x8000)))),</span>
+<span class="go"> (Decimal(&#39;0&#39;), (XorDiff(0x8002), XorModelId(XorDiff(0x8002))))]</span>
+<span class="go">OrderedDict([(XorDiff(dx2), XorDiff(0x0000)), (XorDiff(dx4), XorDiff(0x8000)), (XorDiff(dk1), XorDiff(0x0000)), (XorDiff(dx5), XorDiff(0x0000)), (XorDiff(dx6), XorDiff(0x8000)), (XorDiff(dx7), XorDiff(0x8000)), (XorDiff(dx8), XorDiff(0x0002)), (XorDiff(dx9), XorDiff(0x8002)), (XorDiff(dx7_out), XorDiff(0x8000)), (XorDiff(dx9_out), XorDiff(0x8002))])</span>
+</pre></div>
+</div>
+<p>You can read more about characteristics and the automated search methods in
+<a class="reference internal" href="cascada.abstractproperty.characteristic.html#module-cascada.abstractproperty.characteristic" title="cascada.abstractproperty.characteristic"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">abstractproperty.characteristic</span></code></a> and <a class="reference internal" href="cascada.smt.chsearch.html#module-cascada.smt.chsearch" title="cascada.smt.chsearch"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">chsearch</span></code></a>.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="adding_primitive.html" class="btn btn-neutral float-left" title="Adding a primitive" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="primitives_implemented.html" class="btn btn-neutral float-right" title="Primitives implemented" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Adrián Ranea.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

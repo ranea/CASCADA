@@ -41,6 +41,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../index.html">CASCADA</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../adding_primitive.html">Adding a primitive</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced_usage.html">Advanced Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../primitives_implemented.html">Primitives implemented</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../cascada.html">API reference</a></li>
 </ul>
@@ -70,7 +71,42 @@
            <div itemprop="articleBody">
              
   <h1>Source code for cascada.bitvector.operation</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Provide the common bit-vector operators.&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;Provide the common bit-vector operators.</span>
+
+<span class="sd">.. autosummary::</span>
+<span class="sd">   :nosignatures:</span>
+
+<span class="sd">    Operation</span>
+<span class="sd">    PrimaryOperation</span>
+<span class="sd">    SecondaryOperation</span>
+<span class="sd">    PartialOperation</span>
+<span class="sd">    make_partial_operation</span>
+<span class="sd">    BvNot</span>
+<span class="sd">    BvAnd</span>
+<span class="sd">    BvOr</span>
+<span class="sd">    BvXor</span>
+<span class="sd">    BvComp</span>
+<span class="sd">    BvUlt</span>
+<span class="sd">    BvUle</span>
+<span class="sd">    BvUgt</span>
+<span class="sd">    BvUge</span>
+<span class="sd">    BvShl</span>
+<span class="sd">    BvLshr</span>
+<span class="sd">    RotateLeft</span>
+<span class="sd">    RotateRight</span>
+<span class="sd">    Ite</span>
+<span class="sd">    Extract</span>
+<span class="sd">    Concat</span>
+<span class="sd">    BvNeg</span>
+<span class="sd">    BvAdd</span>
+<span class="sd">    BvSub</span>
+<span class="sd">    BvMul</span>
+<span class="sd">    BvUdiv</span>
+<span class="sd">    BvUrem</span>
+<span class="sd">    BvIdentity</span>
+<span class="sd">    zero_extend</span>
+<span class="sd">    repeat</span>
+<span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">collections</span>
 <span class="kn">import</span> <span class="nn">functools</span>
 <span class="kn">import</span> <span class="nn">itertools</span>

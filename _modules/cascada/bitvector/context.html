@@ -41,6 +41,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../index.html">CASCADA</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../adding_primitive.html">Adding a primitive</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced_usage.html">Advanced Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../primitives_implemented.html">Primitives implemented</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../cascada.html">API reference</a></li>
 </ul>
@@ -70,7 +71,20 @@
            <div itemprop="articleBody">
              
   <h1>Source code for cascada.bitvector.context</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Provide context managers to modify the creation and evaluation of bit-vector expressions.&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;Provide context managers to modify the creation and evaluation of bit-vector expressions.</span>
+
+<span class="sd">.. autosummary::</span>
+<span class="sd">   :nosignatures:</span>
+
+<span class="sd">    StatefulContext</span>
+<span class="sd">    Cache</span>
+<span class="sd">    Simplification</span>
+<span class="sd">    PrimaryOperationEvaluation</span>
+<span class="sd">    SecondaryOperationEvaluation</span>
+<span class="sd">    Validation</span>
+<span class="sd">    Memoization</span>
+<span class="sd">    MemoizationTable</span>
+<span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">collections</span>
 <span class="kn">import</span> <span class="nn">contextlib</span>
 

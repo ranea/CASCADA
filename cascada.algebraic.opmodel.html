@@ -19,8 +19,8 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="cascada.algebraic.chmodel module" href="cascada.algebraic.chmodel.html" />
-    <link rel="prev" title="cascada.algebraic.value module" href="cascada.algebraic.value.html" /> 
+    <link rel="next" title="cascada.algebraic.value module" href="cascada.algebraic.value.html" />
+    <link rel="prev" title="cascada.algebraic.chmodel module" href="cascada.algebraic.chmodel.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -45,21 +45,25 @@
 <li class="toctree-l1"><a class="reference internal" href="index.html">CASCADA</a></li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="adding_primitive.html">Adding a primitive</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced_usage.html">Advanced Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="primitives_implemented.html">Primitives implemented</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="cascada.html">API reference</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="cascada.bitvector.html">cascada.bitvector module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.primitives.html">cascada.primitives module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.abstractproperty.html">cascada.abstractproperty module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.differential.html">cascada.differential module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.linear.html">cascada.linear module</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="cascada.algebraic.html">cascada.algebraic module</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="cascada.algebraic.value.html">cascada.algebraic.value module</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">cascada.algebraic.opmodel module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.algebraic.chmodel.html">cascada.algebraic.chmodel module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.algebraic.characteristic.html">cascada.algebraic.characteristic module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.bitvector.html">cascada.bitvector package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.primitives.html">cascada.primitives package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.abstractproperty.html">cascada.abstractproperty package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.differential.html">cascada.differential package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.linear.html">cascada.linear package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="cascada.algebraic.html">cascada.algebraic package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="cascada.algebraic.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="cascada.algebraic.characteristic.html">cascada.algebraic.characteristic module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.algebraic.chmodel.html">cascada.algebraic.chmodel module</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">cascada.algebraic.opmodel module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.algebraic.value.html">cascada.algebraic.value module</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.smt.html">cascada.smt module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.smt.html">cascada.smt package</a></li>
 </ul>
 </li>
 </ul>
@@ -79,7 +83,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="cascada.html">API reference</a> &raquo;</li>
-          <li><a href="cascada.algebraic.html">cascada.algebraic module</a> &raquo;</li>
+          <li><a href="cascada.algebraic.html">cascada.algebraic package</a> &raquo;</li>
       <li>cascada.algebraic.opmodel module</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/cascada.algebraic.opmodel.rst.txt" rel="nofollow"> View page source</a>
@@ -93,6 +97,29 @@
   <section id="module-cascada.algebraic.opmodel">
 <span id="cascada-algebraic-opmodel-module"></span><h1>cascada.algebraic.opmodel module<a class="headerlink" href="#module-cascada.algebraic.opmodel" title="Permalink to this headline"></a></h1>
 <p>Manipulate algebraic models of bit-vector operations.</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cascada.algebraic.opmodel.OpModel" title="cascada.algebraic.opmodel.OpModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OpModel</span></code></a></p></td>
+<td><p>Represent algebraic models of bit-vector operations.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cascada.algebraic.opmodel.BitModelId" title="cascada.algebraic.opmodel.BitModelId"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BitModelId</span></code></a></p></td>
+<td><p>Represent the <a class="reference internal" href="cascada.algebraic.value.html#cascada.algebraic.value.BitValue" title="cascada.algebraic.value.BitValue"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BitValue</span></code></a> <a class="reference internal" href="#cascada.algebraic.opmodel.OpModel" title="cascada.algebraic.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">algebraic.opmodel.OpModel</span></code></a> of <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.BvIdentity" title="cascada.bitvector.operation.BvIdentity"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvIdentity</span></code></a>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cascada.algebraic.opmodel.WordModelId" title="cascada.algebraic.opmodel.WordModelId"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WordModelId</span></code></a></p></td>
+<td><p>Represent the <a class="reference internal" href="cascada.algebraic.value.html#cascada.algebraic.value.WordValue" title="cascada.algebraic.value.WordValue"><code class="xref any py py-class docutils literal notranslate"><span class="pre">WordValue</span></code></a> <a class="reference internal" href="#cascada.algebraic.opmodel.OpModel" title="cascada.algebraic.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">algebraic.opmodel.OpModel</span></code></a> of <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.BvIdentity" title="cascada.bitvector.operation.BvIdentity"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvIdentity</span></code></a>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cascada.algebraic.opmodel.BitModelBvAdd" title="cascada.algebraic.opmodel.BitModelBvAdd"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BitModelBvAdd</span></code></a></p></td>
+<td><p>Represent the <a class="reference internal" href="cascada.algebraic.value.html#cascada.algebraic.value.BitValue" title="cascada.algebraic.value.BitValue"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BitValue</span></code></a> <a class="reference internal" href="#cascada.algebraic.opmodel.OpModel" title="cascada.algebraic.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">algebraic.opmodel.OpModel</span></code></a> of <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.BvAdd" title="cascada.bitvector.operation.BvAdd"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvAdd</span></code></a>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cascada.algebraic.opmodel.BitModelBvSub" title="cascada.algebraic.opmodel.BitModelBvSub"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BitModelBvSub</span></code></a></p></td>
+<td><p>Represent the <a class="reference internal" href="cascada.algebraic.value.html#cascada.algebraic.value.BitValue" title="cascada.algebraic.value.BitValue"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BitValue</span></code></a> <a class="reference internal" href="#cascada.algebraic.opmodel.OpModel" title="cascada.algebraic.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">algebraic.opmodel.OpModel</span></code></a> of <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.BvSub" title="cascada.bitvector.operation.BvSub"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvSub</span></code></a>.</p></td>
+</tr>
+</tbody>
+</table>
 <dl class="py class">
 <dt class="sig sig-object py" id="cascada.algebraic.opmodel.OpModel">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.algebraic.opmodel.</span></span><span class="sig-name descname"><span class="pre">OpModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_prop</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/algebraic/opmodel.html#OpModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.algebraic.opmodel.OpModel" title="Permalink to this definition"></a></dt>
@@ -182,7 +209,7 @@ containing the input and output properties as <a class="reference internal" href
 <dl class="py method">
 <dt class="sig sig-object py" id="cascada.algebraic.opmodel.OpModel.decimal_weight">
 <span class="sig-name descname"><span class="pre">decimal_weight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_val</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/algebraic/opmodel.html#OpModel.decimal_weight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.algebraic.opmodel.OpModel.decimal_weight" title="Permalink to this definition"></a></dt>
-<dd><p>Return the <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">decimal.Decimal</span></code></a> weight for a given constant output <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a>.</p>
+<dd><p>Return the <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.11)"><code class="xref any docutils literal notranslate"><span class="pre">decimal.Decimal</span></code></a> weight for a given constant output <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a>.</p>
 <p>This method returns, as a decimal number, the weight (negative binary logarithm)
 of the probability of the input property propagating to the output property.</p>
 <p>This method only works when the input property and the output property are
@@ -209,7 +236,7 @@ fractional part of the number represented by <code class="docutils literal notra
 logarithm (weight) of the propagation probability of <span class="math notranslate nohighlight">\((\alpha, \beta)\)</span>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The exact weight can be computed in <a class="reference internal" href="cascada.abstractproperty.tests.test_opmodel.html#cascada.abstractproperty.tests.test_opmodel.TestOpModelGeneric.get_empirical_weight_slow" title="cascada.abstractproperty.tests.test_opmodel.TestOpModelGeneric.get_empirical_weight_slow"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">TestOpModelGeneric.get_empirical_weight_slow</span></code></a>.</p>
+<p>The exact weight can be computed in <code class="docutils literal notranslate"><span class="pre">TestOpModelGeneric.get_empirical_weight_slow</span></code>.</p>
 </div>
 <p>This method returns an upper bound (in absolute value) of the maximum difference
 (over all input and output properties) between the bit-vector weight
@@ -438,8 +465,8 @@ since <code class="docutils literal notranslate"><span class="pre">~(x</span> <s
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="cascada.algebraic.value.html" class="btn btn-neutral float-left" title="cascada.algebraic.value module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="cascada.algebraic.chmodel.html" class="btn btn-neutral float-right" title="cascada.algebraic.chmodel module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="cascada.algebraic.chmodel.html" class="btn btn-neutral float-left" title="cascada.algebraic.chmodel module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cascada.algebraic.value.html" class="btn btn-neutral float-right" title="cascada.algebraic.value module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

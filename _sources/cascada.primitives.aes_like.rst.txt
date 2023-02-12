@@ -1,5 +1,5 @@
-cascada.primitives.aes_like module
-==================================
+cascada.primitives.aes\_like module
+===================================
 
 .. automodule:: cascada.primitives.aes_like
    :members:

@@ -41,6 +41,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../index.html">CASCADA</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../adding_primitive.html">Adding a primitive</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../advanced_usage.html">Advanced Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../primitives_implemented.html">Primitives implemented</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../cascada.html">API reference</a></li>
 </ul>
@@ -70,11 +71,25 @@
            <div itemprop="articleBody">
              
   <h1>Source code for cascada.abstractproperty.opmodel</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Manipulate property models of bit-vector operations (w.r.t an abstract property).&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;Manipulate property models of bit-vector operations (w.r.t an abstract property).</span>
+
+<span class="sd">.. autosummary::</span>
+<span class="sd">   :nosignatures:</span>
+
+<span class="sd">    InvalidOpModelError</span>
+<span class="sd">    OpModel</span>
+<span class="sd">    PartialOpModel</span>
+<span class="sd">    make_partial_op_model</span>
+<span class="sd">    ModelIdentity</span>
+<span class="sd">    WeakModel</span>
+<span class="sd">    BranchNumberModel</span>
+<span class="sd">    WDTModel</span>
+<span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">collections</span>
 <span class="kn">import</span> <span class="nn">functools</span>
 <span class="kn">import</span> <span class="nn">decimal</span>
 <span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">core</span>
 <span class="kn">from</span> <span class="nn">cascada.bitvector</span> <span class="kn">import</span> <span class="n">operation</span>
@@ -91,7 +106,11 @@
 
 
 <span class="k">def</span> <span class="nf">log2_decimal</span><span class="p">(</span><span class="n">my_decimal</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">my_decimal</span><span class="o">.</span><span class="n">ln</span><span class="p">()</span> <span class="o">/</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">ln</span><span class="p">()</span>
+    <span class="n">first_try</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">my_decimal</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">first_try</span><span class="o">.</span><span class="n">is_integer</span><span class="p">():</span>
+        <span class="k">return</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="n">first_try</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">my_decimal</span><span class="o">.</span><span class="n">ln</span><span class="p">()</span> <span class="o">/</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">ln</span><span class="p">()</span>
 
 
 <div class="viewcode-block" id="InvalidOpModelError"><a class="viewcode-back" href="../../../cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.InvalidOpModelError">[docs]</a><span class="k">class</span> <span class="nc">InvalidOpModelError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
@@ -175,7 +194,7 @@
 
 <span class="sd">    .. note::</span>
 <span class="sd">        It is highly recommended that new models of bit-vector operations</span>
-<span class="sd">        are tested with `TestOpModelGeneric`</span>
+<span class="sd">        are tested with ``TestOpModelGeneric``</span>
 <span class="sd">        (see ``differential/tests/test_opmodel.py`` or</span>
 <span class="sd">        ``linear/tests/test_opmodel.py`` for some examples).</span>
 
@@ -376,7 +395,7 @@
 
 <span class="sd">        .. note::</span>
 
-<span class="sd">            The exact weight can be computed in `TestOpModelGeneric.get_empirical_weight_slow`.</span>
+<span class="sd">            The exact weight can be computed in ``TestOpModelGeneric.get_empirical_weight_slow``.</span>
 
 <span class="sd">        This method returns an upper bound (in absolute value) of the maximum difference</span>
 <span class="sd">        (over all input and output properties) between the bit-vector weight</span>
@@ -578,6 +597,8 @@
                 <span class="n">found_frac_bits</span> <span class="o">=</span> <span class="kc">True</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">):</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;non-integer </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">w</span><span class="si">}</span><span class="s2"> is not a Decimal object&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">math</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">w</span><span class="p">)):</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;using </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">w</span><span class="si">}</span><span class="s2"> that might get approx. to </span><span class="si">{</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">w</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="si">}</span><span class="s2"> instead of </span><span class="si">{</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">w</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="mi">0</span> <span class="o">!=</span> <span class="n">w</span> <span class="o">!=</span> <span class="n">math</span><span class="o">.</span><span class="n">inf</span> <span class="ow">and</span> <span class="nb">int</span><span class="p">(</span><span class="n">w</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="bp">cls</span><span class="o">.</span><span class="n">precision</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">w</span><span class="si">}</span><span class="s2"> is 0 with precision </span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">precision</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">found_frac_bits</span> <span class="ow">and</span> <span class="bp">cls</span><span class="o">.</span><span class="n">precision</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
@@ -907,6 +928,10 @@
                     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">weight</span><span class="p">,</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">):</span>
                         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;non-integer weight </span><span class="si">{</span><span class="n">weight</span><span class="si">}</span><span class="s2"> in weight_distribution_table is&quot;</span>
                                          <span class="sa">f</span><span class="s2">&quot; not a Decimal object&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">math</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">weight</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">weight</span><span class="p">)):</span>
+                        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;using weight with value </span><span class="si">{</span><span class="n">weight</span><span class="si">}</span><span class="s2"> that might get approx. to &quot;</span>
+                            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">weight</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="si">}</span><span class="s2"> instead of </span><span class="si">{</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">weight</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="k">if</span> <span class="mi">0</span> <span class="o">!=</span> <span class="n">weight</span> <span class="o">!=</span> <span class="n">math</span><span class="o">.</span><span class="n">inf</span> <span class="ow">and</span> <span class="nb">int</span><span class="p">(</span><span class="n">weight</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="n">precision</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;non-zero weight </span><span class="si">{</span><span class="n">weight</span><span class="si">}</span><span class="s2"> in weight_distribution_table is&quot;</span>
                                      <span class="sa">f</span><span class="s2">&quot; 0 with precision </span><span class="si">{</span><span class="n">precision</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>

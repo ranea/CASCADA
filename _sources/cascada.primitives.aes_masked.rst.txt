@@ -1,5 +1,5 @@
-cascada.primitives.aes_masked module
-====================================
+cascada.primitives.aes\_masked module
+=====================================
 
 .. automodule:: cascada.primitives.aes_masked
    :members:

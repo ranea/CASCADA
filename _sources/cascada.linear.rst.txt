@@ -1,15 +1,17 @@
-cascada.linear module
-=====================
+cascada.linear package
+======================
 
 .. automodule:: cascada.linear
    :members:
    :show-inheritance:
 
+Submodules
+----------
 
 .. toctree::
    :maxdepth: 4
 
+   cascada.linear.characteristic
+   cascada.linear.chmodel
    cascada.linear.mask
    cascada.linear.opmodel
-   cascada.linear.chmodel
-   cascada.linear.characteristic

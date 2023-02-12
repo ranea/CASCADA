@@ -1,15 +1,17 @@
-cascada.algebraic module
-========================
+cascada.algebraic package
+=========================
 
 .. automodule:: cascada.algebraic
    :members:
    :show-inheritance:
 
+Submodules
+----------
 
 .. toctree::
    :maxdepth: 4
 
-   cascada.algebraic.value
-   cascada.algebraic.opmodel
-   cascada.algebraic.chmodel
    cascada.algebraic.characteristic
+   cascada.algebraic.chmodel
+   cascada.algebraic.opmodel
+   cascada.algebraic.value

@@ -19,8 +19,8 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="cascada.abstractproperty.opmodel module" href="cascada.abstractproperty.opmodel.html" />
-    <link rel="prev" title="cascada.abstractproperty module" href="cascada.abstractproperty.html" /> 
+    <link rel="next" title="cascada.differential package" href="cascada.differential.html" />
+    <link rel="prev" title="cascada.abstractproperty.opmodel module" href="cascada.abstractproperty.opmodel.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -45,22 +45,25 @@
 <li class="toctree-l1"><a class="reference internal" href="index.html">CASCADA</a></li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="adding_primitive.html">Adding a primitive</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced_usage.html">Advanced Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="primitives_implemented.html">Primitives implemented</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="cascada.html">API reference</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="cascada.bitvector.html">cascada.bitvector module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.primitives.html">cascada.primitives module</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="cascada.abstractproperty.html">cascada.abstractproperty module</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#">cascada.abstractproperty.property module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.abstractproperty.opmodel.html">cascada.abstractproperty.opmodel module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.abstractproperty.tests.test_opmodel.html">cascada.abstractproperty.tests.test_opmodel module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.abstractproperty.chmodel.html">cascada.abstractproperty.chmodel module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.abstractproperty.characteristic.html">cascada.abstractproperty.characteristic module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.bitvector.html">cascada.bitvector package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.primitives.html">cascada.primitives package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="cascada.abstractproperty.html">cascada.abstractproperty package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="cascada.abstractproperty.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="cascada.abstractproperty.characteristic.html">cascada.abstractproperty.characteristic module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.abstractproperty.chmodel.html">cascada.abstractproperty.chmodel module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.abstractproperty.opmodel.html">cascada.abstractproperty.opmodel module</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">cascada.abstractproperty.property module</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.differential.html">cascada.differential module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.linear.html">cascada.linear module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.algebraic.html">cascada.algebraic module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.smt.html">cascada.smt module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.differential.html">cascada.differential package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.linear.html">cascada.linear package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.algebraic.html">cascada.algebraic package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.smt.html">cascada.smt package</a></li>
 </ul>
 </li>
 </ul>
@@ -80,7 +83,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="cascada.html">API reference</a> &raquo;</li>
-          <li><a href="cascada.abstractproperty.html">cascada.abstractproperty module</a> &raquo;</li>
+          <li><a href="cascada.abstractproperty.html">cascada.abstractproperty package</a> &raquo;</li>
       <li>cascada.abstractproperty.property module</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/cascada.abstractproperty.property.rst.txt" rel="nofollow"> View page source</a>
@@ -94,10 +97,30 @@
   <section id="module-cascada.abstractproperty.property">
 <span id="cascada-abstractproperty-property-module"></span><h1>cascada.abstractproperty.property module<a class="headerlink" href="#module-cascada.abstractproperty.property" title="Permalink to this headline"></a></h1>
 <p>Provide a base class for properties like <a class="reference internal" href="cascada.differential.difference.html#cascada.differential.difference.Difference" title="cascada.differential.difference.Difference"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Difference</span></code></a>, <a class="reference internal" href="cascada.linear.mask.html#cascada.linear.mask.LinearMask" title="cascada.linear.mask.LinearMask"><code class="xref any py py-class docutils literal notranslate"><span class="pre">LinearMask</span></code></a> or <a class="reference internal" href="cascada.algebraic.value.html#cascada.algebraic.value.Value" title="cascada.algebraic.value.Value"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Value</span></code></a>.</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Property</span></code></a></p></td>
+<td><p>Represent bit-vector properties.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cascada.abstractproperty.property.PropConcat" title="cascada.abstractproperty.property.PropConcat"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PropConcat</span></code></a></p></td>
+<td><p>Subclass of <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.Concat" title="cascada.bitvector.operation.Concat"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Concat</span></code></a> that propagates properties naturally.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cascada.abstractproperty.property.PropExtract" title="cascada.abstractproperty.property.PropExtract"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PropExtract</span></code></a></p></td>
+<td><p>Subclass of <code class="docutils literal notranslate"><span class="pre">Extract</span></code> that propagates properties naturally.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cascada.abstractproperty.property.make_partial_propextract" title="cascada.abstractproperty.property.make_partial_propextract"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_partial_propextract</span></code></a></p></td>
+<td><p>Return a <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.PartialOperation" title="cascada.bitvector.operation.PartialOperation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">PartialOperation</span></code></a> of <a class="reference internal" href="#cascada.abstractproperty.property.PropExtract" title="cascada.abstractproperty.property.PropExtract"><code class="xref any py py-class docutils literal notranslate"><span class="pre">PropExtract</span></code></a> that propagates properties naturally.</p></td>
+</tr>
+</tbody>
+</table>
 <dl class="py class">
 <dt class="sig sig-object py" id="cascada.abstractproperty.property.Property">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.abstractproperty.property.</span></span><span class="sig-name descname"><span class="pre">Property</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/abstractproperty/property.html#Property"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.abstractproperty.property.Property" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Represent bit-vector properties.</p>
 <p>A (bit-vector) property pair, or simply a property, over a function <span class="math notranslate nohighlight">\(f\)</span>
 is a pair of bit-vectors <span class="math notranslate nohighlight">\((\alpha, \beta)\)</span> with
@@ -238,8 +261,8 @@ where <code class="docutils literal notranslate"><span class="pre">i,</span> <sp
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="cascada.abstractproperty.html" class="btn btn-neutral float-left" title="cascada.abstractproperty module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="cascada.abstractproperty.opmodel.html" class="btn btn-neutral float-right" title="cascada.abstractproperty.opmodel module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="cascada.abstractproperty.opmodel.html" class="btn btn-neutral float-left" title="cascada.abstractproperty.opmodel module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cascada.differential.html" class="btn btn-neutral float-right" title="cascada.differential package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

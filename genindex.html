@@ -41,6 +41,7 @@
 <li class="toctree-l1"><a class="reference internal" href="index.html">CASCADA</a></li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="adding_primitive.html">Adding a primitive</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced_usage.html">Advanced Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="primitives_implemented.html">Primitives implemented</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cascada.html">API reference</a></li>
 </ul>
@@ -174,12 +175,6 @@
         <li><a href="cascada.linear.opmodel.html#cascada.linear.opmodel.LinearModelExtractCt.base_op">(cascada.linear.opmodel.LinearModelExtractCt attribute)</a>
 </li>
       </ul></li>
-      <li><a href="cascada.abstractproperty.tests.test_opmodel.html#cascada.abstractproperty.tests.test_opmodel.TestOpModelGeneric.base_test_op_model">base_test_op_model() (cascada.abstractproperty.tests.test_opmodel.TestOpModelGeneric method)</a>
-</li>
-      <li><a href="cascada.abstractproperty.tests.test_opmodel.html#cascada.abstractproperty.tests.test_opmodel.TestOpModelGeneric.base_test_op_model_sum_pr_1">base_test_op_model_sum_pr_1() (cascada.abstractproperty.tests.test_opmodel.TestOpModelGeneric method)</a>
-</li>
-      <li><a href="cascada.abstractproperty.tests.test_opmodel.html#cascada.abstractproperty.tests.test_opmodel.TestOpModelGeneric.base_test_pr_one_constraint_slow">base_test_pr_one_constraint_slow() (cascada.abstractproperty.tests.test_opmodel.TestOpModelGeneric method)</a>
-</li>
       <li><a href="cascada.bitvector.core.html#cascada.bitvector.core.Constant.bin">bin() (cascada.bitvector.core.Constant method)</a>
 </li>
       <li><a href="cascada.algebraic.opmodel.html#cascada.algebraic.opmodel.BitModelBvAdd">BitModelBvAdd (class in cascada.algebraic.opmodel)</a>
@@ -336,13 +331,6 @@
 
       <ul>
         <li><a href="cascada.abstractproperty.property.html#module-cascada.abstractproperty.property">module</a>
-</li>
-      </ul></li>
-      <li>
-    cascada.abstractproperty.tests.test_opmodel
-
-      <ul>
-        <li><a href="cascada.abstractproperty.tests.test_opmodel.html#module-cascada.abstractproperty.tests.test_opmodel">module</a>
 </li>
       </ul></li>
       <li>
@@ -577,10 +565,24 @@
 </li>
       </ul></li>
       <li>
+    cascada.primitives.noekeon
+
+      <ul>
+        <li><a href="cascada.primitives.noekeon.html#module-cascada.primitives.noekeon">module</a>
+</li>
+      </ul></li>
+      <li>
     cascada.primitives.picipher
 
       <ul>
         <li><a href="cascada.primitives.picipher.html#module-cascada.primitives.picipher">module</a>
+</li>
+      </ul></li>
+      <li>
+    cascada.primitives.rectangle
+
+      <ul>
+        <li><a href="cascada.primitives.rectangle.html#module-cascada.primitives.rectangle">module</a>
 </li>
       </ul></li>
       <li>
@@ -1025,6 +1027,14 @@
 </li>
         <li><a href="cascada.primitives.multi2.html#cascada.primitives.multi2.MULTI2Cipher.encryption">(cascada.primitives.multi2.MULTI2Cipher attribute)</a>
 </li>
+        <li><a href="cascada.primitives.noekeon.html#cascada.primitives.noekeon.NOEKEONDirectCipher.encryption">(cascada.primitives.noekeon.NOEKEONDirectCipher attribute)</a>
+</li>
+        <li><a href="cascada.primitives.noekeon.html#cascada.primitives.noekeon.NOEKEONIndirectCipher.encryption">(cascada.primitives.noekeon.NOEKEONIndirectCipher attribute)</a>
+</li>
+        <li><a href="cascada.primitives.rectangle.html#cascada.primitives.rectangle.RECTANGLE128Cipher.encryption">(cascada.primitives.rectangle.RECTANGLE128Cipher attribute)</a>
+</li>
+        <li><a href="cascada.primitives.rectangle.html#cascada.primitives.rectangle.RECTANGLE80Cipher.encryption">(cascada.primitives.rectangle.RECTANGLE80Cipher attribute)</a>
+</li>
         <li><a href="cascada.primitives.shacal1.html#cascada.primitives.shacal1.SHACAL1Cipher.encryption">(cascada.primitives.shacal1.SHACAL1Cipher attribute)</a>
 </li>
         <li><a href="cascada.primitives.shacal2.html#cascada.primitives.shacal2.SHACAL2Cipher.encryption">(cascada.primitives.shacal2.SHACAL2Cipher attribute)</a>
@@ -1213,7 +1223,19 @@
 </li>
         <li><a href="cascada.primitives.multi2.html#cascada.primitives.multi2.MULTI2KeySchedule.eval">(cascada.primitives.multi2.MULTI2KeySchedule class method)</a>
 </li>
+        <li><a href="cascada.primitives.noekeon.html#cascada.primitives.noekeon.NOEKEONDirectKeySchedule.eval">(cascada.primitives.noekeon.NOEKEONDirectKeySchedule class method)</a>
+</li>
+        <li><a href="cascada.primitives.noekeon.html#cascada.primitives.noekeon.NOEKEONEncryption.eval">(cascada.primitives.noekeon.NOEKEONEncryption class method)</a>
+</li>
+        <li><a href="cascada.primitives.noekeon.html#cascada.primitives.noekeon.NOEKEONIndirectKeySchedule.eval">(cascada.primitives.noekeon.NOEKEONIndirectKeySchedule class method)</a>
+</li>
         <li><a href="cascada.primitives.picipher.html#cascada.primitives.picipher.PiPermutation.eval">(cascada.primitives.picipher.PiPermutation class method)</a>
+</li>
+        <li><a href="cascada.primitives.rectangle.html#cascada.primitives.rectangle.RECTANGLE128KeySchedule.eval">(cascada.primitives.rectangle.RECTANGLE128KeySchedule class method)</a>
+</li>
+        <li><a href="cascada.primitives.rectangle.html#cascada.primitives.rectangle.RECTANGLE80KeySchedule.eval">(cascada.primitives.rectangle.RECTANGLE80KeySchedule class method)</a>
+</li>
+        <li><a href="cascada.primitives.rectangle.html#cascada.primitives.rectangle.RECTANGLEEncryption.eval">(cascada.primitives.rectangle.RECTANGLEEncryption class method)</a>
 </li>
         <li><a href="cascada.primitives.shacal1.html#cascada.primitives.shacal1.SHACAL1Encryption.eval">(cascada.primitives.shacal1.SHACAL1Encryption class method)</a>
 </li>
@@ -1392,13 +1414,9 @@
         <li><a href="cascada.linear.opmodel.html#cascada.linear.opmodel.get_branch_number_model">(in module cascada.linear.opmodel)</a>
 </li>
       </ul></li>
-      <li><a href="cascada.abstractproperty.tests.test_opmodel.html#cascada.abstractproperty.tests.test_opmodel.TestOpModelGeneric.get_bv_weight_with_frac_bits">get_bv_weight_with_frac_bits() (cascada.abstractproperty.tests.test_opmodel.TestOpModelGeneric method)</a>
-</li>
       <li><a href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.SSA.get_C_code">get_C_code() (cascada.bitvector.ssa.SSA method)</a>
 </li>
       <li><a href="cascada.primitives.cham.html#cascada.primitives.cham.get_CHAM_instance">get_CHAM_instance() (in module cascada.primitives.cham)</a>
-</li>
-      <li><a href="cascada.abstractproperty.tests.test_opmodel.html#cascada.abstractproperty.tests.test_opmodel.TestOpModelGeneric.get_empirical_weight_slow">get_empirical_weight_slow() (cascada.abstractproperty.tests.test_opmodel.TestOpModelGeneric class method)</a>
 </li>
       <li><a href="cascada.primitives.aes_masked.html#cascada.primitives.aes_masked.get_encryption_constraints">get_encryption_constraints() (in module cascada.primitives.aes_masked)</a>
 </li>
@@ -1436,10 +1454,10 @@
       </ul></li>
       <li><a href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.get_random_bvfunction">get_random_bvfunction() (in module cascada.bitvector.ssa)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="cascada.primitives.blockcipher.html#cascada.primitives.blockcipher.get_random_cipher">get_random_cipher() (in module cascada.primitives.blockcipher)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="cascada.abstractproperty.characteristic.html#cascada.abstractproperty.characteristic.Characteristic.get_round_separators">get_round_separators() (cascada.abstractproperty.characteristic.Characteristic method)</a>
 
       <ul>
@@ -1580,8 +1598,6 @@
 </li>
       <li><a href="cascada.bitvector.operation.html#cascada.bitvector.operation.Operation.is_symmetric">is_symmetric (cascada.bitvector.operation.Operation attribute)</a>
 </li>
-      <li><a href="cascada.abstractproperty.tests.test_opmodel.html#cascada.abstractproperty.tests.test_opmodel.TestOpModelGeneric.is_valid_slow">is_valid_slow() (cascada.abstractproperty.tests.test_opmodel.TestOpModelGeneric class method)</a>
-</li>
       <li><a href="cascada.bitvector.operation.html#cascada.bitvector.operation.Ite">Ite (class in cascada.bitvector.operation)</a>
 </li>
   </ul></td>
@@ -1602,6 +1618,14 @@
         <li><a href="cascada.primitives.lea.html#cascada.primitives.lea.LEACipher.key_schedule">(cascada.primitives.lea.LEACipher attribute)</a>
 </li>
         <li><a href="cascada.primitives.multi2.html#cascada.primitives.multi2.MULTI2Cipher.key_schedule">(cascada.primitives.multi2.MULTI2Cipher attribute)</a>
+</li>
+        <li><a href="cascada.primitives.noekeon.html#cascada.primitives.noekeon.NOEKEONDirectCipher.key_schedule">(cascada.primitives.noekeon.NOEKEONDirectCipher attribute)</a>
+</li>
+        <li><a href="cascada.primitives.noekeon.html#cascada.primitives.noekeon.NOEKEONIndirectCipher.key_schedule">(cascada.primitives.noekeon.NOEKEONIndirectCipher attribute)</a>
+</li>
+        <li><a href="cascada.primitives.rectangle.html#cascada.primitives.rectangle.RECTANGLE128Cipher.key_schedule">(cascada.primitives.rectangle.RECTANGLE128Cipher attribute)</a>
+</li>
+        <li><a href="cascada.primitives.rectangle.html#cascada.primitives.rectangle.RECTANGLE80Cipher.key_schedule">(cascada.primitives.rectangle.RECTANGLE80Cipher attribute)</a>
 </li>
         <li><a href="cascada.primitives.shacal1.html#cascada.primitives.shacal1.SHACAL1Cipher.key_schedule">(cascada.primitives.shacal1.SHACAL1Cipher attribute)</a>
 </li>
@@ -1646,6 +1670,8 @@
         <li><a href="cascada.primitives.aes_masked.html#cascada.primitives.aes_masked.SboxB.linear_model">(cascada.primitives.aes_masked.SboxB attribute)</a>
 </li>
         <li><a href="cascada.primitives.aes_masked.html#cascada.primitives.aes_masked.SboxZeroWeight.linear_model">(cascada.primitives.aes_masked.SboxZeroWeight attribute)</a>
+</li>
+        <li><a href="cascada.primitives.rectangle.html#cascada.primitives.rectangle.SboxLut.linear_model">(cascada.primitives.rectangle.SboxLut attribute)</a>
 </li>
         <li><a href="cascada.primitives.skinny128.html#cascada.primitives.skinny128.SboxLut.linear_model">(cascada.primitives.skinny128.SboxLut attribute)</a>
 </li>
@@ -1794,8 +1820,6 @@
 </li>
         <li><a href="cascada.abstractproperty.property.html#module-cascada.abstractproperty.property">cascada.abstractproperty.property</a>
 </li>
-        <li><a href="cascada.abstractproperty.tests.test_opmodel.html#module-cascada.abstractproperty.tests.test_opmodel">cascada.abstractproperty.tests.test_opmodel</a>
-</li>
         <li><a href="cascada.algebraic.html#module-cascada.algebraic">cascada.algebraic</a>
 </li>
         <li><a href="cascada.algebraic.characteristic.html#module-cascada.algebraic.characteristic">cascada.algebraic.characteristic</a>
@@ -1862,7 +1886,11 @@
 </li>
         <li><a href="cascada.primitives.multi2.html#module-cascada.primitives.multi2">cascada.primitives.multi2</a>
 </li>
+        <li><a href="cascada.primitives.noekeon.html#module-cascada.primitives.noekeon">cascada.primitives.noekeon</a>
+</li>
         <li><a href="cascada.primitives.picipher.html#module-cascada.primitives.picipher">cascada.primitives.picipher</a>
+</li>
+        <li><a href="cascada.primitives.rectangle.html#module-cascada.primitives.rectangle">cascada.primitives.rectangle</a>
 </li>
         <li><a href="cascada.primitives.shacal1.html#module-cascada.primitives.shacal1">cascada.primitives.shacal1</a>
 </li>
@@ -1920,6 +1948,16 @@
 </li>
       </ul></li>
       <li><a href="cascada.bitvector.core.html#cascada.bitvector.core.Variable.name">name (cascada.bitvector.core.Variable property)</a>
+</li>
+      <li><a href="cascada.primitives.noekeon.html#cascada.primitives.noekeon.NOEKEONDirectCipher">NOEKEONDirectCipher (class in cascada.primitives.noekeon)</a>
+</li>
+      <li><a href="cascada.primitives.noekeon.html#cascada.primitives.noekeon.NOEKEONDirectKeySchedule">NOEKEONDirectKeySchedule (class in cascada.primitives.noekeon)</a>
+</li>
+      <li><a href="cascada.primitives.noekeon.html#cascada.primitives.noekeon.NOEKEONEncryption">NOEKEONEncryption (class in cascada.primitives.noekeon)</a>
+</li>
+      <li><a href="cascada.primitives.noekeon.html#cascada.primitives.noekeon.NOEKEONIndirectCipher">NOEKEONIndirectCipher (class in cascada.primitives.noekeon)</a>
+</li>
+      <li><a href="cascada.primitives.noekeon.html#cascada.primitives.noekeon.NOEKEONIndirectKeySchedule">NOEKEONIndirectKeySchedule (class in cascada.primitives.noekeon)</a>
 </li>
       <li><a href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.BranchNumberModel.nonzero2nonzero_weight">nonzero2nonzero_weight (cascada.abstractproperty.opmodel.BranchNumberModel attribute)</a>
 
@@ -2341,6 +2379,16 @@
         <li><a href="cascada.linear.characteristic.html#cascada.linear.characteristic.Characteristic.random">(cascada.linear.characteristic.Characteristic class method)</a>
 </li>
       </ul></li>
+      <li><a href="cascada.primitives.rectangle.html#cascada.primitives.rectangle.RECTANGLE128Cipher">RECTANGLE128Cipher (class in cascada.primitives.rectangle)</a>
+</li>
+      <li><a href="cascada.primitives.rectangle.html#cascada.primitives.rectangle.RECTANGLE128KeySchedule">RECTANGLE128KeySchedule (class in cascada.primitives.rectangle)</a>
+</li>
+      <li><a href="cascada.primitives.rectangle.html#cascada.primitives.rectangle.RECTANGLE80Cipher">RECTANGLE80Cipher (class in cascada.primitives.rectangle)</a>
+</li>
+      <li><a href="cascada.primitives.rectangle.html#cascada.primitives.rectangle.RECTANGLE80KeySchedule">RECTANGLE80KeySchedule (class in cascada.primitives.rectangle)</a>
+</li>
+      <li><a href="cascada.primitives.rectangle.html#cascada.primitives.rectangle.RECTANGLEEncryption">RECTANGLEEncryption (class in cascada.primitives.rectangle)</a>
+</li>
       <li><a href="cascada.bitvector.operation.html#cascada.bitvector.operation.repeat">repeat() (in module cascada.bitvector.operation)</a>
 </li>
       <li><a href="cascada.bitvector.context.html#cascada.bitvector.context.MemoizationTable.replace_id">replace_id() (cascada.bitvector.context.MemoizationTable method)</a>
@@ -2353,14 +2401,14 @@
 </li>
       <li><a href="cascada.smt.chsearch.html#cascada.smt.chsearch.round_based_ch_search">round_based_ch_search() (in module cascada.smt.chsearch)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="cascada.smt.chsearch.html#cascada.smt.chsearch.round_based_cipher_ch_search">round_based_cipher_ch_search() (in module cascada.smt.chsearch)</a>
 </li>
       <li><a href="cascada.smt.invalidpropsearch.html#cascada.smt.invalidpropsearch.round_based_invalidcipherprop_search">round_based_invalidcipherprop_search() (in module cascada.smt.invalidpropsearch)</a>
 </li>
       <li><a href="cascada.smt.invalidpropsearch.html#cascada.smt.invalidpropsearch.round_based_invalidprop_search">round_based_invalidprop_search() (in module cascada.smt.invalidpropsearch)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="cascada.primitives.blockcipher.html#cascada.primitives.blockcipher.Encryption.round_keys">round_keys (cascada.primitives.blockcipher.Encryption attribute)</a>
 </li>
       <li><a href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.RoundBasedFunction">RoundBasedFunction (class in cascada.bitvector.ssa)</a>
@@ -2422,6 +2470,8 @@
       <li><a href="cascada.primitives.aes.html#cascada.primitives.aes.SboxLut">SboxLut (class in cascada.primitives.aes)</a>
 
       <ul>
+        <li><a href="cascada.primitives.rectangle.html#cascada.primitives.rectangle.SboxLut">(class in cascada.primitives.rectangle)</a>
+</li>
         <li><a href="cascada.primitives.skinny128.html#cascada.primitives.skinny128.SboxLut">(class in cascada.primitives.skinny128)</a>
 </li>
         <li><a href="cascada.primitives.skinny64.html#cascada.primitives.skinny64.SboxLut">(class in cascada.primitives.skinny64)</a>
@@ -2476,7 +2526,25 @@
 </li>
         <li><a href="cascada.primitives.multi2.html#cascada.primitives.multi2.MULTI2KeySchedule.set_num_rounds">(cascada.primitives.multi2.MULTI2KeySchedule class method)</a>
 </li>
+        <li><a href="cascada.primitives.noekeon.html#cascada.primitives.noekeon.NOEKEONDirectCipher.set_num_rounds">(cascada.primitives.noekeon.NOEKEONDirectCipher class method)</a>
+</li>
+        <li><a href="cascada.primitives.noekeon.html#cascada.primitives.noekeon.NOEKEONEncryption.set_num_rounds">(cascada.primitives.noekeon.NOEKEONEncryption class method)</a>
+</li>
+        <li><a href="cascada.primitives.noekeon.html#cascada.primitives.noekeon.NOEKEONIndirectCipher.set_num_rounds">(cascada.primitives.noekeon.NOEKEONIndirectCipher class method)</a>
+</li>
+        <li><a href="cascada.primitives.noekeon.html#cascada.primitives.noekeon.NOEKEONIndirectKeySchedule.set_num_rounds">(cascada.primitives.noekeon.NOEKEONIndirectKeySchedule class method)</a>
+</li>
         <li><a href="cascada.primitives.picipher.html#cascada.primitives.picipher.PiPermutation.set_num_rounds">(cascada.primitives.picipher.PiPermutation class method)</a>
+</li>
+        <li><a href="cascada.primitives.rectangle.html#cascada.primitives.rectangle.RECTANGLE128Cipher.set_num_rounds">(cascada.primitives.rectangle.RECTANGLE128Cipher class method)</a>
+</li>
+        <li><a href="cascada.primitives.rectangle.html#cascada.primitives.rectangle.RECTANGLE128KeySchedule.set_num_rounds">(cascada.primitives.rectangle.RECTANGLE128KeySchedule class method)</a>
+</li>
+        <li><a href="cascada.primitives.rectangle.html#cascada.primitives.rectangle.RECTANGLE80Cipher.set_num_rounds">(cascada.primitives.rectangle.RECTANGLE80Cipher class method)</a>
+</li>
+        <li><a href="cascada.primitives.rectangle.html#cascada.primitives.rectangle.RECTANGLE80KeySchedule.set_num_rounds">(cascada.primitives.rectangle.RECTANGLE80KeySchedule class method)</a>
+</li>
+        <li><a href="cascada.primitives.rectangle.html#cascada.primitives.rectangle.RECTANGLEEncryption.set_num_rounds">(cascada.primitives.rectangle.RECTANGLEEncryption class method)</a>
 </li>
         <li><a href="cascada.primitives.shacal1.html#cascada.primitives.shacal1.SHACAL1Cipher.set_num_rounds">(cascada.primitives.shacal1.SHACAL1Cipher class method)</a>
 </li>
@@ -2515,10 +2583,10 @@
       </ul></li>
       <li><a href="cascada.primitives.blockcipher.html#cascada.primitives.blockcipher.Cipher.set_round_keys">set_round_keys() (cascada.primitives.blockcipher.Cipher class method)</a>
 </li>
-      <li><a href="cascada.abstractproperty.tests.test_opmodel.html#cascada.abstractproperty.tests.test_opmodel.TestOpModelGeneric.setUpClass">setUpClass() (cascada.abstractproperty.tests.test_opmodel.TestOpModelGeneric class method)</a>
-</li>
       <li><a href="cascada.primitives.shacal1.html#cascada.primitives.shacal1.SHACAL1Cipher">SHACAL1Cipher (class in cascada.primitives.shacal1)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="cascada.primitives.shacal1.html#cascada.primitives.shacal1.SHACAL1Encryption">SHACAL1Encryption (class in cascada.primitives.shacal1)</a>
 </li>
       <li><a href="cascada.primitives.shacal1.html#cascada.primitives.shacal1.SHACAL1KeySchedule">SHACAL1KeySchedule (class in cascada.primitives.shacal1)</a>
@@ -2527,8 +2595,6 @@
 </li>
       <li><a href="cascada.primitives.shacal2.html#cascada.primitives.shacal2.SHACAL2Encryption">SHACAL2Encryption (class in cascada.primitives.shacal2)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="cascada.primitives.shacal2.html#cascada.primitives.shacal2.SHACAL2KeySchedule">SHACAL2KeySchedule (class in cascada.primitives.shacal2)</a>
 </li>
       <li><a href="cascada.abstractproperty.characteristic.html#cascada.abstractproperty.characteristic.Characteristic.signature">signature() (cascada.abstractproperty.characteristic.Characteristic method)</a>
@@ -2669,8 +2735,6 @@
 </li>
       <li><a href="cascada.primitives.tea.html#cascada.primitives.tea.TEAKeySchedule">TEAKeySchedule (class in cascada.primitives.tea)</a>
 </li>
-      <li><a href="cascada.abstractproperty.tests.test_opmodel.html#cascada.abstractproperty.tests.test_opmodel.TestOpModelGeneric.tearDownClass">tearDownClass() (cascada.abstractproperty.tests.test_opmodel.TestOpModelGeneric class method)</a>
-</li>
       <li><a href="cascada.bitvector.core.html#cascada.bitvector.core.Term">Term (class in cascada.bitvector.core)</a>
 </li>
       <li><a href="cascada.primitives.aes.html#cascada.primitives.aes.AESKeySchedule.test">test() (cascada.primitives.aes.AESKeySchedule class method)</a>
@@ -2680,6 +2744,14 @@
 </li>
         <li><a href="cascada.primitives.hight.html#cascada.primitives.hight.HightCipher.test">(cascada.primitives.hight.HightCipher class method)</a>
 </li>
+        <li><a href="cascada.primitives.noekeon.html#cascada.primitives.noekeon.NOEKEONDirectCipher.test">(cascada.primitives.noekeon.NOEKEONDirectCipher class method)</a>
+</li>
+        <li><a href="cascada.primitives.noekeon.html#cascada.primitives.noekeon.NOEKEONIndirectCipher.test">(cascada.primitives.noekeon.NOEKEONIndirectCipher class method)</a>
+</li>
+        <li><a href="cascada.primitives.rectangle.html#cascada.primitives.rectangle.RECTANGLE128Cipher.test">(cascada.primitives.rectangle.RECTANGLE128Cipher class method)</a>
+</li>
+        <li><a href="cascada.primitives.rectangle.html#cascada.primitives.rectangle.RECTANGLE80Cipher.test">(cascada.primitives.rectangle.RECTANGLE80Cipher class method)</a>
+</li>
         <li><a href="cascada.primitives.tea.html#cascada.primitives.tea.TEACipher.test">(cascada.primitives.tea.TEACipher class method)</a>
 </li>
         <li><a href="cascada.primitives.xtea.html#cascada.primitives.xtea.XTEACipher.test">(cascada.primitives.xtea.XTEACipher class method)</a>
@@ -2687,8 +2759,6 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="cascada.abstractproperty.tests.test_opmodel.html#cascada.abstractproperty.tests.test_opmodel.TestOpModelGeneric">TestOpModelGeneric (class in cascada.abstractproperty.tests.test_opmodel)</a>
-</li>
       <li><a href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.SSA.to_bvfunction">to_bvfunction() (cascada.bitvector.ssa.SSA method)</a>
 </li>
       <li><a href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.BvFunction.to_ssa">to_ssa() (cascada.bitvector.ssa.BvFunction class method)</a>
@@ -2697,6 +2767,8 @@
         <li><a href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.RoundBasedFunction.to_ssa">(cascada.bitvector.ssa.RoundBasedFunction class method)</a>
 </li>
       </ul></li>
+      <li><a href="cascada.primitives.rectangle.html#cascada.primitives.rectangle.transpose">transpose() (in module cascada.primitives.rectangle)</a>
+</li>
       <li><a href="cascada.differential.characteristic.html#cascada.differential.characteristic.Characteristic.tuple_assign_outdiff2op_model">tuple_assign_outdiff2op_model (cascada.differential.characteristic.Characteristic attribute)</a>
 </li>
       <li><a href="cascada.linear.characteristic.html#cascada.linear.characteristic.Characteristic.tuple_assign_outmask2op_model">tuple_assign_outmask2op_model (cascada.linear.characteristic.Characteristic attribute)</a>
@@ -3002,6 +3074,8 @@
       <ul>
         <li><a href="cascada.primitives.aes.html#cascada.primitives.aes.SboxLut.xor_model">(cascada.primitives.aes.SboxLut attribute)</a>
 </li>
+        <li><a href="cascada.primitives.rectangle.html#cascada.primitives.rectangle.SboxLut.xor_model">(cascada.primitives.rectangle.SboxLut attribute)</a>
+</li>
         <li><a href="cascada.primitives.simeck.html#cascada.primitives.simeck.SimeckRF.xor_model">(cascada.primitives.simeck.SimeckRF attribute)</a>
 </li>
         <li><a href="cascada.primitives.simon_rf.html#cascada.primitives.simon_rf.SimonRF.xor_model">(cascada.primitives.simon_rf.SimonRF attribute)</a>
@@ -3019,10 +3093,10 @@
 </li>
       <li><a href="cascada.differential.opmodel.html#cascada.differential.opmodel.XorModelBvAnd">XorModelBvAnd (class in cascada.differential.opmodel)</a>
 </li>
-      <li><a href="cascada.differential.opmodel.html#cascada.differential.opmodel.XorModelBvIf">XorModelBvIf (class in cascada.differential.opmodel)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="cascada.differential.opmodel.html#cascada.differential.opmodel.XorModelBvIf">XorModelBvIf (class in cascada.differential.opmodel)</a>
+</li>
       <li><a href="cascada.differential.opmodel.html#cascada.differential.opmodel.XorModelBvMaj">XorModelBvMaj (class in cascada.differential.opmodel)</a>
 </li>
       <li><a href="cascada.differential.opmodel.html#cascada.differential.opmodel.XorModelBvOr">XorModelBvOr (class in cascada.differential.opmodel)</a>

@@ -19,7 +19,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="cascada.bitvector.core module" href="cascada.bitvector.core.html" />
-    <link rel="prev" title="cascada.bitvector module" href="cascada.bitvector.html" /> 
+    <link rel="prev" title="cascada.bitvector package" href="cascada.bitvector.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -44,23 +44,27 @@
 <li class="toctree-l1"><a class="reference internal" href="index.html">CASCADA</a></li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="adding_primitive.html">Adding a primitive</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced_usage.html">Advanced Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="primitives_implemented.html">Primitives implemented</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="cascada.html">API reference</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="cascada.bitvector.html">cascada.bitvector module</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#">cascada.bitvector.context module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.bitvector.core.html">cascada.bitvector.core module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.bitvector.secondaryop.html">cascada.bitvector.secondaryop module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.bitvector.operation.html">cascada.bitvector.operation module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.bitvector.printing.html">cascada.bitvector.printing module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.bitvector.ssa.html">cascada.bitvector.ssa module</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="cascada.bitvector.html">cascada.bitvector package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="cascada.bitvector.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">cascada.bitvector.context module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.bitvector.core.html">cascada.bitvector.core module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.bitvector.operation.html">cascada.bitvector.operation module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.bitvector.printing.html">cascada.bitvector.printing module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.bitvector.secondaryop.html">cascada.bitvector.secondaryop module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.bitvector.ssa.html">cascada.bitvector.ssa module</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.primitives.html">cascada.primitives module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.abstractproperty.html">cascada.abstractproperty module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.differential.html">cascada.differential module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.linear.html">cascada.linear module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.algebraic.html">cascada.algebraic module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.smt.html">cascada.smt module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.primitives.html">cascada.primitives package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.abstractproperty.html">cascada.abstractproperty package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.differential.html">cascada.differential package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.linear.html">cascada.linear package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.algebraic.html">cascada.algebraic package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.smt.html">cascada.smt package</a></li>
 </ul>
 </li>
 </ul>
@@ -80,7 +84,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="cascada.html">API reference</a> &raquo;</li>
-          <li><a href="cascada.bitvector.html">cascada.bitvector module</a> &raquo;</li>
+          <li><a href="cascada.bitvector.html">cascada.bitvector package</a> &raquo;</li>
       <li>cascada.bitvector.context module</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/cascada.bitvector.context.rst.txt" rel="nofollow"> View page source</a>
@@ -94,10 +98,42 @@
   <section id="module-cascada.bitvector.context">
 <span id="cascada-bitvector-context-module"></span><h1>cascada.bitvector.context module<a class="headerlink" href="#module-cascada.bitvector.context" title="Permalink to this headline"></a></h1>
 <p>Provide context managers to modify the creation and evaluation of bit-vector expressions.</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cascada.bitvector.context.StatefulContext" title="cascada.bitvector.context.StatefulContext"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StatefulContext</span></code></a></p></td>
+<td><p>Base class for context managers with history.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cascada.bitvector.context.Cache" title="cascada.bitvector.context.Cache"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cache</span></code></a></p></td>
+<td><p>Control the Cache context.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cascada.bitvector.context.Simplification" title="cascada.bitvector.context.Simplification"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Simplification</span></code></a></p></td>
+<td><p>Control the Simplification context.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cascada.bitvector.context.PrimaryOperationEvaluation" title="cascada.bitvector.context.PrimaryOperationEvaluation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PrimaryOperationEvaluation</span></code></a></p></td>
+<td><p>Control the PrimaryOperationEvaluation context.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cascada.bitvector.context.SecondaryOperationEvaluation" title="cascada.bitvector.context.SecondaryOperationEvaluation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SecondaryOperationEvaluation</span></code></a></p></td>
+<td><p>Control the SecondaryOperationEvaluation context.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cascada.bitvector.context.Validation" title="cascada.bitvector.context.Validation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Validation</span></code></a></p></td>
+<td><p>Control the Validation context.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cascada.bitvector.context.Memoization" title="cascada.bitvector.context.Memoization"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Memoization</span></code></a></p></td>
+<td><p>Control the Memoization context.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cascada.bitvector.context.MemoizationTable" title="cascada.bitvector.context.MemoizationTable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MemoizationTable</span></code></a></p></td>
+<td><p>Store bit-vector expressions with unique identifiers.</p></td>
+</tr>
+</tbody>
+</table>
 <dl class="py class">
 <dt class="sig sig-object py" id="cascada.bitvector.context.StatefulContext">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.bitvector.context.</span></span><span class="sig-name descname"><span class="pre">StatefulContext</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/context.html#StatefulContext"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.context.StatefulContext" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/contextlib.html#contextlib.AbstractContextManager" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">contextlib.AbstractContextManager</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/contextlib.html#contextlib.AbstractContextManager" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">contextlib.AbstractContextManager</span></code></a></p>
 <p>Base class for context managers with history.</p>
 </dd></dl>
 
@@ -271,7 +307,7 @@ contexts are disabled.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="cascada.bitvector.context.MemoizationTable">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.bitvector.context.</span></span><span class="sig-name descname"><span class="pre">MemoizationTable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'x'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/context.html#MemoizationTable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.context.MemoizationTable" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.MutableMapping" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">collections.abc.MutableMapping</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.MutableMapping" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">collections.abc.MutableMapping</span></code></a></p>
 <p>Store bit-vector expressions with unique identifiers.</p>
 <p>The MemoizationTable is a dictionary-like structure
 (implementing the usual methods of a dictionary and
@@ -346,7 +382,7 @@ where the variable represents the output of the operation.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="cascada.bitvector.html" class="btn btn-neutral float-left" title="cascada.bitvector module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cascada.bitvector.html" class="btn btn-neutral float-left" title="cascada.bitvector package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="cascada.bitvector.core.html" class="btn btn-neutral float-right" title="cascada.bitvector.core module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

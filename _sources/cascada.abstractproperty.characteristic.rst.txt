@@ -1,4 +1,4 @@
-﻿cascada.abstractproperty.characteristic module
+cascada.abstractproperty.characteristic module
 ==============================================
 
 .. automodule:: cascada.abstractproperty.characteristic

@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>cascada.linear module &mdash; CASCADA 1.0.rc0 documentation</title>
+  <title>cascada.linear package &mdash; CASCADA 1.0.rc0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -18,8 +18,8 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="cascada.linear.mask module" href="cascada.linear.mask.html" />
-    <link rel="prev" title="cascada.differential.characteristic module" href="cascada.differential.characteristic.html" /> 
+    <link rel="next" title="cascada.linear.characteristic module" href="cascada.linear.characteristic.html" />
+    <link rel="prev" title="cascada.differential.opmodel module" href="cascada.differential.opmodel.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -44,21 +44,25 @@
 <li class="toctree-l1"><a class="reference internal" href="index.html">CASCADA</a></li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="adding_primitive.html">Adding a primitive</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced_usage.html">Advanced Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="primitives_implemented.html">Primitives implemented</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="cascada.html">API reference</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="cascada.bitvector.html">cascada.bitvector module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.primitives.html">cascada.primitives module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.abstractproperty.html">cascada.abstractproperty module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.differential.html">cascada.differential module</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">cascada.linear module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="cascada.linear.mask.html">cascada.linear.mask module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.linear.opmodel.html">cascada.linear.opmodel module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.linear.chmodel.html">cascada.linear.chmodel module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.linear.characteristic.html">cascada.linear.characteristic module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.bitvector.html">cascada.bitvector package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.primitives.html">cascada.primitives package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.abstractproperty.html">cascada.abstractproperty package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.differential.html">cascada.differential package</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">cascada.linear package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cascada.linear.characteristic.html">cascada.linear.characteristic module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.linear.chmodel.html">cascada.linear.chmodel module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.linear.mask.html">cascada.linear.mask module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.linear.opmodel.html">cascada.linear.opmodel module</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.algebraic.html">cascada.algebraic module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.smt.html">cascada.smt module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.algebraic.html">cascada.algebraic package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.smt.html">cascada.smt package</a></li>
 </ul>
 </li>
 </ul>
@@ -78,7 +82,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="cascada.html">API reference</a> &raquo;</li>
-      <li>cascada.linear module</li>
+      <li>cascada.linear package</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/cascada.linear.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -89,26 +93,29 @@
            <div itemprop="articleBody">
              
   <section id="module-cascada.linear">
-<span id="cascada-linear-module"></span><h1>cascada.linear module<a class="headerlink" href="#module-cascada.linear" title="Permalink to this headline"></a></h1>
+<span id="cascada-linear-package"></span><h1>cascada.linear package<a class="headerlink" href="#module-cascada.linear" title="Permalink to this headline"></a></h1>
 <p>Manipulate linear mask properties, linear characteristics,
 linear models of bit-vector operations
 and linear characteristic models (in the context of linear cryptanalysis).</p>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="cascada.linear.characteristic.html">cascada.linear.characteristic module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cascada.linear.chmodel.html">cascada.linear.chmodel module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cascada.linear.mask.html">cascada.linear.mask module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cascada.linear.opmodel.html">cascada.linear.opmodel module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cascada.linear.chmodel.html">cascada.linear.chmodel module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cascada.linear.characteristic.html">cascada.linear.characteristic module</a></li>
 </ul>
 </div>
+</section>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="cascada.differential.characteristic.html" class="btn btn-neutral float-left" title="cascada.differential.characteristic module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="cascada.linear.mask.html" class="btn btn-neutral float-right" title="cascada.linear.mask module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="cascada.differential.opmodel.html" class="btn btn-neutral float-left" title="cascada.differential.opmodel module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cascada.linear.characteristic.html" class="btn btn-neutral float-right" title="cascada.linear.characteristic module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

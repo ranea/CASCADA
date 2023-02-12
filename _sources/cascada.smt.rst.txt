@@ -1,16 +1,17 @@
-cascada.smt module
-==================
+cascada.smt package
+===================
 
 .. automodule:: cascada.smt
    :members:
    :show-inheritance:
 
+Submodules
+----------
 
 .. toctree::
    :maxdepth: 4
 
-   cascada.smt.pysmttypes
    cascada.smt.chsearch
    cascada.smt.invalidpropsearch
+   cascada.smt.pysmttypes
    cascada.smt.wrappedchmodel
-   

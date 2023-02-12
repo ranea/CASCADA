@@ -18,8 +18,8 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="cascada.smt.chsearch module" href="cascada.smt.chsearch.html" />
-    <link rel="prev" title="cascada.smt module" href="cascada.smt.html" /> 
+    <link rel="next" title="cascada.smt.wrappedchmodel module" href="cascada.smt.wrappedchmodel.html" />
+    <link rel="prev" title="cascada.smt.invalidpropsearch module" href="cascada.smt.invalidpropsearch.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -44,19 +44,23 @@
 <li class="toctree-l1"><a class="reference internal" href="index.html">CASCADA</a></li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="adding_primitive.html">Adding a primitive</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced_usage.html">Advanced Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="primitives_implemented.html">Primitives implemented</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="cascada.html">API reference</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="cascada.bitvector.html">cascada.bitvector module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.primitives.html">cascada.primitives module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.abstractproperty.html">cascada.abstractproperty module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.differential.html">cascada.differential module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.linear.html">cascada.linear module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.algebraic.html">cascada.algebraic module</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="cascada.smt.html">cascada.smt module</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#">cascada.smt.pysmttypes module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.smt.chsearch.html">cascada.smt.chsearch module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.smt.invalidpropsearch.html">cascada.smt.invalidpropsearch module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.smt.wrappedchmodel.html">cascada.smt.wrappedchmodel module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.bitvector.html">cascada.bitvector package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.primitives.html">cascada.primitives package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.abstractproperty.html">cascada.abstractproperty package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.differential.html">cascada.differential package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.linear.html">cascada.linear package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.algebraic.html">cascada.algebraic package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="cascada.smt.html">cascada.smt package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="cascada.smt.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="cascada.smt.chsearch.html">cascada.smt.chsearch module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.smt.invalidpropsearch.html">cascada.smt.invalidpropsearch module</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">cascada.smt.pysmttypes module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.smt.wrappedchmodel.html">cascada.smt.wrappedchmodel module</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -78,7 +82,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="cascada.html">API reference</a> &raquo;</li>
-          <li><a href="cascada.smt.html">cascada.smt module</a> &raquo;</li>
+          <li><a href="cascada.smt.html">cascada.smt package</a> &raquo;</li>
       <li>cascada.smt.pysmttypes module</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/cascada.smt.pysmttypes.rst.txt" rel="nofollow"> View page source</a>
@@ -92,6 +96,23 @@
   <section id="module-cascada.smt.pysmttypes">
 <span id="cascada-smt-pysmttypes-module"></span><h1>cascada.smt.pysmttypes module<a class="headerlink" href="#module-cascada.smt.pysmttypes" title="Permalink to this headline"></a></h1>
 <p>Convert between <a class="reference external" href="https://github.com/pysmt/pysmt">pySMT</a> types and <a class="reference internal" href="cascada.bitvector.html#module-cascada.bitvector" title="cascada.bitvector"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">bitvector</span></code></a> types.</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cascada.smt.pysmttypes.bv2pysmt" title="cascada.smt.pysmttypes.bv2pysmt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bv2pysmt</span></code></a></p></td>
+<td><p>Convert a bit-vector type to a pySMT type.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cascada.smt.pysmttypes.pysmt2bv" title="cascada.smt.pysmttypes.pysmt2bv"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pysmt2bv</span></code></a></p></td>
+<td><p>Convert a pySMT type to a bit-vector type.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cascada.smt.pysmttypes.pysmt_model2bv_model" title="cascada.smt.pysmttypes.pysmt_model2bv_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pysmt_model2bv_model</span></code></a></p></td>
+<td><p>Convert a <a class="reference external" href="https://pysmt.readthedocs.io/en/latest/api_ref.html#pysmt.solvers.solver.Model" title="(in pySMT v0.7)"><code class="xref any docutils literal notranslate"><span class="pre">pysmt.solvers.solver.Model</span></code></a> into a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><code class="xref any docutils literal notranslate"><span class="pre">dict</span></code></a> of bit-vector types.</p></td>
+</tr>
+</tbody>
+</table>
 <dl class="py function">
 <dt class="sig sig-object py" id="cascada.smt.pysmttypes.bv2pysmt">
 <span class="sig-prename descclassname"><span class="pre">cascada.smt.pysmttypes.</span></span><span class="sig-name descname"><span class="pre">bv2pysmt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boolean</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parse_shifts_rotations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/smt/pysmttypes.html#bv2pysmt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.smt.pysmttypes.bv2pysmt" title="Permalink to this definition"></a></dt>
@@ -107,7 +128,7 @@ extracting and concatenating bits.</p>
 <li><p><strong>bv</strong> – the bit-vector <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term" title="cascada.bitvector.core.Term"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Term</span></code></a> to convert</p></li>
 <li><p><strong>boolean</strong> – if True, boolean pySMT types (e.g., <a class="reference external" href="https://pysmt.readthedocs.io/en/latest/api_ref.html#pysmt.shortcuts.Bool" title="(in pySMT v0.7)"><code class="xref any docutils literal notranslate"><span class="pre">pysmt.shortcuts.Bool</span></code></a>) are used instead of
 bit-vector pySMT types (e.g., <a class="reference external" href="https://pysmt.readthedocs.io/en/latest/api_ref.html#pysmt.shortcuts.BV" title="(in pySMT v0.7)"><code class="xref any docutils literal notranslate"><span class="pre">pysmt.shortcuts.BV</span></code></a>).</p></li>
-<li><p><strong>parse_shifts_rotations</strong> – if <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">True</span></code></a>, shifts and rotation are preprocessed as above.</p></li>
+<li><p><strong>parse_shifts_rotations</strong> – if <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.11)"><code class="xref any docutils literal notranslate"><span class="pre">True</span></code></a>, shifts and rotation are preprocessed as above.</p></li>
 <li><p><strong>env</strong> – a <a class="reference external" href="https://pysmt.readthedocs.io/en/latest/api_ref.html#pysmt.environment.Environment" title="(in pySMT v0.7)"><code class="xref any docutils literal notranslate"><span class="pre">pysmt.environment.Environment</span></code></a>; if not specified, a new pySMT environment is created.</p></li>
 </ul>
 </dd>
@@ -158,7 +179,7 @@ and <a class="reference external" href="https://pysmt.readthedocs.io/en/latest/a
 <dl class="py function">
 <dt class="sig sig-object py" id="cascada.smt.pysmttypes.pysmt_model2bv_model">
 <span class="sig-prename descclassname"><span class="pre">cascada.smt.pysmttypes.</span></span><span class="sig-name descname"><span class="pre">pysmt_model2bv_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">properties</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/smt/pysmttypes.html#pysmt_model2bv_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.smt.pysmttypes.pysmt_model2bv_model" title="Permalink to this definition"></a></dt>
-<dd><p>Convert a <a class="reference external" href="https://pysmt.readthedocs.io/en/latest/api_ref.html#pysmt.solvers.solver.Model" title="(in pySMT v0.7)"><code class="xref any docutils literal notranslate"><span class="pre">pysmt.solvers.solver.Model</span></code></a> into a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">dict</span></code></a> of bit-vector types.</p>
+<dd><p>Convert a <a class="reference external" href="https://pysmt.readthedocs.io/en/latest/api_ref.html#pysmt.solvers.solver.Model" title="(in pySMT v0.7)"><code class="xref any docutils literal notranslate"><span class="pre">pysmt.solvers.solver.Model</span></code></a> into a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><code class="xref any docutils literal notranslate"><span class="pre">dict</span></code></a> of bit-vector types.</p>
 <p>To return <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a> values instead of <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term" title="cascada.bitvector.core.Term"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Term</span></code></a> values,
 a list of symbolic properties can be passed as argument.
 In that case, variables in the model also present in <code class="docutils literal notranslate"><span class="pre">properties</span></code>
@@ -189,8 +210,8 @@ will be added to the bit-vector model as <a class="reference internal" href="cas
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="cascada.smt.html" class="btn btn-neutral float-left" title="cascada.smt module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="cascada.smt.chsearch.html" class="btn btn-neutral float-right" title="cascada.smt.chsearch module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="cascada.smt.invalidpropsearch.html" class="btn btn-neutral float-left" title="cascada.smt.invalidpropsearch module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cascada.smt.wrappedchmodel.html" class="btn btn-neutral float-right" title="cascada.smt.wrappedchmodel module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

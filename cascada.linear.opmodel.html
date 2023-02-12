@@ -19,7 +19,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="cascada.linear.chmodel module" href="cascada.linear.chmodel.html" />
+    <link rel="next" title="cascada.algebraic package" href="cascada.algebraic.html" />
     <link rel="prev" title="cascada.linear.mask module" href="cascada.linear.mask.html" /> 
 </head>
 
@@ -45,21 +45,25 @@
 <li class="toctree-l1"><a class="reference internal" href="index.html">CASCADA</a></li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="adding_primitive.html">Adding a primitive</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced_usage.html">Advanced Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="primitives_implemented.html">Primitives implemented</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="cascada.html">API reference</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="cascada.bitvector.html">cascada.bitvector module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.primitives.html">cascada.primitives module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.abstractproperty.html">cascada.abstractproperty module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.differential.html">cascada.differential module</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="cascada.linear.html">cascada.linear module</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="cascada.linear.mask.html">cascada.linear.mask module</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">cascada.linear.opmodel module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.linear.chmodel.html">cascada.linear.chmodel module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.linear.characteristic.html">cascada.linear.characteristic module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.bitvector.html">cascada.bitvector package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.primitives.html">cascada.primitives package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.abstractproperty.html">cascada.abstractproperty package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.differential.html">cascada.differential package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="cascada.linear.html">cascada.linear package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="cascada.linear.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="cascada.linear.characteristic.html">cascada.linear.characteristic module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.linear.chmodel.html">cascada.linear.chmodel module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.linear.mask.html">cascada.linear.mask module</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">cascada.linear.opmodel module</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.algebraic.html">cascada.algebraic module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.smt.html">cascada.smt module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.algebraic.html">cascada.algebraic package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.smt.html">cascada.smt package</a></li>
 </ul>
 </li>
 </ul>
@@ -79,7 +83,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="cascada.html">API reference</a> &raquo;</li>
-          <li><a href="cascada.linear.html">cascada.linear module</a> &raquo;</li>
+          <li><a href="cascada.linear.html">cascada.linear package</a> &raquo;</li>
       <li>cascada.linear.opmodel module</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/cascada.linear.opmodel.rst.txt" rel="nofollow"> View page source</a>
@@ -93,6 +97,65 @@
   <section id="module-cascada.linear.opmodel">
 <span id="cascada-linear-opmodel-module"></span><h1>cascada.linear.opmodel module<a class="headerlink" href="#module-cascada.linear.opmodel" title="Permalink to this headline"></a></h1>
 <p>Manipulate linear models of bit-vector operations.</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cascada.linear.opmodel.OpModel" title="cascada.linear.opmodel.OpModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OpModel</span></code></a></p></td>
+<td><p>Represent linear models of bit-vector operations.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cascada.linear.opmodel.PartialOpModel" title="cascada.linear.opmodel.PartialOpModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PartialOpModel</span></code></a></p></td>
+<td><p>Represent <a class="reference internal" href="#cascada.linear.opmodel.OpModel" title="cascada.linear.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">linear.opmodel.OpModel</span></code></a> of <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.PartialOperation" title="cascada.bitvector.operation.PartialOperation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">PartialOperation</span></code></a>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cascada.linear.opmodel.LinearModelId" title="cascada.linear.opmodel.LinearModelId"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LinearModelId</span></code></a></p></td>
+<td><p>Represent the <a class="reference internal" href="#cascada.linear.opmodel.OpModel" title="cascada.linear.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">linear.opmodel.OpModel</span></code></a> of <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.BvIdentity" title="cascada.bitvector.operation.BvIdentity"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvIdentity</span></code></a>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cascada.linear.opmodel.LinearModelFreeBranch" title="cascada.linear.opmodel.LinearModelFreeBranch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LinearModelFreeBranch</span></code></a></p></td>
+<td><p>Represent the (trivial) linear model of the free branches of the forking or branching subroutine.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cascada.linear.opmodel.LinearModelBvXor" title="cascada.linear.opmodel.LinearModelBvXor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LinearModelBvXor</span></code></a></p></td>
+<td><p>Represent the <a class="reference internal" href="#cascada.linear.opmodel.OpModel" title="cascada.linear.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">linear.opmodel.OpModel</span></code></a> of <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.BvXor" title="cascada.bitvector.operation.BvXor"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvXor</span></code></a>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cascada.linear.opmodel.LinearModelBvAnd" title="cascada.linear.opmodel.LinearModelBvAnd"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LinearModelBvAnd</span></code></a></p></td>
+<td><p>Represent the <a class="reference internal" href="#cascada.linear.opmodel.OpModel" title="cascada.linear.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">linear.opmodel.OpModel</span></code></a> of <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.BvAnd" title="cascada.bitvector.operation.BvAnd"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvAnd</span></code></a>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cascada.linear.opmodel.LinearModelBvOr" title="cascada.linear.opmodel.LinearModelBvOr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LinearModelBvOr</span></code></a></p></td>
+<td><p>Represent the <a class="reference internal" href="#cascada.linear.opmodel.OpModel" title="cascada.linear.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">linear.opmodel.OpModel</span></code></a> of <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.BvOr" title="cascada.bitvector.operation.BvOr"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvOr</span></code></a>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cascada.linear.opmodel.LinearModelBvAdd" title="cascada.linear.opmodel.LinearModelBvAdd"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LinearModelBvAdd</span></code></a></p></td>
+<td><p>Represent the <a class="reference internal" href="#cascada.linear.opmodel.OpModel" title="cascada.linear.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">linear.opmodel.OpModel</span></code></a> of <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.BvAdd" title="cascada.bitvector.operation.BvAdd"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvAdd</span></code></a>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cascada.linear.opmodel.LinearModelBvSub" title="cascada.linear.opmodel.LinearModelBvSub"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LinearModelBvSub</span></code></a></p></td>
+<td><p>Represent the <a class="reference internal" href="#cascada.linear.opmodel.OpModel" title="cascada.linear.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">linear.opmodel.OpModel</span></code></a> of <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.BvSub" title="cascada.bitvector.operation.BvSub"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvSub</span></code></a>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cascada.linear.opmodel.LinearModelBvAndCt" title="cascada.linear.opmodel.LinearModelBvAndCt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LinearModelBvAndCt</span></code></a></p></td>
+<td><p>Represent the <a class="reference internal" href="#cascada.linear.opmodel.PartialOpModel" title="cascada.linear.opmodel.PartialOpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">PartialOpModel</span></code></a> of <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.BvAnd" title="cascada.bitvector.operation.BvAnd"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvAnd</span></code></a> by a constant.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cascada.linear.opmodel.LinearModelBvOrCt" title="cascada.linear.opmodel.LinearModelBvOrCt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LinearModelBvOrCt</span></code></a></p></td>
+<td><p>Represent the <a class="reference internal" href="#cascada.linear.opmodel.PartialOpModel" title="cascada.linear.opmodel.PartialOpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">PartialOpModel</span></code></a> of <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.BvOr" title="cascada.bitvector.operation.BvOr"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvOr</span></code></a> by a constant.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cascada.linear.opmodel.LinearModelBvShlCt" title="cascada.linear.opmodel.LinearModelBvShlCt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LinearModelBvShlCt</span></code></a></p></td>
+<td><p>Represent the <a class="reference internal" href="#cascada.linear.opmodel.PartialOpModel" title="cascada.linear.opmodel.PartialOpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">PartialOpModel</span></code></a> of <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.BvShl" title="cascada.bitvector.operation.BvShl"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvShl</span></code></a> by a constant.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cascada.linear.opmodel.LinearModelBvLshrCt" title="cascada.linear.opmodel.LinearModelBvLshrCt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LinearModelBvLshrCt</span></code></a></p></td>
+<td><p>Represent the <a class="reference internal" href="#cascada.linear.opmodel.PartialOpModel" title="cascada.linear.opmodel.PartialOpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">PartialOpModel</span></code></a> of <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.BvLshr" title="cascada.bitvector.operation.BvLshr"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvLshr</span></code></a> by a constant.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cascada.linear.opmodel.LinearModelExtractCt" title="cascada.linear.opmodel.LinearModelExtractCt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LinearModelExtractCt</span></code></a></p></td>
+<td><p>Represent the <a class="reference internal" href="#cascada.linear.opmodel.PartialOpModel" title="cascada.linear.opmodel.PartialOpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">PartialOpModel</span></code></a> of <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.Extract" title="cascada.bitvector.operation.Extract"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Extract</span></code></a> with fixed indices.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cascada.linear.opmodel.get_weak_model" title="cascada.linear.opmodel.get_weak_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_weak_model</span></code></a></p></td>
+<td><p>Return the weak model of the given bit-vector operation <code class="docutils literal notranslate"><span class="pre">op</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cascada.linear.opmodel.get_branch_number_model" title="cascada.linear.opmodel.get_branch_number_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_branch_number_model</span></code></a></p></td>
+<td><p>Return the branch-number model of the given bit-vector operation <code class="docutils literal notranslate"><span class="pre">op</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cascada.linear.opmodel.get_wdt_model" title="cascada.linear.opmodel.get_wdt_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_wdt_model</span></code></a></p></td>
+<td><p>Return the WDT-based model of the given bit-vector operation <code class="docutils literal notranslate"><span class="pre">op</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
 <dl class="py class">
 <dt class="sig sig-object py" id="cascada.linear.opmodel.OpModel">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.linear.opmodel.</span></span><span class="sig-name descname"><span class="pre">OpModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_prop</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/linear/opmodel.html#OpModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.linear.opmodel.OpModel" title="Permalink to this definition"></a></dt>
@@ -287,7 +350,7 @@ is always 0 for any input and output mask.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="cascada.linear.opmodel.LinearModelFreeBranch.decimal_weight">
 <span class="sig-name descname"><span class="pre">decimal_weight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_mask</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/linear/opmodel.html#LinearModelFreeBranch.decimal_weight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.linear.opmodel.LinearModelFreeBranch.decimal_weight" title="Permalink to this definition"></a></dt>
-<dd><p>Return the <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">decimal.Decimal</span></code></a> weight for a given constant output <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a>.</p>
+<dd><p>Return the <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.11)"><code class="xref any docutils literal notranslate"><span class="pre">decimal.Decimal</span></code></a> weight for a given constant output <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a>.</p>
 <p>This method returns, as a decimal number, the weight (negative binary logarithm)
 of the probability of the input property propagating to the output property.</p>
 <p>This method only works when the input property and the output property are
@@ -314,7 +377,7 @@ fractional part of the number represented by <code class="docutils literal notra
 logarithm (weight) of the propagation probability of <span class="math notranslate nohighlight">\((\alpha, \beta)\)</span>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The exact weight can be computed in <a class="reference internal" href="cascada.abstractproperty.tests.test_opmodel.html#cascada.abstractproperty.tests.test_opmodel.TestOpModelGeneric.get_empirical_weight_slow" title="cascada.abstractproperty.tests.test_opmodel.TestOpModelGeneric.get_empirical_weight_slow"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">TestOpModelGeneric.get_empirical_weight_slow</span></code></a>.</p>
+<p>The exact weight can be computed in <code class="docutils literal notranslate"><span class="pre">TestOpModelGeneric.get_empirical_weight_slow</span></code>.</p>
 </div>
 <p>This method returns an upper bound (in absolute value) of the maximum difference
 (over all input and output properties) between the bit-vector weight
@@ -428,7 +491,7 @@ from <a class="reference internal" href="cascada.abstractproperty.opmodel.html#c
 <dl class="py method">
 <dt class="sig sig-object py" id="cascada.linear.opmodel.LinearModelBvXor.decimal_weight">
 <span class="sig-name descname"><span class="pre">decimal_weight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_mask</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/linear/opmodel.html#LinearModelBvXor.decimal_weight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.linear.opmodel.LinearModelBvXor.decimal_weight" title="Permalink to this definition"></a></dt>
-<dd><p>Return the <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">decimal.Decimal</span></code></a> weight for a given constant output <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a>.</p>
+<dd><p>Return the <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.11)"><code class="xref any docutils literal notranslate"><span class="pre">decimal.Decimal</span></code></a> weight for a given constant output <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a>.</p>
 <p>This method returns, as a decimal number, the weight (negative binary logarithm)
 of the probability of the input property propagating to the output property.</p>
 <p>This method only works when the input property and the output property are
@@ -455,7 +518,7 @@ fractional part of the number represented by <code class="docutils literal notra
 logarithm (weight) of the propagation probability of <span class="math notranslate nohighlight">\((\alpha, \beta)\)</span>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The exact weight can be computed in <a class="reference internal" href="cascada.abstractproperty.tests.test_opmodel.html#cascada.abstractproperty.tests.test_opmodel.TestOpModelGeneric.get_empirical_weight_slow" title="cascada.abstractproperty.tests.test_opmodel.TestOpModelGeneric.get_empirical_weight_slow"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">TestOpModelGeneric.get_empirical_weight_slow</span></code></a>.</p>
+<p>The exact weight can be computed in <code class="docutils literal notranslate"><span class="pre">TestOpModelGeneric.get_empirical_weight_slow</span></code>.</p>
 </div>
 <p>This method returns an upper bound (in absolute value) of the maximum difference
 (over all input and output properties) between the bit-vector weight
@@ -578,7 +641,7 @@ from <a class="reference internal" href="cascada.abstractproperty.opmodel.html#c
 <dl class="py method">
 <dt class="sig sig-object py" id="cascada.linear.opmodel.LinearModelBvAnd.decimal_weight">
 <span class="sig-name descname"><span class="pre">decimal_weight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_mask</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/linear/opmodel.html#LinearModelBvAnd.decimal_weight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.linear.opmodel.LinearModelBvAnd.decimal_weight" title="Permalink to this definition"></a></dt>
-<dd><p>Return the <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">decimal.Decimal</span></code></a> weight for a given constant output <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a>.</p>
+<dd><p>Return the <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.11)"><code class="xref any docutils literal notranslate"><span class="pre">decimal.Decimal</span></code></a> weight for a given constant output <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a>.</p>
 <p>This method returns, as a decimal number, the weight (negative binary logarithm)
 of the probability of the input property propagating to the output property.</p>
 <p>This method only works when the input property and the output property are
@@ -605,7 +668,7 @@ fractional part of the number represented by <code class="docutils literal notra
 logarithm (weight) of the propagation probability of <span class="math notranslate nohighlight">\((\alpha, \beta)\)</span>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The exact weight can be computed in <a class="reference internal" href="cascada.abstractproperty.tests.test_opmodel.html#cascada.abstractproperty.tests.test_opmodel.TestOpModelGeneric.get_empirical_weight_slow" title="cascada.abstractproperty.tests.test_opmodel.TestOpModelGeneric.get_empirical_weight_slow"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">TestOpModelGeneric.get_empirical_weight_slow</span></code></a>.</p>
+<p>The exact weight can be computed in <code class="docutils literal notranslate"><span class="pre">TestOpModelGeneric.get_empirical_weight_slow</span></code>.</p>
 </div>
 <p>This method returns an upper bound (in absolute value) of the maximum difference
 (over all input and output properties) between the bit-vector weight
@@ -762,7 +825,7 @@ for a given output <a class="reference internal" href="cascada.abstractproperty.
 <dl class="py method">
 <dt class="sig sig-object py" id="cascada.linear.opmodel.LinearModelBvAdd.decimal_weight">
 <span class="sig-name descname"><span class="pre">decimal_weight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_mask</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/linear/opmodel.html#LinearModelBvAdd.decimal_weight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.linear.opmodel.LinearModelBvAdd.decimal_weight" title="Permalink to this definition"></a></dt>
-<dd><p>Return the <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">decimal.Decimal</span></code></a> weight for a given constant output <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a>.</p>
+<dd><p>Return the <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.11)"><code class="xref any docutils literal notranslate"><span class="pre">decimal.Decimal</span></code></a> weight for a given constant output <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a>.</p>
 <p>This method returns, as a decimal number, the weight (negative binary logarithm)
 of the probability of the input property propagating to the output property.</p>
 <p>This method only works when the input property and the output property are
@@ -789,7 +852,7 @@ fractional part of the number represented by <code class="docutils literal notra
 logarithm (weight) of the propagation probability of <span class="math notranslate nohighlight">\((\alpha, \beta)\)</span>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The exact weight can be computed in <a class="reference internal" href="cascada.abstractproperty.tests.test_opmodel.html#cascada.abstractproperty.tests.test_opmodel.TestOpModelGeneric.get_empirical_weight_slow" title="cascada.abstractproperty.tests.test_opmodel.TestOpModelGeneric.get_empirical_weight_slow"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">TestOpModelGeneric.get_empirical_weight_slow</span></code></a>.</p>
+<p>The exact weight can be computed in <code class="docutils literal notranslate"><span class="pre">TestOpModelGeneric.get_empirical_weight_slow</span></code>.</p>
 </div>
 <p>This method returns an upper bound (in absolute value) of the maximum difference
 (over all input and output properties) between the bit-vector weight
@@ -941,7 +1004,7 @@ class for subclasses generated through <a class="reference internal" href="casca
 <dl class="py method">
 <dt class="sig sig-object py" id="cascada.linear.opmodel.LinearModelBvAndCt.decimal_weight">
 <span class="sig-name descname"><span class="pre">decimal_weight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_mask</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/linear/opmodel.html#LinearModelBvAndCt.decimal_weight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.linear.opmodel.LinearModelBvAndCt.decimal_weight" title="Permalink to this definition"></a></dt>
-<dd><p>Return the <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">decimal.Decimal</span></code></a> weight for a given constant output <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a>.</p>
+<dd><p>Return the <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.11)"><code class="xref any docutils literal notranslate"><span class="pre">decimal.Decimal</span></code></a> weight for a given constant output <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a>.</p>
 <p>This method returns, as a decimal number, the weight (negative binary logarithm)
 of the probability of the input property propagating to the output property.</p>
 <p>This method only works when the input property and the output property are
@@ -968,7 +1031,7 @@ fractional part of the number represented by <code class="docutils literal notra
 logarithm (weight) of the propagation probability of <span class="math notranslate nohighlight">\((\alpha, \beta)\)</span>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The exact weight can be computed in <a class="reference internal" href="cascada.abstractproperty.tests.test_opmodel.html#cascada.abstractproperty.tests.test_opmodel.TestOpModelGeneric.get_empirical_weight_slow" title="cascada.abstractproperty.tests.test_opmodel.TestOpModelGeneric.get_empirical_weight_slow"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">TestOpModelGeneric.get_empirical_weight_slow</span></code></a>.</p>
+<p>The exact weight can be computed in <code class="docutils literal notranslate"><span class="pre">TestOpModelGeneric.get_empirical_weight_slow</span></code>.</p>
 </div>
 <p>This method returns an upper bound (in absolute value) of the maximum difference
 (over all input and output properties) between the bit-vector weight
@@ -1130,7 +1193,7 @@ class for subclasses generated through <a class="reference internal" href="casca
 <dl class="py method">
 <dt class="sig sig-object py" id="cascada.linear.opmodel.LinearModelBvShlCt.decimal_weight">
 <span class="sig-name descname"><span class="pre">decimal_weight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_mask</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/linear/opmodel.html#LinearModelBvShlCt.decimal_weight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.linear.opmodel.LinearModelBvShlCt.decimal_weight" title="Permalink to this definition"></a></dt>
-<dd><p>Return the <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">decimal.Decimal</span></code></a> weight for a given constant output <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a>.</p>
+<dd><p>Return the <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.11)"><code class="xref any docutils literal notranslate"><span class="pre">decimal.Decimal</span></code></a> weight for a given constant output <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a>.</p>
 <p>This method returns, as a decimal number, the weight (negative binary logarithm)
 of the probability of the input property propagating to the output property.</p>
 <p>This method only works when the input property and the output property are
@@ -1157,7 +1220,7 @@ fractional part of the number represented by <code class="docutils literal notra
 logarithm (weight) of the propagation probability of <span class="math notranslate nohighlight">\((\alpha, \beta)\)</span>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The exact weight can be computed in <a class="reference internal" href="cascada.abstractproperty.tests.test_opmodel.html#cascada.abstractproperty.tests.test_opmodel.TestOpModelGeneric.get_empirical_weight_slow" title="cascada.abstractproperty.tests.test_opmodel.TestOpModelGeneric.get_empirical_weight_slow"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">TestOpModelGeneric.get_empirical_weight_slow</span></code></a>.</p>
+<p>The exact weight can be computed in <code class="docutils literal notranslate"><span class="pre">TestOpModelGeneric.get_empirical_weight_slow</span></code>.</p>
 </div>
 <p>This method returns an upper bound (in absolute value) of the maximum difference
 (over all input and output properties) between the bit-vector weight
@@ -1331,7 +1394,7 @@ class for subclasses generated through <a class="reference internal" href="casca
 <dl class="py method">
 <dt class="sig sig-object py" id="cascada.linear.opmodel.LinearModelExtractCt.decimal_weight">
 <span class="sig-name descname"><span class="pre">decimal_weight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_mask</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/linear/opmodel.html#LinearModelExtractCt.decimal_weight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.linear.opmodel.LinearModelExtractCt.decimal_weight" title="Permalink to this definition"></a></dt>
-<dd><p>Return the <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">decimal.Decimal</span></code></a> weight for a given constant output <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a>.</p>
+<dd><p>Return the <a class="reference external" href="https://docs.python.org/3/library/decimal.html#decimal.Decimal" title="(in Python v3.11)"><code class="xref any docutils literal notranslate"><span class="pre">decimal.Decimal</span></code></a> weight for a given constant output <a class="reference internal" href="cascada.abstractproperty.property.html#cascada.abstractproperty.property.Property" title="cascada.abstractproperty.property.Property"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Property</span></code></a>.</p>
 <p>This method returns, as a decimal number, the weight (negative binary logarithm)
 of the probability of the input property propagating to the output property.</p>
 <p>This method only works when the input property and the output property are
@@ -1358,7 +1421,7 @@ fractional part of the number represented by <code class="docutils literal notra
 logarithm (weight) of the propagation probability of <span class="math notranslate nohighlight">\((\alpha, \beta)\)</span>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The exact weight can be computed in <a class="reference internal" href="cascada.abstractproperty.tests.test_opmodel.html#cascada.abstractproperty.tests.test_opmodel.TestOpModelGeneric.get_empirical_weight_slow" title="cascada.abstractproperty.tests.test_opmodel.TestOpModelGeneric.get_empirical_weight_slow"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">TestOpModelGeneric.get_empirical_weight_slow</span></code></a>.</p>
+<p>The exact weight can be computed in <code class="docutils literal notranslate"><span class="pre">TestOpModelGeneric.get_empirical_weight_slow</span></code>.</p>
 </div>
 <p>This method returns an upper bound (in absolute value) of the maximum difference
 (over all input and output properties) between the bit-vector weight
@@ -1413,7 +1476,7 @@ See also  <a class="reference internal" href="cascada.linear.mask.html#cascada.l
 <dd><p>Return the branch-number model of the given bit-vector operation <code class="docutils literal notranslate"><span class="pre">op</span></code>.</p>
 <p>Given the <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.SecondaryOperation" title="cascada.bitvector.operation.SecondaryOperation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">SecondaryOperation</span></code></a> <code class="docutils literal notranslate"><span class="pre">op</span></code>, return the
 <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.BranchNumberModel" title="cascada.abstractproperty.opmodel.BranchNumberModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BranchNumberModel</span></code></a> of <code class="docutils literal notranslate"><span class="pre">op</span></code> with given class attributes
-<code class="docutils literal notranslate"><span class="pre">output_widths</span></code> (given as a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">tuple</span></code></a>),
+<code class="docutils literal notranslate"><span class="pre">output_widths</span></code> (given as a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.11)"><code class="xref any docutils literal notranslate"><span class="pre">tuple</span></code></a>),
 <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.BranchNumberModel.branch_number" title="cascada.abstractproperty.opmodel.BranchNumberModel.branch_number"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">branch_number</span></code></a>, <code class="docutils literal notranslate"><span class="pre">nonzero2nonzero_weight</span></code>,
 <code class="docutils literal notranslate"><span class="pre">zero2nonzero_weight</span></code> and  <code class="docutils literal notranslate"><span class="pre">precision</span></code> (see <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.BranchNumberModel" title="cascada.abstractproperty.opmodel.BranchNumberModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BranchNumberModel</span></code></a>).
 The attribute <code class="docutils literal notranslate"><span class="pre">nonzero2zero_weight</span></code> is set to <code class="docutils literal notranslate"><span class="pre">math.inf</span></code>,
@@ -1459,7 +1522,7 @@ See also  <a class="reference internal" href="cascada.linear.mask.html#cascada.l
 <dd><p>Return the WDT-based model of the given bit-vector operation <code class="docutils literal notranslate"><span class="pre">op</span></code>.</p>
 <p>Given the <a class="reference internal" href="cascada.bitvector.operation.html#cascada.bitvector.operation.Operation" title="cascada.bitvector.operation.Operation"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Operation</span></code></a> <code class="docutils literal notranslate"><span class="pre">op</span></code>, return the <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.WDTModel" title="cascada.abstractproperty.opmodel.WDTModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">WDTModel</span></code></a>
 of <code class="docutils literal notranslate"><span class="pre">op</span></code> with given class attributes <code class="docutils literal notranslate"><span class="pre">weight_distribution_table</span></code>
-(i.e., the Linear Approximation Table (LAT) given as a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">tuple</span></code></a> of <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">tuple</span></code></a>
+(i.e., the Linear Approximation Table (LAT) given as a <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.11)"><code class="xref any docutils literal notranslate"><span class="pre">tuple</span></code></a> of <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.11)"><code class="xref any docutils literal notranslate"><span class="pre">tuple</span></code></a>
 of correlation weights), <code class="docutils literal notranslate"><span class="pre">loop_rows_then_columns</span></code> and  <code class="docutils literal notranslate"><span class="pre">precision</span></code>
 (see <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.WDTModel" title="cascada.abstractproperty.opmodel.WDTModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">WDTModel</span></code></a>).</p>
 <p>The returned model is a subclass of <a class="reference internal" href="cascada.abstractproperty.opmodel.html#cascada.abstractproperty.opmodel.WDTModel" title="cascada.abstractproperty.opmodel.WDTModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">WDTModel</span></code></a> and <a class="reference internal" href="#cascada.linear.opmodel.OpModel" title="cascada.linear.opmodel.OpModel"><code class="xref any py py-class docutils literal notranslate"><span class="pre">OpModel</span></code></a>.</p>
@@ -1524,7 +1587,7 @@ See also  <a class="reference internal" href="cascada.linear.mask.html#cascada.l
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="cascada.linear.mask.html" class="btn btn-neutral float-left" title="cascada.linear.mask module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="cascada.linear.chmodel.html" class="btn btn-neutral float-right" title="cascada.linear.chmodel module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="cascada.algebraic.html" class="btn btn-neutral float-right" title="cascada.algebraic package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

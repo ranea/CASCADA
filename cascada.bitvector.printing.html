@@ -18,7 +18,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="cascada.bitvector.ssa module" href="cascada.bitvector.ssa.html" />
+    <link rel="next" title="cascada.bitvector.secondaryop module" href="cascada.bitvector.secondaryop.html" />
     <link rel="prev" title="cascada.bitvector.operation module" href="cascada.bitvector.operation.html" /> 
 </head>
 
@@ -44,23 +44,27 @@
 <li class="toctree-l1"><a class="reference internal" href="index.html">CASCADA</a></li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="adding_primitive.html">Adding a primitive</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced_usage.html">Advanced Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="primitives_implemented.html">Primitives implemented</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="cascada.html">API reference</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="cascada.bitvector.html">cascada.bitvector module</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="cascada.bitvector.context.html">cascada.bitvector.context module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.bitvector.core.html">cascada.bitvector.core module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.bitvector.secondaryop.html">cascada.bitvector.secondaryop module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.bitvector.operation.html">cascada.bitvector.operation module</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">cascada.bitvector.printing module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cascada.bitvector.ssa.html">cascada.bitvector.ssa module</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="cascada.bitvector.html">cascada.bitvector package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="cascada.bitvector.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="cascada.bitvector.context.html">cascada.bitvector.context module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.bitvector.core.html">cascada.bitvector.core module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.bitvector.operation.html">cascada.bitvector.operation module</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">cascada.bitvector.printing module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.bitvector.secondaryop.html">cascada.bitvector.secondaryop module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.bitvector.ssa.html">cascada.bitvector.ssa module</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.primitives.html">cascada.primitives module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.abstractproperty.html">cascada.abstractproperty module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.differential.html">cascada.differential module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.linear.html">cascada.linear module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.algebraic.html">cascada.algebraic module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cascada.smt.html">cascada.smt module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.primitives.html">cascada.primitives package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.abstractproperty.html">cascada.abstractproperty package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.differential.html">cascada.differential package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.linear.html">cascada.linear package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.algebraic.html">cascada.algebraic package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.smt.html">cascada.smt package</a></li>
 </ul>
 </li>
 </ul>
@@ -80,7 +84,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="cascada.html">API reference</a> &raquo;</li>
-          <li><a href="cascada.bitvector.html">cascada.bitvector module</a> &raquo;</li>
+          <li><a href="cascada.bitvector.html">cascada.bitvector package</a> &raquo;</li>
       <li>cascada.bitvector.printing module</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/cascada.bitvector.printing.rst.txt" rel="nofollow"> View page source</a>
@@ -94,11 +98,37 @@
   <section id="module-cascada.bitvector.printing">
 <span id="cascada-bitvector-printing-module"></span><h1>cascada.bitvector.printing module<a class="headerlink" href="#module-cascada.bitvector.printing" title="Permalink to this headline"></a></h1>
 <p>Manage the representation of bit-vector expressions.</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cascada.bitvector.printing.BvStrPrinter" title="cascada.bitvector.printing.BvStrPrinter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BvStrPrinter</span></code></a></p></td>
+<td><p>Printing class that handles the <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref any docutils literal notranslate"><span class="pre">str</span></code></a> method of <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term" title="cascada.bitvector.core.Term"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Term</span></code></a>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cascada.bitvector.printing.BvShortPrinter" title="cascada.bitvector.printing.BvShortPrinter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BvShortPrinter</span></code></a></p></td>
+<td><p>Printing class that handles the <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term.srepr" title="cascada.bitvector.core.Term.srepr"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">Term.srepr</span></code></a> method of <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term" title="cascada.bitvector.core.Term"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Term</span></code></a>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cascada.bitvector.printing.BvReprPrinter" title="cascada.bitvector.printing.BvReprPrinter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BvReprPrinter</span></code></a></p></td>
+<td><p>Printing class that handles the <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term.vrepr" title="cascada.bitvector.core.Term.vrepr"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">Term.vrepr</span></code></a> method.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cascada.bitvector.printing.BvWrapPrinter" title="cascada.bitvector.printing.BvWrapPrinter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BvWrapPrinter</span></code></a></p></td>
+<td><p>Printing class similar to <a class="reference internal" href="#cascada.bitvector.printing.BvStrPrinter" title="cascada.bitvector.printing.BvStrPrinter"><code class="xref any py py-class docutils literal notranslate"><span class="pre">BvStrPrinter</span></code></a> but prints bit-vector expressions in multiple compact lines.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cascada.bitvector.printing.BvCCodePrinter" title="cascada.bitvector.printing.BvCCodePrinter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BvCCodePrinter</span></code></a></p></td>
+<td><p>Printing class that handles the <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term.crepr" title="cascada.bitvector.core.Term.crepr"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">Term.crepr</span></code></a> method.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cascada.bitvector.printing.dotprinting" title="cascada.bitvector.printing.dotprinting"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dotprinting</span></code></a></p></td>
+<td><p>Return the DOT description of a bit-vector <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term" title="cascada.bitvector.core.Term"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Term</span></code></a> expression tree.</p></td>
+</tr>
+</tbody>
+</table>
 <dl class="py class">
 <dt class="sig sig-object py" id="cascada.bitvector.printing.BvStrPrinter">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.bitvector.printing.</span></span><span class="sig-name descname"><span class="pre">BvStrPrinter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/printing.html#BvStrPrinter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.printing.BvStrPrinter" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.sympy.org/latest/modules/printing.html#sympy.printing.str.StrPrinter" title="(in SymPy v1.10.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">sympy.printing.str.StrPrinter</span></code></a></p>
-<p>Printing class that handles the <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><code class="xref any docutils literal notranslate"><span class="pre">str</span></code></a> method of <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term" title="cascada.bitvector.core.Term"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Term</span></code></a>.</p>
+<dd><p>Bases: <a class="reference external" href="https://docs.sympy.org/latest/modules/printing.html#sympy.printing.str.StrPrinter" title="(in SymPy v1.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">sympy.printing.str.StrPrinter</span></code></a></p>
+<p>Printing class that handles the <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref any docutils literal notranslate"><span class="pre">str</span></code></a> method of <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term" title="cascada.bitvector.core.Term"><code class="xref any py py-class docutils literal notranslate"><span class="pre">Term</span></code></a>.</p>
 </dd></dl>
 
 <dl class="py class">
@@ -111,7 +141,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="cascada.bitvector.printing.BvReprPrinter">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.bitvector.printing.</span></span><span class="sig-name descname"><span class="pre">BvReprPrinter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/printing.html#BvReprPrinter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.printing.BvReprPrinter" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.sympy.org/latest/modules/printing.html#sympy.printing.repr.ReprPrinter" title="(in SymPy v1.10.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">sympy.printing.repr.ReprPrinter</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.sympy.org/latest/modules/printing.html#sympy.printing.repr.ReprPrinter" title="(in SymPy v1.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">sympy.printing.repr.ReprPrinter</span></code></a></p>
 <p>Printing class that handles the <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term.vrepr" title="cascada.bitvector.core.Term.vrepr"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">Term.vrepr</span></code></a> method.</p>
 </dd></dl>
 
@@ -125,7 +155,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="cascada.bitvector.printing.BvCCodePrinter">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.bitvector.printing.</span></span><span class="sig-name descname"><span class="pre">BvCCodePrinter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/bitvector/printing.html#BvCCodePrinter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.bitvector.printing.BvCCodePrinter" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.sympy.org/latest/modules/printing.html#sympy.printing.str.StrPrinter" title="(in SymPy v1.10.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">sympy.printing.str.StrPrinter</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.sympy.org/latest/modules/printing.html#sympy.printing.str.StrPrinter" title="(in SymPy v1.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">sympy.printing.str.StrPrinter</span></code></a></p>
 <p>Printing class that handles the <a class="reference internal" href="cascada.bitvector.core.html#cascada.bitvector.core.Term.crepr" title="cascada.bitvector.core.Term.crepr"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">Term.crepr</span></code></a> method.</p>
 </dd></dl>
 
@@ -214,7 +244,7 @@ to be installed.</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="cascada.bitvector.operation.html" class="btn btn-neutral float-left" title="cascada.bitvector.operation module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="cascada.bitvector.ssa.html" class="btn btn-neutral float-right" title="cascada.bitvector.ssa module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="cascada.bitvector.secondaryop.html" class="btn btn-neutral float-right" title="cascada.bitvector.secondaryop module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

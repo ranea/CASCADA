@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cascada.primitives.noekeon module &mdash; CASCADA 1.0.rc0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="cascada.primitives.picipher module" href="cascada.primitives.picipher.html" />
+    <link rel="prev" title="cascada.primitives.multi2 module" href="cascada.primitives.multi2.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> CASCADA
+          </a>
+              <div class="version">
+                1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">CASCADA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="adding_primitive.html">Adding a primitive</a></li>
+<li class="toctree-l1"><a class="reference internal" href="advanced_usage.html">Advanced Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="primitives_implemented.html">Primitives implemented</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="cascada.html">API reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="cascada.bitvector.html">cascada.bitvector package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="cascada.primitives.html">cascada.primitives package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="cascada.primitives.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="cascada.primitives.aes.html">cascada.primitives.aes module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.primitives.aes_like.html">cascada.primitives.aes_like module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.primitives.aes_masked.html">cascada.primitives.aes_masked module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.primitives.blockcipher.html">cascada.primitives.blockcipher module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.primitives.cham.html">cascada.primitives.cham module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.primitives.chaskey.html">cascada.primitives.chaskey module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.primitives.feal.html">cascada.primitives.feal module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.primitives.hight.html">cascada.primitives.hight module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.primitives.lea.html">cascada.primitives.lea module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.primitives.multi2.html">cascada.primitives.multi2 module</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">cascada.primitives.noekeon module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.primitives.picipher.html">cascada.primitives.picipher module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.primitives.rectangle.html">cascada.primitives.rectangle module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.primitives.shacal1.html">cascada.primitives.shacal1 module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.primitives.shacal2.html">cascada.primitives.shacal2 module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.primitives.simeck.html">cascada.primitives.simeck module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.primitives.simon.html">cascada.primitives.simon module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.primitives.simon_rf.html">cascada.primitives.simon_rf module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.primitives.skinny128.html">cascada.primitives.skinny128 module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.primitives.skinny64.html">cascada.primitives.skinny64 module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.primitives.speck.html">cascada.primitives.speck module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.primitives.tea.html">cascada.primitives.tea module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cascada.primitives.xtea.html">cascada.primitives.xtea module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.abstractproperty.html">cascada.abstractproperty package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.differential.html">cascada.differential package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.linear.html">cascada.linear package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.algebraic.html">cascada.algebraic package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cascada.smt.html">cascada.smt package</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">CASCADA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="cascada.html">API reference</a> &raquo;</li>
+          <li><a href="cascada.primitives.html">cascada.primitives package</a> &raquo;</li>
+      <li>cascada.primitives.noekeon module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/cascada.primitives.noekeon.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-cascada.primitives.noekeon">
+<span id="cascada-primitives-noekeon-module"></span><h1>cascada.primitives.noekeon module<a class="headerlink" href="#module-cascada.primitives.noekeon" title="Permalink to this headline"></a></h1>
+<p>NOEKEON cipher.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.primitives.noekeon.NOEKEONDirectKeySchedule">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.primitives.noekeon.</span></span><span class="sig-name descname"><span class="pre">NOEKEONDirectKeySchedule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/primitives/noekeon.html#NOEKEONDirectKeySchedule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.primitives.noekeon.NOEKEONDirectKeySchedule" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.BvFunction" title="cascada.bitvector.ssa.BvFunction"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.bitvector.ssa.BvFunction</span></code></a></p>
+<p>NOEKEON direct mode key schedule function.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.primitives.noekeon.NOEKEONDirectKeySchedule.eval">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">eval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">master_key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/primitives/noekeon.html#NOEKEONDirectKeySchedule.eval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.primitives.noekeon.NOEKEONDirectKeySchedule.eval" title="Permalink to this definition"></a></dt>
+<dd><p>Evaluate the function (internal method).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.primitives.noekeon.NOEKEONIndirectKeySchedule">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.primitives.noekeon.</span></span><span class="sig-name descname"><span class="pre">NOEKEONIndirectKeySchedule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/primitives/noekeon.html#NOEKEONIndirectKeySchedule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.primitives.noekeon.NOEKEONIndirectKeySchedule" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.RoundBasedFunction" title="cascada.bitvector.ssa.RoundBasedFunction"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.bitvector.ssa.RoundBasedFunction</span></code></a></p>
+<p>NOEKEON indirect mode key schedule function.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.primitives.noekeon.NOEKEONIndirectKeySchedule.set_num_rounds">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_num_rounds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_num_rounds</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/primitives/noekeon.html#NOEKEONIndirectKeySchedule.set_num_rounds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.primitives.noekeon.NOEKEONIndirectKeySchedule.set_num_rounds" title="Permalink to this definition"></a></dt>
+<dd><p>Set <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.RoundBasedFunction.num_rounds" title="cascada.bitvector.ssa.RoundBasedFunction.num_rounds"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">RoundBasedFunction.num_rounds</span></code></a> and update <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.BvFunction.input_widths" title="cascada.bitvector.ssa.BvFunction.input_widths"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">input_widths</span></code></a> and <code class="docutils literal notranslate"><span class="pre">output_widths</span></code> if necessary.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.primitives.noekeon.NOEKEONIndirectKeySchedule.eval">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">eval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">master_key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/primitives/noekeon.html#NOEKEONIndirectKeySchedule.eval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.primitives.noekeon.NOEKEONIndirectKeySchedule.eval" title="Permalink to this definition"></a></dt>
+<dd><p>Evaluate the function (internal method).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.primitives.noekeon.NOEKEONEncryption">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.primitives.noekeon.</span></span><span class="sig-name descname"><span class="pre">NOEKEONEncryption</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/primitives/noekeon.html#NOEKEONEncryption"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.primitives.noekeon.NOEKEONEncryption" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="cascada.primitives.blockcipher.html#cascada.primitives.blockcipher.Encryption" title="cascada.primitives.blockcipher.Encryption"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.primitives.blockcipher.Encryption</span></code></a>, <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.RoundBasedFunction" title="cascada.bitvector.ssa.RoundBasedFunction"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.bitvector.ssa.RoundBasedFunction</span></code></a></p>
+<p>NOEKEON encryption function.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.primitives.noekeon.NOEKEONEncryption.set_num_rounds">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_num_rounds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_num_rounds</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/primitives/noekeon.html#NOEKEONEncryption.set_num_rounds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.primitives.noekeon.NOEKEONEncryption.set_num_rounds" title="Permalink to this definition"></a></dt>
+<dd><p>Set <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.RoundBasedFunction.num_rounds" title="cascada.bitvector.ssa.RoundBasedFunction.num_rounds"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">RoundBasedFunction.num_rounds</span></code></a> and update <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.BvFunction.input_widths" title="cascada.bitvector.ssa.BvFunction.input_widths"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">input_widths</span></code></a> and <code class="docutils literal notranslate"><span class="pre">output_widths</span></code> if necessary.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.primitives.noekeon.NOEKEONEncryption.eval">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">eval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/primitives/noekeon.html#NOEKEONEncryption.eval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.primitives.noekeon.NOEKEONEncryption.eval" title="Permalink to this definition"></a></dt>
+<dd><p>Evaluate the function (internal method).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.primitives.noekeon.NOEKEONDirectCipher">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.primitives.noekeon.</span></span><span class="sig-name descname"><span class="pre">NOEKEONDirectCipher</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plaintext</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">masterkey</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/primitives/noekeon.html#NOEKEONDirectCipher"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.primitives.noekeon.NOEKEONDirectCipher" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="cascada.primitives.blockcipher.html#cascada.primitives.blockcipher.Cipher" title="cascada.primitives.blockcipher.Cipher"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.primitives.blockcipher.Cipher</span></code></a></p>
+<p>NOEKEON cipher in direct mode.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.primitives.noekeon.NOEKEONDirectCipher.key_schedule">
+<span class="sig-name descname"><span class="pre">key_schedule</span></span><a class="headerlink" href="#cascada.primitives.noekeon.NOEKEONDirectCipher.key_schedule" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="#cascada.primitives.noekeon.NOEKEONDirectKeySchedule" title="cascada.primitives.noekeon.NOEKEONDirectKeySchedule"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.primitives.noekeon.NOEKEONDirectKeySchedule</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.primitives.noekeon.NOEKEONDirectCipher.encryption">
+<span class="sig-name descname"><span class="pre">encryption</span></span><a class="headerlink" href="#cascada.primitives.noekeon.NOEKEONDirectCipher.encryption" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="#cascada.primitives.noekeon.NOEKEONEncryption" title="cascada.primitives.noekeon.NOEKEONEncryption"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.primitives.noekeon.NOEKEONEncryption</span></code></a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.primitives.noekeon.NOEKEONDirectCipher.set_num_rounds">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_num_rounds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_num_rounds</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/primitives/noekeon.html#NOEKEONDirectCipher.set_num_rounds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.primitives.noekeon.NOEKEONDirectCipher.set_num_rounds" title="Permalink to this definition"></a></dt>
+<dd><p>Call <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.RoundBasedFunction.set_num_rounds" title="cascada.bitvector.ssa.RoundBasedFunction.set_num_rounds"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">RoundBasedFunction.set_num_rounds</span></code></a> of <a class="reference internal" href="#cascada.primitives.noekeon.NOEKEONDirectCipher.key_schedule" title="cascada.primitives.noekeon.NOEKEONDirectCipher.key_schedule"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">key_schedule</span></code></a> and <a class="reference internal" href="#cascada.primitives.noekeon.NOEKEONDirectCipher.encryption" title="cascada.primitives.noekeon.NOEKEONDirectCipher.encryption"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">encryption</span></code></a> (if iterated).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.primitives.noekeon.NOEKEONDirectCipher.test">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">test</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/primitives/noekeon.html#NOEKEONDirectCipher.test"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.primitives.noekeon.NOEKEONDirectCipher.test" title="Permalink to this definition"></a></dt>
+<dd><p>Test NOEKEON direct mode with NESSIE test vectors.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="cascada.primitives.noekeon.NOEKEONIndirectCipher">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cascada.primitives.noekeon.</span></span><span class="sig-name descname"><span class="pre">NOEKEONIndirectCipher</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plaintext</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">masterkey</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/primitives/noekeon.html#NOEKEONIndirectCipher"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.primitives.noekeon.NOEKEONIndirectCipher" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="cascada.primitives.blockcipher.html#cascada.primitives.blockcipher.Cipher" title="cascada.primitives.blockcipher.Cipher"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.primitives.blockcipher.Cipher</span></code></a></p>
+<p>NOEKEON cipher in indirect mode.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.primitives.noekeon.NOEKEONIndirectCipher.key_schedule">
+<span class="sig-name descname"><span class="pre">key_schedule</span></span><a class="headerlink" href="#cascada.primitives.noekeon.NOEKEONIndirectCipher.key_schedule" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="#cascada.primitives.noekeon.NOEKEONIndirectKeySchedule" title="cascada.primitives.noekeon.NOEKEONIndirectKeySchedule"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.primitives.noekeon.NOEKEONIndirectKeySchedule</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cascada.primitives.noekeon.NOEKEONIndirectCipher.encryption">
+<span class="sig-name descname"><span class="pre">encryption</span></span><a class="headerlink" href="#cascada.primitives.noekeon.NOEKEONIndirectCipher.encryption" title="Permalink to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="#cascada.primitives.noekeon.NOEKEONEncryption" title="cascada.primitives.noekeon.NOEKEONEncryption"><code class="xref py py-class docutils literal notranslate"><span class="pre">cascada.primitives.noekeon.NOEKEONEncryption</span></code></a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.primitives.noekeon.NOEKEONIndirectCipher.set_num_rounds">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_num_rounds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_num_rounds</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/primitives/noekeon.html#NOEKEONIndirectCipher.set_num_rounds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.primitives.noekeon.NOEKEONIndirectCipher.set_num_rounds" title="Permalink to this definition"></a></dt>
+<dd><p>Call <a class="reference internal" href="cascada.bitvector.ssa.html#cascada.bitvector.ssa.RoundBasedFunction.set_num_rounds" title="cascada.bitvector.ssa.RoundBasedFunction.set_num_rounds"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">RoundBasedFunction.set_num_rounds</span></code></a> of <a class="reference internal" href="#cascada.primitives.noekeon.NOEKEONIndirectCipher.key_schedule" title="cascada.primitives.noekeon.NOEKEONIndirectCipher.key_schedule"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">key_schedule</span></code></a> and <a class="reference internal" href="#cascada.primitives.noekeon.NOEKEONIndirectCipher.encryption" title="cascada.primitives.noekeon.NOEKEONIndirectCipher.encryption"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">encryption</span></code></a> (if iterated).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cascada.primitives.noekeon.NOEKEONIndirectCipher.test">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">test</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cascada/primitives/noekeon.html#NOEKEONIndirectCipher.test"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#cascada.primitives.noekeon.NOEKEONIndirectCipher.test" title="Permalink to this definition"></a></dt>
+<dd><p>Test NOEKEON indirect mode with NESSIE test vectors.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cascada.primitives.multi2.html" class="btn btn-neutral float-left" title="cascada.primitives.multi2 module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cascada.primitives.picipher.html" class="btn btn-neutral float-right" title="cascada.primitives.picipher module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Adrián Ranea.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
