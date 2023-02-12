@@ -1,4 +1,17 @@
-"""Search for characteristics by modeling the search as a sequence of SMT problems."""
+"""Search for characteristics by modeling the search as a sequence of SMT problems.
+
+.. autosummary::
+   :nosignatures:
+
+    INCREMENT_NUM_ROUNDS
+    ChModelAssertType
+    PrintingMode
+    MissingVarWarning
+    ChFinder
+    CipherChFinder
+    round_based_ch_search
+    round_based_cipher_ch_search
+"""
 import collections
 import decimal
 import enum
@@ -1017,7 +1030,7 @@ class ChFinder(object):
                 else:
                     yield best_ch_found
         else:
-            assert last_ch_found is None
+            raise ValueError(f"no characteristic found with weight <= {final_weight}")
 
         solver.exit()
 

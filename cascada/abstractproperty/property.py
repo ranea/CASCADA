@@ -1,4 +1,13 @@
-"""Provide a base class for properties like `Difference`, `LinearMask` or `Value`."""
+"""Provide a base class for properties like `Difference`, `LinearMask` or `Value`.
+
+.. autosummary::
+   :nosignatures:
+
+    Property
+    PropConcat
+    PropExtract
+    make_partial_propextract
+"""
 import collections
 import functools
 

@@ -1,4 +1,12 @@
-"""Represent type of value properties."""
+"""Represent type of value properties.
+
+.. autosummary::
+   :nosignatures:
+
+    Value
+    WordValue
+    BitValue
+"""
 import functools
 import warnings
 

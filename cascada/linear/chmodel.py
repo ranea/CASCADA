@@ -1,4 +1,11 @@
-"""Manage bit-vector models of linear characteristics."""
+"""Manage bit-vector models of linear characteristics.
+
+.. autosummary::
+   :nosignatures:
+
+    ChModel
+    EncryptionChModel
+"""
 import functools
 import warnings
 

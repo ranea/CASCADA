@@ -1,4 +1,17 @@
-"""Provide context managers to modify the creation and evaluation of bit-vector expressions."""
+"""Provide context managers to modify the creation and evaluation of bit-vector expressions.
+
+.. autosummary::
+   :nosignatures:
+
+    StatefulContext
+    Cache
+    Simplification
+    PrimaryOperationEvaluation
+    SecondaryOperationEvaluation
+    Validation
+    Memoization
+    MemoizationTable
+"""
 import collections
 import contextlib
 

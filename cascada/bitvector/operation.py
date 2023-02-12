@@ -1,4 +1,39 @@
-"""Provide the common bit-vector operators."""
+"""Provide the common bit-vector operators.
+
+.. autosummary::
+   :nosignatures:
+
+    Operation
+    PrimaryOperation
+    SecondaryOperation
+    PartialOperation
+    make_partial_operation
+    BvNot
+    BvAnd
+    BvOr
+    BvXor
+    BvComp
+    BvUlt
+    BvUle
+    BvUgt
+    BvUge
+    BvShl
+    BvLshr
+    RotateLeft
+    RotateRight
+    Ite
+    Extract
+    Concat
+    BvNeg
+    BvAdd
+    BvSub
+    BvMul
+    BvUdiv
+    BvUrem
+    BvIdentity
+    zero_extend
+    repeat
+"""
 import collections
 import functools
 import itertools

@@ -1,4 +1,19 @@
-"""Provide additional (secondary) bit-vector operators."""
+"""Provide additional (secondary) bit-vector operators.
+
+.. autosummary::
+   :nosignatures:
+
+    BvMaj
+    BvIf
+    PopCount
+    Reverse
+    PopCountSum2
+    PopCountSum3
+    PopCountDiff
+    LeadingZeros
+    LutOperation
+    MatrixOperation
+"""
 import functools
 import math
 

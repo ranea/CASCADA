@@ -1,4 +1,15 @@
-"""Manage the representation of bit-vector expressions."""
+"""Manage the representation of bit-vector expressions.
+
+.. autosummary::
+   :nosignatures:
+
+    BvStrPrinter
+    BvShortPrinter
+    BvReprPrinter
+    BvWrapPrinter
+    BvCCodePrinter
+    dotprinting
+"""
 from sympy.printing import repr as sympy_repr
 from sympy.printing import str as sympy_str
 

@@ -7,5 +7,6 @@
    self
    usage
    adding_primitive
+   advanced_usage
    primitives_implemented
    cascada

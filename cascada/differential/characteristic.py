@@ -1,4 +1,12 @@
-"""Manipulate non-symbolic differential characteristics."""
+"""Manipulate non-symbolic differential characteristics.
+
+.. autosummary::
+   :nosignatures:
+
+    Characteristic
+    EncryptionCharacteristic
+    CipherCharacteristic
+"""
 import decimal
 import collections
 import functools

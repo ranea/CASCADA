@@ -1,4 +1,32 @@
-"""Manipulate differential models of bit-vector operations."""
+"""Manipulate differential models of bit-vector operations.
+
+.. autosummary::
+   :nosignatures:
+
+    OpModel
+    PartialOpModel
+    XorModelId
+    XorModelBvAdd
+    XorModelBvSub
+    XorModelBvOr
+    XorModelBvAnd
+    XorModelBvIf
+    XorModelBvMaj
+    XorModelBvAddCt
+    XorModelBvSubCt
+    RXModelId
+    RXModelBvAdd
+    RXModelBvSub
+    RXModelBvOr
+    RXModelBvAnd
+    RXModelBvIf
+    RXModelBvMaj
+    RXModelBvShlCt
+    RXModelBvLshrCt
+    get_weak_model
+    get_branch_number_model
+    get_wdt_model
+"""
 import functools
 import hashlib
 import math

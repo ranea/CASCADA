@@ -1,4 +1,26 @@
-"""Manipulate linear models of bit-vector operations."""
+"""Manipulate linear models of bit-vector operations.
+
+.. autosummary::
+   :nosignatures:
+
+    OpModel
+    PartialOpModel
+    LinearModelId
+    LinearModelFreeBranch
+    LinearModelBvXor
+    LinearModelBvAnd
+    LinearModelBvOr
+    LinearModelBvAdd
+    LinearModelBvSub
+    LinearModelBvAndCt
+    LinearModelBvOrCt
+    LinearModelBvShlCt
+    LinearModelBvLshrCt
+    LinearModelExtractCt
+    get_weak_model
+    get_branch_number_model
+    get_wdt_model
+"""
 import functools
 import hashlib
 import math

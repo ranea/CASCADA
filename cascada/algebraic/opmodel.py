@@ -1,4 +1,14 @@
-"""Manipulate algebraic models of bit-vector operations."""
+"""Manipulate algebraic models of bit-vector operations.
+
+.. autosummary::
+   :nosignatures:
+
+    OpModel
+    BitModelId
+    WordModelId
+    BitModelBvAdd
+    BitModelBvSub
+"""
 import decimal
 import functools
 

@@ -1,4 +1,17 @@
-"""Wrap bit-vector functions for characteristics with one non-trivial transition."""
+"""Wrap bit-vector functions for characteristics with one non-trivial transition.
+
+.. autosummary::
+   :nosignatures:
+
+    ChFuncAsOp
+    make_chfunc_as_op
+    ModelChFuncAsOp
+    make_chfuncasop_model
+    get_wrapped_chfunc
+    get_wrapped_chcipher
+    get_wrapped_chmodel
+    get_wrapped_cipher_chmodel
+"""
 import collections
 import functools
 import hashlib

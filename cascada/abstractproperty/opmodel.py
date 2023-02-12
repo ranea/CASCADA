@@ -1,8 +1,22 @@
-"""Manipulate property models of bit-vector operations (w.r.t an abstract property)."""
+"""Manipulate property models of bit-vector operations (w.r.t an abstract property).
+
+.. autosummary::
+   :nosignatures:
+
+    InvalidOpModelError
+    OpModel
+    PartialOpModel
+    make_partial_op_model
+    ModelIdentity
+    WeakModel
+    BranchNumberModel
+    WDTModel
+"""
 import collections
 import functools
 import decimal
 import math
+import warnings
 
 from cascada.bitvector import core
 from cascada.bitvector import operation
@@ -107,7 +121,7 @@ class OpModel(object):
 
     .. note::
         It is highly recommended that new models of bit-vector operations
-        are tested with `TestOpModelGeneric`
+        are tested with ``TestOpModelGeneric``
         (see ``differential/tests/test_opmodel.py`` or
         ``linear/tests/test_opmodel.py`` for some examples).
 
@@ -308,7 +322,7 @@ class OpModel(object):
 
         .. note::
 
-            The exact weight can be computed in `TestOpModelGeneric.get_empirical_weight_slow`.
+            The exact weight can be computed in ``TestOpModelGeneric.get_empirical_weight_slow``.
 
         This method returns an upper bound (in absolute value) of the maximum difference
         (over all input and output properties) between the bit-vector weight

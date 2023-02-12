@@ -1,4 +1,12 @@
-"""Manipulate non-symbolic algebraic characteristics."""
+"""Manipulate non-symbolic algebraic characteristics.
+
+.. autosummary::
+   :nosignatures:
+
+    Characteristic
+    EncryptionCharacteristic
+    CipherCharacteristic
+"""
 import functools
 
 from cascada.bitvector import core

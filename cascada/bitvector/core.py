@@ -1,4 +1,13 @@
-"""Provide the basic bit-vector types."""
+"""Provide the basic bit-vector types.
+
+.. autosummary::
+   :nosignatures:
+
+    Term
+    Constant
+    Variable
+    bitvectify
+"""
 import math
 
 from sympy.core import basic

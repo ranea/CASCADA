@@ -1,4 +1,12 @@
-"""Manage models of algebraic characteristics."""
+"""Manage models of algebraic characteristics.
+
+.. autosummary::
+   :nosignatures:
+
+    ChModel
+    EncryptionChModel
+    CipherChModel
+"""
 from cascada.bitvector import core
 from cascada.algebraic import value
 

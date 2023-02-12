@@ -1,4 +1,14 @@
-"""Represent types of difference properties in the context of differential cryptanalysis."""
+"""Represent types of difference properties in the context of differential cryptanalysis.
+
+.. autosummary::
+   :nosignatures:
+
+    Difference
+    XorDiff
+    RXOp
+    RXInvOp
+    RXDiff
+"""
 import warnings
 
 from cascada.bitvector import core

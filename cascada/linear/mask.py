@@ -1,4 +1,10 @@
-"""Represent linear mask properties in the context of linear cryptanalysis."""
+"""Represent linear mask properties in the context of linear cryptanalysis.
+
+.. autosummary::
+   :nosignatures:
+
+    LinearMask
+"""
 import warnings
 
 from cascada.bitvector import core

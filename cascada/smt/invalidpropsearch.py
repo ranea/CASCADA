@@ -1,6 +1,15 @@
 """Search for zero-probability (invalid) properties
 (e.g., impossible differentials or zero-correlation hulls)
 by modeling the search as a sequence of SMT problems.
+
+.. autosummary::
+   :nosignatures:
+
+    ActiveBitMode
+    InvalidPropFinder
+    InvalidCipherPropFinder
+    round_based_invalidprop_search
+    round_based_invalidcipherprop_search
 """
 import collections
 import enum

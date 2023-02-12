@@ -1,4 +1,13 @@
-"""Manage bit-vector models of characteristics w.r.t an abstract property."""
+"""Manage bit-vector models of characteristics w.r.t an abstract property.
+
+.. autosummary::
+   :nosignatures:
+
+    ChModelSigType
+    ChModel
+    EncryptionChModel
+    CipherChModel
+"""
 import enum
 import collections
 import functools

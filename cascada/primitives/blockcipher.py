@@ -1,4 +1,12 @@
-"""Represent encryption functions and block ciphers."""
+"""Represent encryption functions and block ciphers.
+
+.. autosummary::
+   :nosignatures:
+
+    Encryption
+    Cipher
+    get_random_cipher
+"""
 import collections
 import functools
 import warnings

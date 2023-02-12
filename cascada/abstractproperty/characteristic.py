@@ -1,4 +1,13 @@
-"""Manage non-symbolic characteristics w.r.t an abstract property."""
+"""Manage non-symbolic characteristics w.r.t an abstract property.
+
+.. autosummary::
+   :nosignatures:
+
+    EmpiricalWeightData
+    Characteristic
+    EncryptionCharacteristic
+    CipherCharacteristic
+"""
 import decimal
 import collections
 import functools

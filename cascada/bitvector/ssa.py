@@ -1,4 +1,14 @@
-"""Represent bit-vector functions and their representation in static single assignment (SSA) form."""
+"""Represent bit-vector functions and their representation in static single assignment (SSA) form.
+
+.. autosummary::
+   :nosignatures:
+
+    BvFunction
+    RoundBasedFunction
+    SSAReturn
+    SSA
+    get_random_bvfunction
+"""
 import collections
 import functools
 import warnings

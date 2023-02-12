@@ -1,4 +1,12 @@
-"""Manage bit-vector models of differential characteristics."""
+"""Manage bit-vector models of differential characteristics.
+
+.. autosummary::
+   :nosignatures:
+
+    ChModel
+    EncryptionChModel
+    CipherChModel
+"""
 from cascada.bitvector import core
 from cascada.differential import difference
 

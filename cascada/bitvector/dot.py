@@ -1,4 +1,13 @@
-"""Adaptation of sympy.printing.dot to support `Term` objects."""
+"""Adaptation of sympy.printing.dot to support `Term` objects.
+
+.. autosummary::
+   :nosignatures:
+
+    purestr
+    dotnode
+    dotedges
+    dotprint
+"""
 from cascada.bitvector.core import Constant, Variable
 from cascada.bitvector.operation import Operation
 from sympy.printing.dot import (

@@ -1,6 +1,13 @@
 """Convert between pySMT_ types and `bitvector` types.
 
 .. _pySMT: https://github.com/pysmt/pysmt
+
+.. autosummary::
+   :nosignatures:
+
+    bv2pysmt
+    pysmt2bv
+    pysmt_model2bv_model
 """
 
 from pysmt import environment
