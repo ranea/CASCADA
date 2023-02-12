@@ -12,6 +12,7 @@ from cascada.primitives import lea
 from cascada.primitives import multi2
 from cascada.primitives import noekeon
 from cascada.primitives import picipher
+from cascada.primitives import rectangle
 from cascada.primitives import shacal1
 from cascada.primitives import shacal2
 from cascada.primitives import speck
@@ -40,6 +41,8 @@ LIST_PRIMITIVES = [
     noekeon.NOEKEONDirectCipher,
     noekeon.NOEKEONIndirectCipher,
     picipher.PiPermutation,
+    rectangle.RECTANGLE80Cipher,
+    rectangle.RECTANGLE128Cipher,
     shacal1.SHACAL1Cipher,
     shacal2.SHACAL2Cipher,
     Speck32,

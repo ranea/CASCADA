@@ -30,6 +30,7 @@ from cascada.primitives import lea
 from cascada.primitives import multi2
 from cascada.primitives import noekeon
 from cascada.primitives import picipher
+from cascada.primitives import rectangle
 from cascada.primitives import shacal1
 from cascada.primitives import shacal2
 from cascada.primitives import speck
@@ -87,6 +88,10 @@ ListSearchParameters = [
     SearchParameters(noekeon.NOEKEONIndirectCipher, xor_nr=False, rk_nr=None, linear_nr=False, cipher_xor_nr=False, cipher_rx_nr=None, ignore_linear_invalid=True, ignore_bitvalue=True),  # cipher_rx_nr=1 but 10min,
     SearchParameters(noekeon.NOEKEONIndirectCipher.key_schedule, xor_nr=False, rk_nr=1, linear_nr=False, ignore_bitvalue=True),
     SearchParameters(picipher.PiPermutation, xor_nr=False, rk_nr=None, linear_nr=None),  #   # weight rk > 200, BvAddCt
+    SearchParameters(rectangle.RECTANGLE80Cipher, xor_nr=False, rk_nr=None, linear_nr=False, cipher_xor_nr=False, cipher_rx_nr=None, ignore_linear_invalid=True, ignore_bitvalue=True),  # cipher_rx_nr=1 but 10min,
+    SearchParameters(rectangle.RECTANGLE80Cipher.key_schedule, xor_nr=False, rk_nr=1, linear_nr=False, ignore_bitvalue=True),
+    SearchParameters(rectangle.RECTANGLE128Cipher, xor_nr=False, rk_nr=None, linear_nr=False, cipher_xor_nr=False, cipher_rx_nr=None, ignore_linear_invalid=True, ignore_bitvalue=True),  # cipher_rx_nr=1 but 10min,
+    SearchParameters(rectangle.RECTANGLE128Cipher.key_schedule, xor_nr=False, rk_nr=1, linear_nr=False, ignore_bitvalue=True),
     SearchParameters(shacal1.SHACAL1Cipher, xor_nr=False, cipher_xor_nr=True),  # xor 1r but mnr=4, BvIf, cipher_xor 16r but slow, rk discards many ch due to EW
     SearchParameters(shacal1.SHACAL1Cipher.key_schedule, xor_nr=True, rk_nr=False, linear_nr=None),  # BvAddCt, xor 19r but slow
     SearchParameters(shacal2.SHACAL2Cipher, xor_nr=False, cipher_xor_nr=True),  # xor 1r but mnr=4, BvIf, cipher_xor 18r but slow, rk discards many ch due to EW
