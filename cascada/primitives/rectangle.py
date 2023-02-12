@@ -1,9 +1,10 @@
 """RECTANGLE cipher."""
+import functools
 from decimal import Decimal
 from math import inf
 
-from cascada.bitvector.core import Constant
-from cascada.bitvector.operation import RotateLeft, Concat
+from cascada.bitvector.core import Constant, Term
+from cascada.bitvector.operation import RotateLeft, Concat, BvIdentity
 from cascada.bitvector.secondaryop import LutOperation
 from cascada.abstractproperty.opmodel import log2_decimal
 from cascada.differential.difference import XorDiff
@@ -11,6 +12,13 @@ from cascada.differential.opmodel import get_wdt_model as get_differential_wdt_m
 from cascada.linear.opmodel import get_wdt_model as get_linear_wdt_model
 from cascada.bitvector.ssa import RoundBasedFunction
 from cascada.primitives.blockcipher import Encryption, Cipher
+
+
+# if False, represent the plaintext and the encryption state
+# as a 16 × 4 rectangular array of bits (instead of 4 x 16)
+# (masterkey and key-scheduling state remains the same in both representations)
+DEFAULT_REPR = True
+
 
 class SboxLut(LutOperation):
     """The 4-bit S-box of RECTANGLE."""
@@ -62,32 +70,73 @@ SboxLut.linear_model = get_linear_wdt_model(
 
 
 def sub_column(x):
-    bits = x[0].width
+    if DEFAULT_REPR:
+        bits = x[0].width
 
-    for i in range(bits):
-        s = Concat(Concat(Concat(x[3][i], x[2][i]), x[1][i]), x[0][i])
-        s = SboxLut(s)
+        for i in range(bits):
+            s = Concat(Concat(Concat(x[3][i], x[2][i]), x[1][i]), x[0][i])
+            s = SboxLut(s)
 
-        for j in range(4):
-            if i == 0:
-                x[j] = Concat(x[j][:1], s[j])
-            elif i == bits - 1:
-                x[j] = Concat(s[j], x[j][bits - 2:])
-            else:
-                x[j] = Concat(Concat(x[j][:i + 1], s[j]), x[j][i - 1:])
+            for j in range(4):
+                if i == 0:
+                    x[j] = Concat(x[j][:1], s[j])
+                elif i == bits - 1:
+                    x[j] = Concat(s[j], x[j][bits - 2:])
+                else:
+                    x[j] = Concat(Concat(x[j][:i + 1], s[j]), x[j][i - 1:])
+                x[j] = BvIdentity(x[j])
+    else:
+        for i in range(len(x)):
+            x[i] = SboxLut(x[i])
 
 
 def shift_row(x):
-    x[1] = RotateLeft(x[1], 1)
-    x[2] = RotateLeft(x[2], 12)
-    x[3] = RotateLeft(x[3], 13)
+    if DEFAULT_REPR:
+        x[1] = RotateLeft(x[1], 1)
+        x[2] = RotateLeft(x[2], 12)
+        x[3] = RotateLeft(x[3], 13)
+    else:
+        y = [[None for _ in range(4)] for _ in range(16)]
+        for i in range(16):
+            y[i][0] = x[i][0]
+            y[i][1] = x[(i - 1) % 16][1]
+            y[i][2] = x[(i - 12) % 16][2]
+            y[i][3] = x[(i - 13) % 16][3]
+        for i in range(16):
+            x[i] = functools.reduce(Concat, reversed(y[i]))
+
+
+def transpose(list_bv):
+    """Transpose a list of bit-vectors.
+
+    Given a list ``x`` of bit-vectors, return another list of bit-vectors ``y``
+    such as the bit-matrix representation of ``y`` is the transpose of that of ``x``
+    (``x[i][j] == y[j][i]``).
+    """
+    assert all(isinstance(bv, Term) for bv in list_bv)
+    bit_matrix = [[bv[i] for i in range(bv.width)] for bv in list_bv]
+    num_rows = len(bit_matrix)
+    num_columns = len(bit_matrix[0])
+    assert all(num_columns == len(row) for row in bit_matrix)
+
+    bit_matrix_t = [[bit_matrix[i][j] for i in range(num_rows)] for j in range(num_columns)]
+    num_rows, num_columns = num_columns, num_rows
+    assert num_rows == len(bit_matrix_t) and num_columns == len(bit_matrix_t[0])
+
+    list_bv_t = [functools.reduce(Concat, reversed(bit_list)) for bit_list in bit_matrix_t]
+    return list_bv_t
 
 
 def add_round_key(x, k, i):
-    x[0] ^= k[i]
-    x[1] ^= k[i + 1]
-    x[2] ^= k[i + 2]
-    x[3] ^= k[i + 3]
+    if DEFAULT_REPR:
+        x[0] ^= k[i]
+        x[1] ^= k[i + 1]
+        x[2] ^= k[i + 2]
+        x[3] ^= k[i + 3]
+    else:
+        k = transpose(k[i:i + 4])
+        for col in range(16):
+            x[col] ^= BvIdentity(k[col])
 
 
 RC = (0x01, 0x02, 0x04, 0x09, 0x12, 0x05, 0x0B, 0x16,
@@ -100,8 +149,8 @@ class RECTANGLEEncryption(Encryption, RoundBasedFunction):
     """RECTANGLE encryption function."""
 
     num_rounds = 25
-    input_widths = [16, 16, 16, 16]
-    output_widths = [16, 16, 16, 16]
+    input_widths = [16, 16, 16, 16] if DEFAULT_REPR else [4 for _ in range(16)]
+    output_widths = [16, 16, 16, 16] if DEFAULT_REPR else [4 for _ in range(16)]
     round_keys = None
 
     @classmethod
@@ -143,7 +192,12 @@ class RECTANGLE80KeySchedule(RoundBasedFunction):
 
         for i in range(cls.num_rounds):
             t = [x[0][3:], x[1][3:], x[2][3:], x[3][3:]]
-            sub_column(t)
+            if DEFAULT_REPR:
+                sub_column(t)
+            else:
+                t = [BvIdentity(bv) for bv in transpose(t)]
+                sub_column(t)
+                t = transpose(t)
             for j in range(4):
                 x[j] = Concat(x[j][:4], t[j])
 
@@ -181,7 +235,12 @@ class RECTANGLE128KeySchedule(RoundBasedFunction):
 
         for i in range(cls.num_rounds):
             t = [w[7:] for w in x]
-            sub_column(t)
+            if DEFAULT_REPR:
+                sub_column(t)
+            else:
+                t = [BvIdentity(bv) for bv in transpose(t)]
+                sub_column(t)
+                t = transpose(t)
             for j in range(4):
                 x[j] = Concat(x[j][:8], t[j])
 
@@ -214,13 +273,23 @@ class RECTANGLE80Cipher(Cipher):
         old_num_rounds = cls.num_rounds
         cls.set_num_rounds(25)
 
-        plaintext = (0x0000, 0x0000, 0x0000, 0x0000)
         key = (0x0000, 0x0000, 0x0000, 0x0000, 0x0000)
-        assert cls(plaintext, key) == (0x2D96, 0xE354, 0xE8B1, 0x0874)
+        if DEFAULT_REPR:
+            plaintext = (0x0000, 0x0000, 0x0000, 0x0000)
+            assert cls(plaintext, key) == (0x2D96, 0xE354, 0xE8B1, 0x0874)
+        else:
+            plaintext = transpose([Constant(x, 16) for x in (0x0000, 0x0000, 0x0000, 0x0000)])
+            ciphertext = transpose([Constant(x, 16) for x in (0x2D96, 0xE354, 0xE8B1, 0x0874)])
+            assert cls(plaintext, key) == tuple(ciphertext)
 
-        plaintext = (0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF)
         key = (0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF)
-        assert cls(plaintext, key) == (0x9945, 0xAA34, 0xAE3D, 0x0112)
+        if DEFAULT_REPR:
+            plaintext = (0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF)
+            assert cls(plaintext, key) == (0x9945, 0xAA34, 0xAE3D, 0x0112)
+        else:
+            plaintext = transpose([Constant(x, 16) for x in (0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF)])
+            ciphertext = transpose([Constant(x, 16) for x in (0x9945, 0xAA34, 0xAE3D, 0x0112)])
+            assert cls(plaintext, key) == tuple(ciphertext)
 
         cls.set_num_rounds(old_num_rounds)
 
@@ -241,12 +310,22 @@ class RECTANGLE128Cipher(Cipher):
         old_num_rounds = cls.num_rounds
         cls.set_num_rounds(25)
 
-        plaintext = (0x0000, 0x0000, 0x0000, 0x0000)
         key = (0x00000000, 0x00000000, 0x00000000, 0x00000000)
-        assert cls(plaintext, key) == (0xAEE6, 0x3613, 0x44A4, 0x99EE)
+        if DEFAULT_REPR:
+            plaintext = (0x0000, 0x0000, 0x0000, 0x0000)
+            assert cls(plaintext, key) == (0xAEE6, 0x3613, 0x44A4, 0x99EE)
+        else:
+            plaintext = transpose([Constant(x, 16) for x in (0x0000, 0x0000, 0x0000, 0x0000)])
+            ciphertext = transpose([Constant(x, 16) for x in (0xAEE6, 0x3613, 0x44A4, 0x99EE)])
+            assert cls(plaintext, key) == tuple(ciphertext)
 
-        plaintext = (0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF)
         key = (0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF)
-        assert cls(plaintext, key) == (0xE83E, 0xEFEE, 0x4A15, 0x7A46)
+        if DEFAULT_REPR:
+            plaintext = (0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF)
+            assert cls(plaintext, key) == (0xE83E, 0xEFEE, 0x4A15, 0x7A46)
+        else:
+            plaintext = transpose([Constant(x, 16) for x in (0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF)])
+            ciphertext = transpose([Constant(x, 16) for x in (0xE83E, 0xEFEE, 0x4A15, 0x7A46)])
+            assert cls(plaintext, key) == tuple(ciphertext)
 
         cls.set_num_rounds(old_num_rounds)
