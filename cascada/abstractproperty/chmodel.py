@@ -896,7 +896,7 @@ class EncryptionChModel(object):
     """
     _prefix = None
 
-    def __init__(self, cipher, prop_type, op_model_class2options=None):
+    def __init__(self, cipher, prop_type, op_model_class2options=None, round_keys_prefix=None):
         assert issubclass(cipher, blockcipher.Cipher)
 
         prefix = self.__class__._prefix
@@ -906,9 +906,12 @@ class EncryptionChModel(object):
         input_prop_names = [f"{prefix}p" + str(i) for i in range(num_inputs)]
         encryption_prefix = f"{prefix}x"
 
+        if round_keys_prefix is None:
+            warnings.warn("the EncryptionChModel parameter round_keys_prefix is experimental")
+            round_keys_prefix = prefix
         _round_keys = []
         for i, width in enumerate(cipher.key_schedule.output_widths):
-            _round_keys.append(core.Variable(f"{prefix}k" + str(i), width))
+            _round_keys.append(core.Variable(f"{round_keys_prefix}k" + str(i), width))
 
         class Encryption(cipher.encryption):
             round_keys = tuple(_round_keys)
@@ -935,6 +938,7 @@ class EncryptionChModel(object):
             raise ValueError(f"round key properties of {all_round_keys - round_keys_prop_found} not found")
 
         self.cipher = cipher
+        self._round_keys_prefix = round_keys_prefix
 
     @classmethod
     def _get_EncryptionCharacteristic_cls(cls):
@@ -984,6 +988,7 @@ class EncryptionChModel(object):
             self.__class__._prop_label,
             self.prop_type.__name__,
             "" if not self._op_model_class2options else f", op_model_class2options={omc2o_vrepr}",
+            "" if not self._round_keys_prefix else f", round_keys_prefix={self._round_keys_prefix}",
         )
 
     def split(self, prop_separators):

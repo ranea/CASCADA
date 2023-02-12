@@ -734,7 +734,8 @@ class ChFinder(object):
             satisfiable = solver.solve()
 
             if satisfiable:
-                bv_model = pysmttypes.pysmt_model2bv_model(solver.get_model())
+                self._last_model = solver.get_model()
+                bv_model = pysmttypes.pysmt_model2bv_model(self._last_model)
                 if yield_assignment:
                     yield bv_model
                 else:
@@ -988,7 +989,8 @@ class ChFinder(object):
                 if not satisfiable:
                     break
                 else:
-                    last_ch_found = self._pysmt_model2ch(solver.get_model(), target_weight)
+                    self._last_model = solver.get_model()
+                    last_ch_found = self._pysmt_model2ch(self._last_model, target_weight)
 
                     valid_ch = True
                     if empirical_weight_options is not None:

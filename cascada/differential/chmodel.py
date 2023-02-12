@@ -454,9 +454,9 @@ class EncryptionChModel(abstractproperty.chmodel.EncryptionChModel, ChModel):
     """
     _prefix = "d"
 
-    def __init__(self, cipher, diff_type, op_model_class2options=None):
+    def __init__(self, cipher, diff_type, op_model_class2options=None, round_keys_prefix=None):
         super().__init__(
-            cipher, prop_type=diff_type, op_model_class2options=op_model_class2options
+            cipher, prop_type=diff_type, op_model_class2options=op_model_class2options, round_keys_prefix=round_keys_prefix
         )
 
     @classmethod
