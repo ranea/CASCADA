@@ -5,14 +5,12 @@ TK1 version, where the tweakey size is equal to the block size.
 This implementation is based on `skinny128`, but a `WDTModel`
 is used to model the XOR and linear models of the S-box.
 """
-from decimal import Decimal
-from math import inf
-
 from cascada.bitvector.core import Constant
 from cascada.bitvector.secondaryop import LutOperation
-from cascada.abstractproperty.opmodel import log2_decimal
 from cascada.differential.difference import XorDiff
+from cascada.differential.opmodel import get_wdt as get_differential_wdt
 from cascada.differential.opmodel import get_wdt_model as get_differential_wdt_model
+from cascada.linear.opmodel import get_wdt as get_linear_wdt
 from cascada.linear.opmodel import get_wdt_model as get_linear_wdt_model
 
 
@@ -39,48 +37,8 @@ class SboxLut(LutOperation):
     lut = [Constant(x, 4) for x in [12, 6, 9, 0, 1, 10, 2, 11, 3, 8, 5, 13, 4, 14, 7, 15]]
 
 
-ddt = [
-    (16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-    (0, 0, 0, 0, 0, 0, 0, 0, 4, 4, 4, 4, 0, 0, 0, 0),
-    (0, 4, 0, 4, 0, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-    (0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2),
-    (0, 0, 4, 0, 0, 0, 2, 2, 0, 0, 0, 4, 2, 2, 0, 0),
-    (0, 0, 4, 0, 0, 0, 2, 2, 0, 0, 4, 0, 2, 2, 0, 0),
-    (0, 2, 0, 2, 2, 0, 0, 2, 2, 0, 2, 0, 0, 2, 2, 0),
-    (0, 2, 0, 2, 2, 0, 0, 2, 0, 2, 0, 2, 2, 0, 0, 2),
-    (0, 0, 0, 0, 4, 4, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2),
-    (0, 0, 0, 0, 4, 4, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2),
-    (0, 0, 0, 0, 0, 4, 4, 0, 2, 2, 2, 2, 0, 0, 0, 0),
-    (0, 4, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2),
-    (0, 0, 4, 0, 0, 0, 2, 2, 4, 0, 0, 0, 0, 0, 2, 2),
-    (0, 0, 4, 0, 0, 0, 2, 2, 0, 4, 0, 0, 0, 0, 2, 2),
-    (0, 2, 0, 2, 2, 0, 0, 2, 0, 2, 0, 2, 0, 2, 2, 0),
-    (0, 2, 0, 2, 2, 0, 0, 2, 2, 0, 2, 0, 2, 0, 0, 2)
-]
-lat = [
-    (1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-    (0, -1 / 4, 1 / 4, 0, 0, -1 / 4, -1 / 4, -1 / 2, 1 / 2, -1 / 4, -1 / 4, 0, 0, 1 / 4, -1 / 4, 0),
-    (0, 1 / 2, 0, 0, 0, -1 / 2, 0, 0, 0, -1 / 2, 0, 0, 0, -1 / 2, 0, 0),
-    (0, -1 / 4, 1 / 4, 1 / 2, 0, -1 / 4, -1 / 4, 0, 0, 1 / 4, 1 / 4, 0, 1 / 2, -1 / 4, 1 / 4, 0),
-    (0, 0, 1 / 2, 0, 0, 0, 0, 1 / 2, 0, 0, -1 / 2, 0, 0, 0, 0, 1 / 2),
-    (0, -1 / 4, -1 / 4, 0, 0, -1 / 4, -1 / 4, 0, -1 / 2, -1 / 4, 1 / 4, 0, 0, 1 / 4, -1 / 4, 1 / 2),
-    (0, 0, -1 / 2, 1 / 2, 0, 0, 0, 0, 0, 0, -1 / 2, -1 / 2, 0, 0, 0, 0),
-    (0, 1 / 4, -1 / 4, 0, 0, 1 / 4, -1 / 4, 0, 0, -1 / 4, -1 / 4, 1 / 2, 1 / 2, 1 / 4, 1 / 4, 0),
-    (0, 1 / 4, 0, -1 / 4, 1 / 2, -1 / 4, 0, -1 / 4, 0, 1 / 4, 0, -1 / 4, 0, 1 / 4, 1 / 2, 1 / 4),
-    (0, 0, 1 / 4, -1 / 4, 0, 0, 1 / 4, -1 / 4, -1 / 2, 0, -1 / 4, -1 / 4, 1 / 2, 0, -1 / 4, -1 / 4),
-    (0, -1 / 4, 0, -1 / 4, -1 / 2, 1 / 4, 0, -1 / 4, 0, -1 / 4, 0, -1 / 4, 0, -1 / 4, 1 / 2, 1 / 4),
-    (0, 0, 1 / 4, 1 / 4, 0, 0, 1 / 4, 1 / 4, 0, -1 / 2, 1 / 4, -1 / 4, 0, 1 / 2, 1 / 4, -1 / 4),
-    (0, 1 / 4, 0, 1 / 4, -1 / 2, -1 / 4, 1 / 2, -1 / 4, 0, 1 / 4, 0, 1 / 4, 0, 1 / 4, 0, 1 / 4),
-    (0, 0, 1 / 4, 1 / 4, 0, 0, -1 / 4, -1 / 4, -1 / 2, 0, -1 / 4, 1 / 4, -1 / 2, 0, 1 / 4, -1 / 4),
-    (0, 1 / 4, 0, -1 / 4, -1 / 2, -1 / 4, -1 / 2, 1 / 4, 0, 1 / 4, 0, -1 / 4, 0, 1 / 4, 0, -1 / 4),
-    (0, 1 / 2, 1 / 4, 1 / 4, 0, 1 / 2, -1 / 4, -1 / 4, 0, 0, 1 / 4, -1 / 4, 0, 0, -1 / 4, 1 / 4)
-]
-
-
-SboxLut.xor_model = get_differential_wdt_model(
-    SboxLut, XorDiff, tuple([tuple(inf if x == 0 else -log2_decimal(x / Decimal(2 ** 4)) for x in row) for row in ddt]))
-SboxLut.linear_model = get_linear_wdt_model(
-    SboxLut, tuple([tuple(inf if x == 0 else -log2_decimal(Decimal(abs(x))) for x in row) for row in lat]))
+SboxLut.xor_model = get_differential_wdt_model(SboxLut, XorDiff, get_differential_wdt(SboxLut, 4, 4))
+SboxLut.linear_model = get_linear_wdt_model(SboxLut, get_linear_wdt(SboxLut, 4, 4))
 
 
 class SKINNYEncryption(skinny128.SKINNYEncryption):
