@@ -37,6 +37,7 @@ from cascada import abstractproperty
 from cascada.linear.mask import LinearMask
 
 
+log2_decimal = abstractproperty.opmodel.log2_decimal
 make_partial_op_model = abstractproperty.opmodel.make_partial_op_model
 
 
@@ -1426,6 +1427,54 @@ def get_branch_number_model(op, output_widths, branch_number, nonzero2nonzero_we
 
     MyBranchNumberModel.__name__ = f"Linear{abstractproperty.opmodel.BranchNumberModel.__name__}{op.__name__}"
     return MyBranchNumberModel
+
+
+@functools.lru_cache(maxsize=None)
+def get_wdt(op, input_width, output_width):
+    """Return the weight distribution table of the given bit-vector operation ``op`` for WDT-based model.
+
+    Given the `Operation` ``op``, return the weight distribution table
+    as a `tuple` of `tuple` of ``op`` from Linear Approximation Table (LAT)
+    of correlation weights with given ``input_width`` and ``input_width``.
+
+    The returned table is a `tuple` of `tuple`.
+
+    .. note::
+        To link the returned model ``MyModel`` to ``op``
+        such that ``MyModel`` is used in ``propagate``,
+        set the ``linear_model`` attribute of ``op``
+        to ``MyModel`` (e.g., ``op.linear_model = MyModel``).
+        See also  `linear.mask.LinearMask.propagate`.
+
+    ::
+
+        >>> from cascada.bitvector.core import Constant
+        >>> from cascada.bitvector.secondaryop import LutOperation
+        >>> from cascada.linear.opmodel import get_wdt, get_wdt_model
+        >>> class SboxLut(LutOperation):
+        >>>     lut = [Constant(x, 4) for x in (6, 5, 12, 10, 1, 14, 7, 9, 11, 0, 3, 13, 8, 15, 4, 2)]
+        >>> SboxLut.linear_model = get_wdt_model(SboxLut, get_wdt(SboxLut, 4, 4))
+
+    """
+    assert issubclass(op, operation.Operation)
+
+    rows = 2 ** input_width
+    cols = 2 ** output_width
+    lat = []
+
+    for r in range(rows):
+        row = []
+        for c in range(cols):
+            count = 0
+            for i in range(rows):
+                input_hw = int(secondaryop.PopCount(core.Constant(i & r, input_width)))
+                output_hw = int(secondaryop.PopCount(op.eval(core.Constant(i, input_width)) & core.Constant(c, output_width)))
+                count += 1 - ((input_hw - output_hw) & 1)
+
+            row.append((count * 2 - rows) / rows)
+        lat.append(row)
+
+    return tuple([tuple(math.inf if x == 0 else -log2_decimal(decimal.Decimal(abs(x))) for x in row) for row in lat])
 
 
 @functools.lru_cache(maxsize=None)

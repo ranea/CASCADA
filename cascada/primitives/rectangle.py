@@ -1,14 +1,13 @@
 """RECTANGLE cipher."""
 import functools
-from decimal import Decimal
-from math import inf
 
 from cascada.bitvector.core import Constant, Term
 from cascada.bitvector.operation import RotateLeft, Concat, BvIdentity
 from cascada.bitvector.secondaryop import LutOperation
-from cascada.abstractproperty.opmodel import log2_decimal
 from cascada.differential.difference import XorDiff
+from cascada.differential.opmodel import get_wdt as get_differential_wdt
 from cascada.differential.opmodel import get_wdt_model as get_differential_wdt_model
+from cascada.linear.opmodel import get_wdt as get_linear_wdt
 from cascada.linear.opmodel import get_wdt_model as get_linear_wdt_model
 from cascada.bitvector.ssa import RoundBasedFunction
 from cascada.primitives.blockcipher import Encryption, Cipher
@@ -25,48 +24,8 @@ class SboxLut(LutOperation):
     lut = [Constant(x, 4) for x in (6, 5, 12, 10, 1, 14, 7, 9, 11, 0, 3, 13, 8, 15, 4, 2)]
 
 
-ddt = (
-    (16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-    (0, 0, 0, 2, 0, 0, 4, 2, 0, 0, 0, 2, 0, 0, 4, 2),
-    (0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 2, 0, 2, 4, 0, 2),
-    (0, 0, 0, 2, 0, 0, 2, 0, 2, 4, 2, 2, 2, 0, 0, 0),
-    (0, 0, 0, 4, 0, 0, 0, 4, 0, 0, 0, 4, 0, 0, 0, 4),
-    (0, 2, 0, 0, 4, 2, 0, 0, 4, 2, 0, 0, 0, 2, 0, 0),
-    (0, 2, 4, 0, 2, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 2),
-    (0, 0, 4, 0, 2, 2, 0, 0, 0, 2, 0, 2, 2, 0, 0, 2),
-    (0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2),
-    (0, 2, 0, 0, 0, 2, 4, 0, 0, 2, 0, 0, 0, 2, 4, 0),
-    (0, 0, 0, 0, 0, 4, 2, 2, 2, 0, 2, 0, 2, 0, 0, 2),
-    (0, 4, 0, 2, 0, 0, 2, 0, 2, 0, 2, 2, 2, 0, 0, 0),
-    (0, 0, 0, 0, 4, 0, 0, 0, 4, 0, 4, 0, 0, 0, 4, 0),
-    (0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 4, 0, 0, 2, 4, 0),
-    (0, 0, 4, 2, 2, 2, 0, 2, 0, 2, 0, 0, 2, 0, 0, 0),
-    (0, 2, 4, 2, 2, 0, 0, 2, 0, 0, 0, 0, 2, 2, 0, 0)
-)
-lat = (
-    (1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-    (0, 0, 0,  0.25, 0, -0.25, 0, 0,  0.5, -0.5, -0.5, -0.5, -0.5, -0.5,  0.5, -0.5),
-    (0, 0, 0, 0, 0, 0,  0.25,  0.25, 0, 0,  0.25, -0.25, 0, 0, 0, 0),
-    (0, 0, 0, -0.25,  0.25, 0, 0, 0, -0.5,  0.5, -0.5, -0.5, -0.5, -0.5,  0.5, -0.5),
-    (0, 0, 0, 0, 0, 0, -0.25,  0.25, 0, 0, 0, 0, 0, 0,  0.25,  0.25),
-    (0, 0, -0.25, 0, 0, -0.25, 0, 0, -0.5,  0.5, -0.5, -0.5,  0.5,  0.5, -0.5,  0.5),
-    (0, 0, 0, 0, 0, 0, 0, 0,  0.25,  0.25, 0, 0, -0.25,  0.25, 0, 0),
-    (0, 0, -0.25, 0, -0.25, 0, 0, 0, -0.5,  0.5,  0.5,  0.5, -0.5, -0.5,  0.5, -0.5),
-    (0, 0, 0, -0.25, -0.5, -0.5,  0.5, -0.5, 0, -0.25, 0, 0, -0.5,  0.5,  0.5,  0.5),
-    (0, 0, 0, 0, -0.5,  0.5,  0.5, -0.5,  0.5,  0.5, -0.5, -0.5,  0.25, 0,  0.25, 0),
-    (0, 0, 0, -0.25, -0.5, -0.5, -0.5,  0.5,  0.25, 0, 0, 0,  0.5, -0.5, -0.5, -0.5),
-    (0, 0, 0, 0,  0.5, -0.5,  0.5, -0.5,  0.5,  0.5,  0.5,  0.5, 0, -0.25, 0,  0.25),
-    (0,  0.25, 0, 0, -0.5,  0.5, -0.5, -0.5, 0, 0, 0, -0.25, -0.5, -0.5, -0.5,  0.5),
-    (0,  0.25,  0.25, 0, -0.5, -0.5,  0.5,  0.5, -0.5,  0.5, -0.5,  0.5, 0, 0, 0, 0),
-    (0, -0.25, 0, 0, -0.5,  0.5,  0.5,  0.5, 0, 0, -0.25, 0, -0.5, -0.5, -0.5,  0.5),
-    (0,  0.25, -0.25, 0,  0.5,  0.5,  0.5,  0.5,  0.5, -0.5, -0.5,  0.5, 0, 0, 0, 0)
-)
-
-
-SboxLut.xor_model = get_differential_wdt_model(
-    SboxLut, XorDiff, tuple([tuple(inf if x == 0 else -log2_decimal(x / Decimal(2 ** 4)) for x in row) for row in ddt]))
-SboxLut.linear_model = get_linear_wdt_model(
-    SboxLut, tuple([tuple(inf if x == 0 else -log2_decimal(Decimal(abs(x))) for x in row) for row in lat]))
+SboxLut.xor_model = get_differential_wdt_model(SboxLut, XorDiff, get_differential_wdt(SboxLut, 4, 4))
+SboxLut.linear_model = get_linear_wdt_model(SboxLut, get_linear_wdt(SboxLut, 4, 4))
 
 
 def sub_column(x):

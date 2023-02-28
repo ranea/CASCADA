@@ -2534,6 +2534,50 @@ def get_branch_number_model(op, diff_type, output_widths, branch_number, nonzero
 
 
 @functools.lru_cache(maxsize=None)
+def get_wdt(op, input_width, output_width):
+    """Return the weight distribution table of the given bit-vector operation ``op`` for WDT-based model.
+
+    Given the `Operation` ``op``, return the weight distribution table
+    as a `tuple` of `tuple` of ``op`` from Difference Distribution Table (DDT)
+    with given ``input_width`` and ``input_width``.
+
+    The returned table is a `tuple` of `tuple`.
+
+    .. note::
+        To link the returned model ``MyModel`` to ``op``
+        such that ``MyModel`` is used in ``propagate``,
+        set the ``xor_model`` or ``rx_model`` attribute of ``op``
+        to ``MyModel`` (e.g., ``op.xor_model = MyModel``).
+        See also  `differential.difference.XorDiff.propagate`
+        or `differential.difference.RXDiff.propagate`.
+
+    ::
+
+        >>> from cascada.bitvector.core import Constant
+        >>> from cascada.bitvector.secondaryop import LutOperation
+        >>> from cascada.differential.opmodel import get_wdt, get_wdt_model
+        >>> class SboxLut(LutOperation):
+        >>>     lut = [Constant(x, 4) for x in (6, 5, 12, 10, 1, 14, 7, 9, 11, 0, 3, 13, 8, 15, 4, 2)]
+        >>> SboxLut.xor_model = get_wdt_model(SboxLut, get_wdt(SboxLut, 4, 4))
+
+    """
+    assert issubclass(op, operation.Operation)
+
+    rows = 2 ** input_width
+    cols = 2 ** output_width
+    ddt = [0] * (rows * rows)
+
+    for i in range(rows):
+        t = int(op.eval(core.Constant(i, input_width)))
+
+        for j in range(rows):
+            ddt[(j * rows + t) ^ int(op.eval(core.Constant(i ^ j, input_width)))] += 1
+
+    ddt = [ddt[i:i + cols] for i in range(0, len(ddt), cols)]
+    return tuple([tuple(math.inf if x == 0 else -log2_decimal(x / decimal.Decimal(rows)) for x in row) for row in ddt])
+
+
+@functools.lru_cache(maxsize=None)
 def get_wdt_model(op, diff_type, weight_distribution_table, loop_rows_then_columns=True, precision=0):
     """Return the WDT-based model of the given bit-vector operation ``op``.
 
