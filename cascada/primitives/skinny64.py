@@ -37,7 +37,7 @@ class SboxLut(LutOperation):
     lut = [Constant(x, 4) for x in [12, 6, 9, 0, 1, 10, 2, 11, 3, 8, 5, 13, 4, 14, 7, 15]]
 
 
-SboxLut.xor_model = get_differential_wdt_model(SboxLut, XorDiff, get_differential_wdt(SboxLut, 4, 4))
+SboxLut.xor_model = get_differential_wdt_model(SboxLut, XorDiff, get_differential_wdt(SboxLut, XorDiff, 4, 4))
 SboxLut.linear_model = get_linear_wdt_model(SboxLut, get_linear_wdt(SboxLut, 4, 4))
 
 
