@@ -25,6 +25,7 @@
     RXModelBvLshrCt
     get_weak_model
     get_branch_number_model
+    get_wdt
     get_wdt_model
 """
 import functools
@@ -2534,44 +2535,52 @@ def get_branch_number_model(op, diff_type, output_widths, branch_number, nonzero
 
 
 @functools.lru_cache(maxsize=None)
-def get_wdt(op, input_width, output_width):
-    """Return the weight distribution table of the given bit-vector operation ``op`` for WDT-based model.
+def get_wdt(op, diff_type, input_width, output_width):
+    """Return the Weight Distribution Table of the given bit-vector operation ``op`` for `get_wdt_model`.
 
-    Given the `Operation` ``op``, return the weight distribution table
-    as a `tuple` of `tuple` of ``op`` from Difference Distribution Table (DDT)
-    with given ``input_width`` and ``input_width``.
+    Given the `Operation` ``op``, return the Weight Distribution Table
+    (a 2-dimensional tuple ``WDT`` such that  ``WDT[a][b]`` contains
+    the differential weight of the input-output `Difference` pair :math:`(a, b)`,
+    see `WDTModel`) for the given `Difference` type ``diff_type``,
+    the given input bitsize ``input_width`` and output bitsize ``output_width``.
 
-    The returned table is a `tuple` of `tuple`.
-
-    .. note::
-        To link the returned model ``MyModel`` to ``op``
-        such that ``MyModel`` is used in ``propagate``,
-        set the ``xor_model`` or ``rx_model`` attribute of ``op``
-        to ``MyModel`` (e.g., ``op.xor_model = MyModel``).
-        See also  `differential.difference.XorDiff.propagate`
-        or `differential.difference.RXDiff.propagate`.
+    The returned 2D `tuple` can be used as the parameter ``weight_distribution_table``
+    of `get_wdt_model`.
 
     ::
 
         >>> from cascada.bitvector.core import Constant
         >>> from cascada.bitvector.secondaryop import LutOperation
-        >>> from cascada.differential.opmodel import get_wdt, get_wdt_model
-        >>> class SboxLut(LutOperation):
-        >>>     lut = [Constant(x, 4) for x in (6, 5, 12, 10, 1, 14, 7, 9, 11, 0, 3, 13, 8, 15, 4, 2)]
-        >>> SboxLut.xor_model = get_wdt_model(SboxLut, get_wdt(SboxLut, 4, 4))
+        >>> from cascada.differential.difference import XorDiff
+        >>> from cascada.differential.opmodel import get_wdt, XorModelBvAddCt, make_partial_op_model
+        >>> class Sbox3b(LutOperation): lut = [Constant(x, 3) for x in (7,6,0,4,2,5,1,3)]
+        >>> wdt = get_wdt(Sbox3b, XorDiff, 3, 3)
+        >>> for row in wdt: print(row)
+        (Decimal('0'), inf, inf, inf, inf, inf, inf, inf)
+        (inf, Decimal('2'), Decimal('2'), inf, Decimal('2'), inf, inf, Decimal('2'))
+        (inf, inf, Decimal('2'), Decimal('2'), inf, inf, Decimal('2'), Decimal('2'))
+        (inf, Decimal('2'), inf, Decimal('2'), Decimal('2'), inf, Decimal('2'), inf)
+        (inf, Decimal('2'), inf, Decimal('2'), inf, Decimal('2'), inf, Decimal('2'))
+        (inf, inf, Decimal('2'), Decimal('2'), Decimal('2'), Decimal('2'), inf, inf)
+        (inf, Decimal('2'), Decimal('2'), inf, inf, Decimal('2'), Decimal('2'), inf)
+        (inf, inf, inf, inf, Decimal('2'), Decimal('2'), Decimal('2'), Decimal('2'))
 
     """
     assert issubclass(op, operation.Operation)
 
     rows = 2 ** input_width
     cols = 2 ** output_width
-    ddt = [0] * (rows * rows)
+    ddt = [0] * (rows * cols)
 
-    for i in range(rows):
-        t = int(op.eval(core.Constant(i, input_width)))
-
-        for j in range(rows):
-            ddt[(j * rows + t) ^ int(op.eval(core.Constant(i ^ j, input_width)))] += 1
+    for x in range(rows):
+        x = core.Constant(x, input_width)
+        y = op(x)
+        assert y.width == output_width
+        for in_d in range(rows):
+            in_d = diff_type(core.Constant(in_d, input_width))
+            out_d = diff_type.from_pair(y, op(in_d.get_pair_element(x)))
+            assert out_d.val.width == output_width
+            ddt[in_d.val.val * cols + out_d.val.val] += 1
 
     ddt = [ddt[i:i + cols] for i in range(0, len(ddt), cols)]
     return tuple([tuple(math.inf if x == 0 else -log2_decimal(x / decimal.Decimal(rows)) for x in row) for row in ddt])
@@ -2583,9 +2592,9 @@ def get_wdt_model(op, diff_type, weight_distribution_table, loop_rows_then_colum
 
     Given the `Operation` ``op``, return the `WDTModel`
     of ``op`` for the `Difference` type ``diff_type`` with given class
-    attributes ``weight_distribution_table``
-    (i.e., the Difference Distribution Table (DDT) given as a `tuple` of `tuple`
-    of differential weights),
+    attributes ``weight_distribution_table`` (i.e., a 2-dimensional tuple
+    like the Difference Distribution Table (DDT) but containing
+    the weights rather than the differential probabilities, see `WDTModel`),
     ``loop_rows_then_columns`` and  ``precision`` (see `WDTModel`).
 
     The returned model is a subclass of `WDTModel` and `OpModel`.

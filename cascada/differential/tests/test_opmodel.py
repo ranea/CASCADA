@@ -18,6 +18,7 @@ from hypothesis.strategies import integers, decimals, sampled_from, booleans
 
 from cascada.bitvector.core import Constant, Variable
 from cascada.bitvector.operation import BvComp, SecondaryOperation
+from cascada.bitvector.secondaryop import LutOperation
 from cascada.bitvector.context import Validation, Simplification
 
 from cascada.abstractproperty.tests.test_opmodel import TestOpModelGeneric as AbstractTestOpModelGeneric
@@ -30,7 +31,7 @@ from cascada.differential.opmodel import (
     RXModelBvAdd, RXModelBvSub, RXModelBvOr, RXModelBvAnd,
     RXModelBvIf, RXModelBvMaj, log2_decimal, make_partial_op_model,
     RXModelBvShlCt, RXModelBvLshrCt,
-    get_weak_model, get_branch_number_model, get_wdt_model
+    get_weak_model, get_branch_number_model, get_wdt_model, get_wdt
 )
 
 from cascada.differential.tests import preimageXDA
@@ -788,7 +789,7 @@ class TestBvAddCteModel(TestOpModelGeneric):
             super().tearDownClass()  # print errors
 
 
-class TestOtherOpModels(unittest.TestCase):
+class TestOtherOpModels(TestOpModelGeneric):
     """Test differential WeakModel and BranchNumberModel."""
 
     def _check_weak_model(self, my_model, width, num_inputs, verbose=False, write_msg=False):
@@ -937,7 +938,7 @@ class TestOtherOpModels(unittest.TestCase):
                                                      0 if nonzero2nonzero_weight == int(nonzero2nonzero_weight)
                                                      else 2 ** (-precision), msg=msg)
 
-    def _check_wdt_model(self, my_model, seed, verbose=False, write_msg=False):
+    def _check_wdt_model(self, my_model, seed, slow_check=False, verbose=False, write_msg=False):
         input_width = int(math.log2(len(my_model.weight_distribution_table)))
         output_width = int(math.log2(len(my_model.weight_distribution_table[0])))
         prop_type = my_model.prop_type
@@ -961,6 +962,7 @@ class TestOtherOpModels(unittest.TestCase):
             for input_val in range(2 ** input_width):
                 input_prop = prop_type(Constant(input_val, input_width))
                 f = my_model(input_prop)
+
                 for output_val in range(2 ** output_width):
                     output_prop = prop_type(Constant(output_val, output_width))
 
@@ -977,6 +979,13 @@ class TestOtherOpModels(unittest.TestCase):
                     if is_valid:
                         w = WDT[input_val][output_val]  # non-approximated decimal value
                         self.assertLessEqual(abs(decimal_weight - w), 0 if w == int(w) else 2 ** (-precision), msg=msg)
+
+                    if slow_check:
+                        self.base_test_op_model(my_model, input_prop, output_prop)
+                        self.base_test_pr_one_constraint_slow(my_model, input_prop, output_prop)
+                        # # does not work for linear
+                        # if output_prop.val == 0:
+                        #     self.base_test_op_model_sum_pr_1(my_model, input_prop)
 
     @unittest.skipIf(SKIP_LONG_TESTS, "skipping test_weak_model")
     @given(
@@ -1130,6 +1139,52 @@ class TestOtherOpModels(unittest.TestCase):
         )
 
         self._check_wdt_model(WDTModel, seed, verbose=VERBOSE)  # , write_msg=True)
+
+    @unittest.skipIf(SKIP_LONG_TESTS, "skipping test_wdt_model_lut")
+    @given(
+        sampled_from([XorDiff, RXDiff]),
+        integers(min_value=2, max_value=3),
+        integers(min_value=1, max_value=3),
+        integers(min_value=0),
+        booleans(),
+        integers(min_value=0, max_value=3),
+    )
+    @settings(deadline=None, max_examples=10000)
+    def test_wdt_model_lut(self, diff_type, input_width, output_width, seed, lrtc, precision):
+        self.__class__.PRNG.seed(seed)
+
+        assume(not (diff_type == RXDiff and (input_width == 1 or output_width == 1)))
+
+        class RandomLut(LutOperation):
+            lut = [Constant(self.__class__.PRNG.randint(0, 2 ** output_width - 1), output_width)
+                   for i in range(2 ** input_width)]
+
+        wdt = get_wdt(RandomLut, diff_type, input_width, output_width)
+
+        # # avoid non-zero weight 0.X in weight_distribution_table is 0 with precision 0
+        # # avoid precision = 1 != 0 but no non-integer weight was given
+        to_ignore = False
+        non_integer_w_found = False
+        for row in wdt:
+            for w in row:
+                if w != math.inf and w.as_integer_ratio()[1] != 1:
+                    non_integer_w_found = True
+                if 0 < w < 1:
+                    w = float(w)
+                    if w.hex()[-2] != "-":
+                        to_ignore = True
+                    if not to_ignore:
+                        precision = max(precision, int(w.hex()[-1]))
+
+        if not non_integer_w_found:
+            precision = 0
+
+        if not to_ignore:
+            WDTModel = get_wdt_model(
+                RandomLut, diff_type, wdt, loop_rows_then_columns=bool(lrtc), precision=precision
+            )
+
+            self._check_wdt_model(WDTModel, seed, slow_check=True, verbose=VERBOSE)  # , write_msg=True)
 
 
 # noinspection PyUnusedLocal

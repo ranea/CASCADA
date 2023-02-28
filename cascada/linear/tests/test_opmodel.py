@@ -12,6 +12,7 @@ from hypothesis import given, example, settings, assume  # unlimited, HealthChec
 from hypothesis.strategies import integers, decimals, booleans
 
 from cascada.bitvector.core import Constant, Variable
+from cascada.bitvector.secondaryop import LutOperation
 from cascada.bitvector.context import Validation, Simplification
 
 from cascada.abstractproperty.opmodel import log2_decimal
@@ -26,7 +27,7 @@ from cascada.linear.opmodel import (
     LinearModelBvAdd, LinearModelBvSub, LinearModelBvAnd, LinearModelBvXor, LinearModelBvOr,
     LinearModelBvAndCt, LinearModelBvOrCt, LinearModelExtractCt,
     LinearModelBvLshrCt, LinearModelBvShlCt, make_partial_op_model,
-    get_weak_model, get_branch_number_model, get_wdt_model
+    get_weak_model, get_branch_number_model, get_wdt_model, get_wdt
 )
 
 
@@ -201,7 +202,7 @@ class TestOpModelsSmallWidth(TestOpModelGeneric):
                     self.base_test_op_model_sum_pr_1(model, input_widths, output_mask)
 
 
-class TestOtherOpModels(DifferentialTestOtherOpModels):
+class TestOtherOpModels(TestOpModelGeneric, DifferentialTestOtherOpModels):
     """Test linear WeakModel and BranchNumberModel."""
 
     @unittest.skipIf(SKIP_LONG_TESTS, "skipping test_weak_model")
@@ -338,6 +339,49 @@ class TestOtherOpModels(DifferentialTestOtherOpModels):
         )
 
         self._check_wdt_model(WDTModel, seed, verbose=VERBOSE)  # , write_msg=True)
+
+    @unittest.skipIf(SKIP_LONG_TESTS, "skipping test_wdt_model_lut")
+    @given(
+        integers(min_value=2, max_value=3),
+        integers(min_value=1, max_value=3),
+        integers(min_value=0),
+        booleans(),
+        integers(min_value=0, max_value=3),
+    )
+    @settings(deadline=None, max_examples=10000)
+    def test_wdt_model_lut(self, input_width, output_width, seed, lrtc, precision):
+        self.__class__.PRNG.seed(seed)
+
+        class RandomLut(LutOperation):
+            lut = [Constant(self.__class__.PRNG.randint(0, 2 ** output_width - 1), output_width)
+                   for i in range(2 ** input_width)]
+
+        wdt = get_wdt(RandomLut, input_width, output_width)
+
+        # # avoid non-zero weight 0.X in weight_distribution_table is 0 with precision 0
+        # # avoid precision = 1 != 0 but no non-integer weight was given
+        to_ignore = False
+        non_integer_w_found = False
+        for row in wdt:
+            for w in row:
+                if w != math.inf and w.as_integer_ratio()[1] != 1:
+                    non_integer_w_found = True
+                if 0 < w < 1:
+                    w = float(w)
+                    if w.hex()[-2] != "-":
+                        to_ignore = True
+                    if not to_ignore:
+                        precision = max(precision, int(w.hex()[-1]))
+
+        if not non_integer_w_found:
+            precision = 0
+
+        if not to_ignore:
+            WDTModel = get_wdt_model(
+                RandomLut, wdt, loop_rows_then_columns=bool(lrtc), precision=precision
+            )
+
+            self._check_wdt_model(WDTModel, seed, slow_check=True, verbose=VERBOSE)  # , write_msg=True)
 
 
 # noinspection PyUnusedLocal

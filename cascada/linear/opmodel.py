@@ -19,6 +19,7 @@
     LinearModelExtractCt
     get_weak_model
     get_branch_number_model
+    get_wdt
     get_wdt_model
 """
 import functools
@@ -1431,29 +1432,30 @@ def get_branch_number_model(op, output_widths, branch_number, nonzero2nonzero_we
 
 @functools.lru_cache(maxsize=None)
 def get_wdt(op, input_width, output_width):
-    """Return the weight distribution table of the given bit-vector operation ``op`` for WDT-based model.
+    """Return the Weight Distribution Table of the given bit-vector operation ``op`` for `get_wdt_model`.
 
-    Given the `Operation` ``op``, return the weight distribution table
-    as a `tuple` of `tuple` of ``op`` from Linear Approximation Table (LAT)
-    of correlation weights with given ``input_width`` and ``input_width``.
-
-    The returned table is a `tuple` of `tuple`.
-
-    .. note::
-        To link the returned model ``MyModel`` to ``op``
-        such that ``MyModel`` is used in ``propagate``,
-        set the ``linear_model`` attribute of ``op``
-        to ``MyModel`` (e.g., ``op.linear_model = MyModel``).
-        See also  `linear.mask.LinearMask.propagate`.
+    Given the `Operation` ``op``, return the Weight Distribution Table
+    (a 2-dimensional tuple ``WDT`` such that  ``WDT[a][b]`` contains
+    the correlation weight of the input-output `LinearMask` pair :math:`(a, b)`,
+    see `WDTModel`) for the given input bitsize ``input_width``
+    and output bitsize ``output_width``.
 
     ::
 
         >>> from cascada.bitvector.core import Constant
         >>> from cascada.bitvector.secondaryop import LutOperation
         >>> from cascada.linear.opmodel import get_wdt, get_wdt_model
-        >>> class SboxLut(LutOperation):
-        >>>     lut = [Constant(x, 4) for x in (6, 5, 12, 10, 1, 14, 7, 9, 11, 0, 3, 13, 8, 15, 4, 2)]
-        >>> SboxLut.linear_model = get_wdt_model(SboxLut, get_wdt(SboxLut, 4, 4))
+        >>> class Sbox3b(LutOperation): lut = [Constant(x, 3) for x in (7,6,0,4,2,5,1,3)]
+        >>> wdt = get_wdt(Sbox3b, 3, 3)
+        >>> for row in wdt: print(row)
+        (Decimal('0'), inf, inf, inf, inf, inf, inf, inf)
+        (inf, inf, inf, inf, Decimal('1'), Decimal('1'), Decimal('1'), Decimal('1'))
+        (inf, inf, Decimal('1'), Decimal('1'), Decimal('1'), Decimal('1'), inf, inf)
+        (inf, inf, Decimal('1'), Decimal('1'), inf, inf, Decimal('1'), Decimal('1'))
+        (inf, Decimal('1'), inf, Decimal('1'), Decimal('1'), inf, Decimal('1'), inf)
+        (inf, Decimal('1'), inf, Decimal('1'), inf, Decimal('1'), inf, Decimal('1'))
+        (inf, Decimal('1'), Decimal('1'), inf, inf, Decimal('1'), Decimal('1'), inf)
+        (inf, Decimal('1'), Decimal('1'), inf, Decimal('1'), inf, inf, Decimal('1'))
 
     """
     assert issubclass(op, operation.Operation)
@@ -1463,12 +1465,15 @@ def get_wdt(op, input_width, output_width):
     lat = []
 
     for r in range(rows):
+        r = core.Constant(r, input_width)
         row = []
         for c in range(cols):
+            c = core.Constant(c, output_width)
             count = 0
             for i in range(rows):
-                input_hw = int(secondaryop.PopCount(core.Constant(i & r, input_width)))
-                output_hw = int(secondaryop.PopCount(op.eval(core.Constant(i, input_width)) & core.Constant(c, output_width)))
+                i = core.Constant(i, input_width)
+                input_hw = secondaryop.PopCount(i & r).val
+                output_hw = secondaryop.PopCount(op(i) & c).val
                 count += 1 - ((input_hw - output_hw) & 1)
 
             row.append((count * 2 - rows) / rows)
