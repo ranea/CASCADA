@@ -1,9 +1,28 @@
 """NOEKEON cipher."""
 from cascada.bitvector.core import Constant
-from cascada.bitvector.operation import RotateLeft, RotateRight, BvIdentity
+from cascada.bitvector.operation import RotateLeft, RotateRight, BvIdentity, Concat
+from cascada.bitvector.secondaryop import LutOperation
+from cascada.differential.difference import XorDiff
+from cascada.differential.opmodel import get_wdt as get_differential_wdt
+from cascada.differential.opmodel import get_wdt_model as get_differential_wdt_model
+from cascada.linear.opmodel import get_wdt as get_linear_wdt
+from cascada.linear.opmodel import get_wdt_model as get_linear_wdt_model
 
 from cascada.bitvector.ssa import BvFunction, RoundBasedFunction
 from cascada.primitives.blockcipher import Encryption, Cipher
+
+
+WDT_MODEL = True
+
+
+class SboxLut(LutOperation):
+    """The 4-bit S-box of NOEKEON."""
+    sbox = (7, 10, 2, 12, 4, 8, 15, 0, 5, 9, 1, 14, 3, 13, 11, 6)
+    lut = [Constant(x, 4) for x in sbox]
+
+
+SboxLut.xor_model = get_differential_wdt_model(SboxLut, XorDiff, get_differential_wdt(SboxLut, XorDiff, 4, 4))
+SboxLut.linear_model = get_linear_wdt_model(SboxLut, get_linear_wdt(SboxLut, 4, 4))
 
 
 def theta(x, k):
@@ -31,16 +50,33 @@ def theta(x, k):
 
 
 def gamma(x):
-    x[1] ^= ~(x[3] | x[2])
-    x[0] ^= x[2] & x[1]
+    if WDT_MODEL:
+        bits = x[0].width
 
-    t = x[3]
-    x[3] = x[0]
-    x[0] = t
-    x[2] ^= x[0] ^ x[1] ^ x[3]
+        for i in range(bits):
+            s = Concat(Concat(Concat(x[3][i], x[2][i]), x[1][i]), x[0][i])
+            s = SboxLut(s)
 
-    x[1] ^= ~(x[3] | x[2])
-    x[0] ^= x[2] & x[1]
+            for j in range(4):
+                if i == 0:
+                    x[j] = Concat(x[j][:1], s[j])
+                elif i == bits - 1:
+                    x[j] = Concat(s[j], x[j][bits - 2:])
+                else:
+                    x[j] = Concat(Concat(x[j][:i + 1], s[j]), x[j][i - 1:])
+                x[j] = BvIdentity(x[j])
+
+    else:
+        x[1] ^= ~(x[3] | x[2])
+        x[0] ^= x[2] & x[1]
+
+        t = x[3]
+        x[3] = x[0]
+        x[0] = t
+        x[2] ^= x[0] ^ x[1] ^ x[3]
+
+        x[1] ^= ~(x[3] | x[2])
+        x[0] ^= x[2] & x[1]
 
 
 def pi1(x):
