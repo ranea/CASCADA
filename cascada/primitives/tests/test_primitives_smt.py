@@ -84,9 +84,9 @@ ListSearchParameters = [
     SearchParameters(lea.LEACipher.key_schedule, xor_nr=2, rk_nr=None, linear_nr=None),  # BvAddCt, xor_nr slow, rk discards many ch due to EW
     SearchParameters(multi2.MULTI2Cipher, xor_nr=2, rk_nr=None, linear_nr=3, cipher_xor_nr=2, cipher_rx_nr=False),
     SearchParameters(multi2.MULTI2Cipher.key_schedule, xor_nr=True, rk_nr=False, linear_nr=None),  # BvAddCt
-    SearchParameters(noekeon.NOEKEONDirectCipher, xor_nr=False, linear_nr=False, cipher_xor_nr=1, cipher_rx_nr=None, ignore_linear_invalid=True, ignore_bitvalue=True),  # cipher_rx_nr=2 but 10+min,
-    SearchParameters(noekeon.NOEKEONIndirectCipher, xor_nr=False, rk_nr=None, linear_nr=False, cipher_xor_nr=False, cipher_rx_nr=None, ignore_linear_invalid=True, ignore_bitvalue=True),  # cipher_rx_nr=1 but 10min,
-    SearchParameters(noekeon.NOEKEONIndirectCipher.key_schedule, xor_nr=False, rk_nr=1, linear_nr=False, ignore_bitvalue=True),
+    SearchParameters(noekeon.NOEKEONDirectCipher, xor_nr=False, linear_nr=False, cipher_xor_nr=1, ignore_cipher_rx_invalid=True, ignore_linear_invalid=True, ignore_bitvalue=True),  # (rx requires non-WDT model, and then cipher_rx_nr=2 but 10+min)
+    SearchParameters(noekeon.NOEKEONIndirectCipher, xor_nr=False, linear_nr=False, cipher_xor_nr=False, ignore_cipher_rx_invalid=True, ignore_linear_invalid=True, ignore_bitvalue=True),  # (rx requires non-WDT model, and then cipher_rx_nr=1 but 10min)
+    SearchParameters(noekeon.NOEKEONIndirectCipher.key_schedule, xor_nr=False, rk_nr=None, linear_nr=False, ignore_bitvalue=True),  # (rx requires non-WDT model)
     SearchParameters(picipher.PiPermutation, xor_nr=False, rk_nr=None, linear_nr=None),  #   # weight rk > 200, BvAddCt
     SearchParameters(rectangle.RECTANGLE80Cipher, xor_nr=False, rk_nr=None, linear_nr=False, cipher_xor_nr=False, cipher_rx_nr=None, ignore_linear_invalid=True, ignore_bitvalue=True),  # cipher_rx_nr=1 but 10min,
     SearchParameters(rectangle.RECTANGLE80Cipher.key_schedule, xor_nr=False, rk_nr=1, linear_nr=False, ignore_bitvalue=True),
