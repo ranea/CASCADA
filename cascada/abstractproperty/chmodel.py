@@ -906,9 +906,10 @@ class EncryptionChModel(object):
         input_prop_names = [f"{prefix}p" + str(i) for i in range(num_inputs)]
         encryption_prefix = f"{prefix}x"
 
-        if round_keys_prefix is not None:
-            warnings.warn("the EncryptionChModel parameter round_keys_prefix is experimental")
+        if round_keys_prefix is None:
             round_keys_prefix = prefix
+        else:
+            warnings.warn("the EncryptionChModel parameter round_keys_prefix is experimental")
         _round_keys = []
         for i, width in enumerate(cipher.key_schedule.output_widths):
             _round_keys.append(core.Variable(f"{round_keys_prefix}k" + str(i), width))
