@@ -10,8 +10,6 @@ See also:
 resulting in 56 small rounds.
 """
 
-import enum
-
 from cascada.bitvector.core import Constant
 from cascada.bitvector.operation import RotateLeft, RotateRight, Extract, Concat
 from cascada.bitvector.secondaryop import LutOperation
@@ -20,8 +18,6 @@ from cascada.bitvector.ssa import RoundBasedFunction
 from cascada.primitives.blockcipher import Encryption, Cipher
 from cascada.differential.opmodel import get_weak_model as get_differential_weak_model
 from cascada.linear.opmodel import get_weak_model as get_linear_weak_model
-
-from pprint import pprint
 
 class BeltKeySchedule(RoundBasedFunction):
     """Key schedule for Belt."""
@@ -112,9 +108,9 @@ class BeltEncryption(Encryption, RoundBasedFunction):
             if i == cls.num_rounds:
                 break
             # step 4
-            e = BeltG(b + c + K[i], 21) ^ Constant(i // 7 + 1, 32)
-            b = b + e
-            c = c - e
+            c = c + b
+            b = b + (BeltG(c + K[i], 21) ^ Constant(i // 7 + 1, 32))
+            c = c - b
             cls.add_round_outputs(a, b, c, d)
             i += 1
             if i == cls.num_rounds:
