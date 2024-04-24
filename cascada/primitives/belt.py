@@ -19,6 +19,9 @@ from cascada.primitives.blockcipher import Encryption, Cipher
 from cascada.differential.opmodel import get_weak_model as get_differential_weak_model
 from cascada.linear.opmodel import get_weak_model as get_linear_weak_model
 
+from cascada.abstractproperty.opmodel import log2_decimal
+import decimal
+
 class BeltKeySchedule(RoundBasedFunction):
     """Key schedule for Belt."""
     num_rounds = 56
@@ -61,9 +64,11 @@ class SboxLut(LutOperation):
     """The 8-bit S-box of Belt."""
     lut = [Constant(x, 8) for x in _H]
 
-# weight 1 to count the number of active S-boxes
-SboxLut.xor_model = get_differential_weak_model(SboxLut, XorDiff, 1)
-SboxLut.linear_model = get_linear_weak_model(SboxLut, 1)
+max_ddt = 5 # -log2(8 / 256)
+SboxLut.xor_model = get_differential_weak_model(SboxLut, XorDiff, max_ddt)
+
+max_corr = -log2_decimal(decimal.Decimal(256 - 2 * 102) / 256)
+SboxLut.linear_model = get_linear_weak_model(SboxLut, max_corr)
 
 def BeltG(x, r):
     o1 = SboxLut(Extract(x, 7, 0))
