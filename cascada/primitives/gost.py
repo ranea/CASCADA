@@ -86,10 +86,25 @@ def get_GOST_instance(_sboxes):
         @classmethod
         def init(cls, lut):
             cls.lut = [Constant(x, 4) for x in lut]
-            cls.xor_model = get_differential_wdt_model(cls, XorDiff, 
-                get_differential_wdt(cls, XorDiff, 4, 4))
-            cls.linear_model = get_linear_wdt_model(cls, 
-                get_linear_wdt(cls, 4, 4))
+            # differential wdt
+            wdt = get_differential_wdt(cls, XorDiff, 4, 4)
+            min_wdt = min(min(wdt[1:], key=lambda row: min(row[1:])))
+            assert min_wdt > 0
+            prec = 0
+            while min_wdt < 1:
+               min_wdt = min_wdt * 2
+               prec = prec + 1
+            cls.xor_model = get_differential_wdt_model(cls, XorDiff, wdt, 
+                precision=prec)
+            # linear wdt
+            wdt = get_linear_wdt(cls, 4, 4)
+            min_wdt = min(min(wdt[1:], key=lambda row: min(row[1:])))
+            assert min_wdt > 0
+            prec = 0
+            while min_wdt < 1:
+               min_wdt = min_wdt * 2
+               prec = prec + 1
+            cls.linear_model = get_linear_wdt_model(cls, wdt, precision=prec)
     
     class GostEncryption(Encryption, RoundBasedFunction):
         num_rounds = 32
