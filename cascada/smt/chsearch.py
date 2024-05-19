@@ -2117,6 +2117,8 @@ def round_based_ch_search(
         if ChModelAssertType.ValidityAndWeight in list_assert_type:
             min_target_weight = math.inf
             for target_weight, ch in ch_finder.find_next_ch_increasing_weight(**extra_findnextchweight_args):
+                if target_weight is None:  # second time optimal ch is yielded
+                    continue
                 found_ch = True
                 min_target_weight = min(min_target_weight, target_weight)
                 sent_value = (yield (num_rounds, ch))
