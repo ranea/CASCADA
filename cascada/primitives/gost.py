@@ -76,7 +76,7 @@ def get_GOST_instance(_sboxes):
         @classmethod
         def eval(cls, *master_key):
             round_keys = [None for _ in range(cls.num_rounds)]
-            for i in range(24):
+            for i in range(min(cls.num_rounds, 24)):
                 round_keys[i] = master_key[i % 8]
             for i in range(24, cls.num_rounds):
                 round_keys[i] = master_key[cls.num_rounds - i - 1]
