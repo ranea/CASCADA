@@ -28,19 +28,6 @@ INSTALL_REQUIRES = [
     ]
 
 
-def _post_install(dir):
-    from subprocess import call
-    call([sys.executable, 'installBtor.py'],
-         cwd=os.path.join(dir, 'cascada'))
-
-
-class install(_install):
-    def run(self):
-        _install.run(self)
-        self.execute(_post_install, (self.install_lib,),
-                     msg="Running post install task")
-
-
 setup(
     name=PACKAGE_NAME,
     version=VERSION,
@@ -54,5 +41,4 @@ setup(
     license=LICENSE,
     packages=find_packages(),
     include_package_data=True,
-    cmdclass={'install': install}
 )
